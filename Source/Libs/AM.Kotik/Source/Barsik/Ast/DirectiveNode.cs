@@ -77,7 +77,7 @@ public sealed class DirectiveNode
 
         if (!success)
         {
-            context.Error?.WriteLine ($"Unknown directive {_command}");
+            context.Commmon.Error?.WriteLine ($"Unknown directive {_command}");
         }
     }
 

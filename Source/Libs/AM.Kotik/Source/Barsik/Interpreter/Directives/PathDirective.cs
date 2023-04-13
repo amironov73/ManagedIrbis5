@@ -61,13 +61,13 @@ public sealed class PathDirective
         {
             if (pathes.IsNullOrEmpty())
             {
-                context.Output?.WriteLine ("(no include path)");
+                context.Commmon.Output?.WriteLine ("(no include path)");
                 return;
             }
         
             foreach (var path in pathes)
             {
-                context.Output?.WriteLine (path);
+                context.Commmon.Output?.WriteLine (path);
             }
 
             return;

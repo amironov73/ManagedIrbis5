@@ -43,7 +43,7 @@ public sealed class UseDirective
         )
     {
         argument = argument.SafeTrim();
-        context = context.GetTopContext();
+        context = context.GetRootContext();
         if (string.IsNullOrEmpty (argument))
         {
             context.DumpNamespaces();

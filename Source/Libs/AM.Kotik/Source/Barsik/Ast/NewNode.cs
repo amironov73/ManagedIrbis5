@@ -76,7 +76,7 @@ internal sealed class NewNode
         var type = context.FindType (_typeName, _typeArguments);
         if (type is null)
         {
-            context.Error?.WriteLine($"Type '{_typeName}' not found");
+            context.Commmon.Error?.WriteLine($"Type '{_typeName}' not found");
             return null;
         }
 

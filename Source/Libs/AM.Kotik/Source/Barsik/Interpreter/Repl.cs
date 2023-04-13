@@ -80,12 +80,12 @@ public sealed class Repl
     /// <summary>
     /// Абстракция стандартного вывода.
     /// </summary>
-    public AttentiveWriter? Output => (AttentiveWriter?) Context.Output;
+    public AttentiveWriter? Output => (AttentiveWriter?) Context.Commmon.Output;
 
     /// <summary>
     /// Абстракция потока ошибок.
     /// </summary>
-    public TextWriter? Error => Context.Error;
+    public TextWriter? Error => Context.Commmon.Error;
 
     /// <summary>
     /// Абстракция входного потока.
@@ -110,7 +110,7 @@ public sealed class Repl
         output = new AttentiveWriter (output ?? Console.Out);
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
-        Interpreter.UserData["repl"] = this;
+        Interpreter.Context.UserData["repl"] = this;
         Echo = true;
         _input = new ReplInput (Input, output, Interpreter);
         if (LineEditor.IsSupported (AnsiConsole.Console))
@@ -130,13 +130,13 @@ public sealed class Repl
     {
         interpreter.MakeAttentive();
         Interpreter = interpreter;
-        Interpreter.UserData["repl"] = this;
-        Input = input ?? interpreter.Input;
+        Interpreter.Context.UserData["repl"] = this;
+        Input = input ?? interpreter.Context.Commmon.Input ?? Console.In;
         Echo = true;
         _input = new ReplInput
             (
                 Input,
-                interpreter.Output,
+                interpreter.Context.Commmon.Output ?? Console.Out,
                 interpreter
             );
         if (LineEditor.IsSupported (AnsiConsole.Console))

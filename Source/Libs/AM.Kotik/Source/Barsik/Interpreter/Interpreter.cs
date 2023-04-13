@@ -45,30 +45,25 @@ public sealed class Interpreter
 {
     #region Properties
 
-    /// <summary>
-    /// Стандартный входной поток.
-    /// </summary>
-    public TextReader Input { get; set; }
-
-    /// <summary>
-    /// Стандартный выходной поток.
-    /// </summary>
-    public TextWriter Output { get; set; }
-
-    /// <summary>
-    /// Стандартный поток ошибок.
-    /// </summary>
-    public TextWriter Error { get; set; }
+    // /// <summary>
+    // /// Стандартный входной поток.
+    // /// </summary>
+    // public TextReader Input { get; set; }
+    //
+    // /// <summary>
+    // /// Стандартный выходной поток.
+    // /// </summary>
+    // public TextWriter Output { get; set; }
+    //
+    // /// <summary>
+    // /// Стандартный поток ошибок.
+    // /// </summary>
+    // public TextWriter Error { get; set; }
 
     /// <summary>
     /// Дефайны.
     /// </summary>
     public Dictionary<string, dynamic?> Defines { get; }
-
-    /// <summary>
-    /// Произвольные пользовательские данные.
-    /// </summary>
-    public Dictionary<string, object?> UserData { get; }
 
     /// <summary>
     /// Отладчик скрипта.
@@ -113,11 +108,6 @@ public sealed class Interpreter
     public Dictionary<string, Assembly> Assemblies { get; }
 
     /// <summary>
-    /// Обработчик внешнего кода.
-    /// </summary>
-    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
-
-    /// <summary>
     /// Произвольные пользовательские данные, свяазанные с данным интерпретатором.
     /// </summary>
     public BarsikDictionary Auxiliary { get; }
@@ -150,17 +140,22 @@ public sealed class Interpreter
             InterpreterSettings? settings = null
         )
     {
-        Input = input ?? Console.In;
-        Output = output ?? Console.Out;
-        Error = error ?? Console.Error;
         Settings =  settings ?? InterpreterSettings.CreateDefault();
         AllowNewOperator = true;
         Defines = new ();
         Modules = new ();
         Assemblies = new ();
         Auxiliary = new ();
-        UserData = new ();
-        Context = new () { Interpreter = this };
+        Context = new ()
+        {
+            Interpreter = this,
+            Commmon =
+            {
+                Input = input ?? Console.In,
+                Output = output ?? Console.Out,
+                Error = error ?? Console.Error
+            }
+        };
 
         var path = Environment.GetEnvironmentVariable ("BARSIK_PATH") ?? string.Empty;
         Pathes = new (path.Split
@@ -290,9 +285,9 @@ public sealed class Interpreter
     /// </summary>
     internal void MakeAttentive()
     {
-        if (Output is not AttentiveWriter)
+        if (Context.Commmon.Output is { } output and not AttentiveWriter)
         {
-            Output = new AttentiveWriter (Output);
+            Context.Commmon.Output = new AttentiveWriter (output);
         }
     }
 
@@ -321,7 +316,7 @@ public sealed class Interpreter
 
         if (Settings.DebugParser)
         {
-            ParsingDebugOutput = Output;
+            ParsingDebugOutput = Context.Commmon.Output;
         }
 
         Settings.Grammar.Rebuild();
@@ -421,7 +416,7 @@ public sealed class Interpreter
                 {
                     if (!string.IsNullOrEmpty (executionResult.Message))
                     {
-                        interpreter.Output.WriteLine (executionResult.Message);
+                        interpreter.Context.Commmon.Output?.WriteLine (executionResult.Message);
                     }
 
                     return executionResult.ExitCode;
@@ -459,8 +454,11 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult DoRepl()
     {
-        Output.WriteLine ($"Meow interpreter {FileVersion}");
-        Output.WriteLine ("Press ENTER twice to exit");
+        if (Context.Commmon.Output is { } output)
+        {
+            output.WriteLine ($"Meow interpreter {FileVersion}");
+            output.WriteLine ("Press ENTER twice to exit");
+        }
 
         return new Repl (this).Loop();
     }
@@ -481,11 +479,11 @@ public sealed class Interpreter
                 Settings.Tokenizer,
                 ParsingDebugOutput
             );
-        if (Settings.DumpAst)
+        if (Settings.DumpAst && Context.Commmon.Output is { } output)
         {
-            Output.WriteLine (new string ('=', 60));
-            node.DumpHierarchyItem (null, 0, Output);
-            Output.WriteLine (new string ('=', 60));
+            output.WriteLine (new string ('=', 60));
+            node.DumpHierarchyItem (null, 0, output);
+            output.WriteLine (new string ('=', 60));
         }
 
         return node;
@@ -511,10 +509,10 @@ public sealed class Interpreter
                 traceOutput: null,
                 ParsingDebugOutput
             );
-        if (Settings.DumpAst)
+        if (Settings.DumpAst && Context.Commmon.Output is { } output)
         {
-            program.Dump (Output);
-            Output.WriteLine (new string ('=', 60));
+            program.Dump (output);
+            output.WriteLine (new string ('=', 60));
         }
 
         // отделяем отладочную печать парсеров от прочего вывода

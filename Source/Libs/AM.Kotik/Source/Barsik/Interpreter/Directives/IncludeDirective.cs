@@ -60,13 +60,13 @@ public sealed class IncludeDirective
             var pathes = interpreter.Pathes;
             if (pathes.IsNullOrEmpty())
             {
-                context.Output?.WriteLine ("(no include pathes)");
+                context.Commmon.Output?.WriteLine ("(no include pathes)");
                 return;
             }
             
             foreach (var path in pathes)
             {
-                context.Output?.WriteLine (path);
+                context.Commmon.Output?.WriteLine (path);
             }
 
             return;

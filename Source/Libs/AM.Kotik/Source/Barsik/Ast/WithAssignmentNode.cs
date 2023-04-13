@@ -72,14 +72,14 @@ internal sealed class WithAssignmentNode
         var center = context.With;
         if (center is null)
         {
-            context.Interpreter?.Error.WriteLine ("Bad with block");
+            context.Interpreter?.Context.Commmon.Error?.WriteLine ("Bad with block");
             return;
         }
 
         var objectValue = center.Compute (context);
         if (objectValue is null)
         {
-            context.Interpreter?.Error.WriteLine($"Can't assign to null");
+            context.Interpreter?.Context.Commmon.Error?.WriteLine($"Can't assign to null");
             return;
         }
 
@@ -131,7 +131,7 @@ internal sealed class WithAssignmentNode
             return;
         }
 
-        context.Error?.WriteLine ("Can't handle assignment");
+        context.Commmon.Error?.WriteLine ("Can't handle assignment");
     }
 
     #endregion

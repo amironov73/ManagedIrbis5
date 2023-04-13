@@ -186,7 +186,7 @@ public static class Builtins
     {
         if (args.Length < 1)
         {
-            context.Error?.WriteLine ("Too few arguments for apply");
+            context.Commmon.Error?.WriteLine ("Too few arguments for apply");
             return null;
         }
 
@@ -269,7 +269,7 @@ public static class Builtins
     {
         if (args.Length < 1)
         {
-            context.Error?.WriteLine ("Too few arguments for apply");
+            context.Commmon.Error?.WriteLine ("Too few arguments for apply");
             return null;
         }
 
@@ -376,7 +376,7 @@ public static class Builtins
         }
 
         var value = Compute (context, args, 1);
-        context.GetTopContext().Interpreter.ThrowIfNull().SetDefine (name, value);
+        context.GetRootContext().Interpreter.ThrowIfNull().SetDefine (name, value);
 
         return null;
     }
@@ -471,7 +471,7 @@ public static class Builtins
         var text = ComputeAll (context, args);
         if (!string.IsNullOrEmpty (text))
         {
-            context.Error?.WriteLine (text);
+            context.Commmon.Error?.WriteLine (text);
         }
 
         return null;
@@ -518,7 +518,7 @@ public static class Builtins
     {
         if (args.Length < 2)
         {
-            context.Error?.WriteLine ("Too few arguments for filter");
+            context.Commmon.Error?.WriteLine ("Too few arguments for filter");
             return null;
         }
 
@@ -694,7 +694,7 @@ public static class Builtins
     {
         if (args.Length < 2)
         {
-            context.Error?.WriteLine ("Too few arguments for map");
+            context.Commmon.Error?.WriteLine ("Too few arguments for map");
             return null;
         }
 
@@ -861,7 +861,7 @@ public static class Builtins
     {
         foreach (var node in args)
         {
-            KotikUtility.PrintObject (context.Output, node);
+            KotikUtility.PrintObject (context.Commmon.Output, node);
         }
 
         return null;
@@ -878,7 +878,7 @@ public static class Builtins
         )
     {
         Print (context, args);
-        context.Output?.WriteLine();
+        context.Commmon.Output?.WriteLine();
 
         return null;
     }
@@ -910,7 +910,7 @@ public static class Builtins
             dynamic?[] args
         )
     {
-        return context.Input?.ReadLine();
+        return context.Commmon.Input?.ReadLine();
     }
 
     /// <summary>
@@ -924,7 +924,7 @@ public static class Builtins
     {
         if (args.Length < 3)
         {
-            context.Error?.WriteLine ("Too few arguments for reduce");
+            context.Commmon.Error?.WriteLine ("Too few arguments for reduce");
             return null;
         }
 

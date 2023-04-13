@@ -48,7 +48,7 @@ public sealed class ModuleDirective
             string? argument
         )
     {
-        var interpreter = context.GetTopContext().Interpreter;
+        var interpreter = context.GetRootContext().Interpreter;
         if (interpreter is not null)
         {
             if (string.IsNullOrEmpty (argument))
@@ -56,12 +56,12 @@ public sealed class ModuleDirective
                 var modules = interpreter.Modules;
                 foreach (var module in modules)
                 {
-                    context.Output?.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
+                    context.Commmon.Output?.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
                 }
 
                 if (modules.Count == 0)
                 {
-                    context.Output?.WriteLine ("(no modules loaded)");
+                    context.Commmon.Output?.WriteLine ("(no modules loaded)");
                 }
             }
             else
@@ -76,7 +76,7 @@ public sealed class ModuleDirective
                     if (subCommand.SameString ("unload"))
                     {
                         var success = interpreter.UnloadModule (subArgument);
-                        context.Output?.WriteLine ($"Unload module {subArgument}: {success}");
+                        context.Commmon.Output?.WriteLine ($"Unload module {subArgument}: {success}");
                     }
                 }
                 else

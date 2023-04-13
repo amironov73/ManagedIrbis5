@@ -57,7 +57,7 @@ public sealed class AssemblyDirective
 
             foreach (var assembly in assemblies)
             {
-                context.Output?.WriteLine (assembly.FullName);
+                context.Commmon.Output?.WriteLine (assembly.FullName);
             }
         }
         else
@@ -71,11 +71,11 @@ public sealed class AssemblyDirective
                 var asm = context.LoadAssembly (argument);
                 if (asm is null)
                 {
-                    context.Error?.WriteLine ($"Faield to load assembly: {argument}");
+                    context.Commmon.Error?.WriteLine ($"Faield to load assembly: {argument}");
                 }
                 else
                 {
-                    context.Output?.WriteLine ($"Loaded: {asm}");
+                    context.Commmon.Output?.WriteLine ($"Loaded: {asm}");
                 }
             }
         }

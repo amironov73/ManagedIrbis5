@@ -44,19 +44,10 @@ public sealed class Context
     public Interpreter? Interpreter { get; internal init; }
 
     /// <summary>
-    /// Выходной поток, ассоциированный с интерпретатором.
+    /// Общая часть контекста (чтобы не копировать
+    /// по всем дочерним контекстам).
     /// </summary>
-    public TextWriter? Output => Interpreter?.Output;
-
-    /// <summary>
-    /// Поток ошибок, ассоциированный с интерпретатором.
-    /// </summary>
-    public TextWriter? Error => Interpreter?.Error;
-
-    /// <summary>
-    /// Входной поток, ассоциированный с интерпретатором.
-    /// </summary>
-    public TextReader? Input => Interpreter?.Input;
+    public CommonContext Commmon { get; }
 
     /// <summary>
     /// Родительский контекст.
@@ -84,6 +75,16 @@ public sealed class Context
     /// </summary>
     public AtomNode? With { get; set; }
 
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public Dictionary<string, object?> UserData { get; }
+
+    /// <summary>
+    /// Обработчик внешнего кода.
+    /// </summary>
+    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+
     #endregion
 
     #region Construction
@@ -101,6 +102,8 @@ public sealed class Context
         Variables = new ();
         Functions = new ();
         Namespaces = new ();
+        UserData = new ();
+        Commmon = parent?.Commmon ?? new ();
 
         var comparer = OperatingSystem.IsWindows()
             ? StringComparer.InvariantCultureIgnoreCase
@@ -157,18 +160,18 @@ public sealed class Context
     /// </summary>
     public void DumpNamespaces()
     {
-        var interpreter = GetTopContext().Interpreter;
+        var interpreter = GetRootContext().Interpreter;
         var keys = Namespaces.Keys.ToArray();
         if (keys.IsNullOrEmpty())
         {
-            interpreter?.Output.WriteLine ("(no namespaces)");
+            interpreter?.Context.Commmon.Output?.WriteLine ("(no namespaces)");
             return;
         }
 
         Array.Sort (keys);
         foreach (var key in keys)
         {
-            interpreter?.Output.WriteLine (key);
+            interpreter?.Context.Commmon.Output?.WriteLine (key);
         }
     }
 
@@ -180,11 +183,11 @@ public sealed class Context
         var keys = Variables.Keys.ToArray();
 
         Array.Sort (keys);
-        var interpreter = GetTopContext().Interpreter;
+        var interpreter = GetRootContext().Interpreter;
         foreach (var key in keys)
         {
             var value = Variables[key];
-            interpreter?.Output.WriteLine
+            interpreter?.Context.Commmon.Output?.WriteLine
                 (
                     value is null
                         ? $"{key}: (null)"
@@ -194,7 +197,7 @@ public sealed class Context
 
         if (keys.Length == 0)
         {
-            interpreter?.Output.WriteLine ("(no variables in the context)");
+            interpreter?.Context.Commmon.Output?.WriteLine ("(no variables in the context)");
         }
     }
 
@@ -296,7 +299,7 @@ public sealed class Context
             return ConstructType (result, typeArguments);
         }
 
-        var topContext = GetTopContext();
+        var topContext = GetRootContext();
         var interpreter = topContext.Interpreter.ThrowIfNull();
         if (!name.Contains ('.'))
         {
@@ -366,10 +369,10 @@ public sealed class Context
     }
 
     /// <summary>
-    /// Получение топового контекста, используемого как свалка
+    /// Получение корневого контекста, используемого как свалка
     /// для регистрации модулей и сборок.
     /// </summary>
-    public Context GetTopContext()
+    public Context GetRootContext()
     {
         var result = this;
 
@@ -397,7 +400,7 @@ public sealed class Context
             throw new BarsikException();
         }
 
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
         if (interpreter.Assemblies.TryGetValue (name, out var foundAssembly))
         {
             // уже загружено, пропускаем
@@ -476,10 +479,10 @@ public sealed class Context
         )
     {
         var value = node.Compute (this);
-        var interpreter = GetTopContext().Interpreter;
+        var interpreter = GetRootContext().Interpreter;
         if (interpreter is not null)
         {
-            KotikUtility.PrintObject (interpreter.Output, value);
+            KotikUtility.PrintObject (interpreter.Context.Commmon.Output, value);
         }
     }
 
@@ -529,7 +532,7 @@ public sealed class Context
             throw new BarsikException ($"{name} used by builtin function");
         }
 
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
         if (interpreter.Defines.ContainsKey (name))
         {
             throw new BarsikException ($"Can't redefine {name}");
@@ -564,7 +567,7 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        var interpreter = GetTopContext().Interpreter.ThrowIfNull();
+        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
         if (interpreter.Defines.TryGetValue (name, out value) ||
             Variables.TryGetValue (name, out value))
         {

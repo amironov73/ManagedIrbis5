@@ -3,9 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConvertIfStatementToConditionalTernaryExpression
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* StandardDumper.cs -- стандартный дампер контекста.
  * Ars Magna project, http://arsmagna.ru
@@ -32,8 +30,7 @@ public sealed class StandardDumper
     {
         Sure.NotNull (context);
 
-        var output = context.Output;
-        if (output is not null)
+        if (context.Commmon.Output is { } output)
         {
             output.WriteLine (new string ('=', 60));
             context.DumpVariables();

@@ -24,7 +24,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
-using System.Xml.Linq;
 
 using AM.Configuration;
 using AM.IO;
@@ -135,7 +134,7 @@ public sealed class StdLib
         {
             if (verbose)
             {
-                context.Error?.WriteLine ($"Variable {CacheDefineName} not found");
+                context.Commmon.Error?.WriteLine ($"Variable {CacheDefineName} not found");
             }
             return false;
         }
@@ -148,7 +147,7 @@ public sealed class StdLib
 
         if (verbose)
         {
-            context.Error?.WriteLine ($"Bad value of {CacheDefineName}: {value}");
+            context.Commmon.Error?.WriteLine ($"Bad value of {CacheDefineName}: {value}");
         }
 
         return false;
@@ -181,7 +180,7 @@ public sealed class StdLib
             type = context.FindType (typeName);
             if (type is null)
             {
-                context.Error?.WriteLine ($"Can't find type {typeName}");
+                context.Commmon.Error?.WriteLine ($"Can't find type {typeName}");
                 return null;
             }
         }
@@ -207,7 +206,7 @@ public sealed class StdLib
         var interpreter = context.Interpreter;
         if (interpreter is null)
         {
-            context.Error?.WriteLine ("Interpreter is null");
+            context.Commmon.Error?.WriteLine ("Interpreter is null");
             return null;
         }
 
@@ -228,7 +227,7 @@ public sealed class StdLib
             if (program.Statements.Last() is not SimpleStatement last)
             {
                 // последний стейтмент должен быть выражением
-                context.Error?.WriteLine ("Last statement must be expression");
+                context.Commmon.Error?.WriteLine ("Last statement must be expression");
                 return null;
             }
 
@@ -284,7 +283,7 @@ public sealed class StdLib
             target = context.FindType (typeName);
             if (target is null)
             {
-                context.Error?.WriteLine ($"Can't find type {typeName}");
+                context.Commmon.Error?.WriteLine ($"Can't find type {typeName}");
                 return null;
             }
         }
@@ -327,7 +326,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine ($"Error changing directory: {exception.Message}");
+            context.Commmon.Error?.WriteLine ($"Error changing directory: {exception.Message}");
         }
 
         return Environment.CurrentDirectory;
@@ -444,7 +443,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine (exception.Message);
+            context.Commmon.Error?.WriteLine (exception.Message);
         }
 
         return null;
@@ -474,7 +473,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine (exception.Message);
+            context.Commmon.Error?.WriteLine (exception.Message);
         }
 
         return null;
@@ -568,7 +567,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine ($"Error reading file {fileName}: {exception.Message}");
+            context.Commmon.Error?.WriteLine ($"Error reading file {fileName}: {exception.Message}");
         }
 
         return null;
@@ -607,7 +606,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine ($"Error writing file {fileName}: {exception.Message}");
+            context.Commmon.Error?.WriteLine ($"Error writing file {fileName}: {exception.Message}");
         }
 
         return null;
@@ -956,7 +955,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var topContext = context.GetTopContext();
+        var topContext = context.GetRootContext();
         Assembly? result = null;
         for (var i = 0; i < args.Length; i++)
         {
@@ -985,7 +984,7 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (name))
             {
                 name = name.Trim();
-                context.GetTopContext().Interpreter!.LoadModule (name);
+                context.GetRootContext().Interpreter!.LoadModule (name);
             }
         }
 
@@ -1112,7 +1111,7 @@ public sealed class StdLib
                 }
                 catch (Exception exception)
                 {
-                    context.Error?.WriteLine ($"Error removing file {path}: {exception.Message}");
+                    context.Commmon.Error?.WriteLine ($"Error removing file {path}: {exception.Message}");
                 }
             }
         }
@@ -1146,7 +1145,7 @@ public sealed class StdLib
         }
         catch (Exception exception)
         {
-            context.Error?.WriteLine ($"Error renaming {oldName} to {newName}: {exception.Message}");
+            context.Commmon.Error?.WriteLine ($"Error renaming {oldName} to {newName}: {exception.Message}");
             return 1;
         }
 
@@ -1336,7 +1335,7 @@ public sealed class StdLib
             dynamic?[] args
         )
     {
-        var topContext = context.GetTopContext();
+        var topContext = context.GetRootContext();
         for (var i = 0; i < args.Length; i++)
         {
             var name = Compute (context, args, i) as string;

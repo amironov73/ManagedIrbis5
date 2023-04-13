@@ -42,11 +42,10 @@ public sealed class EchoDirective
             string? argument
         )
     {
-        var interpreter = context.Interpreter;
-        if (interpreter is not null)
+        var rootContext = context.GetRootContext();
+        var repl = (Repl?) rootContext.UserData["repl"];
+        if (repl is not null)
         {
-            var repl = (Repl) interpreter.UserData["repl"].ThrowIfNull();
-
             var echo = repl.Echo;
             if (argument.SameString ("on"))
             {
@@ -59,7 +58,7 @@ public sealed class EchoDirective
 
             var onoff = echo ? "on" : "off";
             repl.Echo = echo;
-            context.Output?.WriteLine ($"Echo is {onoff} now");
+            context.Commmon.Output?.WriteLine ($"Echo is {onoff} now");
         }
     }
 
