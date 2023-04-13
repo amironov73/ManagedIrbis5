@@ -1,6 +1,11 @@
-﻿// ReSharper disable IdentifierTypo
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable IdentifierTypo
 // ReSharper disable CheckNamespace
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System.IO;
 
@@ -12,72 +17,74 @@ using ManagedIrbis.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+#endregion
+
 #nullable enable
 
-namespace UnitTests.ManagedIrbis.Client
+namespace UnitTests.ManagedIrbis.Client;
+
+[TestClass]
+public class DisplayIniSectionTest
+    : Common.CommonUnitTest
 {
-    [TestClass]
-    public class DisplayIniSectionTest
-        : Common.CommonUnitTest
+    private string _GetFileName() =>
+        Path.Combine (Irbis64RootPath, "irbisc.ini");
+
+    private IniFile _GetIniFile() =>
+        new (_GetFileName(), IrbisEncoding.Ansi);
+
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void DisplayIniSection_Construction_1()
     {
-        private string _GetFileName()
-        {
-            return Path.Combine (Irbis64RootPath, "irbisc.ini");
-        }
+        var section = new DisplayIniSection();
+        Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
+    }
 
-        private IniFile _GetIniFile()
-        {
-            return new (_GetFileName(), IrbisEncoding.Ansi);
-        }
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void DisplayIniSection_Construction_2()
+    {
+        var iniFile = _GetIniFile();
+        var section = new DisplayIniSection (iniFile);
+        Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
+        Assert.AreSame (iniFile, section.Section.Owner);
+        iniFile.Dispose();
+    }
 
-        [TestMethod]
-        public void DisplayIniSection_Construction_1()
-        {
-            var section = new DisplayIniSection();
-            Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
-        }
+    [TestMethod]
+    [Description ("Конструктор")]
+    public void DisplayIniSection_Construction_3()
+    {
+        var iniFile = _GetIniFile();
+        var iniSection = iniFile.GetSection (DisplayIniSection.SectionName);
+        Assert.IsNotNull (iniSection);
+        var section = new DisplayIniSection (iniSection);
+        Assert.AreSame (iniSection, section.Section);
+        Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
+        Assert.AreSame (iniFile, section.Section.Owner);
+        iniFile.Dispose();
+    }
 
-        [TestMethod]
-        public void DisplayIniSection_Construction_2()
-        {
-            var iniFile = _GetIniFile();
-            var section = new DisplayIniSection (iniFile);
-            Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
-            Assert.AreSame (iniFile, section.Section.Owner);
-            iniFile.Dispose();
-        }
+    [TestMethod]
+    [Description ("Получение значения MaxBriefPortion")]
+    public void DisplayIniSection_MaxBriefPortion_1()
+    {
+        var section = new DisplayIniSection();
+        Assert.AreEqual (6, section.MaxBriefPortion);
+        section.MaxBriefPortion = 12345;
+        var actual = section.ToString().DosToUnix();
+        Assert.AreEqual ("[Display]\nMaxBriefPortion=12345\n", actual);
+    }
 
-        [TestMethod]
-        public void DisplayIniSection_Construction_3()
-        {
-            var iniFile = _GetIniFile();
-            var iniSection = iniFile.GetSection (DisplayIniSection.SectionName);
-            Assert.IsNotNull (iniSection);
-            var section = new DisplayIniSection (iniSection);
-            Assert.AreSame (iniSection, section.Section);
-            Assert.AreEqual (DisplayIniSection.SectionName, section.Section.Name);
-            Assert.AreSame (iniFile, section.Section.Owner);
-            iniFile.Dispose();
-        }
-
-        [TestMethod]
-        public void DisplayIniSection_MaxBriefPortion_1()
-        {
-            var section = new DisplayIniSection();
-            Assert.AreEqual (6, section.MaxBriefPortion);
-            section.MaxBriefPortion = 12345;
-            var actual = section.ToString().DosToUnix();
-            Assert.AreEqual ("[Display]\nMaxBriefPortion=12345\n", actual);
-        }
-
-        [TestMethod]
-        public void DisplayIniSection_MaxMarked_1()
-        {
-            var section = new DisplayIniSection();
-            Assert.AreEqual (100, section.MaxMarked);
-            section.MaxMarked = 12345;
-            var actual = section.ToString().DosToUnix();
-            Assert.AreEqual ("[Display]\nMaxMarked=12345\n", actual);
-        }
+    [TestMethod]
+    [Description ("Получение MaxMarked")]
+    public void DisplayIniSection_MaxMarked_1()
+    {
+        var section = new DisplayIniSection();
+        Assert.AreEqual (100, section.MaxMarked);
+        section.MaxMarked = 12345;
+        var actual = section.ToString().DosToUnix();
+        Assert.AreEqual ("[Display]\nMaxMarked=12345\n", actual);
     }
 }

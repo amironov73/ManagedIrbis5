@@ -2,12 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* DisplayIniSection.cs -- DISPLAY-секция INI-файла для клиента
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +14,8 @@
 using System.ComponentModel;
 
 using AM.IO;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -31,6 +29,7 @@ namespace ManagedIrbis.Client;
 /// <remarks>
 /// Находится в серверном INI-файле irbisc.ini.
 /// </remarks>
+[PublicAPI]
 public sealed class DisplayIniSection
     : AbstractIniSection
 {

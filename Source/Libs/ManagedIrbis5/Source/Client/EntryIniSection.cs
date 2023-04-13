@@ -19,6 +19,8 @@ using System.Xml.Serialization;
 using AM;
 using AM.IO;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -31,6 +33,7 @@ namespace ManagedIrbis.Client;
 /// <remarks>
 /// Находится в серверном INI-файле irbisc.ini.
 /// </remarks>
+[PublicAPI]
 public sealed class EntryIniSection
     : AbstractIniSection
 {
