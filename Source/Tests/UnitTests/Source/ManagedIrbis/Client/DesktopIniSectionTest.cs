@@ -1,6 +1,11 @@
-﻿// ReSharper disable IdentifierTypo
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable IdentifierTypo
 // ReSharper disable CheckNamespace
 // ReSharper disable StringLiteralTypo
+
+#region Using directives
 
 using System.IO;
 
@@ -11,6 +16,8 @@ using ManagedIrbis.Client;
 using ManagedIrbis.Infrastructure;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 
@@ -58,7 +65,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
-    [Description ("Автосервис")]
+    [Description ("Получение значения для Автосервиса")]
     public void DesktopIniSection_AutoService_1()
     {
         var section = new DesktopIniSection();
@@ -69,6 +76,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для DBContext")]
     public void DesktopIniSection_DBContext_1()
     {
         var section = new DesktopIniSection();
@@ -79,6 +87,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для DBContextFloating")]
     public void DesktopIniSection_DBContextFloating_1()
     {
         var section = new DesktopIniSection();
@@ -89,6 +98,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для DBOpen")]
     public void DesktopIniSection_DBOpen_1()
     {
         var section = new DesktopIniSection();
@@ -99,6 +109,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для DBOpenFloating")]
     public void DesktopIniSection_DBOpenFloating_1()
     {
         var section = new DesktopIniSection();
@@ -109,6 +120,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для Entry")]
     public void DesktopIniSection_Entry_1()
     {
         var section = new DesktopIniSection();
@@ -119,6 +131,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для EntryFloating")]
     public void DesktopIniSection_EntryFloating_1()
     {
         var section = new DesktopIniSection();
@@ -129,6 +142,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для MainMenu")]
     public void DesktopIniSection_MainMenu_1()
     {
         var section = new DesktopIniSection();
@@ -139,6 +153,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для MainMenuFloating")]
     public void DesktopIniSection_MainMenuFloating_1()
     {
         var section = new DesktopIniSection();
@@ -149,6 +164,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для Search")]
     public void DesktopIniSection_Search_1()
     {
         var section = new DesktopIniSection();
@@ -159,6 +175,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для SearchFloating")]
     public void DesktopIniSection_SearchFloating_1()
     {
         var section = new DesktopIniSection();
@@ -169,6 +186,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для Spelling")]
     public void DesktopIniSection_Spelling_1()
     {
         var section = new DesktopIniSection();
@@ -179,6 +197,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для UserMode")]
     public void DesktopIniSection_UserMode_1()
     {
         var section = new DesktopIniSection();
@@ -189,6 +208,7 @@ public class DesktopIniSectionTest
     }
 
     [TestMethod]
+    [Description ("Получение значения для UserModeFloating")]
     public void DesktopIniSection_UserModeFloating_1()
     {
         var section = new DesktopIniSection();
