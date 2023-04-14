@@ -468,7 +468,6 @@ internal sealed class LinqNode
         var rank = fromRank + joinRank;
         var variables = context.Variables;
         var sequences = new List<IReadOnlyList<dynamic?>>();
-        var interpreter = context.Interpreter.ThrowIfNull();
         foreach (var clause in _fromClauses)
         {
             for (var i = 0; i < fromRank; i++)
@@ -479,7 +478,7 @@ internal sealed class LinqNode
                 Sure.AssertState (!context.Parent!.TryGetVariable (variableName, out _));
 
                 // это должно быть lvalue
-                Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, variableName));
+                Sure.AssertState (context.EnsureVariableCanBeAssigned (variableName));
 
                 // имя переменной не должно повторяться в текущем контексте
                 var count = _fromClauses.Count (x => x.VariableName == variableName);
@@ -518,7 +517,7 @@ internal sealed class LinqNode
                 Sure.AssertState (!context.Parent!.TryGetVariable (variableName, out _));
 
                 // это должно быть lvalue
-                Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, variableName));
+                Sure.AssertState (context.EnsureVariableCanBeAssigned (variableName));
 
                 // имя переменной не должно повторяться в текущем контексте
                 var count = _fromClauses.Count (x => x.VariableName == variableName);

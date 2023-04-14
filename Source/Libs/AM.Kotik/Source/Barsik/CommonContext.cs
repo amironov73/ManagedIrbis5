@@ -11,7 +11,13 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+
+using AM.Kotik.Barsik.Diagnostics;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -23,6 +29,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Общая часть контекста исполнения скрипта.
 /// </summary>
+[PublicAPI]
 public sealed class CommonContext
 {
     #region Properties
@@ -47,6 +54,37 @@ public sealed class CommonContext
     /// Применяются перед началом разбора и исполнения скрипта.
     /// </summary>
     public InterpreterSettings Settings { get; set; } = null!;
+
+    /// <summary>
+    /// Произвольные пользовательские данные, свяазанные
+    /// с контекстом выполнения скрипта.
+    /// </summary>
+    public BarsikDictionary Auxiliary { get; } = new ();
+
+    /// <summary>
+    /// Загруженные модули.
+    /// </summary>
+    public List<IBarsikModule> Modules { get; } = new ();
+
+    /// <summary>
+    /// Загруженные сборки (чтобы не писать assembly-qualified type name).
+    /// </summary>
+    public Dictionary<string, Assembly> Assemblies { get; } = new ();
+
+    /// <summary>
+    /// Дефайны.
+    /// </summary>
+    public Dictionary<string, dynamic?> Defines { get; } = new ();
+
+    /// <summary>
+    /// Отладчик скрипта.
+    /// </summary>
+    public IBarsikDebugger? ScriptDebugger { get; set; }
+
+    /// <summary>
+    /// Поток для отладочного вывода при парсинге скрипта.
+    /// </summary>
+    public TextWriter? ParsingDebugOutput { get; set; }
 
     #endregion
 }

@@ -376,7 +376,7 @@ public static class Builtins
         }
 
         var value = Compute (context, args, 1);
-        context.GetRootContext().Interpreter.ThrowIfNull().SetDefine (name, value);
+        context.GetRootContext().SetDefine (name, value);
 
         return null;
     }

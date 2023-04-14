@@ -67,8 +67,7 @@ internal sealed class NewNode
             Context context
         )
     {
-        var interpreter = context.Interpreter.ThrowIfNull();
-        if (!interpreter.AllowNewOperator)
+        if (!context.Commmon.Settings.AllowNewOperator)
         {
             throw new BarsikException ("Operator NEW is not allowed");
         }

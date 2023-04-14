@@ -203,19 +203,12 @@ public sealed class StdLib
             return null;
         }
 
-        var interpreter = context.Interpreter;
-        if (interpreter is null)
-        {
-            context.Commmon.Error?.WriteLine ("Interpreter is null");
-            return null;
-        }
-
         dynamic? value;
-        var settings = interpreter.Context.Commmon.Settings;
+        var settings = context.Commmon.Settings;
         var program = settings.Grammar.ParseProgram (bon, settings.Tokenizer);
         if (program.Statements.Count == 1)
         {
-            var expression = interpreter.EvaluateAtom (bon);
+            var expression = context.EvaluateAtom (bon);
             value = expression.Compute (context);
         }
         else
@@ -251,7 +244,7 @@ public sealed class StdLib
                 shortContext.Functions[name] = descriptor;
             }
 
-            interpreter.Execute (shortProgram, shortContext);
+            shortContext.Execute (shortProgram);
             value = last.Expression.Compute (shortContext);
         }
 
@@ -868,8 +861,7 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (fileName))
             {
                 fileName = fileName.Trim();
-                var interpreter = context.Interpreter;
-                interpreter?.Include (fileName);
+                context.Include (fileName);
             }
         }
 
@@ -985,7 +977,7 @@ public sealed class StdLib
             if (!string.IsNullOrWhiteSpace (name))
             {
                 name = name.Trim();
-                context.GetRootContext().Interpreter!.LoadModule (name);
+                context.GetRootContext().LoadModule (name);
             }
         }
 
@@ -1377,12 +1369,11 @@ public sealed class StdLib
     /// <inheritdoc cref="IBarsikModule.AttachModule"/>
     public bool AttachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in _registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
@@ -1394,12 +1385,11 @@ public sealed class StdLib
     /// <inheritdoc cref="IBarsikModule.DetachModule"/>
     public void DetachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in _registry)
         {
             context.Functions.Remove (descriptor.Key);

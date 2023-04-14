@@ -5,8 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 
 /* Context.cs -- контекст исполнения скрипта
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +22,8 @@ using System.Reflection;
 using AM.Collections;
 using AM.Kotik.Barsik.Ast;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -33,15 +33,10 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Контекст исполнения скрипта.
 /// </summary>
+[PublicAPI]
 public sealed class Context
 {
     #region Properties
-
-    /// <summary>
-    /// Интерпретатор, к которому привязан контекст.
-    /// </summary>
-    // TODO сделать только get
-    public Interpreter? Interpreter { get; internal init; }
 
     /// <summary>
     /// Общая часть контекста (чтобы не копировать
@@ -98,7 +93,6 @@ public sealed class Context
         )
     {
         Parent = parent;
-        Interpreter = parent?.Interpreter;
         Variables = new ();
         Functions = new ();
         Namespaces = new ();
@@ -143,9 +137,76 @@ public sealed class Context
         return mainType.MakeGenericType (typeArguments);
     }
 
+    internal bool EnsureVariableCanBeAssigned
+        (
+            string variableName
+        )
+    {
+        Sure.NotNullNorEmpty (variableName);
+
+        var tokenizerSettings = Commmon.Settings.Tokenizer.Settings;
+        if (tokenizerSettings.KnownTerms.Contains (variableName)
+            || tokenizerSettings.ReservedWords.Contains (variableName))
+        {
+            return false;
+        }
+
+        if (Commmon.Defines.ContainsKey (variableName))
+        {
+            return false;
+        }
+
+        if (FindFunction (variableName, out _))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool TryInclude
+        (
+            string fileName
+        )
+    {
+        if (!_inclusions.TryGetValue (fileName, out var program))
+        {
+            if (!File.Exists (fileName))
+            {
+                return false;
+            }
+
+            var sourceCode = File.ReadAllText(fileName);
+            program = Commmon.Settings.Grammar.ParseProgram (sourceCode, Commmon.Settings.Tokenizer);
+            _inclusions[fileName] = program;
+        }
+
+        // TODO отрабатывать ExitException?
+        Execute (program);
+
+        return true;
+    }
+
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Подключение модуля.
+    /// </summary>
+    public void AttachModule
+        (
+            IBarsikModule instance
+        )
+    {
+        Sure.NotNull (instance);
+
+        if (instance.AttachModule (this))
+        {
+            // Output.WriteLine ($"Module loaded: {instance}");
+            Commmon.Modules.Add (instance);
+        }
+    }
 
     /// <summary>
     /// Создание контекста-потомка.
@@ -160,18 +221,17 @@ public sealed class Context
     /// </summary>
     public void DumpNamespaces()
     {
-        var interpreter = GetRootContext().Interpreter;
         var keys = Namespaces.Keys.ToArray();
         if (keys.IsNullOrEmpty())
         {
-            interpreter?.Context.Commmon.Output?.WriteLine ("(no namespaces)");
+            Commmon.Output?.WriteLine ("(no namespaces)");
             return;
         }
 
         Array.Sort (keys);
         foreach (var key in keys)
         {
-            interpreter?.Context.Commmon.Output?.WriteLine (key);
+            Commmon.Output?.WriteLine (key);
         }
     }
 
@@ -183,11 +243,10 @@ public sealed class Context
         var keys = Variables.Keys.ToArray();
 
         Array.Sort (keys);
-        var interpreter = GetRootContext().Interpreter;
         foreach (var key in keys)
         {
             var value = Variables[key];
-            interpreter?.Context.Commmon.Output?.WriteLine
+            Commmon.Output?.WriteLine
                 (
                     value is null
                         ? $"{key}: (null)"
@@ -197,8 +256,102 @@ public sealed class Context
 
         if (keys.Length == 0)
         {
-            interpreter?.Context.Commmon.Output?.WriteLine ("(no variables in the context)");
+            Commmon.Output?.WriteLine ("(no variables in the context)");
         }
+    }
+
+    /// <summary>
+    /// Вычисление значения переменной.
+    /// </summary>
+    public AtomNode EvaluateAtom
+        (
+            string sourceCode
+        )
+    {
+        Sure.NotNull (sourceCode);
+
+        var settings = Commmon.Settings;
+        var node = settings.Grammar.ParseExpression
+            (
+                sourceCode,
+                settings.Tokenizer,
+                Commmon.ParsingDebugOutput
+            );
+        if (settings.DumpAst && Commmon.Output is { } output)
+        {
+            output.WriteLine (new string ('=', 60));
+            node.DumpHierarchyItem (null, 0, output);
+            output.WriteLine (new string ('=', 60));
+        }
+
+        return node;
+    }
+
+    /// <summary>
+    /// Запуск скрипта на исполнение.
+    /// </summary>
+    public ExecutionResult Execute
+        (
+            ProgramNode program
+        )
+    {
+        Sure.NotNull (program);
+
+        var haveDefinitions = false;
+        foreach (var statement in program.Statements)
+        {
+            if (statement is FunctionDefinitionNode node)
+            {
+                haveDefinitions = true;
+                var name = node.Name;
+                if (Builtins.IsBuiltinFunction (name))
+                {
+                    throw new BarsikException ($"{name} used by builtin function");
+                }
+
+                var definition = new FunctionDefinition
+                    (
+                        name,
+                        node._argumentNames,
+                        node.Body
+                    );
+                var descriptor = new FunctionDescriptor
+                    (
+                        name,
+                        definition.CreateCallPoint()
+                    );
+                Functions[name] = descriptor;
+            }
+        }
+
+        if (haveDefinitions)
+        {
+            program.Statements = program.Statements
+                .Where (stmt => stmt is not PseudoNode)
+                .ToList();
+        }
+
+        var result = new ExecutionResult();
+        try
+        {
+            program.Execute (this);
+        }
+        catch (ReturnException exception)
+        {
+            result.ExitRequested = true;
+            result.ExitCode = KotikUtility.ToInt32 (exception.Value);
+            result.Message = exception.Message;
+        }
+        catch (ExitException exception)
+        {
+            result.ExitRequested = true;
+            result.ExitCode = exception.ExitCode;
+            result.Message = exception.Message;
+        }
+
+        Commmon.Settings.VariableDumper?.DumpContext (this);
+
+        return result;
     }
 
     /// <summary>
@@ -300,7 +453,6 @@ public sealed class Context
         }
 
         var topContext = GetRootContext();
-        var interpreter = topContext.Interpreter.ThrowIfNull();
         if (!name.Contains ('.'))
         {
             // это не полное имя, так что попробуем приписать к нему
@@ -320,7 +472,7 @@ public sealed class Context
         {
             // это не assembly-qualified name, так что попробуем
             // приписать к нему загруженные нами сборки
-            foreach (var asm in interpreter.Assemblies.Values)
+            foreach (var asm in Commmon.Assemblies.Values)
             {
                 var asmName = asm.GetName().Name;
                 var fullName = name + ", " + asmName;
@@ -385,6 +537,57 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Вложение скрипта - файла на диске.
+    /// </summary>
+    public void Include
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        var extension = Path.GetExtension (fileName);
+        if (string.IsNullOrEmpty (extension))
+        {
+            fileName += ".meow";
+        }
+
+        // сначала пытаемся найти в текущей директории
+        // или по полному пути (если он указан)
+        if (TryInclude (fileName))
+        {
+            return;
+        }
+        
+        if (Path.IsPathRooted (fileName))
+        {
+            throw new BarsikException ($"Can't include '{fileName}'");
+        }
+
+        // ищем по путям (INCLUDE)
+        foreach (var part in Commmon.Settings.Paths)
+        {
+            var fullPath = Path.Combine (part, fileName);
+            if (TryInclude (fullPath))
+            {
+                return;
+            }
+        }
+
+        // пытаемся загрузить файл рядом со скриптом
+        if (TryGetVariable ("__DIR__", out var scriptDir))
+        {
+            var fullPath = Path.Combine (scriptDir, fileName);
+            if (TryInclude (fullPath))
+            {
+                return;
+            }
+        }
+
+        throw new BarsikException ($"Can't include '{fileName}'");
+    }
+
+    /// <summary>
     /// Загрузка сборки.
     /// </summary>
     public Assembly? LoadAssembly
@@ -400,8 +603,7 @@ public sealed class Context
             throw new BarsikException();
         }
 
-        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
-        if (interpreter.Assemblies.TryGetValue (name, out var foundAssembly))
+        if (Commmon.Assemblies.TryGetValue (name, out var foundAssembly))
         {
             // уже загружено, пропускаем
             return foundAssembly;
@@ -413,7 +615,7 @@ public sealed class Context
             var asmName = asm.GetName().Name;
             if (asmName.SameString (name))
             {
-                interpreter.Assemblies.Add (name, asm);
+                Commmon.Assemblies.Add (name, asm);
                 return asm;
             }
         }
@@ -438,7 +640,7 @@ public sealed class Context
 
         if (result is not null)
         {
-            interpreter.Assemblies.Add (name, result);
+            Commmon.Assemblies.Add (name, result);
             return result;
         }
 
@@ -455,19 +657,60 @@ public sealed class Context
             }
         }
 
-        foreach (var part in interpreter.Pathes)
+        foreach (var part in Commmon.Settings.Paths)
         {
             var fullPath = Path.GetFullPath (Path.Combine (part, name));
             if (File.Exists (fullPath))
             {
                 result = Assembly.LoadFile (fullPath);
-                interpreter.Assemblies.Add (name, result);
+                Commmon.Assemblies.Add (name, result);
 
                 return result;
             }
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Загрузка модуля.
+    /// </summary>
+    public void LoadModule
+        (
+            string moduleName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleName);
+
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            var types = assembly.GetTypes()
+                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
+                .ToArray();
+            foreach (var type in types)
+            {
+                var alreadyHave = false;
+                foreach (var module in Commmon.Modules)
+                {
+                    if (module.GetType() == type)
+                    {
+                        alreadyHave = true;
+                        break;
+                    }
+                }
+
+                if (alreadyHave || type.Name != moduleName)
+                {
+                    continue;
+                }
+
+                var instance = (IBarsikModule?) Activator.CreateInstance (type);
+                if (instance is not null)
+                {
+                    AttachModule (instance);
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -479,11 +722,7 @@ public sealed class Context
         )
     {
         var value = node.Compute (this);
-        var interpreter = GetRootContext().Interpreter;
-        if (interpreter is not null)
-        {
-            KotikUtility.PrintObject (interpreter.Context.Commmon.Output, value);
-        }
+        KotikUtility.PrintObject (Commmon.Output, value);
     }
 
     /// <summary>
@@ -516,6 +755,28 @@ public sealed class Context
     }
 
     /// <summary>
+    /// Установка значения дефайна
+    /// (с сохранением места в контексте).
+    /// </summary>
+    public void SetDefine
+        (
+            string name,
+            dynamic? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        if (Builtins.IsBuiltinFunction (name))
+        {
+            throw new BarsikException ($"{name} used by builtin function");
+        }
+
+        // TODO пройтись по всем контекстам
+        Variables.Remove (name);
+        Commmon.Defines[name] = value;
+    }
+
+    /// <summary>
     /// Установка значения переменной
     /// (с сохранением ее места в контексте).
     /// </summary>
@@ -532,8 +793,7 @@ public sealed class Context
             throw new BarsikException ($"{name} used by builtin function");
         }
 
-        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
-        if (interpreter.Defines.ContainsKey (name))
+        if (Commmon.Defines.ContainsKey (name))
         {
             throw new BarsikException ($"Can't redefine {name}");
         }
@@ -567,8 +827,7 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
-        var interpreter = GetRootContext().Interpreter.ThrowIfNull();
-        if (interpreter.Defines.TryGetValue (name, out value) ||
+        if (Commmon.Defines.TryGetValue (name, out value) ||
             Variables.TryGetValue (name, out value))
         {
             return true;
@@ -581,6 +840,37 @@ public sealed class Context
             {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Выгрузка модуля.
+    /// </summary>
+    public bool UnloadModule
+        (
+            string moduleName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleName);
+
+        IBarsikModule? found = null;
+        foreach (var module in Commmon.Modules)
+        {
+            if (module.GetType().Name.SameString (moduleName))
+            {
+                found = module;
+                break;
+            }
+        }
+
+        if (found is not null)
+        {
+            found.DetachModule (this);
+            Commmon.Modules.Remove (found);
+
+            return true;
         }
 
         return false;

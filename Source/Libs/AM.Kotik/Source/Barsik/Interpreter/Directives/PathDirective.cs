@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* PathDirective.cs -- задание пути для поиска скриптов
  * Ars Magna project, http://arsmagna.ru
@@ -50,22 +49,16 @@ public sealed class PathDirective
             string? argument
         )
     {
-        var interpreter = context.Interpreter;
-        if (interpreter is null)
-        {
-            return;
-        }
-        
-        var pathes = interpreter.Pathes;
+        var paths = context.Commmon.Settings.Paths;
         if (string.IsNullOrEmpty (argument))
         {
-            if (pathes.IsNullOrEmpty())
+            if (paths.IsNullOrEmpty())
             {
                 context.Commmon.Output?.WriteLine ("(no include path)");
                 return;
             }
         
-            foreach (var path in pathes)
+            foreach (var path in paths)
             {
                 context.Commmon.Output?.WriteLine (path);
             }
@@ -79,7 +72,7 @@ public sealed class PathDirective
             comparison = StringComparison.OrdinalIgnoreCase;
         }
         
-        foreach (var path in pathes)
+        foreach (var path in paths)
         {
             if (string.Compare (path, argument, comparison) == 0)
             {
@@ -87,7 +80,7 @@ public sealed class PathDirective
             }
         }
         
-        pathes.Add (argument);
+        paths.Add (argument);
     }
 
     #endregion

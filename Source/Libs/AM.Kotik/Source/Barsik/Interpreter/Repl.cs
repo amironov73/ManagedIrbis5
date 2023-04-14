@@ -167,7 +167,7 @@ public sealed class Repl
     {
         try
         {
-            var node = Interpreter.EvaluateAtom (sourceCode);
+            var node = Interpreter.Context.EvaluateAtom (sourceCode);
             if (node != null!)
             {
                 result = node.Compute (Context);

@@ -48,41 +48,37 @@ public sealed class ModuleDirective
             string? argument
         )
     {
-        var interpreter = context.GetRootContext().Interpreter;
-        if (interpreter is not null)
+        if (string.IsNullOrEmpty (argument))
         {
-            if (string.IsNullOrEmpty (argument))
+            var modules = context.Commmon.Modules;
+            foreach (var module in modules)
             {
-                var modules = interpreter.Modules;
-                foreach (var module in modules)
-                {
-                    context.Commmon.Output?.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
-                }
+                context.Commmon.Output?.WriteLine ($"{module.GetType().Name}: {module.Description} v{module.Version}");
+            }
 
-                if (modules.Count == 0)
+            if (modules.Count == 0)
+            {
+                context.Commmon.Output?.WriteLine ("(no modules loaded)");
+            }
+        }
+        else
+        {
+            if (argument.StartsWith ("/"))
+            {
+                var navigator = new TextNavigator (argument);
+                navigator.ReadChar();
+                var subCommand = navigator.ReadWord();
+                navigator.SkipWhitespace();
+                var subArgument = navigator.GetRemainingText().ToString();
+                if (subCommand.SameString ("unload"))
                 {
-                    context.Commmon.Output?.WriteLine ("(no modules loaded)");
+                    var success = context.UnloadModule (subArgument);
+                    context.Commmon.Output?.WriteLine ($"Unload module {subArgument}: {success}");
                 }
             }
             else
             {
-                if (argument.StartsWith ("/"))
-                {
-                    var navigator = new TextNavigator (argument);
-                    navigator.ReadChar();
-                    var subCommand = navigator.ReadWord();
-                    navigator.SkipWhitespace();
-                    var subArgument = navigator.GetRemainingText().ToString();
-                    if (subCommand.SameString ("unload"))
-                    {
-                        var success = interpreter.UnloadModule (subArgument);
-                        context.Commmon.Output?.WriteLine ($"Unload module {subArgument}: {success}");
-                    }
-                }
-                else
-                {
-                    interpreter.LoadModule (argument);
-                }
+                context.LoadModule (argument);
             }
         }
     }

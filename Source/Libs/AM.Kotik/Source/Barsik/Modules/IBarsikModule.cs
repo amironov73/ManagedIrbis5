@@ -37,11 +37,11 @@ public interface IBarsikModule
     /// <summary>
     /// Инициализация модуля при загрузке в интерпретатор.
     /// </summary>
-    bool AttachModule (Interpreter interpreter);
+    bool AttachModule (Context context);
 
     /// <summary>
     /// Освобождение (деинициализация) модуля
     /// при выгрузке из интерпретатора.
     /// </summary>
-    void DetachModule (Interpreter interpreter);
+    void DetachModule (Context context);
 }

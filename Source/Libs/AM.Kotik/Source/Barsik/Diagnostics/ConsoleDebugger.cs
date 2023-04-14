@@ -84,7 +84,7 @@ public sealed class ConsoleDebugger
         Sure.NotNull (interpreter);
 
         _interpreter = interpreter;
-        _interpreter.ScriptDebugger = this;
+        _interpreter.Context.Commmon.ScriptDebugger = this;
         Breakpoints = new ();
     }
 
@@ -104,7 +104,7 @@ public sealed class ConsoleDebugger
         {
             if (_program is not null)
             {
-                _interpreter.Execute (_program, _interpreter.Context);
+                _interpreter.Context.Execute (_program);
             }
         }
         catch (Exception exception)
@@ -256,7 +256,7 @@ public sealed class ConsoleDebugger
 
         try
         {
-            var atom = _interpreter.EvaluateAtom (expression);
+            var atom = _interpreter.Context.EvaluateAtom (expression);
             Console.WriteLine (atom);
             var value = atom.Compute (_interpreter.Context);
             KotikUtility.PrintObject (Console.Out, value);

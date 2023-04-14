@@ -149,10 +149,16 @@ public sealed class InterpreterSettings
     public bool DumpTokens { get; set; }
 
     /// <summary>
-    /// Пути для поиска суб-скриптов.
+    /// Пути для поиска скриптов, модулей  и т. д.
+    /// Инициализируется значением переменной окружения "BARSIK_PATH".
     /// </summary>
     [JsonPropertyName ("path")]
-    public List<string> Pathes { get; set; }
+    public List<string> Paths { get; }
+
+    /// <summary>
+    /// Разрешение использовать оператор <c>new</c>.
+    /// </summary>
+    public bool AllowNewOperator { get; set; }
 
     #endregion
 
@@ -171,7 +177,8 @@ public sealed class InterpreterSettings
         UseNamespaces = new ();
         MainPrompt = "> ";
         SecondaryPrompt = "... ";
-        Pathes = new ();
+        Paths = new ();
+        AllowNewOperator = true;
     }
 
     #endregion
@@ -188,7 +195,7 @@ public sealed class InterpreterSettings
         result.Tokenizer = KotikUtility.CreateTokenizerForBarsik (result.TokenizerSettings);
         result.Grammar = AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
 
-        result.Pathes.Add ("include");
+        result.Paths.Add ("include");
 
         result.UseNamespaces.Add ("System");
         result.UseNamespaces.Add ("System.Collections.Generic");
@@ -291,7 +298,7 @@ public sealed class InterpreterSettings
             }
             else if (arg is "--path")
             {
-                result.Pathes.Add (args[++index]);
+                result.Paths.Add (args[++index]);
             }
             else if (arg is "--include")
             {

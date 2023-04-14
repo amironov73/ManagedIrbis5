@@ -126,8 +126,7 @@ internal sealed class ForEachNode
         Sure.AssertState (!context.Parent!.TryGetVariable (_variableName, out _));
 
         // это должно быть lvalue
-        var interpreter = context.Interpreter.ThrowIfNull();
-        Sure.AssertState (interpreter.EnsureVariableCanBeAssigned (context, _variableName));
+        Sure.AssertState (context.EnsureVariableCanBeAssigned (_variableName));
 
         var enumerable = _enumerable.Compute (context);
         if (enumerable is null or not IEnumerable)

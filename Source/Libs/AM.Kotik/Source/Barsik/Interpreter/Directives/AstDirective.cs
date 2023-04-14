@@ -48,14 +48,10 @@ public sealed class AstDirective
             string? argument
         )
     {
-        var interpreter = context.Interpreter;
-        if (interpreter is not null)
-        {
-            var flag = !context.Commmon.Settings.DumpAst;
-            var onoff = flag ? "on" : "off";
-            context.Commmon.Settings.DumpAst = flag;
-            context.Commmon.Output?.WriteLine ($"Dump AST is {onoff} now");
-        }
+        var flag = !context.Commmon.Settings.DumpAst;
+        var onoff = flag ? "on" : "off";
+        context.Commmon.Settings.DumpAst = flag;
+        context.Commmon.Output?.WriteLine ($"Dump AST is {onoff} now");
     }
 
     #endregion

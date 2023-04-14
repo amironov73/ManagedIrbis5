@@ -14,7 +14,6 @@
 
 using AM.Collections;
 
-
 #endregion
 
 #nullable enable
@@ -49,22 +48,16 @@ public sealed class IncludeDirective
             string? argument
         )
     {
-        var interpreter = context.Interpreter;
-        if (interpreter is null)
-        {
-            return;
-        }
-
         if (string.IsNullOrEmpty (argument))
         {
-            var pathes = interpreter.Pathes;
-            if (pathes.IsNullOrEmpty())
+            var paths = context.Commmon.Settings.Paths;
+            if (paths.IsNullOrEmpty())
             {
-                context.Commmon.Output?.WriteLine ("(no include pathes)");
+                context.Commmon.Output?.WriteLine ("(no include paths)");
                 return;
             }
             
-            foreach (var path in pathes)
+            foreach (var path in paths)
             {
                 context.Commmon.Output?.WriteLine (path);
             }
@@ -73,7 +66,7 @@ public sealed class IncludeDirective
         }
 
         var fileName = argument.Trim();
-        interpreter.Include (fileName);
+        context.Include (fileName);
     }
 
     #endregion

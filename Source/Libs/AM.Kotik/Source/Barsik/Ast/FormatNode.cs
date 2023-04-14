@@ -63,13 +63,12 @@ internal sealed class FormatNode
     {
         var result = new StringBuilder();
 
-        var interpreter = context.Interpreter.ThrowIfNull();
         foreach (var specification in _specification)
         {
             result.Append (specification.Prefix);
             if (!string.IsNullOrEmpty (specification.Value))
             {
-                var atom = interpreter.EvaluateAtom (specification.Value);
+                var atom = context.EvaluateAtom (specification.Value);
                 var value = atom.Compute (context);
                 if (value is not null)
                 {

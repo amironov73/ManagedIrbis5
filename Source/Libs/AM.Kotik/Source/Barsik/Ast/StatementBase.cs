@@ -66,8 +66,7 @@ public class StatementBase
         Sure.NotNull (context);
 
         // трассировка
-        var debugger = context.Interpreter?.ScriptDebugger;
-
+        var debugger = context.Commmon.ScriptDebugger;
         if (debugger is not null)
         {
             debugger.PreTrace (context, this);

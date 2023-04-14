@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 using AM.IO;
@@ -46,22 +45,6 @@ public sealed class Interpreter
     #region Properties
 
     /// <summary>
-    /// Дефайны.
-    /// </summary>
-    public Dictionary<string, dynamic?> Defines { get; }
-
-    /// <summary>
-    /// Отладчик скрипта.
-    /// </summary>
-    public IBarsikDebugger? ScriptDebugger { get; set; }
-
-    /// <summary>
-    /// Поток для отладочного вывода при парсинге скрипта.
-    /// </summary>
-    // TODO перенести в Settings
-    public TextWriter? ParsingDebugOutput { get; set; }
-
-    /// <summary>
     /// Версия API.
     /// </summary>
     public static string AssemblyVersion = ThisAssembly.AssemblyVersion;
@@ -72,37 +55,9 @@ public sealed class Interpreter
     public static string FileVersion = ThisAssembly.AssemblyFileVersion;
 
     /// <summary>
-    /// Контекст исполнения программы.
+    /// Корневой контекст исполнения программы.
     /// </summary>
     public Context Context { get; }
-
-    /// <summary>
-    /// Разрешение использовать оператор <c>new</c>.
-    /// </summary>
-    // TODO перенести в Settings
-    public bool AllowNewOperator { get; set; }
-
-    /// <summary>
-    /// Загруженные модули.
-    /// </summary>
-    public List<IBarsikModule> Modules { get; }
-
-    /// <summary>
-    /// Загруженные сборки (чтобы не писать assembly-qualified type name).
-    /// </summary>
-    public Dictionary<string, Assembly> Assemblies { get; }
-
-    /// <summary>
-    /// Произвольные пользовательские данные, свяазанные с данным интерпретатором.
-    /// </summary>
-    public BarsikDictionary Auxiliary { get; }
-
-    /// <summary>
-    /// Пути для поиска скриптов, модулей  и т. д.
-    /// Инициализируется значением переменной окружения "BARSIK_PATH".
-    /// </summary>
-    // TODO перенести в Settings
-    public List<string> Pathes { get; }
 
     #endregion
 
@@ -119,14 +74,9 @@ public sealed class Interpreter
             InterpreterSettings? settings = null
         )
     {
-        AllowNewOperator = true;
-        Defines = new ();
-        Modules = new ();
-        Assemblies = new ();
-        Auxiliary = new ();
+        var path = Environment.GetEnvironmentVariable ("BARSIK_PATH") ?? string.Empty;
         Context = new ()
         {
-            Interpreter = this,
             Commmon =
             {
                 Input = input ?? Console.In,
@@ -136,20 +86,19 @@ public sealed class Interpreter
             }
         };
 
-        var path = Environment.GetEnvironmentVariable ("BARSIK_PATH") ?? string.Empty;
-        Pathes = new (path.Split
+        Context.Commmon.Settings.Paths.AddRange (path.Split
             (
                 Path.PathSeparator,
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
             ));
 
         // устанавливаем значения стандартных переменных
-        SetDefine ("__NAME__", string.Empty);
-        SetDefine ("__DIR__", string.Empty);
-        SetDefine ("__FILE__", string.Empty);
-        SetDefine ("__DOTNET__", Environment.Version);
-        SetDefine ("__ROOT__", AppContext.BaseDirectory);
-        SetDefine ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
+        Context.SetDefine ("__NAME__", string.Empty);
+        Context.SetDefine ("__DIR__", string.Empty);
+        Context.SetDefine ("__FILE__", string.Empty);
+        Context.SetDefine ("__DOTNET__", Environment.Version);
+        Context.SetDefine ("__ROOT__", AppContext.BaseDirectory);
+        Context.SetDefine ("__VER__", Assembly.GetExecutingAssembly().GetName().Version);
     }
 
     #endregion
@@ -157,35 +106,6 @@ public sealed class Interpreter
     #region Private members
 
     private bool _settinsWasApplied;
-
-    internal bool EnsureVariableCanBeAssigned
-        (
-            Context context,
-            string variableName
-        )
-    {
-        Sure.NotNull (context);
-        Sure.NotNullNorEmpty (variableName);
-
-        var tokenizerSettings = context.Commmon.Settings.Tokenizer.Settings;
-        if (tokenizerSettings.KnownTerms.Contains (variableName)
-            || tokenizerSettings.ReservedWords.Contains (variableName))
-        {
-            return false;
-        }
-
-        if (Defines.ContainsKey (variableName))
-        {
-            return false;
-        }
-
-        if (context.FindFunction (variableName, out _))
-        {
-            return false;
-        }
-
-        return true;
-    }
 
     private static void HighlightToConsole
         (
@@ -236,29 +156,6 @@ public sealed class Interpreter
         output.WriteLine ("</pre>");
     }
 
-    private bool TryInclude
-        (
-            string fileName
-        )
-    {
-        if (!Context._inclusions.TryGetValue (fileName, out var program))
-        {
-            if (!File.Exists (fileName))
-            {
-                return false;
-            }
-
-            var sourceCode = File.ReadAllText(fileName);
-            program = Context.Commmon.Settings.Grammar.ParseProgram (sourceCode, Context.Commmon.Settings.Tokenizer);
-            Context._inclusions[fileName] = program;
-        }
-
-        // TODO отрабатывать ExitException?
-        Execute (program, Context);
-
-        return true;
-    }
-
     /// <summary>
     /// Делаем контекст внимательным к выводу текста.
     /// </summary>
@@ -286,8 +183,9 @@ public sealed class Interpreter
             Context.LoadAssembly (assembly);
         }
 
-        Pathes.Clear();
-        Pathes.AddRange (settings.Pathes);
+        var paths = Context.Commmon.Settings.Paths;
+        paths.Clear();
+        paths.AddRange (settings.Paths);
 
         foreach (var ns in settings.UseNamespaces)
         {
@@ -296,28 +194,11 @@ public sealed class Interpreter
 
         if (settings.DebugParser)
         {
-            ParsingDebugOutput = Context.Commmon.Output;
+            Context.Commmon.ParsingDebugOutput = Context.Commmon.Output;
         }
 
         settings.Grammar.Rebuild();
         _settinsWasApplied = true;
-    }
-
-    /// <summary>
-    /// Подключение модуля.
-    /// </summary>
-    public void AttachModule
-        (
-            IBarsikModule instance
-        )
-    {
-        Sure.NotNull (instance);
-
-        if (instance.AttachModule (this))
-        {
-            // Output.WriteLine ($"Module loaded: {instance}");
-            Modules.Add (instance);
-        }
     }
 
     /// <summary>
@@ -445,33 +326,6 @@ public sealed class Interpreter
     }
 
     /// <summary>
-    /// Вычисление значения переменной.
-    /// </summary>
-    public AtomNode EvaluateAtom
-        (
-            string sourceCode
-        )
-    {
-        Sure.NotNull (sourceCode);
-
-        var settings = Context.Commmon.Settings;
-        var node = settings.Grammar.ParseExpression
-            (
-                sourceCode,
-                settings.Tokenizer,
-                ParsingDebugOutput
-            );
-        if (settings.DumpAst && Context.Commmon.Output is { } output)
-        {
-            output.WriteLine (new string ('=', 60));
-            node.DumpHierarchyItem (null, 0, output);
-            output.WriteLine (new string ('=', 60));
-        }
-
-        return node;
-    }
-
-    /// <summary>
     /// Запуск скрипта на исполнение.
     /// </summary>
     public ExecutionResult Execute
@@ -490,7 +344,7 @@ public sealed class Interpreter
                 requireEnd,
                 settings.DumpTokens,
                 traceOutput: null,
-                ParsingDebugOutput
+                Context.Commmon.ParsingDebugOutput
             );
         if (settings.DumpAst && Context.Commmon.Output is { } output)
         {
@@ -499,9 +353,9 @@ public sealed class Interpreter
         }
 
         // отделяем отладочную печать парсеров от прочего вывода
-        ParsingDebugOutput?.WriteLine (new string ('=', 60));
+        Context.Commmon.ParsingDebugOutput?.WriteLine (new string ('=', 60));
 
-        var result = Execute (program, Context);
+        var result = Context.Execute (program);
 
         return result;
     }
@@ -511,8 +365,7 @@ public sealed class Interpreter
     /// </summary>
     public ExecutionResult Execute
         (
-            ProgramNode program,
-            Context? context = null
+            ProgramNode program
         )
     {
         Sure.NotNull (program);
@@ -522,62 +375,7 @@ public sealed class Interpreter
             ApplySettings();
         }
 
-        context ??= Context;
-        var haveDefinitions = false;
-        foreach (var statement in program.Statements)
-        {
-            if (statement is FunctionDefinitionNode node)
-            {
-                haveDefinitions = true;
-                var name = node.Name;
-                if (Builtins.IsBuiltinFunction (name))
-                {
-                    throw new BarsikException ($"{name} used by builtin function");
-                }
-
-                var definition = new FunctionDefinition
-                    (
-                        name,
-                        node._argumentNames,
-                        node.Body
-                    );
-                var descriptor = new FunctionDescriptor
-                    (
-                        name,
-                        definition.CreateCallPoint()
-                    );
-                context.Functions[name] = descriptor;
-            }
-        }
-
-        if (haveDefinitions)
-        {
-            program.Statements = program.Statements
-                .Where (stmt => stmt is not PseudoNode)
-                .ToList();
-        }
-
-        var result = new ExecutionResult();
-        try
-        {
-            program.Execute (context);
-        }
-        catch (ReturnException exception)
-        {
-            result.ExitRequested = true;
-            result.ExitCode = KotikUtility.ToInt32 (exception.Value);
-            result.Message = exception.Message;
-        }
-        catch (ExitException exception)
-        {
-            result.ExitRequested = true;
-            result.ExitCode = exception.ExitCode;
-            result.Message = exception.Message;
-        }
-
-        Context.Commmon.Settings.VariableDumper?.DumpContext (Context);
-
-        return result;
+        return Context.Execute (program);
     }
 
     /// <summary>
@@ -615,6 +413,7 @@ public sealed class Interpreter
         Sure.FileExists (fileName);
 
         ExecutionResult result;
+        var defines = Context.Commmon.Defines;
         try
         {
             if (!_settinsWasApplied)
@@ -623,9 +422,9 @@ public sealed class Interpreter
             }
 
             var fullPath = Path.GetFullPath (fileName);
-            Defines["__NAME__"] = "__MAIN__";
-            Defines["__FILE__"] = fullPath;
-            Defines["__DIR__"] = Path.GetDirectoryName (fullPath);
+            defines["__NAME__"] = "__MAIN__";
+            defines["__FILE__"] = fullPath;
+            defines["__DIR__"] = Path.GetDirectoryName (fullPath);
 
             var sourceCode = File.ReadAllText (fileName);
             result = Execute (sourceCode);
@@ -650,9 +449,9 @@ public sealed class Interpreter
         }
         finally
         {
-            Defines["__NAME__"] = string.Empty;
-            Defines["__FILE__"] = string.Empty;
-            Defines["__DIR__"] = string.Empty;
+            defines["__NAME__"] = string.Empty;
+            defines["__FILE__"] = string.Empty;
+            defines["__DIR__"] = string.Empty;
         }
 
         return result;
@@ -759,99 +558,7 @@ public sealed class Interpreter
         }
     }
 
-    /// <summary>
-    /// Вложение скрипта - файла на диске.
-    /// </summary>
-    public void Include
-        (
-            string fileName
-        )
-    {
-        Sure.NotNullNorEmpty (fileName);
 
-        var extension = Path.GetExtension (fileName);
-        if (string.IsNullOrEmpty (extension))
-        {
-            fileName += ".meow";
-        }
-
-        // сначала пытаемся найти в текущей директории
-        // или по полному пути (если он указан)
-        if (TryInclude (fileName))
-        {
-            return;
-        }
-        
-        if (Path.IsPathRooted (fileName))
-        {
-            throw new BarsikException ($"Can't include '{fileName}'");
-        }
-
-        // ищем по путям (INCLUDE)
-        foreach (var part in Pathes)
-        {
-            var fullPath = Path.Combine (part, fileName);
-            if (TryInclude (fullPath))
-            {
-                return;
-            }
-        }
-
-        // пытаемся загрузить файл рядом со скриптом
-        if (Context.TryGetVariable ("__DIR__", out var scriptDir))
-        {
-            var fullPath = Path.Combine (scriptDir, fileName);
-            if (TryInclude (fullPath))
-            {
-                return;
-            }
-        }
-
-        throw new BarsikException ($"Can't include '{fileName}'");
-    }
-
-    /// <summary>
-    /// Загрузка модуля.
-    /// </summary>
-    public void LoadModule
-        (
-            string moduleName
-        )
-    {
-        Sure.NotNullNorEmpty (moduleName);
-
-        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-        {
-            var types = assembly.GetTypes()
-                .Where (type => type.IsAssignableTo (typeof (IBarsikModule)))
-                .ToArray();
-            foreach (var type in types)
-            {
-                var alreadyHave = false;
-                foreach (var module in Modules)
-                {
-                    if (module.GetType() == type)
-                    {
-                        alreadyHave = true;
-                        break;
-                    }
-                }
-
-                if (alreadyHave || type.Name != moduleName)
-                {
-                    continue;
-                }
-
-                var instance = (IBarsikModule?) Activator.CreateInstance (type);
-                if (instance is not null)
-                {
-                    AttachModule (instance);
-                }
-            }
-        }
-    }
-
-    
     /// <summary>
     /// Сброс состояния интерпретатора.
     /// </summary>
@@ -860,59 +567,6 @@ public sealed class Interpreter
         Context.Reset();
     }
 
-    /// <summary>
-    /// Установка значения дефайна
-    /// (с сохранением места в контексте).
-    /// </summary>
-    public void SetDefine
-        (
-            string name,
-            dynamic? value
-        )
-    {
-        Sure.NotNullNorEmpty (name);
-
-        if (Builtins.IsBuiltinFunction (name))
-        {
-            throw new BarsikException ($"{name} used by builtin function");
-        }
-
-        // TODO пройтись по всем контекстам
-        Context.Variables.Remove (name);
-
-        Defines[name] = value;
-    }
-
-    /// <summary>
-    /// Выгрузка модуля.
-    /// </summary>
-    public bool UnloadModule
-        (
-            string moduleName
-        )
-    {
-        Sure.NotNullNorEmpty (moduleName);
-
-        IBarsikModule? found = null;
-        foreach (var module in Modules)
-        {
-            if (module.GetType().Name.SameString (moduleName))
-            {
-                found = module;
-                break;
-            }
-        }
-
-        if (found is not null)
-        {
-            found.DetachModule (this);
-            Modules.Remove (found);
-
-            return true;
-        }
-
-        return false;
-    }
 
     /// <summary>
     /// Подключение стандартной библиотеки.
@@ -920,7 +574,7 @@ public sealed class Interpreter
     /// <returns><c>this</c>.</returns>
     public Interpreter WithStdLib()
     {
-        foreach (var module in Modules)
+        foreach (var module in Context.Commmon.Modules)
         {
             if (module is StdLib)
             {
@@ -928,7 +582,7 @@ public sealed class Interpreter
             }
         }
 
-        AttachModule (new StdLib());
+        Context.AttachModule (new StdLib());
 
         return this;
     }
