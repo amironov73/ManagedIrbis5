@@ -211,7 +211,8 @@ public sealed class StdLib
         }
 
         dynamic? value;
-        var program = interpreter.Settings.Grammar.ParseProgram (bon, interpreter.Settings.Tokenizer);
+        var settings = interpreter.Context.Commmon.Settings;
+        var program = settings.Grammar.ParseProgram (bon, settings.Tokenizer);
         if (program.Statements.Count == 1)
         {
             var expression = interpreter.EvaluateAtom (bon);
@@ -434,9 +435,9 @@ public sealed class StdLib
                 return null;
             }
 
-            var interpreter = context.Interpreter.ThrowIfNull();
-            var tokenizer = interpreter.Settings.Tokenizer;
-            var expression = interpreter.Settings.Grammar.ParseExpression (sourceCode, tokenizer);
+            var settings = context.Commmon.Settings;
+            var tokenizer = settings.Tokenizer;
+            var expression = settings.Grammar.ParseExpression (sourceCode, tokenizer);
             var result = expression.Compute (context);
 
             return result;
@@ -466,9 +467,9 @@ public sealed class StdLib
                 return null;
             }
 
-            var interpreter = context.Interpreter.ThrowIfNull();
-            var tokenizer = interpreter.Settings.Tokenizer;
-            var program = interpreter.Settings.Grammar.ParseProgram (sourceCode, tokenizer);
+            var settings = context.Commmon.Settings;
+            var tokenizer = settings.Tokenizer;
+            var program = settings.Grammar.ParseProgram (sourceCode, tokenizer);
             program.Execute (context);
         }
         catch (Exception exception)

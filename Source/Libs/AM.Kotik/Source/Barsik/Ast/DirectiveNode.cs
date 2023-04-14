@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* DirectiveNode.cs -- обработка директивы
  * Ars Magna project, http://arsmagna.ru
@@ -64,9 +63,8 @@ public sealed class DirectiveNode
     {
         base.Execute (context);
 
-        var interpreter = context.Interpreter.ThrowIfNull();
         var success = false;
-        foreach (var directive in interpreter.Settings.KnownDirectives)
+        foreach (var directive in context.Commmon.Settings.KnownDirectives)
         {
             if (directive.Recognize (_command, _argument))
             {

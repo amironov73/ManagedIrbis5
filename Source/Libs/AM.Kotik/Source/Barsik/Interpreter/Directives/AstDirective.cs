@@ -51,9 +51,9 @@ public sealed class AstDirective
         var interpreter = context.Interpreter;
         if (interpreter is not null)
         {
-            var flag = !interpreter.Settings.DumpAst;
+            var flag = !context.Commmon.Settings.DumpAst;
             var onoff = flag ? "on" : "off";
-            interpreter.Settings.DumpAst = flag;
+            context.Commmon.Settings.DumpAst = flag;
             context.Commmon.Output?.WriteLine ($"Dump AST is {onoff} now");
         }
     }

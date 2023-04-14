@@ -112,8 +112,9 @@ public sealed class BarsorParser
 
         // TODO не покупаться на @ в именах и в значениях атрибутов.
 
-        var grammar = _interpreter.Settings.Grammar;
-        var tokenizer = _interpreter.Settings.Tokenizer;
+        var settings = _interpreter.Context.Commmon.Settings;
+        var grammar = settings.Grammar;
+        var tokenizer = settings.Tokenizer;
         var statements = new List<StatementBase>();
         var navigator = new ValueTextNavigator (templateText);
         while (!navigator.IsEOF)

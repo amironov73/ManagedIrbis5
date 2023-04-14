@@ -3,11 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMethodReturnValue.Local
 
 /* ReplInput.cs -- прием пользовательского ввода для REPL
  * Ars Magna project, http://arsmagna.ru
@@ -65,10 +61,11 @@ public sealed class ReplInput
     {
         try
         {
-            _interpreter.Settings.Grammar.ParseStatement
+            var settings = _interpreter.Context.Commmon.Settings;
+            settings.Grammar.ParseStatement
                 (
                     expression.ToString(),
-                    _interpreter.Settings.Tokenizer
+                    settings.Tokenizer
                 );
         }
         catch
@@ -92,8 +89,8 @@ public sealed class ReplInput
         var first = true;
         while (true)
         {
-            var prompt = first ? _interpreter.Settings.MainPrompt
-                : _interpreter.Settings.SecondaryPrompt;
+            var settings = _interpreter.Context.Commmon.Settings;
+            var prompt = first ? settings.MainPrompt : settings.SecondaryPrompt;
             if (!string.IsNullOrEmpty (prompt))
             {
                 _writer.Write (prompt);

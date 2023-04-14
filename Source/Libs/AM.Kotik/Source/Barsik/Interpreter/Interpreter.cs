@@ -45,21 +45,6 @@ public sealed class Interpreter
 {
     #region Properties
 
-    // /// <summary>
-    // /// Стандартный входной поток.
-    // /// </summary>
-    // public TextReader Input { get; set; }
-    //
-    // /// <summary>
-    // /// Стандартный выходной поток.
-    // /// </summary>
-    // public TextWriter Output { get; set; }
-    //
-    // /// <summary>
-    // /// Стандартный поток ошибок.
-    // /// </summary>
-    // public TextWriter Error { get; set; }
-
     /// <summary>
     /// Дефайны.
     /// </summary>
@@ -119,12 +104,6 @@ public sealed class Interpreter
     // TODO перенести в Settings
     public List<string> Pathes { get; }
 
-    /// <summary>
-    /// Настройки интерпретатора.
-    /// Применяются перед началом разбора и исполнения скрипта.
-    /// </summary>
-    public InterpreterSettings Settings { get; }
-
     #endregion
 
     #region Construction
@@ -140,7 +119,6 @@ public sealed class Interpreter
             InterpreterSettings? settings = null
         )
     {
-        Settings =  settings ?? InterpreterSettings.CreateDefault();
         AllowNewOperator = true;
         Defines = new ();
         Modules = new ();
@@ -153,7 +131,8 @@ public sealed class Interpreter
             {
                 Input = input ?? Console.In,
                 Output = output ?? Console.Out,
-                Error = error ?? Console.Error
+                Error = error ?? Console.Error,
+                Settings =  settings ?? InterpreterSettings.CreateDefault()
             }
         };
 
@@ -188,7 +167,7 @@ public sealed class Interpreter
         Sure.NotNull (context);
         Sure.NotNullNorEmpty (variableName);
 
-        var tokenizerSettings = Settings.Tokenizer.Settings;
+        var tokenizerSettings = context.Commmon.Settings.Tokenizer.Settings;
         if (tokenizerSettings.KnownTerms.Contains (variableName)
             || tokenizerSettings.ReservedWords.Contains (variableName))
         {
@@ -270,7 +249,7 @@ public sealed class Interpreter
             }
 
             var sourceCode = File.ReadAllText(fileName);
-            program = Settings.Grammar.ParseProgram (sourceCode, Settings.Tokenizer);
+            program = Context.Commmon.Settings.Grammar.ParseProgram (sourceCode, Context.Commmon.Settings.Tokenizer);
             Context._inclusions[fileName] = program;
         }
 
@@ -301,25 +280,26 @@ public sealed class Interpreter
     /// </summary>
     public void ApplySettings()
     {
-        foreach (var assembly in Settings.LoadAssemblies)
+        var settings = Context.Commmon.Settings;
+        foreach (var assembly in settings.LoadAssemblies)
         {
             Context.LoadAssembly (assembly);
         }
 
         Pathes.Clear();
-        Pathes.AddRange (Settings.Pathes);
+        Pathes.AddRange (settings.Pathes);
 
-        foreach (var ns in Settings.UseNamespaces)
+        foreach (var ns in settings.UseNamespaces)
         {
             Context.Namespaces.TryAdd (ns, null);
         }
 
-        if (Settings.DebugParser)
+        if (settings.DebugParser)
         {
             ParsingDebugOutput = Context.Commmon.Output;
         }
 
-        Settings.Grammar.Rebuild();
+        settings.Grammar.Rebuild();
         _settinsWasApplied = true;
     }
 
@@ -374,11 +354,12 @@ public sealed class Interpreter
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
 
-        if (interpreter.Settings.BarsorMode)
+        var settings = interpreter.Context.Commmon.Settings;
+        if (settings.BarsorMode)
         {
             interpreter.ApplySettings();
             var barsor = new BarsorParser (interpreter);
-            foreach (var fileName in interpreter.Settings.ScriptFiles)
+            foreach (var fileName in settings.ScriptFiles)
             {
                 var sourceCode = File.ReadAllText (fileName);
                 var programNode = barsor.ParseTemplate (sourceCode);
@@ -388,18 +369,18 @@ public sealed class Interpreter
             return 0;
         }
 
-        if (interpreter.Settings.Highlight is not null)
+        if (settings.Highlight is not null)
         {
-            foreach (var file in interpreter.Settings.ScriptFiles)
+            foreach (var file in settings.ScriptFiles)
             {
-                HighlightFile (file, interpreter.Settings.Highlight);
+                HighlightFile (file, settings.Highlight);
             }
 
             return 0;
         }
 
         ConsoleDebugger? debugger = null;
-        if (interpreter.Settings.StartDebugger)
+        if (settings.StartDebugger)
         {
             debugger = new ConsoleDebugger (interpreter);
         }
@@ -407,7 +388,7 @@ public sealed class Interpreter
         try
         {
             interpreter.ApplySettings();
-            foreach (var scriptFile in interpreter.Settings.ScriptFiles)
+            foreach (var scriptFile in settings.ScriptFiles)
             {
                 var executionResult = debugger is not null
                     ? debugger.ExecuteFile (scriptFile)
@@ -423,7 +404,7 @@ public sealed class Interpreter
                 }
             }
 
-            if (interpreter.Settings.ReplMode)
+            if (settings.ReplMode)
             {
                 if (debugger is not null)
                 {
@@ -473,13 +454,14 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var node = Settings.Grammar.ParseExpression
+        var settings = Context.Commmon.Settings;
+        var node = settings.Grammar.ParseExpression
             (
                 sourceCode,
-                Settings.Tokenizer,
+                settings.Tokenizer,
                 ParsingDebugOutput
             );
-        if (Settings.DumpAst && Context.Commmon.Output is { } output)
+        if (settings.DumpAst && Context.Commmon.Output is { } output)
         {
             output.WriteLine (new string ('=', 60));
             node.DumpHierarchyItem (null, 0, output);
@@ -500,16 +482,17 @@ public sealed class Interpreter
     {
         Sure.NotNull (sourceCode);
 
-        var program = Settings.Grammar.ParseProgram
+        var settings = Context.Commmon.Settings;
+        var program = settings.Grammar.ParseProgram
             (
                 sourceCode,
-                Settings.Tokenizer,
+                settings.Tokenizer,
                 requireEnd,
-                Settings.DumpTokens,
+                settings.DumpTokens,
                 traceOutput: null,
                 ParsingDebugOutput
             );
-        if (Settings.DumpAst && Context.Commmon.Output is { } output)
+        if (settings.DumpAst && Context.Commmon.Output is { } output)
         {
             program.Dump (output);
             output.WriteLine (new string ('=', 60));
@@ -592,7 +575,7 @@ public sealed class Interpreter
             result.Message = exception.Message;
         }
 
-        Settings.VariableDumper?.DumpContext (Context);
+        Context.Commmon.Settings.VariableDumper?.DumpContext (Context);
 
         return result;
     }

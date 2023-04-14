@@ -295,9 +295,10 @@ public sealed class ConsoleDebugger
 
         Sure.FileExists (fileName);
 
+        var settings = _interpreter.Context.Commmon.Settings;
         var sourceCode = File.ReadAllText (fileName);
         _sourceLines = sourceCode.SplitLines();
-        _program = _interpreter.Settings.Grammar.ParseProgram (sourceCode, _interpreter.Settings.Tokenizer);
+        _program = settings.Grammar.ParseProgram (sourceCode, settings.Tokenizer);
     }
 
     /// <inheritdoc cref="IBarsikDebugger.Next"/>

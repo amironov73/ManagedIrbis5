@@ -42,5 +42,11 @@ public sealed class CommonContext
     /// </summary>
     public TextReader? Input { get; set; }
 
+    /// <summary>
+    /// Настройки интерпретатора.
+    /// Применяются перед началом разбора и исполнения скрипта.
+    /// </summary>
+    public InterpreterSettings Settings { get; set; } = null!;
+
     #endregion
 }
