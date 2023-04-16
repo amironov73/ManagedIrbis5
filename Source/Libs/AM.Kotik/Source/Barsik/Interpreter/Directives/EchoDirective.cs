@@ -43,7 +43,7 @@ public sealed class EchoDirective
         )
     {
         var rootContext = context.GetRootContext();
-        var repl = (Repl?) rootContext.UserData["repl"];
+        var repl = (Repl?) rootContext.Commmon.UserData["repl"];
         if (repl is not null)
         {
             var echo = repl.Echo;

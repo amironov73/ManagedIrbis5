@@ -13,8 +13,8 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 
-using AM.Collections;
 using AM.Text;
 
 #endregion
@@ -38,7 +38,7 @@ public sealed class TypeDescriptor
     /// <summary>
     /// Параметры обобщенного типа (опционально).
     /// </summary>
-    public string[]? GenericParameters { get; set; }
+    public IList<string>? GenericParameters { get; set; }
 
     #endregion
 
@@ -77,12 +77,12 @@ public sealed class TypeDescriptor
             return other.GenericParameters is null;
         }
 
-        if (GenericParameters.Length != other.GenericParameters!.Length)
+        if (GenericParameters.Count != other.GenericParameters!.Count)
         {
             return false;
         }
 
-        for (var i = 0; i < GenericParameters.Length; i++)
+        for (var i = 0; i < GenericParameters.Count; i++)
         {
             if (GenericParameters[i] != other.GenericParameters![i])
             {
@@ -98,7 +98,7 @@ public sealed class TypeDescriptor
     {
         var result = new HashCode();
         result.Add (TypeName);
-        if (!GenericParameters.IsNullOrEmpty())
+        if (GenericParameters is { Count: not 0 })
         {
             foreach (var parameter in GenericParameters)
             {
@@ -112,7 +112,7 @@ public sealed class TypeDescriptor
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString()
     {
-        if (GenericParameters.IsNullOrEmpty())
+        if (GenericParameters is { Count: not 0 })
         {
             return TypeName.ToVisibleString();
         }
@@ -120,7 +120,7 @@ public sealed class TypeDescriptor
         var builder = StringBuilderPool.Shared.Get();
         builder.Append (TypeName);
         builder.Append ('<');
-        builder.AppendList (GenericParameters);
+        builder.AppendEnumerable (GenericParameters, open: string.Empty, close: string.Empty);
         builder.Append ('>');
 
         return builder.ReturnShared();

@@ -16,6 +16,7 @@ using System.IO;
 using System.Reflection;
 
 using AM.Kotik.Barsik.Diagnostics;
+using AM.Kotik.Types;
 
 using JetBrains.Annotations;
 
@@ -85,6 +86,16 @@ public sealed class CommonContext
     /// Поток для отладочного вывода при парсинге скрипта.
     /// </summary>
     public TextWriter? ParsingDebugOutput { get; set; }
+
+    /// <summary>
+    /// Произвольные пользовательские данные.
+    /// </summary>
+    public Dictionary<string, object?> UserData { get; } = new ();
+
+    /// <summary>
+    /// Разрешает типы и члены классов.
+    /// </summary>
+    public IResolver Resolver { get; set; } = null!;
 
     #endregion
 }

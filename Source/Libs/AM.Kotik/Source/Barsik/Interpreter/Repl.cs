@@ -110,7 +110,7 @@ public sealed class Repl
         output = new AttentiveWriter (output ?? Console.Out);
         error ??= Console.Error;
         Interpreter = new Interpreter (Input, output, error);
-        Interpreter.Context.UserData["repl"] = this;
+        Interpreter.Context.Commmon.UserData["repl"] = this;
         Echo = true;
         _input = new ReplInput (Input, output, Interpreter);
         if (LineEditor.IsSupported (AnsiConsole.Console))
@@ -130,7 +130,7 @@ public sealed class Repl
     {
         interpreter.MakeAttentive();
         Interpreter = interpreter;
-        Interpreter.Context.UserData["repl"] = this;
+        Interpreter.Context.Commmon.UserData["repl"] = this;
         Input = input ?? interpreter.Context.Commmon.Input ?? Console.In;
         Echo = true;
         _input = new ReplInput

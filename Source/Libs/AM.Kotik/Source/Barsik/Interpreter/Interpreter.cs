@@ -25,6 +25,7 @@ using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Highlighting;
 using AM.Kotik.Tokenizers;
+using AM.Kotik.Types;
 using AM.Text;
 
 using JetBrains.Annotations;
@@ -82,7 +83,8 @@ public sealed class Interpreter
                 Input = input ?? Console.In,
                 Output = output ?? Console.Out,
                 Error = error ?? Console.Error,
-                Settings =  settings ?? InterpreterSettings.CreateDefault()
+                Settings =  settings ?? InterpreterSettings.CreateDefault(),
+                Resolver = new CachingResolver()
             }
         };
 
