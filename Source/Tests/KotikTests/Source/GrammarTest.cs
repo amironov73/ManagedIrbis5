@@ -6,9 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+#region Using directives
+
 using AM.Kotik;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+#endregion
 
 #nullable enable
 

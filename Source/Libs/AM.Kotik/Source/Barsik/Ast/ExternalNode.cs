@@ -66,7 +66,7 @@ public sealed class ExternalNode
     {
         PreExecute (context);
 
-        var handler = context.GetRootContext().ExternalCodeHandler;
+        var handler = context.Commmon.ExternalCodeHandler;
         if (handler is null)
         {
             context.Commmon.Error?.WriteLine ("Missing external code handler");
@@ -88,10 +88,10 @@ public sealed class ExternalNode
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {

@@ -14,6 +14,8 @@
 
 namespace AM.Kotik.Barsik.Directives;
 
+// TODO реализовать сохранение/загрузку JSON
+
 /// <summary>
 /// Абстрактная директива интерпретатора.
 /// </summary>
@@ -67,6 +69,13 @@ public abstract class DirectiveBase
 
         return string.CompareOrdinal (command, _command) == 0;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => _command;
 
     #endregion
 }

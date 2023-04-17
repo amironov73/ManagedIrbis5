@@ -65,11 +65,6 @@ public sealed class Context
     /// </summary>
     public AtomNode? With { get; set; }
 
-    /// <summary>
-    /// Обработчик внешнего кода.
-    /// </summary>
-    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
-
     #endregion
 
     #region Construction
@@ -86,21 +81,11 @@ public sealed class Context
         Variables = new ();
         Functions = new ();
         Commmon = parent?.Commmon ?? new ();
-
-        var comparer = OperatingSystem.IsWindows()
-            ? StringComparer.InvariantCultureIgnoreCase
-            : StringComparer.InvariantCulture;
-        _inclusions = new (comparer);
     }
 
     #endregion
 
     #region Private members
-
-    /// <summary>
-    /// Здесь запоминаются вложенные скрипты.
-    /// </summary>
-    internal readonly Dictionary<string, ProgramNode> _inclusions;
 
     /// <summary>
     /// Конструирование типа, если необходимо.
@@ -157,7 +142,7 @@ public sealed class Context
             string fileName
         )
     {
-        if (!_inclusions.TryGetValue (fileName, out var program))
+        if (!Commmon.Inclusions.TryGetValue (fileName, out var program))
         {
             if (!File.Exists (fileName))
             {
@@ -166,7 +151,7 @@ public sealed class Context
 
             var sourceCode = File.ReadAllText(fileName);
             program = Commmon.Settings.Grammar.ParseProgram (sourceCode, Commmon.Settings.Tokenizer);
-            _inclusions[fileName] = program;
+            Commmon.Inclusions[fileName] = program;
         }
 
         // TODO отрабатывать ExitException?

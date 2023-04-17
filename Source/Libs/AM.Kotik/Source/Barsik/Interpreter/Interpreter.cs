@@ -214,7 +214,8 @@ public sealed class Interpreter
     {
         Sure.NotNull (args);
 
-        var settings = InterpreterSettings.FromCommandLine (args);
+        var settings = InterpreterSettings.CreateDefault();
+        settings.FromCommandLine (args);
         return new Interpreter (settings: settings);
     }
 

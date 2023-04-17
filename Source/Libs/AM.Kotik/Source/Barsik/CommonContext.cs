@@ -11,9 +11,11 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
+using AM.Kotik.Barsik.Ast;
 using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Types;
 
@@ -100,6 +102,21 @@ public sealed class CommonContext
     /// Разрешает типы и члены классов.
     /// </summary>
     public IResolver Resolver { get; set; } = null!;
+
+    /// <summary>
+    /// Обработчик внешнего кода.
+    /// </summary>
+    public ExternalCodeHandler? ExternalCodeHandler { get; set; }
+
+    /// <summary>
+    /// Здесь запоминаются вложенные скрипты.
+    /// </summary>
+    public Dictionary<string, ProgramNode> Inclusions { get; }= new
+        (
+            OperatingSystem.IsWindows()
+                ? StringComparer.InvariantCultureIgnoreCase
+                : StringComparer.InvariantCulture
+        );
 
     #endregion
 }

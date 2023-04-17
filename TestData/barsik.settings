@@ -1,0 +1,14 @@
+{
+  "start-debugger": false,
+  "debug-parser": false,
+  "dump-ast": false,
+  "repl": false,
+  "use-namespaces": [
+    "System",
+    "System.Collections.Generic",
+    "System.IO",
+    "System.Text"
+  ],
+  "dump-tokens": false,
+  "allow-new": true
+}

@@ -9,6 +9,7 @@
 #region Using directives
 
 using System;
+using System.IO;
 
 using AM.Kotik;
 using AM.Kotik.Tokenizers;
@@ -21,6 +22,29 @@ namespace KotikTests;
 
 public class CommonParserTest
 {
+    /// <summary>
+    /// Папка, в которой расположена UnitTests.dll.
+    /// </summary>
+    public string UnitTestDllPath => AppContext.BaseDirectory;
+
+    /// <summary>
+    /// Папка с данными для тестов.
+    /// </summary>
+    public string TestDataPath
+    {
+        get
+        {
+            var result = Path.Combine
+                (
+                    UnitTestDllPath,
+                    @"../../../../../../TestData"
+                );
+            result = Path.GetFullPath (result);
+
+            return result;
+        }
+    }
+
     protected static object IntegerArithmetic
         (
             object leftOperand,
