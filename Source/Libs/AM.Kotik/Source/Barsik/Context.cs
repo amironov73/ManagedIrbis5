@@ -294,7 +294,7 @@ public sealed class Context
                 var name = node.Name;
                 if (Builtins.IsBuiltinFunction (name))
                 {
-                    throw new BarsikException ($"{name} used by builtin function");
+                    throw new BarsikException ($"Name {name} used by builtin function");
                 }
 
                 var definition = new FunctionDefinition
@@ -611,6 +611,8 @@ public sealed class Context
             AtomNode node
         )
     {
+        Sure.NotNull (node);
+
         var value = node.Compute (this);
         KotikUtility.PrintObject (Commmon.Output, value);
     }

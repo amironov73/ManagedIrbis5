@@ -12,6 +12,10 @@
 
 #nullable enable
 
+using System.IO;
+
+using AM.Kotik.Ast;
+
 namespace AM.Kotik.Barsik.Ast;
 
 /// <summary>
@@ -69,7 +73,7 @@ public sealed class IsNode
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute 
+    public override dynamic? Compute
         (
             Context context
         )
@@ -102,6 +106,31 @@ public sealed class IsNode
         }
 
         return null;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        _obj.DumpHierarchyItem ("Obj", level + 1, writer);
+        if (string.IsNullOrEmpty (_typeName))
+        {
+            _other.ThrowIfNull().DumpHierarchyItem ("Other", level + 1, writer);
+        }
+        else
+        {
+            base.DumpHierarchyItem ("Type", level + 1, writer, _typeName);
+        }
     }
 
     #endregion

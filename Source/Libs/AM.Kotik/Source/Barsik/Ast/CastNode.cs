@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* CastNode.cs -- преобразование типа
  * Ars Magna project, http://arsmagna.ru
@@ -68,7 +67,7 @@ internal sealed class CastNode
         var targetType = context.ResolveType (_typeName);
         if (targetType is null)
         {
-            context.Commmon.Error?.WriteLine ($"Type {_typeName} not found");
+            context.Commmon.Error?.WriteLine ($"Can't resolve type {_typeName}");
             return null;
         }
 
@@ -191,10 +190,10 @@ internal sealed class CastNode
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {

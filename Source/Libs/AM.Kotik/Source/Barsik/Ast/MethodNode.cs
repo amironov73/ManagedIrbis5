@@ -89,24 +89,30 @@ internal sealed class MethodNode
             argumentTypes.Add (argType);
         }
 
+        var descriptor = new MethodDescriptor
+        {
+            Name = _methodName,
+            Arguments = argumentTypes.ToArray()
+        };
+
         if (thisValue is Type type)
         {
-            var staticMethod = type.GetMethod (_methodName, argumentTypes.ToArray());
-            staticMethod ??= type.GetMethod (_methodName);
+            descriptor.Type = type;
+            var staticMethod = context.Commmon.Resolver.ResolveMethod (descriptor);
             if (staticMethod is null)
             {
-                return null;
+                throw new BarsikException ($"Can't resolve method {type}.{_methodName}");
             }
 
             return staticMethod.Invoke (null, argumentValues.ToArray());
         }
 
         type = ((object) thisValue).GetType();
-        var instanceMethod = type.GetMethod (_methodName, argumentTypes.ToArray());
-        instanceMethod ??= type.GetMethod (_methodName);
+        descriptor.Type = type;
+        var instanceMethod = context.Commmon.Resolver.ResolveMethod (descriptor);
         if (instanceMethod is null)
         {
-            return null;
+            throw new BarsikException ($"Can't resolve method {type}.{_methodName}");
         }
 
         var result = instanceMethod.Invoke (thisValue, argumentValues.ToArray());

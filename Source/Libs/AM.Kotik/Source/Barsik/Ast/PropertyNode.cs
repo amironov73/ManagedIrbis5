@@ -14,6 +14,9 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.IO;
+
+using AM.Kotik.Ast;
 
 #endregion
 
@@ -65,29 +68,29 @@ internal sealed class PropertyNode
         var obj = _target.Compute (context);
         if (obj is null)
         {
-            return null;
+            throw new BarsikException ("Can't get property or field of null object");
         }
 
         if (string.IsNullOrEmpty (_propertyName))
         {
-            return null;
+            throw new BarsikException ("Property or field name not specified");
         }
 
+        var descriptor = new MemberDescriptor
+        {
+            Name = _propertyName
+        };
+        
         if (obj is Type type)
         {
-            var propertyInfo = type.GetProperty (_propertyName);
-            if (propertyInfo is not null)
+            descriptor.Type = type;
+            var staticMember = context.Commmon.Resolver.ResolveMember (descriptor);
+            if (staticMember is null)
             {
-                return propertyInfo.GetValue (null);
+                throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
             }
 
-            var fieldInfo = type.GetField (_propertyName);
-            if (fieldInfo is not null)
-            {
-                return fieldInfo.GetValue (null);
-            }
-
-            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
+            return staticMember.GetValue (null);
         }
 
         if (obj is ExpandoObject expando)
@@ -104,19 +107,14 @@ internal sealed class PropertyNode
         }
 
         type = ((object) obj).GetType();
-        var property = type.GetProperty (_propertyName);
-        if (property is not null)
+        descriptor.Type = type;
+        var instanceMember = context.Commmon.Resolver.ResolveMember (descriptor);
+        if (instanceMember is null)
         {
-            return property.GetValue (obj);
+            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
         }
 
-        var field = type.GetField (_propertyName);
-        if (field is not null)
-        {
-            return field.GetValue (obj);
-        }
-
-        throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
+        return instanceMember.GetValue (obj);
     }
 
     /// <inheritdoc cref="AtomNode.Assign"/>
@@ -130,33 +128,30 @@ internal sealed class PropertyNode
         var obj = _target.Compute (context);
         if (obj is null)
         {
-            return null;
+            throw new BarsikException ($"Can't set property or field of null object");
         }
 
         if (string.IsNullOrEmpty (_propertyName))
         {
-            return null;
+            throw new BarsikException ("Property or field name not specified");
         }
+
+        var descriptor = new MemberDescriptor
+        {
+            Name = _propertyName
+        };
 
         if (obj is Type type)
         {
-            var propertyInfo = type.GetProperty (_propertyName);
-            if (propertyInfo is not null)
+            descriptor.Type = type;
+            var staticMember = context.Commmon.Resolver.ResolveMember (descriptor);
+            if (staticMember is null)
             {
-                propertyInfo.SetValue (null, value);
-
-                return value;
+                throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
             }
-
-            var fieldInfo = type.GetField (_propertyName);
-            if (fieldInfo is not null)
-            {
-                fieldInfo.SetValue (null, value);
-
-                return value;
-            }
-
-            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
+            
+            staticMember.SetValue (null, value);
+            return value;
         }
 
         if (obj is ExpandoObject expando)
@@ -164,28 +159,37 @@ internal sealed class PropertyNode
             #pragma warning disable CS8619
             ((IDictionary<string, object?>) expando)[_propertyName] = value;
             #pragma warning restore CS8619
-
             return value;
         }
 
         type = ((object) obj).GetType();
-        var property = type.GetProperty (_propertyName);
-        if (property is not null)
+        descriptor.Type = type;
+        var instanceMember = context.Commmon.Resolver.ResolveMember (descriptor);
+        if (instanceMember is null)
         {
-            property.SetValue (obj, value);
-
-            return value;
+            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
         }
 
-        var field = type.GetField (_propertyName);
-        if (field is not null)
-        {
-            field.SetValue (obj, value);
+        instanceMember.SetValue (obj, value);
+        return value;
+    }
 
-            return value;
-        }
+    #endregion
 
-        throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+
+        _target.DumpHierarchyItem ("Target", level + 1, writer);
+        DumpHierarchyItem ("Property", level + 1, writer, _propertyName);
     }
 
     #endregion

@@ -141,7 +141,7 @@ internal sealed class NewNode
         {
             foreach (var typeArgument in _typeArguments)
             {
-                DumpHierarchyItem ("TypeArg: " + typeArgument, level + 1, writer);
+                DumpHierarchyItem ("TypeArg", level + 1, writer, typeArgument);
             }
         }
         foreach (var argument in _constructorArguments)

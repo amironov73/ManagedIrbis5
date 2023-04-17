@@ -126,12 +126,15 @@ public class NaiveResolver
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static
             | BindingFlags.Public | BindingFlags.NonPublic;
         var arguments = descriptor.Arguments ?? Array.Empty<Type>();
-        return type.GetMethod
+        var result = type.GetMethod
             (
                 name,
                 flags,
                 arguments
             );
+        result ??= type.GetMethod (name, flags);
+
+        return result;
     }
 
     /// <inheritdoc cref="IResolver.ResolveType"/>

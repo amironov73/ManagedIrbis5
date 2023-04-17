@@ -201,7 +201,7 @@ public sealed class PropertyOrField
     /// </summary>
     public object? GetValue
         (
-            object obj
+            object? obj
         )
     {
         if (IsProperty)
@@ -231,7 +231,7 @@ public sealed class PropertyOrField
     /// </summary>
     public void SetValue
         (
-            object obj,
+            object? obj,
             object? value
         )
     {
