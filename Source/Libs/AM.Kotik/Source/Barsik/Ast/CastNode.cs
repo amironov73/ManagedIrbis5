@@ -65,7 +65,7 @@ internal sealed class CastNode
             Context context
         )
     {
-        var targetType = context.FindType (_typeName);
+        var targetType = context.ResolveType (_typeName);
         if (targetType is null)
         {
             context.Commmon.Error?.WriteLine ($"Type {_typeName} not found");

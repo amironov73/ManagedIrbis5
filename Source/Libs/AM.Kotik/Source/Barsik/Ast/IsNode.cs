@@ -84,7 +84,7 @@ public sealed class IsNode
         if (!string.IsNullOrEmpty (_typeName))
         {
             var leftType = ((object) value).GetType();
-            var rightType = context.FindType (_typeName);
+            var rightType = context.ResolveType (_typeName);
 
             if (leftType == rightType)
             {

@@ -177,7 +177,7 @@ public sealed class StdLib
         var typeName = Compute (context, args, 1) as string;
         if (!string.IsNullOrEmpty (typeName))
         {
-            type = context.FindType (typeName);
+            type = context.ResolveType (typeName);
             if (type is null)
             {
                 context.Commmon.Error?.WriteLine ($"Can't find type {typeName}");
@@ -274,7 +274,7 @@ public sealed class StdLib
 
         if (target is string typeName)
         {
-            target = context.FindType (typeName);
+            target = context.ResolveType (typeName);
             if (target is null)
             {
                 context.Commmon.Error?.WriteLine ($"Can't find type {typeName}");
@@ -1261,7 +1261,7 @@ public sealed class StdLib
 
         if (args.Length < 2)
         {
-            return context.FindType (typeName);
+            return context.ResolveType (typeName);
         }
 
         var typeArguments = new List<string>();
@@ -1274,7 +1274,7 @@ public sealed class StdLib
             }
         }
 
-        return context.FindType (typeName, typeArguments.ToArray());
+        return context.ResolveType (typeName, typeArguments.ToArray());
     }
 
     /// <summary>
@@ -1342,18 +1342,18 @@ public sealed class StdLib
                         name = name.Substring (1);
                         if (!string.IsNullOrEmpty (name))
                         {
-                            topContext.Namespaces.Remove (name);
+                            topContext.Commmon.Resolver.Namespaces.Remove (name);
                         }
                     }
                     else
                     {
-                        topContext.Namespaces.TryAdd (name, null);
+                        topContext.Commmon.Resolver.Namespaces.Add (name);
                     }
                 }
             }
         }
 
-        return context.Namespaces.Keys;
+        return context.Commmon.Resolver.Namespaces;
     }
 
     #endregion

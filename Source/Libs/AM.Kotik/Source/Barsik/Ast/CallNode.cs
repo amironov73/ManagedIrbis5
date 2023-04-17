@@ -76,7 +76,7 @@ internal sealed class CallNode
             throw new BarsikException ($"Unexpected variable {_name}");
         }
 
-        _function ??= context.GetFunction (_name).ThrowIfNull ($"Can't find function {_name}");
+        _function ??= context.ResolveFunction (_name).ThrowIfNull ($"Can't find function {_name}");
 
         var args = new List<dynamic?>();
         foreach (var node in _arguments)

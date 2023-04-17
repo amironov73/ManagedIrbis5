@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* CachingResolver.cs -- кеширующий резольвер
  * Ars Magna project, http://arsmagna.ru
@@ -67,7 +66,10 @@ public sealed class CachingResolver
         _methodCache.Clear();
         _memberCache.Clear();
     }
-    
+
+    /// <inheritdoc cref="NaiveResolver.Reset"/>
+    public override void Reset() => Clear();
+
     /// <summary>
     /// Разрешение конструктора по его аргументам.
     /// </summary>

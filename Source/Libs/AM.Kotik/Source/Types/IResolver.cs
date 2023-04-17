@@ -40,6 +40,11 @@ public interface IResolver
     HashSet<string> Namespaces { get; }
 
     /// <summary>
+    /// Сброс резольвера в начальное состояние.
+    /// </summary>
+    void Reset();
+
+    /// <summary>
     /// Разрешение конструктора.
     /// </summary>
     ConstructorInfo? ResolveConstructor

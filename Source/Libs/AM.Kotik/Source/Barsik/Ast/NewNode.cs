@@ -16,6 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
+
+using AM.Kotik.Ast;
 
 #endregion
 
@@ -72,7 +75,7 @@ internal sealed class NewNode
             throw new BarsikException ("Operator NEW is not allowed");
         }
 
-        var type = context.FindType (_typeName, _typeArguments);
+        var type = context.ResolveType (_typeName, _typeArguments);
         if (type is null)
         {
             context.Commmon.Error?.WriteLine($"Type '{_typeName}' not found");
@@ -117,6 +120,34 @@ internal sealed class NewNode
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+        
+        DumpHierarchyItem ("Type", level + 1, writer, _typeName);
+        if (_typeArguments is not null)
+        {
+            foreach (var typeArgument in _typeArguments)
+            {
+                DumpHierarchyItem ("TypeArg: " + typeArgument, level + 1, writer);
+            }
+        }
+        foreach (var argument in _constructorArguments)
+        {
+            argument.DumpHierarchyItem ("Arg", level + 1, writer);
+        }
     }
 
     #endregion

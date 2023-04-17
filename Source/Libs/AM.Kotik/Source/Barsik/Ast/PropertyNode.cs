@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* PropertyNode.cs -- обращение к свойству объекта
  * Ars Magna project, http://arsmagna.ru
@@ -88,7 +87,7 @@ internal sealed class PropertyNode
                 return fieldInfo.GetValue (null);
             }
 
-            return null;
+            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
         }
 
         if (obj is ExpandoObject expando)
@@ -117,7 +116,7 @@ internal sealed class PropertyNode
             return field.GetValue (obj);
         }
 
-        return null;
+        throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
     }
 
     /// <inheritdoc cref="AtomNode.Assign"/>
@@ -157,13 +156,13 @@ internal sealed class PropertyNode
                 return value;
             }
 
-            return value;
+            throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
         }
 
         if (obj is ExpandoObject expando)
         {
             #pragma warning disable CS8619
-            ((IDictionary<string, object>) expando)[_propertyName] = value!;
+            ((IDictionary<string, object?>) expando)[_propertyName] = value;
             #pragma warning restore CS8619
 
             return value;
@@ -186,7 +185,7 @@ internal sealed class PropertyNode
             return value;
         }
 
-        return null;
+        throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
     }
 
     #endregion

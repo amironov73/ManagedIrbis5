@@ -72,6 +72,12 @@ public class NaiveResolver
 
     #region IResolver members
 
+    /// <inheritdoc cref="IResolver.Reset"/>
+    public virtual void Reset()
+    {
+        // пустое тело метода
+    }
+
     /// <inheritdoc cref="IResolver.ResolveConstructor"/>
     public virtual ConstructorInfo? ResolveConstructor
         (

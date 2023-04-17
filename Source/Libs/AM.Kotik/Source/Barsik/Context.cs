@@ -60,11 +60,6 @@ public sealed class Context
     public Dictionary<string, FunctionDescriptor> Functions { get; }
 
     /// <summary>
-    /// Используемые пространства имен.
-    /// </summary>
-    public Dictionary<string, object?> Namespaces { get; }
-
-    /// <summary>
     /// Опциональный префикс, используемый, например, в операторе "new"
     /// при инициализации свойств свежесозданного объекта.
     /// </summary>
@@ -90,7 +85,6 @@ public sealed class Context
         Parent = parent;
         Variables = new ();
         Functions = new ();
-        Namespaces = new ();
         Commmon = parent?.Commmon ?? new ();
 
         var comparer = OperatingSystem.IsWindows()
@@ -215,7 +209,7 @@ public sealed class Context
     /// </summary>
     public void DumpNamespaces()
     {
-        var keys = Namespaces.Keys.ToArray();
+        var keys = Commmon.Resolver.Namespaces.ToArray();
         if (keys.IsNullOrEmpty())
         {
             Commmon.Output?.WriteLine ("(no namespaces)");
@@ -373,18 +367,13 @@ public sealed class Context
             }
         }
 
-        if (Builtins.Registry.TryGetValue (name, out result))
-        {
-            return true;
-        }
-
-        return false;
+        return Builtins.Registry.TryGetValue (name, out result);
     }
 
     /// <summary>
     /// Получение типа по его имени.
     /// </summary>
-    public Type? FindType
+    public Type? ResolveType
         (
             string name,
             IList<string>? arguments = null
@@ -398,115 +387,12 @@ public sealed class Context
             GenericParameters = arguments
         };
         return Commmon.Resolver.ResolveType (descriptor);
-        
-        // switch (name)
-        // {
-        //     case "bool": return typeof (bool);
-        //     case "byte": return typeof (byte);
-        //     case "sbyte": return typeof (sbyte);
-        //     case "short": return typeof (short);
-        //     case "char": return typeof (char);
-        //     case "ushort": return typeof (ushort);
-        //     case "int": return typeof (int);
-        //     case "uint": return typeof (uint);
-        //     case "long": return typeof (long);
-        //     case "ulong": return typeof (ulong);
-        //     case "decimal": return typeof (decimal);
-        //     case "float": return typeof (float);
-        //     case "double": return typeof (double);
-        //     case "object": return typeof (object);
-        //     case "string": return typeof (string);
-        //
-        //     // наши псевдо-типы
-        //     case "list": return typeof (BarsikList);
-        //     case "dict": return typeof (BarsikDictionary);
-        // }
-        //
-        // Type[]? typeArguments = null;
-        // if (arguments is not null)
-        // {
-        //     var list = new List<Type>();
-        //     foreach (var oneArgument in arguments)
-        //     {
-        //         var foundType = FindType (oneArgument);
-        //         if (foundType is null)
-        //         {
-        //             // TODO более осмысленная реакция на ошибку
-        //             return null;
-        //         }
-        //
-        //         list.Add (foundType);
-        //     }
-        //
-        //     typeArguments = list.ToArray();
-        // }
-        //
-        // if (typeArguments is not null && !name.Contains ('`'))
-        // {
-        //     // TODO разбирать на имя типа и сборку
-        //     name += $"`{typeArguments.Length}";
-        // }
-        //
-        // var result = Type.GetType (name, false);
-        // if (result is not null)
-        // {
-        //     return ConstructType (result, typeArguments);
-        // }
-        //
-        // var topContext = GetRootContext();
-        // if (!name.Contains ('.'))
-        // {
-        //     // это не полное имя, так что попробуем приписать к нему
-        //     // различные пространства имен
-        //     foreach (var ns in topContext.Namespaces.Keys)
-        //     {
-        //         var fullName = ns + "." + name;
-        //         result = Type.GetType (fullName, false);
-        //         if (result is not null)
-        //         {
-        //             return ConstructType (result, typeArguments);
-        //         }
-        //     }
-        // }
-        //
-        // if (!name.Contains (','))
-        // {
-        //     // это не assembly-qualified name, так что попробуем
-        //     // приписать к нему загруженные нами сборки
-        //     foreach (var asm in Commmon.Assemblies.Values)
-        //     {
-        //         var asmName = asm.GetName().Name;
-        //         var fullName = name + ", " + asmName;
-        //         result = Type.GetType (fullName, false);
-        //         if (result is not null)
-        //         {
-        //             return ConstructType (result, typeArguments);
-        //         }
-        //
-        //         if (!name.Contains ('.'))
-        //         {
-        //             // это не полное имя, так что попробуем приписать к нему
-        //             // различные пространства имен
-        //             foreach (var ns in topContext.Namespaces.Keys)
-        //             {
-        //                 fullName = ns + "." + name + ", " + asmName;
-        //                 result = Type.GetType (fullName, false);
-        //                 if (result is not null)
-        //                 {
-        //                     return ConstructType (result, typeArguments);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-        //
-        // return null;
     }
 
     /// <summary>
     /// Поиск функции в текущем и в родительском контекстах.
     /// </summary>
-    public FunctionDescriptor GetFunction
+    public FunctionDescriptor ResolveFunction
         (
             string name
         )
@@ -598,16 +484,20 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
+        // TODO сделать умное сравнение имен сборок
         name = name.Trim();
         if (string.IsNullOrEmpty (name))
         {
             throw new BarsikException();
         }
 
-        if (Commmon.Assemblies.TryGetValue (name, out var foundAssembly))
+        foreach (var assembly in Commmon.Resolver.Assemblies)
         {
-            // уже загружено, пропускаем
-            return foundAssembly;
+            if (assembly.GetName().Name.SameString (name))
+            {
+                // уже загружено, пропускаем
+                return assembly;
+            }
         }
 
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -616,7 +506,7 @@ public sealed class Context
             var asmName = asm.GetName().Name;
             if (asmName.SameString (name))
             {
-                Commmon.Assemblies.Add (name, asm);
+                Commmon.Resolver.Assemblies.Add (asm);
                 return asm;
             }
         }
@@ -641,7 +531,7 @@ public sealed class Context
 
         if (result is not null)
         {
-            Commmon.Assemblies.Add (name, result);
+            Commmon.Resolver.Assemblies.Add (result);
             return result;
         }
 
@@ -664,8 +554,7 @@ public sealed class Context
             if (File.Exists (fullPath))
             {
                 result = Assembly.LoadFile (fullPath);
-                Commmon.Assemblies.Add (name, result);
-
+                Commmon.Resolver.Assemblies.Add (result);
                 return result;
             }
         }

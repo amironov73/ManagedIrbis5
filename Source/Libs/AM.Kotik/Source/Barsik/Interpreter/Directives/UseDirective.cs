@@ -50,7 +50,7 @@ public sealed class UseDirective
         }
         else
         {
-            context.Namespaces[argument] = null;
+            context.Commmon.Resolver.Namespaces.Add (argument);
         }
     }
 

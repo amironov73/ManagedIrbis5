@@ -191,7 +191,7 @@ public sealed class Interpreter
 
         foreach (var ns in settings.UseNamespaces)
         {
-            Context.Namespaces.TryAdd (ns, null);
+            Context.Commmon.Resolver.Namespaces.Add (ns);
         }
 
         if (settings.DebugParser)

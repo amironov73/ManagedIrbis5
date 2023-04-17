@@ -68,7 +68,7 @@ internal sealed class VariableNode
             return value;
         }
 
-        var type = context.FindType (Name);
+        var type = context.ResolveType (Name);
         if (type is not null)
         {
             return type;
