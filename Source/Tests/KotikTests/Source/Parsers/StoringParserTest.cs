@@ -29,21 +29,21 @@ public sealed class StoringParserTest
     [Description ("Успешный простой разбор целого")]
     public void StoringParser_Parse_1()
     {
-        var value = 0;
+        var value = new int [1];
         var state = _GetState ("123");
-        var parser = new StoringParser<int>(ref value);
+        var parser = new StoringParser<int>(value);
         parser.ParseOrThrow (state);
         Assert.IsNotNull (value);
-        Assert.AreEqual (123, value);
+        Assert.AreEqual (123, value[0]);
     }
 
     [TestMethod]
     [Description ("Неуспешный простой разбор целого")]
     public void StoringParser_Parse_2()
     {
-        var value = 0;
+        var value = new int[1];
         var state = _GetState ("aga");
-        var parser = new StoringParser<int>(ref value);
+        var parser = new StoringParser<int>(value);
         var result = parser.Parse (state);
         Assert.IsFalse (result.IsSuccess);
     }
@@ -52,20 +52,20 @@ public sealed class StoringParserTest
     [Description ("Успешный разбор целого между двух скобок")]
     public void StoringParser_Parse_3()
     {
-        var value = 0;
+        var value = new int[1];
         var state = _GetState ("(123)");
-        var parser = new StoringParser<int> (ref value).RoundBrackets ();
+        var parser = new StoringParser<int> (value).RoundBrackets ();
         parser.ParseOrThrow (state);
-        Assert.AreEqual (123, value);
+        Assert.AreEqual (123, value[0]);
     }
 
     [TestMethod]
     [Description ("Неуспешный разбор целого между двух скобок")]
     public void StoringParser_Parse_4()
     {
-        var value = 0;
+        var value = new int[1];
         var state = _GetState ("(ugu)");
-        var parser = new StoringParser<int> (ref value).RoundBrackets ();
+        var parser = new StoringParser<int> (value).RoundBrackets ();
         var result = parser.Parse (state);
         Assert.IsFalse (result.IsSuccess);
     }
@@ -74,15 +74,15 @@ public sealed class StoringParserTest
     [Description ("Успешный простой разбор числа с плавающей точкой")]
     public void StoringParser_Parse_5()
     {
-        var value = 0.0;
+        var value = new [] { 0.0 };
         var state = _GetState ("123.45");
-        var parser = new StoringParser<double> (ref value)
+        var parser = new StoringParser<double> (value)
         {
             FormatProvider = CultureInfo.InvariantCulture
         };
         parser.ParseOrThrow (state);
         Assert.IsNotNull (value);
-        Assert.AreEqual (123.45, value);
+        Assert.AreEqual (123.45, value[0]);
     }
 
     [TestMethod]
@@ -90,19 +90,19 @@ public sealed class StoringParserTest
     public void StoringParser_Parse_6()
     {
         var invariantCulture = CultureInfo.InvariantCulture;
-        var first = 0.0;
-        var second = 0.0;
+        var first = new [] { 0.0 };
+        var second = new[] { 0.0 };
         var state = _GetState ("http: 1.2 + 3.4");
         var parser = Parser.Sequence
             (
                 Parser.Identifier.Assert (x => x.IsOneOf ("http", "https")),
                 Parser.Term (":"),
-                new StoringParser<double> (ref first) { FormatProvider = invariantCulture },
+                new StoringParser<double> (first) { FormatProvider = invariantCulture },
                 Parser.Term ("+", "-"),
-                new StoringParser<double> (ref second) { FormatProvider = invariantCulture }
+                new StoringParser<double> (second) { FormatProvider = invariantCulture }
             );
         parser.ParseOrThrow (state);
-        Assert.AreEqual (1.2, first);
-        Assert.AreEqual (3.4, second);
+        Assert.AreEqual (1.2, first[0]);
+        Assert.AreEqual (3.4, second[0]);
     }
 }

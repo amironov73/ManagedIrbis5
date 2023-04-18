@@ -71,6 +71,7 @@ public sealed class SimplestParser<TResult>
         if (current.Kind == _expectedTokenKind)
         {
             result = (TResult) current.UserData.ThrowIfNull();
+            state.Advance();
             return true;
         }
 

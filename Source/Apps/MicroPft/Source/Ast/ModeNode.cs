@@ -87,7 +87,7 @@ internal sealed class ModeNode
         if (context.CurrentRepeat == 0)
         {
             context.Mode = _mode;
-            context.Output.UpperMode = _upper;
+            context.Upper = _upper;
         }
     }
 

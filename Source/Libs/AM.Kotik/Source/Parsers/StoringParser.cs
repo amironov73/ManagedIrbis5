@@ -13,7 +13,6 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 
 #endregion
 
@@ -24,7 +23,7 @@ namespace AM.Kotik;
 /// <summary>
 /// Парсит и запоминает парсуемое.
 /// </summary>
-public sealed unsafe class StoringParser<TResult>
+public sealed class StoringParser<TResult>
     : Parser<Unit>
     where TResult: unmanaged, IParsable<TResult>
 {
@@ -35,10 +34,10 @@ public sealed unsafe class StoringParser<TResult>
     /// </summary>
     public StoringParser
         (
-            ref TResult resultReference
+            Memory<TResult> memory
         )
     {
-        _pointer = (TResult*) Unsafe.AsPointer (ref resultReference);
+        _memory = memory;
     }
 
     #endregion
@@ -48,7 +47,7 @@ public sealed unsafe class StoringParser<TResult>
     /// <summary>
     /// Где размещается результат.
     /// </summary>
-    public TResult Result => * _pointer;
+    public ref TResult Result => ref _memory.Span[0];
 
     /// <summary>
     /// Провайдер формата.
@@ -59,7 +58,7 @@ public sealed unsafe class StoringParser<TResult>
 
     #region Private members
 
-    private readonly TResult* _pointer;
+    private readonly Memory<TResult> _memory;
 
     #endregion
 
@@ -88,7 +87,7 @@ public sealed unsafe class StoringParser<TResult>
 
         if (TResult.TryParse (text, FormatProvider, out var temporary))
         {
-            *_pointer = temporary;
+            Result = temporary;
             state.Advance();
 
             return DebugSuccess (state, true);

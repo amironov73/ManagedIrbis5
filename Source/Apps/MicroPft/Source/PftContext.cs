@@ -30,7 +30,7 @@ namespace MicroPft;
 /// <summary>
 /// Контекст исполнения PFT-скрипта.
 /// </summary>
-sealed class PftContext
+internal sealed class PftContext
 {
     #region Properties
 
@@ -48,6 +48,11 @@ sealed class PftContext
     /// Режим вывода полей/подполей.
     /// </summary>
     public char Mode { get; set; }
+
+    /// <summary>
+    /// Преобразование в верхний регистр при выводе полей/подполей.
+    /// </summary>
+    public bool Upper { get; set; }
 
     /// <summary>
     /// Текущая группа.

@@ -37,11 +37,6 @@ internal sealed class PftOutput
     /// </summary>
     public int ColumnNumber { get; private set; }
 
-    /// <summary>
-    /// Нужно ли переводить символы в верхний регистр.
-    /// </summary>
-    public bool UpperMode { get; set; }
-
     #endregion
 
     #region Private members
@@ -59,7 +54,6 @@ internal sealed class PftOutput
     {
         _builder.Clear();
         ColumnNumber = 0;
-        UpperMode = false;
     }
 
     /// <summary>
@@ -71,11 +65,6 @@ internal sealed class PftOutput
             int count = 1
         )
     {
-        if (UpperMode)
-        {
-            chr = char.ToUpperInvariant (chr);
-        }
-
         _builder.EnsureCapacity (_builder.Length + count);
         if (count > 0)
         {
@@ -99,10 +88,9 @@ internal sealed class PftOutput
     {
         foreach (var chr in text)
         {
-            var chr2 = UpperMode ? char.ToUpperInvariant (chr) : chr;
-            LastCharacter = chr2;
-            _builder.Append (chr2);
-            ColumnNumber = (chr2 == '\n') ? 0 : ColumnNumber + 1;
+            LastCharacter = chr;
+            _builder.Append (chr);
+            ColumnNumber = (chr == '\n') ? 0 : ColumnNumber + 1;
         }
     }
 

@@ -67,7 +67,7 @@ sealed class FieldNode
     /// <summary>
     /// Длина.
     /// </summary>
-    public int Length { get; }
+    public int Width { get; }
 
     #endregion
 
@@ -80,19 +80,19 @@ sealed class FieldNode
     /// <param name="tag">Метка поля.</param>
     /// <param name="code">Код подполя (опционально).</param>
     /// <param name="offset">Смещение (опционально).</param>
-    /// <param name="length">Длина (опционально).</param>
+    /// <param name="width">Длина (опционально).</param>
     public FieldNode
         (
             char command,
             int tag,
             char code = '\0',
             int offset = 0,
-            int length = 0
+            int width = 0
         )
     {
         Sure.Positive (tag);
         Sure.NonNegative (offset);
-        Sure.NonNegative (length);
+        Sure.NonNegative (width);
 
         code = char.ToLowerInvariant (code);
         command = char.ToLowerInvariant (command);
@@ -107,7 +107,7 @@ sealed class FieldNode
         Tag = tag;
         Code = code;
         Offset = offset;
-        Length = length;
+        Width = width;
     }
 
     #endregion
@@ -137,11 +137,95 @@ sealed class FieldNode
         {
             if (Code == '\0')
             {
-                prepared.Add (field.ToText());
+                switch (context.Mode)
+                {
+                    case 'h':
+                    case 'H':
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        PftUtility.HeaderMode (field.Subfields)
+                                    )
+                            );
+                        break;
+
+                    case 'd':
+                    case 'D':
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        PftUtility.DataMode
+                                            (
+                                                PftUtility.HeaderMode (field.Subfields)
+                                            )
+                                    )
+                            );
+                        break;
+
+                    default:
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        field.ToText()
+                                    )
+                            );
+                        break;
+                }
             }
             else
             {
-                prepared.Add (field.GetSubFieldValue (Code));
+                switch (context.Mode)
+                {
+                    case 'h':
+                    case 'H':
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        PftUtility.HeaderMode
+                                            (
+                                                field.GetSubFieldValue (Code)
+                                            )
+                                    )
+                            );
+                        break;
+
+                    case 'd':
+                    case 'D':
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        PftUtility.DataMode
+                                            (
+                                                PftUtility.HeaderMode
+                                                    (
+                                                        field.GetSubFieldValue (Code)
+                                                    )
+                                            )
+                                    )
+                            );
+                        break;
+
+                    default:
+                        prepared.Add
+                            (
+                                PftUtility.UpperMode
+                                    (
+                                        context.Upper,
+                                        field.GetSubFieldValue (Code)
+                                    )
+                            );
+                        break;
+                }
             }
         }
 
@@ -179,6 +263,17 @@ sealed class FieldNode
 
             if (Command == 'v')
             {
+                if (Offset is not 0 || Width is not 0)
+                {
+                    var width = 1_000_000_000;
+                    if (Width is not 0)
+                    {
+                        width = Width;
+                    }
+                    
+                    value = value.SafeSubstring (Offset, width);
+                }
+                
                 context.Write (value);
             }
 
@@ -203,7 +298,6 @@ sealed class FieldNode
         )
     {
         var group = context.CurrentGroup;
-        var record = context.Record;
 
         if (group is null)
         {
@@ -279,11 +373,11 @@ sealed class FieldNode
             result.Append (Offset);
         }
 
-        if (Length > 0)
+        if (Width > 0)
         {
             result.Append ('_');
             result.Append ('.');
-            result.Append (Length);
+            result.Append (Width);
         }
 
         if (LeftHand.Count != 0)

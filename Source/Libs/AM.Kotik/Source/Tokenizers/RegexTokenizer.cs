@@ -83,7 +83,7 @@ public sealed class RegexTokenizer
 
         var goodLength = 0;
         var maxLength = Math.Min (_maxLength, navigator.Length - navigator.Position);
-        for (var length = 1; length < maxLength; length++)
+        for (var length = 1; length <= maxLength; length++)
         {
             var slice = navigator.Substring (position, length).Span;
             if (_regex.IsMatch (slice))
@@ -96,7 +96,7 @@ public sealed class RegexTokenizer
         {
             navigator.RestorePosition (position + goodLength);
             var text = navigator.Substring (position, goodLength).ToString();
-            return new Token (_kind, text, line, column);
+            return new Token (_kind, text, line, column) { UserData = text };
         }
 
         return null;

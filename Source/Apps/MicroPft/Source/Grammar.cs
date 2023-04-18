@@ -44,33 +44,41 @@ internal static class Grammar
 
     // запятая
     private static readonly Parser<PftNode> Comma = new TermParser (new[] { "," })
-        .Map (_ => (PftNode)new CommaNode());
+        .Map (_ => (PftNode) new CommaNode())
+        .Labeled ("Comma");
 
     // команда вывода поля
     private static readonly Parser<PftNode> FieldCmd =
-        new SimplestParser<PftNode> ("field");
+        new SimplestParser<PftNode> ("field")
+            .Labeled ("Field");
 
     // безусловный литерал
     private static readonly Parser<PftNode> Unconditional =
-        new SimplestParser<PftNode> ("unconditional");
+        new SimplestParser<PftNode> ("unconditional")
+        .Labeled ("Unconditional");
 
     // условный литерал
     private static readonly Parser<PftNode> Conditional =
-        new SimplestParser<PftNode> ("conditional");
+        new SimplestParser<PftNode> ("conditional")
+        .Labeled ("Conditional");
 
     // повторяющийся литерал
     private static readonly Parser<PftNode> Repeating =
-        new SimplestParser<PftNode> ("repeating");
+        new SimplestParser<PftNode> ("repeating")
+        .Labeled ("Repeating");
 
     // начало группы
-    private static readonly Parser<PftNode> OpenGroup = Term ("(").Map (_ => PftNode.OpenGroup);
+    private static readonly Parser<PftNode> OpenGroup = Term ("(").Map (_ => PftNode.OpenGroup)
+        .Labeled ("Open");
 
     // конец группы
-    private static readonly Parser<PftNode> CloseGroup = Term (")").Map (_ => PftNode.CloseGroup);
+    private static readonly Parser<PftNode> CloseGroup = Term (")").Map (_ => PftNode.CloseGroup)
+        .Labeled ("Close");
 
     // перевод строки
     private static readonly Parser<PftNode> NewLine = Term ("#", "/", "%")
-        .Map (x => (PftNode)new NewLineNode (x[0]));
+        .Map (x => (PftNode)new NewLineNode (x[0]))
+        .Labeled ("NewLine");
 
     // команда смены режима `mpl`
     private static readonly Parser<PftNode> ModeCommand = new SimplestParser<string> ("mode")
@@ -78,15 +86,18 @@ internal static class Grammar
             (
                 char.ToLowerInvariant (x[1]),
                 x[2].SameChar ('u')
-            ));
+            ))
+        .Labeled ("Mode");
 
     // команда позиционирования
     private static readonly Parser<PftNode> CommandC = new SimplestParser<string> ("c")
-        .Map (x => (PftNode)new CNode (int.Parse (x[1..], CultureInfo.InvariantCulture)));
+        .Map (x => (PftNode)new CNode (int.Parse (x[1..], CultureInfo.InvariantCulture)))
+        .Labeled ("Position");
 
     // команда вывода пробелов
     private static readonly Parser<PftNode> CommandX = new SimplestParser<string> ("x")
-        .Map (x => (PftNode)new XNode (int.Parse (x[1..], CultureInfo.InvariantCulture)));
+        .Map (x => (PftNode)new XNode (int.Parse (x[1..], CultureInfo.InvariantCulture)))
+        .Labeled ("Indent");
 
     private static readonly Parser<PftNode> Expr = Parser.OneOf
         (
@@ -196,11 +207,23 @@ internal static class Grammar
                 continue;
             }
 
-            if (node is CNode or XNode or ModeNode or NewLineNode)
+            if (node is CNode or XNode)
             {
                 // может быть только слева
                 stack.Add (node);
                 continue;
+            }
+
+            if (node is ModeNode or NewLineNode)
+            {
+                if (group is not null)
+                {
+                    group.Items.Add (node);
+                }
+                else
+                {
+                    result.Add (node);
+                }
             }
 
             if (ReferenceEquals (node, PftNode.OpenGroup))
@@ -255,12 +278,14 @@ internal static class Grammar
             {
                 new WhitespaceTokenizer(),
                 new FieldTokenizer(),
-                new RegexTokenizer ("c", "[Cc]\\d+"),
-                new RegexTokenizer ("conditional", "[|][^|]*?[|]"),
-                new RegexTokenizer ("mode", "[Mm][DdHhPp][UuLl]"),
-                new RegexTokenizer ("x", "[Xx]\\d+"),
+                new RegexTokenizer ("c", "^[Cc]\\d+$"),
+                new RegexTokenizer ("conditional", "$^[|][^|]*?[|]$"),
+                new RegexTokenizer ("mode", "^[Mm][DdHhPp][UuLl]$"),
+                new RegexTokenizer ("x", "^[Xx]\\d+$"),
                 new RepeatingNodeTokenizer(),
-                new UnconditionalTokenizer()
+                new UnconditionalTokenizer(),
+                new ConditionalTokenizer(),
+                new TermTokenizer()
             }
         };
         var tokens = tokeninzer.Tokenize (text);

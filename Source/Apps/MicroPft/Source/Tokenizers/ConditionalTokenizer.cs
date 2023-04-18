@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* UnconditionalTokenizer.cs -- разбирает безусловный литерал
+/* ConditionalTokenizer.cs -- разбирает условный литерал
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,9 +22,9 @@ using MicroPft.Ast;
 namespace MicroPft.Tokenizers;
 
 /// <summary>
-/// Разбирает безусловный литерал.
+/// Разбирает условный литерал.
 /// </summary>
-public sealed class UnconditionalTokenizer
+public sealed class ConditionalTokenizer
     : Tokenizer
 {
     #region Tokeninzer members
@@ -37,7 +37,7 @@ public sealed class UnconditionalTokenizer
         var position = navigator.SavePosition();
 
         var chr = PeekChar();
-        if (chr != '\'')
+        if (chr != '"')
         {
             navigator.RestorePosition (position);
             return null;
@@ -47,13 +47,13 @@ public sealed class UnconditionalTokenizer
         while (!IsEof)
         {
             chr = ReadChar();
-            if (chr == '\'')
+            if (chr == '"')
             {
                 break;
             }
         }
 
-        if (chr != '\'')
+        if (chr != '"')
         {
             navigator.RestorePosition (position);
             return null;
@@ -61,9 +61,9 @@ public sealed class UnconditionalTokenizer
 
         var textLength = navigator.Position - position - 2;
         var text = navigator.Substring (position + 1, textLength).ToString();
-        return new Token ("unconditional", text, line, column, position)
+        return new Token ("conditional", text, line, column, position)
         {
-            UserData = new UnconditionalNode (text)
+            UserData = new ConditionalNode (text)
         };
     }
 

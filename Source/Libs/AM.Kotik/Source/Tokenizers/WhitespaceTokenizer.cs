@@ -90,14 +90,18 @@ public sealed class WhitespaceTokenizer
 
         if (navigator.Position != offset)
         {
+            var text = navigator.Substring (offset, navigator.Position - offset).ToString();
             return new Token
                 (
                     TokenKind.Whitespace,
-                    navigator.Substring (offset, navigator.Position - offset).ToString(),
+                    text,
                     line,
                     column,
                     offset
-                );
+                )
+                {
+                    UserData = text
+                };
         }
 
         return null;
