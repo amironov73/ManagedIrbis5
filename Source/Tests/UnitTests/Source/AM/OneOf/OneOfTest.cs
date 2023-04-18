@@ -2,13 +2,6 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable CollectionNeverQueried.Local
-// ReSharper disable CollectionNeverUpdated.Local
-// ReSharper disable ConvertToLocalFunction
-// ReSharper disable HeapView.ClosureAllocation
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable ForCanBeConvertedToForeach
-// ReSharper disable UseObjectOrCollectionInitializer
 
 #region Using directives
 
@@ -20,12 +13,15 @@ using AM;
 
 #endregion
 
+#nullable enable
+
 namespace UnitTests.AM;
 
 [TestClass]
-public class OneOfTest
+public sealed class OneOfTest
 {
     [TestMethod]
+    [Description ("Целое или строка: целое")]
     public void OneOf2_Constructor_1()
     {
         var one = new OneOf<int, string> (1);
@@ -35,6 +31,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Целое или строка: строка")]
     public void OneOf2_Constructor_2()
     {
         var one = new OneOf<int, string> ("Hello");
@@ -63,7 +60,7 @@ public class OneOfTest
         var one = new OneOf<int, string> (1);
         Assert.IsTrue (one.Try1 (out var intValue));
         Assert.AreEqual (1, intValue);
-        Assert.IsFalse (one.Try2 (out var _));
+        Assert.IsFalse (one.Try2 (out _));
     }
 
     [TestMethod]
@@ -76,6 +73,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Целое или строка: целое")]
     public void OneOf2_As_1()
     {
         var one = new OneOf<int, string> (1);
@@ -84,6 +82,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Целое или строка: неверный каст")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf2_As_2()
     {
@@ -217,6 +216,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Значение: первый вариант")]
     public void OneOf3_Value_1()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -224,6 +224,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Значение: второй вариант")]
     public void OneOf3_Value_2()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -231,6 +232,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Значение: третий вариант")]
     public void OneOf3_Value_3()
     {
         var one = new OneOf<int, string, bool> (true);
@@ -238,6 +240,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор: первый вариант")]
     public void OneOf3_Try_1()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -248,6 +251,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор: второй вариант")]
     public void OneOf3_Try_2()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -258,16 +262,18 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор: третий вариант")]
     public void OneOf3_Try_3()
     {
         var one = new OneOf<int, string, bool> (true);
         Assert.IsTrue (one.Try3 (out var boolValue));
         Assert.AreEqual (true, boolValue);
-        Assert.IsFalse (one.Try1 (out var _));
-        Assert.IsFalse (one.Try2 (out var _));
+        Assert.IsFalse (one.Try1 (out _));
+        Assert.IsFalse (one.Try2 (out _));
     }
 
     [TestMethod]
+    [Description ("Выбор: правильный")]
     public void OneOf3_As_1()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -276,6 +282,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор: исключение")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf3_As_2()
     {
@@ -284,6 +291,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор: исключение")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf3_As_3()
     {
@@ -292,6 +300,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор")]
     public void OneOf3_Switch_1()
     {
         var flag = false;
@@ -303,6 +312,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор")]
     public void OneOf3_Switch_2()
     {
         var flag = true;
@@ -314,6 +324,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор")]
     public void OneOf3_Switch_3()
     {
         var flag = true;
@@ -325,6 +336,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Выбор")]
     public void OneOf3_Switch_4()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -332,6 +344,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Матчинг")]
     public void OneOf3_Match_1()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -342,6 +355,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Матчинг")]
     public void OneOf3_Match_2()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -352,6 +366,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: проверка возможности")]
     public void OneOf3_Operator_1()
     {
         OneOf<int, string, bool> one = 1;
@@ -362,6 +377,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: проверка возможности")]
     public void OneOf3_Operator_2()
     {
         OneOf<int, string, bool> one = "Hello";
@@ -372,6 +388,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: проверка возможности")]
     public void OneOf3_Operator_3()
     {
         OneOf<int, string, bool> one = true;
@@ -382,6 +399,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование в целое число")]
     public void OneOf3_Operator_4()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -390,6 +408,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование в строку")]
     public void OneOf3_Operator_5()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -398,6 +417,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование в логический тип")]
     public void OneOf3_Operator_6()
     {
         var one = new OneOf<int, string, bool> (true);
@@ -406,6 +426,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: исключение")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf3_Operator_7()
     {
@@ -414,6 +435,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: исключение")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf3_Operator_8()
     {
@@ -422,6 +444,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Неявное преобразование: исключение")]
     [ExpectedException (typeof (InvalidCastException))]
     public void OneOf3_Operator_9()
     {
@@ -430,6 +453,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Строковое представление")]
     public void OneOf3_ToString_1()
     {
         var one = new OneOf<int, string, bool> (1);
@@ -437,6 +461,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Строковое представление")]
     public void OneOf3_ToString_2()
     {
         var one = new OneOf<int, string, bool> ("Hello");
@@ -444,6 +469,7 @@ public class OneOfTest
     }
 
     [TestMethod]
+    [Description ("Строковое представление")]
     public void OneOf3_ToString_3()
     {
         var one = new OneOf<int, string, bool> (true);

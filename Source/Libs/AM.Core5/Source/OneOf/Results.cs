@@ -67,6 +67,16 @@ public readonly struct All { }
 public readonly struct Some { }
 
 /// <summary>
+/// Результат: достигнут конец.
+/// </summary>
+public readonly struct End { }
+
+/// <summary>
+/// Результат: пропуск.
+/// </summary>
+public readonly struct Skip { }
+
+/// <summary>
 /// Результат: ни одного.
 /// </summary>
 public readonly struct None
