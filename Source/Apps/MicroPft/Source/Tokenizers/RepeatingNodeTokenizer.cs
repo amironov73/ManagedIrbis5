@@ -36,7 +36,7 @@ public sealed class RepeatingNodeTokenizer
     #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -55,13 +55,13 @@ public sealed class RepeatingNodeTokenizer
         if (IsEof)
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         if (chr != '|')
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar();
@@ -81,7 +81,7 @@ public sealed class RepeatingNodeTokenizer
         if (chr != '|')
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         navigator.SkipWhitespace();
@@ -94,10 +94,12 @@ public sealed class RepeatingNodeTokenizer
 
         var textLength = navigator.Position - position;
         var text = navigator.Substring (position, textLength).ToString();
-        return new Token ("field", text, line, column, position)
+        var token = new Token ("field", text, line, column, position)
         {
             UserData = new RepeatingNode (value.ToString(), plus)
         };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

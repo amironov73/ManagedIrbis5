@@ -19,6 +19,8 @@ using AM.Text;
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -28,13 +30,14 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для <see cref="BigInteger"/>.
 /// </summary>
+[PublicAPI]
 public sealed class BigIntegerTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -42,7 +45,7 @@ public sealed class BigIntegerTokenizer
         var chr = PeekChar();
         if (!chr.IsArabicDigit())
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         Span<char> buffer = stackalloc char[16];
@@ -69,7 +72,7 @@ public sealed class BigIntegerTokenizer
         if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar();
@@ -85,7 +88,7 @@ public sealed class BigIntegerTokenizer
                 position
             );
 
-        return result;
+        return TokenizerResult.Success (result);
     }
 
     #endregion

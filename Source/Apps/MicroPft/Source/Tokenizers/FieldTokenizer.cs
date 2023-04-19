@@ -34,7 +34,7 @@ internal sealed class FieldTokenizer
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -42,7 +42,7 @@ internal sealed class FieldTokenizer
         var chr = char.ToLowerInvariant (PeekChar());
         if (chr is not 'v' and not 'd' and not 'n')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar();
@@ -63,7 +63,7 @@ internal sealed class FieldTokenizer
         if (tag == 0)
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         var code = '\0';
@@ -73,7 +73,7 @@ internal sealed class FieldTokenizer
             if (IsEof)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
 
             code = ReadChar();
@@ -86,7 +86,7 @@ internal sealed class FieldTokenizer
             if (IsEof)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
 
             ReadChar();
@@ -105,7 +105,7 @@ internal sealed class FieldTokenizer
             if (offset == 0)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
         }
 
@@ -115,7 +115,7 @@ internal sealed class FieldTokenizer
             if (IsEof)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
 
             ReadChar();
@@ -134,7 +134,7 @@ internal sealed class FieldTokenizer
             if (length == 0)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
         }
 
@@ -143,7 +143,7 @@ internal sealed class FieldTokenizer
             if (offset != 0 || IsEof)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
 
             ReadChar();
@@ -162,16 +162,18 @@ internal sealed class FieldTokenizer
             if (offset == 0)
             {
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
         }
 
         var textLength = navigator.Position - position;
         var text = navigator.Substring (position, textLength).ToString();
-        return new Token ("field", text, line, column, offset)
+        var token = new Token ("field", text, line, column, offset)
         {
             UserData = new FieldNode (command, tag, code, offset, length)
         };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

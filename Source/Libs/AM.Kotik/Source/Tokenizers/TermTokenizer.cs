@@ -17,6 +17,8 @@ using System.Runtime.CompilerServices;
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,6 +28,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для термов.
 /// </summary>
+[PublicAPI]
 public sealed class TermTokenizer
     : Tokenizer
 {
@@ -62,7 +65,7 @@ public sealed class TermTokenizer
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         string? previousGood = null;
         var line = navigator.Line;
@@ -126,10 +129,8 @@ public sealed class TermTokenizer
             }
         }
 
-        bool CheckCharIsIdentifier (char chr)
-        {
-            return Array.IndexOf (nextIdentifierLetter, chr) >= 0;
-        }
+        bool CheckCharIsIdentifier (char chr) =>
+            Array.IndexOf (nextIdentifierLetter, chr) >= 0;
 
         bool CheckTextIsIdentifier (string suspect)
         {
@@ -149,18 +150,18 @@ public sealed class TermTokenizer
             return true;
         }
 
-        Token? MakeToken (string? tokenValue, int length)
+        TokenizerResult MakeToken (string? tokenValue, int length)
         {
             if (tokenValue is null)
             {
-                return null;
+                return TokenizerResult.Error;
             }
 
             if (CheckTextIsIdentifier (tokenValue)
                 && CheckCharIsIdentifier (navigator.LookAhead (tokenValue.Length)))
             {
                 // это идентификатор, а не терм
-                return null;
+                return TokenizerResult.Error;
             }
 
             for (var i = 0; i < length; i++)
@@ -168,14 +169,19 @@ public sealed class TermTokenizer
                 ReadChar();
             }
 
-            return new Token
+            var token = new Token
                 (
                     TokenKind.Term,
                     tokenValue,
                     line,
                     column,
                     offset
-                );
+                )
+                {
+                    UserData = tokenValue
+                };
+
+            return TokenizerResult.Success (token);
         }
     }
 

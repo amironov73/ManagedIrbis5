@@ -14,6 +14,8 @@
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,13 +25,14 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для форматных строк.
 /// </summary>
+[PublicAPI]
 public sealed class FormatTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var offset = navigator.Position;
         var line = navigator.Line;
@@ -37,7 +40,7 @@ public sealed class FormatTokenizer
 
         if (PeekChar() != '$' || PeekChar (1) != '"')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar(); // съедаем доллар
@@ -68,10 +71,21 @@ public sealed class FormatTokenizer
             throw new SyntaxException (navigator);
         }
 
-        var text = builder.ReturnShared();
-        text = TextUtility.UnescapeText (text);
+        var value = builder.ReturnShared();
+        value = TextUtility.UnescapeText (value);
+        var token = new Token
+            (
+                TokenKind.Format,
+                value,
+                line,
+                column,
+                offset
+            )
+            {
+                UserData = value
+            };
 
-        return new Token (TokenKind.Format, text, line, column, offset);
+        return TokenizerResult.Success (token);
     }
 
     #endregion

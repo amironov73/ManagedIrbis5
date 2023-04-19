@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* Token.cs -- токен
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +14,8 @@
 using System;
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,11 +25,12 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токен состоит из вида и значения.
 /// </summary>
+[PublicAPI]
 public sealed class Token
     : IEquatable<Token>
 {
     #region Properties
-    
+
     /// <summary>
     /// Смещение от начала текста (в символах).
     /// </summary>

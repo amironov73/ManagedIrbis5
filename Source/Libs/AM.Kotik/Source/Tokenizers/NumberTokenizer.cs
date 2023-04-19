@@ -18,6 +18,8 @@ using AM.Text;
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,13 +29,14 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для дробных чисел.
 /// </summary>
+[PublicAPI]
 public sealed class NumberTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -52,7 +55,7 @@ public sealed class NumberTokenizer
         }
         else
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         Span<char> buffer = stackalloc char[16];
@@ -124,7 +127,7 @@ public sealed class NumberTokenizer
             {
                 // это целое число, для них есть отдельный токенайзер
                 navigator.RestorePosition (position);
-                return null;
+                return TokenizerResult.Error;
             }
         }
 
@@ -132,7 +135,7 @@ public sealed class NumberTokenizer
         {
             // это не похоже на число
             navigator.RestorePosition(position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         // суффиксы
@@ -152,16 +155,18 @@ public sealed class NumberTokenizer
 
         var span = builder.AsSpan();
         var value = StringPool.Shared.GetOrAdd (span);
-
-        var result = new Token
+        var token = new Token
             (
                 kind,
                 value,
                 line,
                 column
-            );
+            )
+            {
+                UserData = value
+            };
 
-        return result;
+        return TokenizerResult.Success (token);
     }
 
     #endregion

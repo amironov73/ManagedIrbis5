@@ -15,6 +15,8 @@
 using System;
 using System.Text.RegularExpressions;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -24,6 +26,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер на регулярных выражениях.
 /// </summary>
+[PublicAPI]
 public sealed class RegexTokenizer
     : Tokenizer
 {
@@ -75,7 +78,7 @@ public sealed class RegexTokenizer
     #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -96,10 +99,12 @@ public sealed class RegexTokenizer
         {
             navigator.RestorePosition (position + goodLength);
             var text = navigator.Substring (position, goodLength).ToString();
-            return new Token (_kind, text, line, column) { UserData = text };
+            var token = new Token (_kind, text, line, column) { UserData = text };
+
+            return TokenizerResult.Success (token);
         }
 
-        return null;
+        return TokenizerResult.Error;
     }
 
     #endregion

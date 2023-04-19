@@ -30,7 +30,7 @@ public sealed class ConditionalTokenizer
     #region Tokeninzer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
@@ -40,7 +40,7 @@ public sealed class ConditionalTokenizer
         if (chr != '"')
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar();
@@ -56,15 +56,17 @@ public sealed class ConditionalTokenizer
         if (chr != '"')
         {
             navigator.RestorePosition (position);
-            return null;
+            return TokenizerResult.Error;
         }
 
         var textLength = navigator.Position - position - 2;
         var text = navigator.Substring (position + 1, textLength).ToString();
-        return new Token ("conditional", text, line, column, position)
+        var token = new Token ("conditional", text, line, column, position)
         {
             UserData = new ConditionalNode (text)
         };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

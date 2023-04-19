@@ -14,6 +14,8 @@
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,20 +25,21 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для директив.
 /// </summary>
+[PublicAPI]
 public sealed class DirectiveTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
         var position = navigator.Position;
         if (PeekChar() != '#')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         // директива должна быть первым токеном в строке
@@ -66,7 +69,7 @@ public sealed class DirectiveTokenizer
 
         if (!atStart)
         {
-            throw new SyntaxException (navigator);
+            return TokenizerResult.Error;
         }
 
         ReadChar();
@@ -76,17 +79,24 @@ public sealed class DirectiveTokenizer
             : navigator.ReadWord().ToString();
         if (string.IsNullOrEmpty (command))
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         navigator.SkipWhile (' ', '\t');
         var memory = navigator.ReadLine();
         var argument = StringPool.Shared.GetOrAdd (memory.Span);
+        var token = new Token
+            (
+                TokenKind.Directive,
+                command,
+                line, column,
+                position
+            )
+            {
+                UserData = argument
+            };
 
-        return new Token (TokenKind.Directive, command, line, column, position)
-        {
-            UserData = argument
-        };
+        return TokenizerResult.Success (token);
     }
 
     #endregion

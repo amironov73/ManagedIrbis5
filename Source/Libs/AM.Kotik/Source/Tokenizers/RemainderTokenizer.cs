@@ -12,26 +12,33 @@
 
 #nullable enable
 
+using JetBrains.Annotations;
+
 namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Выдает оставшуюся часть текста
 /// (либо пустую строку, если достигнут конец текста).
 /// </summary>
+[PublicAPI]
 public sealed class RemainderTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
         var text = navigator.GetRemainingText().ToString();
+        var token = new Token ("remainder", text, line, column, offset)
+        {
+            UserData = text
+        };
 
-        return new Token ("remainder", text, line, column, offset);
+        return TokenizerResult.Success (token);
     }
 
     #endregion

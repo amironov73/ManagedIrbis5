@@ -12,11 +12,14 @@
 
 #nullable enable
 
+using JetBrains.Annotations;
+
 namespace AM.Kotik.Tokenizers;
 
 /// <summary>
 /// Известные виды токенов.
 /// </summary>
+[PublicAPI]
 public static class TokenKind
 {
     #region Constants
@@ -30,7 +33,7 @@ public static class TokenKind
     /// Пробелы.
     /// </summary>
     public const string Whitespace = "whitespace";
-    
+
     /// <summary>
     /// Директива.
     /// </summary>

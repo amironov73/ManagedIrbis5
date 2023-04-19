@@ -18,6 +18,8 @@ using AM.Text;
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,13 +29,14 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для целых чисел.
 /// </summary>
+[PublicAPI]
 public sealed class IntegerTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var offset = navigator.Position;
         var line = navigator.Line;
@@ -42,7 +45,7 @@ public sealed class IntegerTokenizer
         var chr = PeekChar();
         if (!chr.IsArabicDigit())
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         Span<char> buffer = stackalloc char[16];
@@ -94,7 +97,7 @@ public sealed class IntegerTokenizer
             {
                 // это число с плавающей (или фиксированной) точкой
                 navigator.RestorePosition (offset);
-                return null;
+                return TokenizerResult.Error;
             }
             else
             {
@@ -110,17 +113,19 @@ public sealed class IntegerTokenizer
 
         var span = builder.AsSpan();
         var value = StringPool.Shared.GetOrAdd (span);
-
-        var result = new Token
+        var token = new Token
             (
                 kind,
                 value,
                 line,
                 column,
                 offset
-            );
+            )
+            {
+                UserData = value
+            };
 
-        return result;
+        return TokenizerResult.Success (token);
     }
 
     #endregion

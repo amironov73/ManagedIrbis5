@@ -14,6 +14,8 @@
 
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для комментариев.
 /// </summary>
+[PublicAPI]
 public sealed class CommentTokenizer
     : Tokenizer
 {
@@ -42,7 +45,7 @@ public sealed class CommentTokenizer
     }
 
     #endregion
-    
+
     #region Private members
 
     private bool _eatComments;
@@ -61,7 +64,7 @@ public sealed class CommentTokenizer
         )
     {
         Sure.NotNull (tokenizers);
-        
+
         foreach (var tokenizer in tokenizers)
         {
             if (tokenizer is CommentTokenizer commentTokenizer)
@@ -76,12 +79,12 @@ public sealed class CommentTokenizer
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
-        
+
         if (PeekChar() == '/')
         {
             var nextChar = navigator.LookAhead();
@@ -100,18 +103,26 @@ public sealed class CommentTokenizer
                     ReadChar();
                 }
 
-                var memory = navigator.Substring (offset, navigator.Position - offset);
+                if (_eatComments)
+                {
+                    return TokenizerResult.Skip;
+                }
 
-                return _eatComments
-                    ? null
-                    : new Token
-                        (
-                            TokenKind.Comment,
-                            memory.ToString(),
-                            line,
-                            column,
-                            offset
-                        );
+                var memory = navigator.Substring (offset, navigator.Position - offset);
+                var value = memory.ToString();
+                var token = new Token
+                    (
+                        TokenKind.Comment,
+                        value,
+                        line,
+                        column,
+                        offset
+                    )
+                    {
+                        UserData = value
+                    };
+
+                return TokenizerResult.Success (token);
             }
 
             // многострочный комментарий
@@ -125,22 +136,30 @@ public sealed class CommentTokenizer
                     throw new SyntaxException (navigator);
                 }
 
-                var memory = navigator.Substring (offset, navigator.Position - offset);
+                if (_eatComments)
+                {
+                    return TokenizerResult.Skip;
+                }
 
-                return _eatComments
-                    ? null
-                    : new Token 
-                        (
-                            TokenKind.Comment,
-                            memory.ToString(),
-                            line,
-                            column,
-                            offset
-                        );
+                var memory = navigator.Substring (offset, navigator.Position - offset);
+                var value = memory.ToString();
+                var token = new Token
+                    (
+                        TokenKind.Comment,
+                        value,
+                        line,
+                        column,
+                        offset
+                    )
+                    {
+                        UserData = value
+                    };
+
+                return TokenizerResult.Success (token);
             }
         }
 
-        return null;
+        return TokenizerResult.Error;
     }
 
     #endregion

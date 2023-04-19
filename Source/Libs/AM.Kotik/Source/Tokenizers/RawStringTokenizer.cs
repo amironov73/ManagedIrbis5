@@ -14,6 +14,8 @@
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,20 +25,22 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для сырых строк.
 /// </summary>
+[PublicAPI]
 public sealed class RawStringTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
 
-        if (PeekChar() != '"' || PeekChar (1) != '"' || PeekChar (2) != '"')
+        if (PeekChar() != '"' || PeekChar (1) != '"'
+            || PeekChar (2) != '"')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar(); // съедаем открывающие кавычки
@@ -62,10 +66,22 @@ public sealed class RawStringTokenizer
         if (!success)
         {
             StringBuilderPool.Shared.Return (builder);
-            throw new SyntaxException (navigator);
+            return TokenizerResult.Error;
         }
 
-        return new Token (TokenKind.String, builder.ReturnShared(), line, column);
+        var value = builder.ReturnShared();
+        var token = new Token
+            (
+                TokenKind.String,
+                value,
+                line,
+                column
+            )
+            {
+                UserData = value
+            };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

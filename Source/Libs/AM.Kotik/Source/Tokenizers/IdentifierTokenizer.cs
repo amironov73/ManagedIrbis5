@@ -16,6 +16,8 @@ using System;
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -25,19 +27,20 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для идентификаторов.
 /// </summary>
+[PublicAPI]
 public sealed class IdentifierTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var firstIdentifierLetter = Settings.FirstIdentifierLetter;
         var nextIdentifierLetter = Settings.NextIdentifierLetter;
         if (Array.IndexOf (firstIdentifierLetter, PeekChar()) < 0)
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         var line = navigator.Line;
@@ -57,15 +60,19 @@ public sealed class IdentifierTokenizer
         var length = navigator.Position - offset;
         var memory = navigator.Substring (offset, length);
         var value = StringPool.Shared.GetOrAdd (memory.Span);
-
-        return new Token
+        var token = new Token
             (
                 IsReservedWord (value) ? TokenKind.ReservedWord : TokenKind.Identifier,
                 value,
                 line,
                 column,
                 offset
-            );
+            )
+            {
+                UserData = value
+            };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

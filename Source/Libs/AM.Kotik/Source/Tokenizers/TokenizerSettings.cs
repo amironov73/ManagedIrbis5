@@ -14,6 +14,8 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Настройки токенизации.
 /// </summary>
+[PublicAPI]
 public sealed class TokenizerSettings
 {
     #region Properties
@@ -86,7 +89,7 @@ public sealed class TokenizerSettings
             "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
             "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
             "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&",
-            ".", ",", "in", "is", "<=>", "@", "?", "??", "&", 
+            ".", ",", "in", "is", "<=>", "@", "?", "??", "&",
             "!=", "===", "!==", "~~",
         };
 

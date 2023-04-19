@@ -16,6 +16,8 @@ using System;
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -25,20 +27,21 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для отдельных символов.
 /// </summary>
+[PublicAPI]
 public sealed class CharacterTokenizer
     : Tokenizer
 {
     #region Tokenizer methods
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var offset = navigator.Position;
         var line = navigator.Line;
         var column = navigator.Column;
         if (PeekChar() != '\'')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar(); // съедаем открывающий апостроф
@@ -79,10 +82,16 @@ public sealed class CharacterTokenizer
 
         if (ReadChar() != '\'')
         {
-            throw new SyntaxException (navigator);
+            return TokenizerResult.Error;
         }
 
-        return new Token (TokenKind.Char, result.ToString(), line, column, offset);
+        var value = result.ToString();
+        var token = new Token (TokenKind.Char, value, line, column, offset)
+        {
+            UserData = value
+        };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

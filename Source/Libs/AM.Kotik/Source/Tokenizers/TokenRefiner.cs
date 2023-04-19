@@ -14,6 +14,8 @@
 
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Абстрактный пересборщик токенов.
 /// </summary>
+[PublicAPI]
 public abstract class TokenRefiner
 {
     #region Public methods

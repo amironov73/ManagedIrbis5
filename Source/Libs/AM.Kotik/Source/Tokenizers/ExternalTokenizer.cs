@@ -12,9 +12,9 @@
 
 #region Using directives
 
-using AM.Text;
-
 using CommunityToolkit.HighPerformance.Buffers;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -25,13 +25,14 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для внешнего кода.
 /// </summary>
+[PublicAPI]
 public sealed class ExternalTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var offset = navigator.Position;
         var line = navigator.Line;
@@ -39,7 +40,7 @@ public sealed class ExternalTokenizer
 
         if (PeekChar() != '`')
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         ReadChar(); // съедаем открывающую кавычку
@@ -55,20 +56,28 @@ public sealed class ExternalTokenizer
 
         if (chr != '`')
         {
-            throw new SyntaxException (navigator);
+            return TokenizerResult.Error;
         }
 
-        var memory = navigator.Substring (offset + 1, navigator.Position - offset - 2);
+        var memory = navigator.Substring
+            (
+                offset + 1,
+                navigator.Position - offset - 2
+            );
         var value = StringPool.Shared.GetOrAdd (memory.Span);
-        
-        return new Token 
+        var token = new Token
             (
                 TokenKind.External,
                 value,
-                line, 
-                column, 
+                line,
+                column,
                 offset
-            );
+            )
+            {
+                UserData = value
+            };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion

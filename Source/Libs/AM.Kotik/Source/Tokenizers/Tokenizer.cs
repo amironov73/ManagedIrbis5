@@ -154,11 +154,11 @@ public class Tokenizer
     /// Разбор токена в текущей позиции.
     /// Метод должен быть переопределен в потомках.
     /// </summary>
-    public virtual Token? Parse()
+    public virtual TokenizerResult Parse()
     {
         throw new NotImplementedException();
     }
-    
+
     /// <summary>
     /// Разбор текста на токены.
     /// </summary>
@@ -178,34 +178,34 @@ public class Tokenizer
             tokenizer.navigator = navigator;
         }
 
-        var attempts = 0;
+        AGAIN:
         while (!IsEof)
         {
-            Token? token = null;
+            var token = TokenizerResult.Error;
             foreach (var tokenizer in Tokenizers)
             {
                 token = tokenizer.Parse();
-                if (token is not null)
+                if (token.IsSkip)
+                {
+                    goto AGAIN;
+                }
+
+                if (!token.IsError)
                 {
                     break;
                 }
             }
 
-            if (token is null)
+            if (token.IsError)
             {
-                // костыль с несколькими попытками сделан
-                // для считывания переводов строки и пробелов в конце скрипта
-                // иначе CommentTokenizer возвращает null
-                // и токенизация падает с синтаксической ошибкой
-                if (++attempts == 10)
-                {
-                    throw new SyntaxException (navigator);
-                }
+                // ни один токенайзер не опознал текст,
+                // нам подсунули плохой скрипт
+                throw new SyntaxException (navigator);
             }
-            else
+
+            if (token.IsSucceed)
             {
-                attempts = 0;
-                result.Add (token);
+                result.Add (token.Token);
             }
         }
 

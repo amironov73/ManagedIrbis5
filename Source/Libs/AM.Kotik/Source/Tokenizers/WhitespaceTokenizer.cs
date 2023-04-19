@@ -14,6 +14,8 @@
 
 using System.Collections.Generic;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -23,6 +25,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для пробелов.
 /// </summary>
+[PublicAPI]
 public sealed class WhitespaceTokenizer
     : Tokenizer
 {
@@ -42,7 +45,7 @@ public sealed class WhitespaceTokenizer
     }
 
     #endregion
-    
+
     #region Private members
 
     private bool _eatWhitespace;
@@ -61,7 +64,7 @@ public sealed class WhitespaceTokenizer
         )
     {
         Sure.NotNull (tokenizers);
-        
+
         foreach (var tokenizer in tokenizers)
         {
             if (tokenizer is WhitespaceTokenizer whitespaceTokenizer)
@@ -72,26 +75,29 @@ public sealed class WhitespaceTokenizer
     }
 
     #endregion
-    
+
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
 
         navigator.SkipWhitespace();
-        if (_eatWhitespace)
-        {
-            return null;
-        }
 
         if (navigator.Position != offset)
         {
+            if (_eatWhitespace)
+            {
+                return navigator.IsEOF
+                    ? TokenizerResult.End
+                    : TokenizerResult.Skip;
+            }
+
             var text = navigator.Substring (offset, navigator.Position - offset).ToString();
-            return new Token
+            var token = new Token
                 (
                     TokenKind.Whitespace,
                     text,
@@ -102,9 +108,11 @@ public sealed class WhitespaceTokenizer
                 {
                     UserData = text
                 };
+
+            return TokenizerResult.Success (token);
         }
 
-        return null;
+        return TokenizerResult.Error;
     }
 
     #endregion

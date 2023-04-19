@@ -18,6 +18,8 @@ using AM.Text;
 
 using CommunityToolkit.HighPerformance.Buffers;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,23 +29,24 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер для чисел в шестнадцатеричной системе счичления.
 /// </summary>
+[PublicAPI]
 public sealed class HexTokenizer
     : Tokenizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override Token? Parse()
+    public override TokenizerResult Parse()
     {
         var offset = navigator.Position;
         var line = navigator.Line;
         var column = navigator.Column;
- 
+
         // префикс '0x'
         var chr = PeekChar();
         if (chr != '0' || navigator.LookAhead (1) is not ('x' or 'X'))
         {
-            return null;
+            return TokenizerResult.Error;
         }
 
         Span<char> buffer = stackalloc char[16];
@@ -77,15 +80,19 @@ public sealed class HexTokenizer
 
         var span = builder.AsSpan();
         var value = StringPool.Shared.GetOrAdd (span);
-
-        return new Token 
+        var token = new Token
             (
-                kind, 
-                value, 
-                line, 
-                column, 
+                kind,
+                value,
+                line,
+                column,
                 offset
-            );
+            )
+            {
+                UserData = value
+            };
+
+        return TokenizerResult.Success (token);
     }
 
     #endregion
