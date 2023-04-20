@@ -3,10 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* Results.cs -- предопределенные результаты
  * Ars Magna project, http://arsmagna.ru
@@ -15,6 +11,8 @@
 #region Using directives
 
 using System;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -29,20 +27,25 @@ namespace AM.Results;
 /// <summary>
 /// Результат: да.
 /// </summary>
-public readonly struct Yes { }
+[PublicAPI]
+public readonly struct Yes
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Yes Value;
+}
 
 /// <summary>
-/// Результат: да со значением.
+/// Результат: да плюс значение.
 /// </summary>
+[PublicAPI]
 public readonly struct Yes<T>
 {
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Yes (T value)
-    {
-        Value = value;
-    }
+    public Yes (T value) => Value = value;
 
     /// <summary>
     /// Хранимое значение.
@@ -53,81 +56,157 @@ public readonly struct Yes<T>
 /// <summary>
 /// Результат: нет.
 /// </summary>
-public readonly struct No { }
+[PublicAPI]
+public readonly struct No
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly No Value;
+}
 
 /// <summary>
 /// Результат: может быть.
 /// </summary>
-public readonly struct Maybe { }
+[PublicAPI]
+public readonly struct Maybe
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Maybe Value;
+}
 
 /// <summary>
 /// Результат: неизвестно.
 /// </summary>
-public readonly struct Unknown { }
+[PublicAPI]
+public readonly struct Unknown
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Unknown Value;
+}
 
 /// <summary>
 /// Результат: истина.
 /// </summary>
-public readonly struct True { }
+[PublicAPI]
+public readonly struct True
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly True Value;
+}
 
 /// <summary>
 /// Результат: ложь.
 /// </summary>
-public readonly struct False { }
+[PublicAPI]
+public readonly struct False
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly False Value;
+}
 
 /// <summary>
 /// Результат: все.
 /// </summary>
-public readonly struct All { }
+[PublicAPI]
+public readonly struct All
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly All Value;
+}
 
 /// <summary>
 /// Результат: некоторые.
 /// </summary>
-public readonly struct Some { }
+[PublicAPI]
+public readonly struct Some
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Some Value;
+}
 
 /// <summary>
 /// Результат: достигнут конец.
 /// </summary>
-public readonly struct End { }
+[PublicAPI]
+public readonly struct End
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly End Value;
+}
 
 /// <summary>
 /// Результат: пропуск.
 /// </summary>
-public readonly struct Skip { }
+[PublicAPI]
+public readonly struct Skip
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Skip Value;
+}
 
 /// <summary>
 /// Результат: ни одного.
 /// </summary>
+[PublicAPI]
 public readonly struct None
 {
     /// <summary>
-    /// Конструирование значения.
+    /// Общее значение.
     /// </summary>
-    public static OneOf<T, None> Of<T>(T t) => new None();
+    public static readonly None Value;
 }
 
 /// <summary>
 /// Результат: не найдено.
 /// </summary>
-public readonly struct NotFound { }
+[PublicAPI]
+public readonly struct NotFound
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly NotFound Value;
+}
 
 /// <summary>
 /// Результат: успех.
 /// </summary>
-public readonly struct Success { }
+[PublicAPI]
+public readonly struct Success
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Success Value;
+}
 
 /// <summary>
-/// Результат: успех со значением.
+/// Результат: успех плюс значение.
 /// </summary>
+[PublicAPI]
 public readonly struct Success<T>
 {
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Success(T value)
-    {
-        Value = value;
-    }
+    public Success (T value) => Value = value;
 
     /// <summary>
     /// Хранимое значение.
@@ -136,8 +215,9 @@ public readonly struct Success<T>
 }
 
 /// <summary>
-/// Результат со значением.
+/// Результат со значением либо сообщением об ощибке.
 /// </summary>
+[PublicAPI]
 public readonly struct Result<T>
 {
     #region Properties
@@ -151,6 +231,11 @@ public readonly struct Result<T>
     /// Сообщение об ошибке.
     /// </summary>
     public string? Message { get; init; }
+
+    /// <summary>
+    /// Общее значение для сбоя.
+    /// </summary>
+    public static readonly Result<T> Failure = Fail();
 
     /// <summary>
     /// Хранимое значение.
@@ -197,7 +282,7 @@ public readonly struct Result<T>
     /// <summary>
     /// Сбой.
     /// </summary>
-    public static Result<T> Failure
+    public static Result<T> Fail
         (
             string? message = null
         )
@@ -214,20 +299,24 @@ public readonly struct Result<T>
 /// <summary>
 /// Результат: ошибка.
 /// </summary>
-public readonly struct Error { }
+[PublicAPI]
+public readonly struct Error
+{
+    /// <summary>
+    /// Общее значение.
+    /// </summary>
+    public static readonly Error Value;
+}
 
 /// <summary>
-/// Результат: ошибка со значением.
+/// Результат: ошибка плюс значение.
 /// </summary>
 public readonly struct Error<T>
 {
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public Error(T value)
-    {
-        Value = value;
-    }
+    public Error (T value) => Value = value;
 
     /// <summary>
     /// Хранимое значение.

@@ -200,7 +200,7 @@ public abstract class Parser<TResult>
 
         if (!TryParse (state, out var temporary))
         {
-            return Result<TResult>.Failure();
+            return Result<TResult>.Failure;
         }
 
         return new Result<TResult> (temporary);
@@ -928,7 +928,7 @@ public static class Parser
     {
         return new TraceParser<TResult> (parser);
     }
-    
+
     /// <summary>
     /// Последовательность из двух парсеров.
     /// </summary>

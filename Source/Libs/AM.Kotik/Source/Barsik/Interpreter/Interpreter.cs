@@ -26,7 +26,6 @@ using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Highlighting;
 using AM.Kotik.Tokenizers;
 using AM.Kotik.Types;
-using AM.Results;
 using AM.Text;
 
 using JetBrains.Annotations;
@@ -170,7 +169,7 @@ public sealed class Interpreter
         }
     }
 
-    private OneOf<No, Yes<int>> _RunScriptFile
+    private ExecutionResult _RunScriptFile
         (
             ConsoleDebugger? debugger,
             string scriptFile
@@ -185,11 +184,9 @@ public sealed class Interpreter
             {
                 Context.Commmon.Output?.WriteLine (executionResult.Message);
             }
-
-            return new (new Yes<int>(executionResult.ExitCode));
         }
 
-        return new (new No());
+        return executionResult;
     }
 
     private int _Run
@@ -211,9 +208,9 @@ public sealed class Interpreter
             foreach (var scriptFile in settings.ScriptFiles)
             {
                 var result = _RunScriptFile (debugger, scriptFile);
-                if (result.Is2)
+                if (result.ExitRequested)
                 {
-                    return result.As2().Value;
+                    return result.ExitCode;
                 }
             }
 
