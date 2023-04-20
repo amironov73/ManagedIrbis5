@@ -6590,6 +6590,22 @@ public static class Utility
     }
 
     /// <summary>
+    /// Слияние двух значений.
+    /// </summary>
+    public static void AdoptValue<TValue>
+        (
+            this ref TValue first,
+            TValue second
+        )
+        where TValue: struct, IEquatable<TValue>
+    {
+        if (first.Equals (default))
+        {
+            first = second;
+        }
+    }
+
+    /// <summary>
     /// Произвести все возможные пермутации из элемента списка списков.
     /// </summary>
     public static IEnumerable<IReadOnlyList<T>> Permute<T>

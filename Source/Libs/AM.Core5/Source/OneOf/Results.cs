@@ -32,6 +32,25 @@ namespace AM.Results;
 public readonly struct Yes { }
 
 /// <summary>
+/// Результат: да со значением.
+/// </summary>
+public readonly struct Yes<T>
+{
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public Yes (T value)
+    {
+        Value = value;
+    }
+
+    /// <summary>
+    /// Хранимое значение.
+    /// </summary>
+    public T Value { get; }
+}
+
+/// <summary>
 /// Результат: нет.
 /// </summary>
 public readonly struct No { }
@@ -117,7 +136,7 @@ public readonly struct Success<T>
 }
 
 /// <summary>
-/// Результат.
+/// Результат со значением.
 /// </summary>
 public readonly struct Result<T>
 {

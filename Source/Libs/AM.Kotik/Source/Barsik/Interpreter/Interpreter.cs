@@ -26,6 +26,7 @@ using AM.Kotik.Barsik.Diagnostics;
 using AM.Kotik.Highlighting;
 using AM.Kotik.Tokenizers;
 using AM.Kotik.Types;
+using AM.Results;
 using AM.Text;
 
 using JetBrains.Annotations;
@@ -169,6 +170,79 @@ public sealed class Interpreter
         }
     }
 
+    private OneOf<No, Yes<int>> _RunScriptFile
+        (
+            ConsoleDebugger? debugger,
+            string scriptFile
+        )
+    {
+        var executionResult = debugger is not null
+            ? debugger.ExecuteFile (scriptFile)
+            : ExecuteFile (scriptFile);
+        if (executionResult.ExitRequested)
+        {
+            if (!string.IsNullOrEmpty (executionResult.Message))
+            {
+                Context.Commmon.Output?.WriteLine (executionResult.Message);
+            }
+
+            return new (new Yes<int>(executionResult.ExitCode));
+        }
+
+        return new (new No());
+    }
+
+    private int _Run
+        (
+            Action<Interpreter, Exception>? exceptionHandler
+        )
+    {
+        var settings = Context.Commmon.Settings;
+
+        ConsoleDebugger? debugger = null;
+        if (settings.StartDebugger)
+        {
+            debugger = new ConsoleDebugger (this);
+        }
+
+        try
+        {
+            ApplySettings();
+            foreach (var scriptFile in settings.ScriptFiles)
+            {
+                var result = _RunScriptFile (debugger, scriptFile);
+                if (result.Is2)
+                {
+                    return result.As2().Value;
+                }
+            }
+
+            if (settings.ReplMode)
+            {
+                if (debugger is not null)
+                {
+                    debugger.DoRepl();
+                }
+                else
+                {
+                    DoRepl();
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            if (Debugger.IsAttached)
+            {
+                throw;
+            }
+
+            exceptionHandler?.Invoke (this, exception);
+            return 1;
+        }
+
+        return 0;
+    }
+
     #endregion
 
     #region Public methods
@@ -216,7 +290,73 @@ public sealed class Interpreter
 
         var settings = InterpreterSettings.CreateDefault();
         settings.FromCommandLine (args);
+
+        if (!settings.DontLoadSettings)
+        {
+            var baseDirectory = AppContext.BaseDirectory;
+            var fileName = Path.Combine (baseDirectory, "barsik");
+            if (File.Exists (fileName))
+            {
+                var loaded = InterpreterSettings.FromFile
+                    (
+                        fileName,
+                        withDefaults: false
+                    );
+                settings.Coalesce (loaded);
+            }
+        }
+
         return new Interpreter (settings: settings);
+    }
+
+    /// <summary>
+    /// Запуск интерпретатора.
+    /// </summary>
+    public int Run
+        (
+            Action<Interpreter, Exception>? exceptionHandler = null
+        )
+    {
+        var settings = Context.Commmon.Settings;
+        if (settings.PrintVersion)
+        {
+            Context.Commmon.Output?.WriteLine (ThisAssembly.AssemblyFileVersion);
+            return 0;
+        }
+
+        if (settings.BarsorMode)
+        {
+            return RunBarsorMode();
+        }
+
+        if (settings.Highlight is not null)
+        {
+            foreach (var file in settings.ScriptFiles)
+            {
+                HighlightFile (file, settings.Highlight);
+            }
+
+            return 0;
+        }
+
+        return _Run (exceptionHandler);
+    }
+
+    /// <summary>
+    /// Запуск в режиме Barsor.
+    /// </summary>
+    public int RunBarsorMode()
+    {
+        ApplySettings();
+        var barsor = new BarsorParser (this);
+        foreach (var fileName in Context.Commmon.Settings.ScriptFiles)
+        {
+            var sourceCode = File.ReadAllText (fileName);
+            var programNode = barsor.ParseTemplate (sourceCode);
+            Execute (programNode);
+        }
+
+        return 0;
     }
 
     /// <summary>
@@ -238,80 +378,7 @@ public sealed class Interpreter
         var interpreter = CreateInterpreter (args);
         configure?.Invoke (interpreter);
 
-        var settings = interpreter.Context.Commmon.Settings;
-        if (settings.BarsorMode)
-        {
-            interpreter.ApplySettings();
-            var barsor = new BarsorParser (interpreter);
-            foreach (var fileName in settings.ScriptFiles)
-            {
-                var sourceCode = File.ReadAllText (fileName);
-                var programNode = barsor.ParseTemplate (sourceCode);
-                interpreter.Execute (programNode);
-            }
-
-            return 0;
-        }
-
-        if (settings.Highlight is not null)
-        {
-            foreach (var file in settings.ScriptFiles)
-            {
-                HighlightFile (file, settings.Highlight);
-            }
-
-            return 0;
-        }
-
-        ConsoleDebugger? debugger = null;
-        if (settings.StartDebugger)
-        {
-            debugger = new ConsoleDebugger (interpreter);
-        }
-
-        try
-        {
-            interpreter.ApplySettings();
-            foreach (var scriptFile in settings.ScriptFiles)
-            {
-                var executionResult = debugger is not null
-                    ? debugger.ExecuteFile (scriptFile)
-                    : interpreter.ExecuteFile (scriptFile);
-                if (executionResult.ExitRequested)
-                {
-                    if (!string.IsNullOrEmpty (executionResult.Message))
-                    {
-                        interpreter.Context.Commmon.Output?.WriteLine (executionResult.Message);
-                    }
-
-                    return executionResult.ExitCode;
-                }
-            }
-
-            if (settings.ReplMode)
-            {
-                if (debugger is not null)
-                {
-                    debugger.DoRepl();
-                }
-                else
-                {
-                    interpreter.DoRepl();
-                }
-            }
-        }
-        catch (Exception exception)
-        {
-            if (Debugger.IsAttached)
-            {
-                throw;
-            }
-
-            exceptionHandler?.Invoke (interpreter, exception);
-            return 1;
-        }
-
-        return 0;
+        return interpreter.Run (exceptionHandler);
     }
 
     /// <summary>

@@ -68,15 +68,10 @@ public sealed class CommonContext
     /// </summary>
     public List<IBarsikModule> Modules { get; } = new ();
 
-    // /// <summary>
-    // /// Загруженные сборки (чтобы не писать assembly-qualified type name).
-    // /// </summary>
-    // public HashSet<Assembly> Assemblies { get; } = new ();
-    //
-    // /// <summary>
-    // /// Используемые пространства имен.
-    // /// </summary>
-    // public HashSet<string> Namespaces { get; } = new ();
+    /// <summary>
+    /// Аргументы для скрипта.
+    /// </summary>
+    public List<string> Arguments { get; } = new ();
 
     /// <summary>
     /// Дефайны.

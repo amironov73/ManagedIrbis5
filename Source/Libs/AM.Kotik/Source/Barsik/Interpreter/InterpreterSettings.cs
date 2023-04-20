@@ -12,6 +12,7 @@
 
 #region Using directive
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -90,6 +91,12 @@ public sealed class InterpreterSettings
     public List<string> ScriptFiles { get; set; }
 
     /// <summary>
+    /// Аргументы для скриптов.
+    /// </summary>
+    [JsonPropertyName ("arguments")]
+    public List<string> ScriptArguments { get; set; }
+
+    /// <summary>
     /// Запуск REPL.
     /// </summary>
     [JsonPropertyName ("repl")]
@@ -151,6 +158,18 @@ public sealed class InterpreterSettings
     public bool DumpTokens { get; set; }
 
     /// <summary>
+    /// Не загружать настройки из файла рядом с интерпретатором.
+    /// </summary>
+    [JsonIgnore]
+    public bool DontLoadSettings { get; set; }
+
+    /// <summary>
+    /// Вывести версию.
+    /// </summary>
+    [JsonIgnore]
+    public bool PrintVersion { get; set; }
+
+    /// <summary>
     /// Пути для поиска скриптов, модулей  и т. д.
     /// Инициализируется значением переменной окружения "BARSIK_PATH".
     /// </summary>
@@ -177,6 +196,7 @@ public sealed class InterpreterSettings
         KnownDirectives = new ();
         LoadAssemblies = new ();
         ScriptFiles = new ();
+        ScriptArguments = new ();
         UseNamespaces = new ();
         MainPrompt = "> ";
         SecondaryPrompt = "... ";
@@ -189,53 +209,52 @@ public sealed class InterpreterSettings
     #region Public methods
 
     /// <summary>
-    /// Применение настроек по умолчанию
-    /// там, где они не заданы явно.
+    /// Слияние настроек.
     /// </summary>
-    public void ApplyDefaults
+    public void Coalesce
         (
-            InterpreterSettings defaults
+            InterpreterSettings other
         )
     {
-        Sure.NotNull (defaults);
+        Sure.NotNull (other);
 
-        StartDebugger |= defaults.StartDebugger;
-        DebugParser |= defaults.DebugParser;
-        DumpAst |= defaults.DumpAst;
-        ReplMode |= defaults.ReplMode;
-        BarsorMode |= defaults.BarsorMode;
-        DumpTokens |= defaults.DumpTokens;
-        AllowNewOperator &= defaults.AllowNewOperator; // это не описка!
-        VariableDumper ??= defaults.VariableDumper;
-        EvaluateExpression ??= defaults.EvaluateExpression;
-        MainPrompt ??= defaults.MainPrompt;
-        SecondaryPrompt ??= defaults.SecondaryPrompt;
-        TokenizerSettings ??= defaults.TokenizerSettings;
-        Highlight ??= defaults.Highlight;
+        StartDebugger = StartDebugger || other.StartDebugger;
+        DebugParser = DebugParser || other.DebugParser;
+        DumpAst = DumpAst || other.DumpAst;
+        ReplMode = ReplMode || other.ReplMode;
+        BarsorMode = BarsorMode || other.BarsorMode;
+        DumpTokens = DumpTokens || other.DumpTokens;
+        AllowNewOperator = AllowNewOperator && other.AllowNewOperator; // это не описка!
+        VariableDumper ??= other.VariableDumper;
+        EvaluateExpression ??= other.EvaluateExpression;
+        MainPrompt ??= other.MainPrompt;
+        SecondaryPrompt ??= other.SecondaryPrompt;
+        TokenizerSettings ??= other.TokenizerSettings;
+        Highlight ??= other.Highlight;
 
         if (KnownDirectives.Count is 0)
         {
-            KnownDirectives.AddRange (defaults.KnownDirectives);
+            KnownDirectives.AddRange (other.KnownDirectives);
         }
 
         if (LoadAssemblies.Count is 0)
         {
-            LoadAssemblies.AddRange (defaults.LoadAssemblies);
+            LoadAssemblies.AddRange (other.LoadAssemblies);
         }
 
         if (ScriptFiles.Count is 0)
         {
-            ScriptFiles.AddRange (defaults.ScriptFiles);
+            ScriptFiles.AddRange (other.ScriptFiles);
         }
 
         if (UseNamespaces.Count is 0)
         {
-            UseNamespaces.AddRange (defaults.UseNamespaces);
+            UseNamespaces.AddRange (other.UseNamespaces);
         }
 
         if (Paths.Count is 0)
         {
-            Paths.AddRange (defaults.Paths);
+            Paths.AddRange (other.Paths);
         }
     }
 
@@ -255,11 +274,26 @@ public sealed class InterpreterSettings
             ReplMode = true;
         }
 
+        var scriptArgs = false;
         for (var index = 0; index < args.Length; index++)
         {
             var arg = args[index];
 
-            if (arg is "--dump-variables")
+            if (arg is "--settings" or "-s")
+            {
+                var loaded = FromFile (args[++index], false);
+                Coalesce (loaded);
+            }
+            else if (arg is "--tokenizer")
+            {
+                var fileName = args[++index];
+                TokenizerSettings = TokenizerSettings.Load (fileName);
+            }
+            else if (arg is "--version" or "-v")
+            {
+                PrintVersion = true;
+            }
+            else if (arg is "--dump-variables")
             {
                 VariableDumper = new StandardDumper();
             }
@@ -269,14 +303,15 @@ public sealed class InterpreterSettings
             }
             else if (arg is "--grammar")
             {
-                // TODO установка нестандартной грамматики
-                index++;
+                var typeName = args[++index];
+                var grammarType = Type.GetType (typeName, true).ThrowIfNull();
+                Grammar = (IGrammar) Activator.CreateInstance (grammarType).ThrowIfNull();
             }
-            else if (arg is "--repl")
+            else if (arg is "--repl" or "-r")
             {
                 ReplMode = true;
             }
-            else if (arg is "--debug-parser")
+            else if (arg is "--debug-parser" or "-p")
             {
                 DebugParser = true;
             }
@@ -285,19 +320,19 @@ public sealed class InterpreterSettings
                 // TODO установка обработчика внешнего кода
                 index++;
             }
-            else if (arg is "--use-namespace")
+            else if (arg is "--use-namespace" or "-u")
             {
                 UseNamespaces.Add (args[++index]);
             }
-            else if (arg is "--load-assembly")
+            else if (arg is "--load-assembly" or "-a")
             {
                 LoadAssemblies.Add (args[++index]);
             }
-            else if (arg is "--debugger")
+            else if (arg is "--debugger" or "-d")
             {
                 StartDebugger = true;
             }
-            else if (arg is "--eval")
+            else if (arg is "--eval" or "-e")
             {
                 EvaluateExpression = string.Join (' ', args.Skip (index + 1));
                 break;
@@ -314,26 +349,48 @@ public sealed class InterpreterSettings
             {
                 BarsorMode = true;
             }
-            else if (arg is "--dump-tokens")
+            else if (arg is "--dump-tokens" or "-t")
             {
                 DumpTokens = true;
             }
-            else if (arg is "--path")
+            else if (arg is "--include" or "-i" or "--path")
             {
-                Paths.Add (args[++index]);
+                var value = args[++index];
+                var items = value.Split
+                    (
+                        Path.PathSeparator,
+                        StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                    );
+                foreach (var item in items)
+                {
+                    Paths.Add (item);
+                }
             }
-            else if (arg is "--include")
+            else if (arg is "--")
             {
-                // TODO добавление инклюда
-                index++;
+                scriptArgs = true;
             }
             else if (arg.StartsWith ("-"))
             {
-                throw new BarsikException ($"Unknown option {arg}");
+                if (scriptArgs)
+                {
+                    ScriptArguments.Add (args[++index]);
+                }
+                else
+                {
+                    throw new BarsikException ($"Unknown option {arg}");
+                }
             }
             else
             {
-                ScriptFiles.Add (arg);
+                if (scriptArgs)
+                {
+                    ScriptArguments.Add (args[++index]);
+                }
+                else
+                {
+                    ScriptFiles.Add (arg);
+                }
             }
         }
     }
@@ -375,14 +432,18 @@ public sealed class InterpreterSettings
     /// </summary>
     public static InterpreterSettings FromFile
         (
-            string fileName
+            string fileName,
+            bool withDefaults = true
         )
     {
         Sure.FileExists (fileName);
 
-        var defaults = CreateDefault();
         var loaded = JsonUtility.ReadObjectFromFile<InterpreterSettings> (fileName);
-        loaded.ApplyDefaults (defaults);
+        if (withDefaults)
+        {
+            var defaults = CreateDefault();
+            loaded.Coalesce (defaults);
+        }
 
         return loaded;
     }
