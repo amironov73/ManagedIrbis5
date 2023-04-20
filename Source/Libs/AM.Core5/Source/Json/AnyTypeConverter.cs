@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* AnyTypeConverter.cs -- JSON-конвертер для произвольного типа
  * Ars Magna project, http://arsmagna.ru
@@ -29,6 +26,11 @@ namespace AM.Json;
 /// <summary>
 /// JSON-конвертер для произвольного типа.
 /// </summary>
+/// <remarks>
+/// Просто сохраняет в JSOn полное имя типа.
+/// При сериализации вызывает <see cref="Activator.CreateInstance(Type)"/>.
+/// Поэтому тип должен иметь конструктор без параметров.
+/// </remarks>
 [PublicAPI]
 public sealed class AnyTypeConverter<TObject>
     : JsonConverter<TObject>

@@ -27,7 +27,7 @@ namespace AM.Kotik.Tokenizers;
 /// </summary>
 [PublicAPI]
 public sealed class TokenizerResult
-    : OneOf<Token, End, Skip, Error>
+    : OneOf<Token, Skip, Error>
 {
     #region Properties
 
@@ -41,25 +41,15 @@ public sealed class TokenizerResult
     /// </summary>
     public bool IsSucceed => Is1;
 
-    /// <summary>
-    /// Проверка: достигнут ли конец текста.
-    /// </summary>
-    public bool IsEnd => Is2;
-
-    /// <summary>
+   /// <summary>
     /// Проверка: пропуск.
     /// </summary>
-    public bool IsSkip => Is3;
+    public bool IsSkip => Is2;
 
     /// <summary>
     /// Проверка: ошибка.
     /// </summary>
-    public bool IsError => Is4;
-
-    /// <summary>
-    /// Результат: достигнут конец текста.
-    /// </summary>
-    public static readonly TokenizerResult End = new (new End());
+    public bool IsError => Is3;
 
     /// <summary>
     /// Результат: ошибка.
@@ -79,8 +69,6 @@ public sealed class TokenizerResult
 
     // конструкторы требуются базовым классом
     private TokenizerResult (Token value) : base (value) { }
-
-    private TokenizerResult (End value) : base (value) { }
 
     private TokenizerResult (Skip value) : base (value) { }
 

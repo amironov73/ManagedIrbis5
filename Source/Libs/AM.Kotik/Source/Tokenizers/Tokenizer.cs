@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
+using AM.Json;
 using AM.Text;
 
 #endregion
@@ -26,6 +28,7 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Генерализованный токенайзер.
 /// </summary>
+[JsonConverter (typeof (AnyTypeConverter<Tokenizer>))]
 public class Tokenizer
 {
     #region Properties
@@ -190,23 +193,20 @@ public class Tokenizer
                     goto AGAIN;
                 }
 
-                if (!token.IsError)
+                if (token.IsSucceed)
                 {
                     break;
                 }
             }
 
-            if (token.IsError)
+            if (!token.IsSucceed)
             {
                 // ни один токенайзер не опознал текст,
                 // нам подсунули плохой скрипт
                 throw new SyntaxException (navigator);
             }
 
-            if (token.IsSucceed)
-            {
-                result.Add (token.Token);
-            }
+            result.Add (token.Token);
         }
 
         if (Refiner is not null)

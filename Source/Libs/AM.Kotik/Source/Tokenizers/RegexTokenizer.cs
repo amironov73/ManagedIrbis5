@@ -26,6 +26,10 @@ namespace AM.Kotik.Tokenizers;
 /// <summary>
 /// Токенайзер на регулярных выражениях.
 /// </summary>
+/// <remarks>
+/// Не может быть добавлен в <c>tokenizer.settings</c>,
+/// т. к. не содержит конструктора по умолчанию.
+/// </remarks>
 [PublicAPI]
 public sealed class RegexTokenizer
     : Tokenizer

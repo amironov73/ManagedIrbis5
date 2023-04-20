@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* DirectiveBase.cs -- абстрактная директива интерпретатора
  * Ars Magna project, http://arsmagna.ru
@@ -14,14 +13,14 @@
 
 using System.Text.Json.Serialization;
 
-namespace AM.Kotik.Barsik.Directives;
+using AM.Json;
 
-// TODO реализовать сохранение/загрузку JSON
+namespace AM.Kotik.Barsik.Directives;
 
 /// <summary>
 /// Абстрактная директива интерпретатора.
 /// </summary>
-[JsonConverter (typeof (DirectiveConverter))]
+[JsonConverter (typeof (AnyTypeConverter<DirectiveBase>))]
 public abstract class DirectiveBase
 {
     #region Construction

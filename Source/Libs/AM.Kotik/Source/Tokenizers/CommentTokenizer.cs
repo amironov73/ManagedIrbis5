@@ -32,13 +32,22 @@ public sealed class CommentTokenizer
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public CommentTokenizer()
+        : this (true)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
     /// Конструктор.
     /// </summary>
     /// <param name="eatComments">Съедать комментарии,
     /// т. е. не выдавать их как токены.</param>
     public CommentTokenizer
         (
-            bool eatComments = true
+            bool eatComments
         )
     {
         _eatComments = eatComments;

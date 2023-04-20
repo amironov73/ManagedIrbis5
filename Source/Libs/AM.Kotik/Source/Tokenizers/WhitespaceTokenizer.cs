@@ -32,13 +32,22 @@ public sealed class WhitespaceTokenizer
     #region Construction
 
     /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public WhitespaceTokenizer()
+        : this (true)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
     /// Конструктор
     /// </summary>
     /// <param name="eatWhitespace">Съедать пробелы,
     /// т .е. не выдавать их как токены.</param>
     public WhitespaceTokenizer
         (
-            bool eatWhitespace = true
+            bool eatWhitespace
         )
     {
         _eatWhitespace = eatWhitespace;
@@ -91,9 +100,7 @@ public sealed class WhitespaceTokenizer
         {
             if (_eatWhitespace)
             {
-                return navigator.IsEOF
-                    ? TokenizerResult.End
-                    : TokenizerResult.Skip;
+                return TokenizerResult.Skip;
             }
 
             var text = navigator.Substring (offset, navigator.Position - offset).ToString();
