@@ -12,6 +12,8 @@
 
 #nullable enable
 
+using System.Text.Json.Serialization;
+
 namespace AM.Kotik.Barsik.Directives;
 
 // TODO реализовать сохранение/загрузку JSON
@@ -19,6 +21,7 @@ namespace AM.Kotik.Barsik.Directives;
 /// <summary>
 /// Абстрактная директива интерпретатора.
 /// </summary>
+[JsonConverter (typeof (DirectiveConverter))]
 public abstract class DirectiveBase
 {
     #region Construction

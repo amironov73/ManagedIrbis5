@@ -13,6 +13,11 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json.Serialization;
+
+using AM.Json;
 
 using JetBrains.Annotations;
 
@@ -33,22 +38,32 @@ public sealed class TokenizerSettings
     /// <summary>
     /// Первый символ идентификатора.
     /// </summary>
+    [JsonPropertyName ("first-letter")]
     public char[] FirstIdentifierLetter { get; set; }
 
     /// <summary>
     /// Последующие символы идентификатора.
     /// </summary>
+    [JsonPropertyName ("next-letter")]
     public char[] NextIdentifierLetter { get; set; }
 
     /// <summary>
     /// Распознаваемые термы.
     /// </summary>
+    [JsonPropertyName ("known-terms")]
     public string[] KnownTerms { get; set; }
 
     /// <summary>
     /// Зарезервированные (ключевые) слова.
     /// </summary>
+    [JsonPropertyName ("reserved-words")]
     public string[] ReservedWords { get; set; }
+
+    /// <summary>
+    /// Токенайзеры.
+    /// </summary>
+    [JsonPropertyName ("tokenizers")]
+    public List<Tokenizer>? Tokenizers { get; set; }
 
     #endregion
 
@@ -59,56 +74,10 @@ public sealed class TokenizerSettings
     /// </summary>
     public TokenizerSettings()
     {
-        FirstIdentifierLetter =
-            (
-                "abcdefghijklmnopqrstuvwxyz" // строчная латиница
-                + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // заглавная латиница
-                + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" // строчная кириллица
-                + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" // заглавная кириллица
-                + "αβϐγδεϵζηθϑικϰλμνξοπϖρϱσςτυφϕχψω" // строчные греческие
-                + "ΑΒΓΔΕΖΗΘϴΙΚΛΜΝΞΟΠΡΣΤΥϒΦΧΨΩ" // заглавные греческие
-                + "_$"
-            )
-            .ToCharArray();
-
-        NextIdentifierLetter =
-            (
-                "abcdefghijklmnopqrstuvwxyz" // строчная латиница
-                + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // заглавная латиница
-                + "0123456789" // цифры
-                + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" // строчная кирилица
-                + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" // заглавная кириллица
-                + "αβϐγδεϵζηθϑικϰλμνξοπϖρϱσςτυφϕχψω" // строчные греческие
-                + "ΑΒΓΔΕΖΗΘϴΙΚΛΜΝΞΟΠΡΣΤΥϒΦΧΨΩ" // заглавные греческие
-                + "_$"
-            )
-            .ToCharArray();
-
-        KnownTerms = new[]
-        {
-            "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
-            "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
-            "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&",
-            ".", ",", "in", "is", "<=>", "@", "?", "??", "&",
-            "!=", "===", "!==", "~~",
-        };
-
-        ReservedWords = new []
-        {
-            "abstract", "and", "as", "async", "await", "base", "bool", "break",
-            "by", "byte", "case", "catch", "char", "checked", "class", "const",
-            "continue", "decimal", "default", "delegate", "descending", "do",
-            "double", "else", "enum", "equals", "event", "explicit", "extern",
-            "false", "finally", "fixed", "float", "for", "foreach", "from", "func",
-            "goto", "group", "if", "implicit", "in", "int", "interface", "internal",
-            "is", "join", "lambda", "let", "local", "lock", "long", "namespace",
-            "new", "null", "object", "on", "operator", "or", "orderby", "out",
-            "override", "params", "private", "protected", "public", "readonly", "ref",
-            "return", "sbyte", "sealed", "select", "short", "sizeof", "stackalloc",
-            "static", "string", "struct", "switch", "this", "throw", "true", "try",
-            "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using",
-            "virtual", "void", "volatile", "where", "while", "with"
-        };
+        FirstIdentifierLetter = Array.Empty<char>();
+        NextIdentifierLetter = Array.Empty<char>();
+        KnownTerms = Array.Empty<string>();
+        ReservedWords = Array.Empty<string>();
     }
 
     #endregion
@@ -120,7 +89,59 @@ public sealed class TokenizerSettings
     /// </summary>
     public static TokenizerSettings CreateDefault()
     {
-        return new TokenizerSettings();
+        return new TokenizerSettings
+        {
+            FirstIdentifierLetter =
+                (
+                    "abcdefghijklmnopqrstuvwxyz" // строчная латиница
+                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // заглавная латиница
+                    + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" // строчная кириллица
+                    + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" // заглавная кириллица
+                    + "αβϐγδεϵζηθϑικϰλμνξοπϖρϱσςτυφϕχψω" // строчные греческие
+                    + "ΑΒΓΔΕΖΗΘϴΙΚΛΜΝΞΟΠΡΣΤΥϒΦΧΨΩ" // заглавные греческие
+                    + "_$"
+                )
+                .ToCharArray(),
+
+            NextIdentifierLetter =
+                (
+                    "abcdefghijklmnopqrstuvwxyz" // строчная латиница
+                    + "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // заглавная латиница
+                    + "0123456789" // цифры
+                    + "абвгдеёжзийклмнопрстуфхцчшщъыьэюя" // строчная кирилица
+                    + "АБСГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" // заглавная кириллица
+                    + "αβϐγδεϵζηθϑικϰλμνξοπϖρϱσςτυφϕχψω" // строчные греческие
+                    + "ΑΒΓΔΕΖΗΘϴΙΚΛΜΝΞΟΠΡΣΤΥϒΦΧΨΩ" // заглавные греческие
+                    + "_$"
+                )
+                .ToCharArray(),
+
+            KnownTerms = new[]
+            {
+                "!", ";", ":", ",", "(", ")", "+", "-", "*", "/", "[", "]",
+                "{", "}", "|", "%", "~", "=", "++", "--", "+=", "-=", "*=",
+                "/=", "==", "<", ">", "<<", ">>", "<=", ">=", "||", "&&",
+                ".", ",", "in", "is", "<=>", "@", "?", "??", "&",
+                "!=", "===", "!==", "~~",
+            },
+
+            ReservedWords = new []
+            {
+                "abstract", "and", "as", "async", "await", "base", "bool", "break",
+                "by", "byte", "case", "catch", "char", "checked", "class", "const",
+                "continue", "decimal", "default", "delegate", "descending", "do",
+                "double", "else", "enum", "equals", "event", "explicit", "extern",
+                "false", "finally", "fixed", "float", "for", "foreach", "from", "func",
+                "goto", "group", "if", "implicit", "in", "int", "interface", "internal",
+                "is", "join", "lambda", "let", "local", "lock", "long", "namespace",
+                "new", "null", "object", "on", "operator", "or", "orderby", "out",
+                "override", "params", "private", "protected", "public", "readonly", "ref",
+                "return", "sbyte", "sealed", "select", "short", "sizeof", "stackalloc",
+                "static", "string", "struct", "switch", "this", "throw", "true", "try",
+                "typeof", "uint", "ulong", "unchecked", "unsafe", "ushort", "using",
+                "virtual", "void", "volatile", "where", "while", "with"
+            }
+        };
     }
 
     /// <summary>
@@ -133,7 +154,7 @@ public sealed class TokenizerSettings
     {
         Sure.FileExists (fileName);
 
-        throw new NotImplementedException();
+        return JsonUtility.ReadObjectFromFile<TokenizerSettings> (fileName);
     }
 
     /// <summary>
@@ -146,7 +167,8 @@ public sealed class TokenizerSettings
     {
         Sure.NotNullNorEmpty (fileName);
 
-        throw new NotImplementedException();
+        var text = JsonUtility.SerializeIndented (this);
+        File.WriteAllText (fileName, text);
     }
 
     #endregion

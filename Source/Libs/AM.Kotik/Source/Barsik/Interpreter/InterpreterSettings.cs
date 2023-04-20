@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* InterpreterSettings.cs -- настройки интерпретатора
@@ -63,6 +61,7 @@ public sealed class InterpreterSettings
     /// Вывод дампа всех переменных после исполнения скрипта.
     /// </summary>
     [JsonPropertyName ("dump-variables")]
+    [JsonConverter (typeof (AnyTypeConverter<IBarsikDumper>))]
     public IBarsikDumper? VariableDumper { get; set; }
 
     /// <summary>
@@ -239,7 +238,7 @@ public sealed class InterpreterSettings
             Paths.AddRange (defaults.Paths);
         }
     }
-    
+
     /// <summary>
     /// Применение аргументов командной строки
     /// к настройкам интерпретатора.
@@ -250,7 +249,7 @@ public sealed class InterpreterSettings
         )
     {
         Sure.NotNull (args);
-        
+
         if (args.Length == 0)
         {
             ReplMode = true;
