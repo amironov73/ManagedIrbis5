@@ -215,7 +215,7 @@ public readonly struct Success<T>
 }
 
 /// <summary>
-/// Результат со значением либо сообщением об ощибке.
+/// Результат плюс значение либо сообщением об ощибке.
 /// </summary>
 [PublicAPI]
 public readonly struct Result<T>
