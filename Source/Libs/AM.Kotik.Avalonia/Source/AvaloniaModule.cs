@@ -18,8 +18,19 @@ using System;
 using System.Collections.Generic;
 
 using AM.Kotik.Barsik;
+using AM.Kotik.Barsik.Ast;
+
+using Avalonia.Controls;
+using Avalonia.Layout;
+using Avalonia.Media;
+
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 #endregion
+
+#nullable enable
 
 namespace AM.Kotik.Avalonia;
 
@@ -38,7 +49,11 @@ public sealed class AvaloniaModule
     {
         { "alert", new FunctionDescriptor ("alert", Alert) },
         { "confirm", new FunctionDescriptor ("confirm", Confirm) },
+        { "getBrush", new FunctionDescriptor ("getBrush", GetBrush) },
         { "prompt", new FunctionDescriptor ("prompt", Prompt) },
+        { "stretchHorizontally", new FunctionDescriptor ("stretchHorizontally", StretchHorizontally) },
+        { "stretchVertically", new FunctionDescriptor ("stretchVertically", StretchVertically) },
+        { "runDesktopApplication", new FunctionDescriptor ("runDesktopApplication", RunDesktopApplication) },
     };
 
     #endregion
@@ -58,6 +73,36 @@ public sealed class AvaloniaModule
     }
 
     /// <summary>
+    /// Вычисление аргумента по соответствующему индексу.
+    /// </summary>
+    public static object? Compute
+        (
+            Context context,
+            dynamic?[] args,
+            int index
+        )
+    {
+        if (index >= args.Length)
+        {
+            return null;
+        }
+
+        var arg = args[index];
+        if (arg is null)
+        {
+            return null;
+        }
+
+        if (arg is AtomNode atom)
+        {
+            var value = atom.Compute (context);
+            return value;
+        }
+
+        return arg;
+    }
+
+    /// <summary>
     /// Простейшее подтверждение действия у пользователя.
     /// </summary>
     public static dynamic? Confirm
@@ -70,6 +115,18 @@ public sealed class AvaloniaModule
     }
 
     /// <summary>
+    /// Получение кисти указанного цвета.
+    /// </summary>
+    public static dynamic? GetBrush
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return Brushes.Bisque;
+    }
+
+    /// <summary>
     /// Простейший ввод строки.
     /// </summary>
     public static dynamic? Prompt
@@ -79,6 +136,65 @@ public sealed class AvaloniaModule
         )
     {
         throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// Запуск десктопного приложения.
+    /// </summary>
+    public static dynamic? RunDesktopApplication
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        Sure.NotNull (context);
+
+        if (Compute (context, args, 0) is FunctionDescriptor descriptor)
+        {
+            var mainWindowCreator = () =>
+                (Window) descriptor.CallPoint.Invoke (context, args)!;
+            BarsikApplication.RunDesktopApplication (mainWindowCreator);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Растяжение по горизонтали.
+    /// </summary>
+    public static dynamic? StretchHorizontally
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Control control)
+        {
+            control.HorizontalAlignment = HorizontalAlignment.Stretch;
+
+            return control;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Растяжение по вертикали.
+    /// </summary>
+    public static dynamic? StretchVertically
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is Control control)
+        {
+            control.VerticalAlignment = VerticalAlignment.Stretch;
+
+            return control;
+        }
+
+        return null;
     }
 
     #endregion

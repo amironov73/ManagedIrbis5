@@ -68,7 +68,7 @@ internal sealed class PropertyNode
         var obj = _target.Compute (context);
         if (obj is null)
         {
-            throw new BarsikException ("Can't get property or field of null object");
+            throw new BarsikException ($"Can't get property or field of null object: {_target}");
         }
 
         if (string.IsNullOrEmpty (_propertyName))
@@ -80,7 +80,7 @@ internal sealed class PropertyNode
         {
             Name = _propertyName
         };
-        
+
         if (obj is Type type)
         {
             descriptor.Type = type;
@@ -149,7 +149,7 @@ internal sealed class PropertyNode
             {
                 throw new BarsikException ($"Can't resolve property or field {type}.{_propertyName}");
             }
-            
+
             staticMember.SetValue (null, value);
             return value;
         }

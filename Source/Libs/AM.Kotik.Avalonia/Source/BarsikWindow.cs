@@ -8,39 +8,32 @@
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* AvaloniaUtility.cs -- вспомогательные методы для работы из Barsik с Avalonia
+/* BarsikWindow.cs -- класс окна для создания из скриптов
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
+using System.Collections.Generic;
+
 using AM.Kotik.Barsik;
+
+using Avalonia.Controls;
 
 #endregion
 
 namespace AM.Kotik.Avalonia;
 
 /// <summary>
-/// Вспомогательные методы для работы из Barsik с Avalonia.
+/// Класс окна для создания из скриптов.
 /// </summary>
-public static class AvaloniaUtility
+public sealed class BarsikWindow
+    : Window
 {
     #region Public methods
 
-    /// <summary>
-    /// Подключение WinForms-модуля.
-    /// </summary>
-    public static Interpreter WithAvalonia
-        (
-            this Interpreter interpreter
-        )
-    {
-        Sure.NotNull (interpreter);
-
-        interpreter.Context.AttachModule (new AvaloniaModule());
-
-        return interpreter;
-    }
+    // TODO добавить методы
 
     #endregion
 }

@@ -85,6 +85,10 @@ public class BlockNode
         writer ??= Console.Out;
 
         DumpHierarchyItem (null, 0, writer);
+        foreach (var function in Functions)
+        {
+            function.DumpHierarchyItem ("Function", 0, writer);
+        }
     }
 
     #endregion

@@ -1,0 +1,33 @@
+func createMainWindow()
+{
+    window = new BarsikWindow()
+    {
+        .Title = "Hello, Avalonia";
+        .Height = 600;
+        .Width = 800;
+    }
+
+//    panel = new StackPanel()
+//    children = panel.Children
+//    stretchHorizontally (panel)
+//    stretchVertically (panel)
+//    window.Content = panel
+
+    textBox = new TextBox()
+    {
+        .Text = "Here is text"
+    }
+    // children.Add (textBox)
+    window.Content = textBox
+
+//    button = new Button()
+//    {
+//        .Content = "Here is button"
+//    }
+//    panel.Children.Add (button)
+
+
+    return window
+}
+
+runDesktopApplication (createMainWindow)

@@ -417,6 +417,7 @@ public sealed class Interpreter
         {
             program.Dump (output);
             output.WriteLine (new string ('=', 60));
+            return new ExecutionResult();
         }
 
         // отделяем отладочную печать парсеров от прочего вывода
