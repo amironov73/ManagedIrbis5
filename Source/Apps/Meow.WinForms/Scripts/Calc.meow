@@ -1,0 +1,112 @@
+// Простейший калькулятор
+
+using (form = new Form() { .Text = "Калькулятор"; })
+{
+    firstLabel = new Label()
+    {
+        .Top = 10;
+        .Left = 10;
+        .Text = "Первый операнд";
+    }
+
+    firstOperand = new TextBox()
+    {
+        .Top = 35;
+        .Left = 10;
+        .Text = "1111";
+    }
+
+    secondLabel = new Label()
+    {
+        .Top = 70;
+        .Left = 10;
+        .Text = "Операция";
+    }
+
+    operation = new ComboBox()
+    {
+        .Top = 95;
+        .Left = 10;
+        .DropDownStyle = ComboBoxStyle.DropDownList;
+    }
+    operation.Items.Add ("+")
+    operation.Items.Add ("-")
+    operation.Items.Add ("*")
+    operation.Items.Add ("/")
+    operation.SelectedIndex = 0
+
+    thirdLabel = new Label()
+    {
+        .Top = 130;
+        .Left = 10;
+        .Text = "Второй операнд";
+    }
+
+    secondOperand = new TextBox()
+    {
+        .Top = 155;
+        .Left = 10;
+        .Text = "2222";
+    }
+
+    button = new Button()
+    {
+        .Top = 95;
+        .Left = 150;
+        .Width = 100;
+        .Text = "Вычислить";
+    }
+
+    fourthLabel = new Label()
+    {
+        .Top = 130;
+        .Left = 150;
+        .Text = "Результат";
+    }
+
+    result = new TextBox()
+    {
+        .Top = 155;
+        .Left = 150;
+        .ReadOnly = true;
+        .BackColor = Color.Yellow;
+    }
+
+    form.Controls.Add (firstLabel)
+    form.Controls.Add (firstOperand)
+    form.Controls.Add (secondLabel)
+    form.Controls.Add (operation)
+    form.Controls.Add (thirdLabel)
+    form.Controls.Add (secondOperand)
+    form.Controls.Add (button)
+    form.Controls.Add (fourthLabel)
+    form.Controls.Add (result)
+
+    subscribe (button, "Click", buttonHandler)
+
+    Application.Run (form)
+}
+
+func buttonHandler (sender, eventArgs)
+{
+    first = Int32.Parse (firstOperand.Text)
+    second = Int32.Parse (secondOperand.Text)
+    code = operation.SelectedItem
+
+    switch (code)
+    {
+        case "+":
+            calculated = first + second
+
+        case "-":
+            calculated = first - second
+
+        case "*":
+            calculated = first * second
+
+        case "/":
+            calculated = first / second
+    }
+
+    result.Text = calculated.ToString()
+}

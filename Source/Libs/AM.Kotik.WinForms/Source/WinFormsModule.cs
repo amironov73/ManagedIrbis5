@@ -4,11 +4,9 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
-/* AvaloniaModule.cs -- Barsik-модуль для Avalonia
+/* WinFormsModule.cs -- Barsik-модуль для WinForms
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -16,19 +14,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 
-using AM.Scripting.Barsik;
+using AM.Kotik.Barsik;
+using AM.Windows.Forms;
 
-using static AM.Scripting.Barsik.Builtins;
+using JetBrains.Annotations;
+
+using static AM.Kotik.Barsik.Builtins;
 
 #endregion
 
-namespace AM.Scripting.Avalonia;
+namespace AM.Kotik.WinForms;
 
 /// <summary>
-/// Barsik-модуль для Avalonia UI.
+/// Barsik-модуль для WinForms.
 /// </summary>
-public sealed class AvaloniaModule
+[PublicAPI]
+public sealed class WinFormsModule
     : IBarsikModule
 {
     #region Properties
@@ -56,7 +59,23 @@ public sealed class AvaloniaModule
             dynamic?[] args
         )
     {
-        throw new NotImplementedException();
+        var text = ComputeAll (context, args);
+        // MessageBox.Show (text, "Barsik", MessageBoxButtons.OK);
+
+        var icon = Resources.Barsik;
+        TaskDialog.ShowDialog (new TaskDialogPage()
+        {
+            Caption = "Barsik interpreter",
+            Text = text,
+            AllowCancel = true,
+            Icon = new TaskDialogIcon (icon),
+            Buttons =
+            {
+                TaskDialogButton.OK
+            }
+        });
+
+        return null;
     }
 
     /// <summary>
@@ -68,7 +87,23 @@ public sealed class AvaloniaModule
             dynamic?[] args
         )
     {
-        throw new NotImplementedException();
+        var text = ComputeAll (context, args);
+
+        var icon = Resources.Barsik;
+        var result = TaskDialog.ShowDialog (new TaskDialogPage()
+        {
+            Caption = "Barsik interpreter",
+            Text = text,
+            AllowCancel = true,
+            Icon = new TaskDialogIcon (icon),
+            Buttons =
+            {
+                TaskDialogButton.OK,
+                TaskDialogButton.Cancel
+            }
+        });
+
+        return result == TaskDialogButton.OK;
     }
 
     /// <summary>
@@ -80,7 +115,26 @@ public sealed class AvaloniaModule
             dynamic?[] args
         )
     {
-        throw new NotImplementedException();
+        if (args.Length == 0)
+        {
+            return null;
+        }
+
+        var text = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (text))
+        {
+            return null;
+        }
+
+        var defaultValue = Compute (context, args, 1) as string ?? string.Empty;
+        var result = defaultValue;
+        if (InputBox.Query ("Barsik interpreter", text, ref result)
+            != DialogResult.OK)
+        {
+            result = null;
+        }
+
+        return result;
     }
 
     #endregion
@@ -88,7 +142,7 @@ public sealed class AvaloniaModule
     #region IBarsikModule members
 
     /// <inheritdoc cref="IBarsikModule.Description"/>
-    public string Description => "Avalonia";
+    public string Description => "WinForms";
 
     /// <inheritdoc cref="IBarsikModule.Version"/>
     public Version Version { get; } = new (1, 0);
@@ -96,12 +150,11 @@ public sealed class AvaloniaModule
     /// <inheritdoc cref="IBarsikModule.AttachModule"/>
     public bool AttachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
@@ -113,12 +166,11 @@ public sealed class AvaloniaModule
     /// <inheritdoc cref="IBarsikModule.DetachModule"/>
     public void DetachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions.Remove (descriptor.Key);

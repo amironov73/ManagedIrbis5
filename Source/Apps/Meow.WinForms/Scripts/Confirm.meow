@@ -1,0 +1,2 @@
+﻿answer = confirm ("Это круто?")
+alert ("Ответ: ", answer)

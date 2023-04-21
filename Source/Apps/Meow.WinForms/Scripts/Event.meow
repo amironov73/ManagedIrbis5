@@ -1,0 +1,31 @@
+﻿using (form = new Form() { .Text = "Это Барсик!"; .Height = 100; })
+{
+    button = new Button()
+    {
+        .Text = "Привет, Барсик!";
+        .Left = 10;
+        .Top = 10;
+        .Width = 110;
+    }
+    subscribe (button, "Click", buttonHandler)
+
+    label = new Label()
+    {
+        .Text = "Нажми на кнопку, получишь результат!";
+        .Top = 35;
+        .Left = 10;
+        .AutoSize = true;
+    }
+
+    form.Controls.Add (button)
+    form.Controls.Add (label)
+
+    Application.Run (form)
+}
+
+func buttonHandler (sender, eventArgs)
+{
+    // buttonHandler можно размещать ниже создания формы, так как
+    // наши функции "поднимаются" ничуть не хуже javascript'овых
+    alert ("Вас приветствует обработчик событий из скрипта!")
+}

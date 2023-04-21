@@ -1,0 +1,17 @@
+﻿// "Здравствуй, мир!" для WinForms
+
+using (form = new Form() { .Text="Интерпретатор Барсик"; })
+{
+    form.Width = 400
+    button = new Button()
+    {
+        // Здесь лучше употреблять запятые. Во избежание
+        .Text = "Здравствуй, Барсик!";
+        .Left = 10;
+        .Top = 10;
+        .Width = 200;
+    }
+    form.Controls.Add (button)
+
+    Application.Run (form)
+}

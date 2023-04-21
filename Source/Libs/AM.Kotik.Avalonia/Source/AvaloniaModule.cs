@@ -17,13 +17,11 @@
 using System;
 using System.Collections.Generic;
 
-using AM.Scripting.Barsik;
-
-using static AM.Scripting.Barsik.Builtins;
+using AM.Kotik.Barsik;
 
 #endregion
 
-namespace AM.Scripting.Avalonia;
+namespace AM.Kotik.Avalonia;
 
 /// <summary>
 /// Barsik-модуль для Avalonia UI.
@@ -96,12 +94,11 @@ public sealed class AvaloniaModule
     /// <inheritdoc cref="IBarsikModule.AttachModule"/>
     public bool AttachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions[descriptor.Key] = descriptor.Value;
@@ -113,12 +110,11 @@ public sealed class AvaloniaModule
     /// <inheritdoc cref="IBarsikModule.DetachModule"/>
     public void DetachModule
         (
-            Interpreter interpreter
+            Context context
         )
     {
-        Sure.NotNull (interpreter);
+        Sure.NotNull (context);
 
-        var context = interpreter.Context.ThrowIfNull();
         foreach (var descriptor in Registry)
         {
             context.Functions.Remove (descriptor.Key);
