@@ -12,8 +12,10 @@
 
 #region Using directives
 
+using AM.Kotik.Avalonia.Controls;
 using AM.Kotik.Barsik;
 
+using Avalonia;
 using Avalonia.Controls;
 
 using JetBrains.Annotations;
@@ -48,11 +50,20 @@ public static class AvaloniaBarsikUtility
         var assemblies = resolver.Assemblies;
         var namespaces = resolver.Namespaces;
         assemblies.Add (typeof (Window).Assembly);
+        assemblies.Add (typeof (Thickness).Assembly);
         assemblies.Add (typeof (AvaloniaBarsikUtility).Assembly);
         assemblies.Add (typeof (BarsikWindow).Assembly);
-        namespaces.Add ("System.Avalonia");
-        namespaces.Add ("System.Avalonia.Controls");
+        namespaces.Add ("Avalonia");
+        namespaces.Add ("Avalonia.Base");
+        namespaces.Add ("Avalonia.Controls");
+        namespaces.Add ("Avalonia.Data");
+        namespaces.Add ("Avalonia.Layout");
+        namespaces.Add ("Avalonia.Media");
+        namespaces.Add ("Avalonia.Styling");
+        namespaces.Add ("AM.Avalonia");
+        namespaces.Add ("AM.Avalonia.Controls");
         namespaces.Add ("AM.Kotik.Avalonia");
+        namespaces.Add ("AM.Kotik.Avalonia.Controls");
         interpreter.Context.AttachModule (new AvaloniaModule());
 
         return interpreter;

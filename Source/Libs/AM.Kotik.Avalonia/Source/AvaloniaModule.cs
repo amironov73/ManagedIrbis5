@@ -51,8 +51,6 @@ public sealed class AvaloniaModule
         { "confirm", new FunctionDescriptor ("confirm", Confirm) },
         { "getBrush", new FunctionDescriptor ("getBrush", GetBrush) },
         { "prompt", new FunctionDescriptor ("prompt", Prompt) },
-        { "stretchHorizontally", new FunctionDescriptor ("stretchHorizontally", StretchHorizontally) },
-        { "stretchVertically", new FunctionDescriptor ("stretchVertically", StretchVertically) },
         { "runDesktopApplication", new FunctionDescriptor ("runDesktopApplication", RunDesktopApplication) },
     };
 
@@ -123,7 +121,12 @@ public sealed class AvaloniaModule
             dynamic?[] args
         )
     {
-        return Brushes.Bisque;
+        if (Compute (context, args, 0) is string brushName)
+        {
+            return Brush.Parse (brushName);
+        }
+
+        return Brushes.Black;
     }
 
     /// <summary>
@@ -151,47 +154,9 @@ public sealed class AvaloniaModule
 
         if (Compute (context, args, 0) is FunctionDescriptor descriptor)
         {
-            var mainWindowCreator = () =>
-                (Window) descriptor.CallPoint.Invoke (context, args)!;
-            BarsikApplication.RunDesktopApplication (mainWindowCreator);
-        }
+            Window MainWindowCreator() => (Window) descriptor.CallPoint.Invoke (context, args)!;
 
-        return null;
-    }
-
-    /// <summary>
-    /// Растяжение по горизонтали.
-    /// </summary>
-    public static dynamic? StretchHorizontally
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (Compute (context, args, 0) is Control control)
-        {
-            control.HorizontalAlignment = HorizontalAlignment.Stretch;
-
-            return control;
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    /// Растяжение по вертикали.
-    /// </summary>
-    public static dynamic? StretchVertically
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (Compute (context, args, 0) is Control control)
-        {
-            control.VerticalAlignment = VerticalAlignment.Stretch;
-
-            return control;
+            BarsikApplication.RunDesktopApplication (MainWindowCreator);
         }
 
         return null;
@@ -219,6 +184,16 @@ public sealed class AvaloniaModule
         {
             context.Functions[descriptor.Key] = descriptor.Value;
         }
+
+        // удобные константы
+        context.SetDefine ("HorizontalCenter", HorizontalAlignment.Center);
+        context.SetDefine ("HorizontalStretch", HorizontalAlignment.Stretch);
+        context.SetDefine ("AlignLeft", HorizontalAlignment.Left);
+        context.SetDefine ("AlignRight", HorizontalAlignment.Right);
+        context.SetDefine ("VerticalCenter", VerticalAlignment.Center);
+        context.SetDefine ("VerticalStretch", VerticalAlignment.Stretch);
+        context.SetDefine ("AlignTop", VerticalAlignment.Top);
+        context.SetDefine ("AlignBottom", VerticalAlignment.Bottom);
 
         return true;
     }

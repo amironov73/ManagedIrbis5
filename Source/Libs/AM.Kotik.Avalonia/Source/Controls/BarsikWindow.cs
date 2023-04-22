@@ -20,10 +20,13 @@ using System.Collections.Generic;
 using AM.Kotik.Barsik;
 
 using Avalonia.Controls;
+using Avalonia.ReactiveUI;
 
 #endregion
 
-namespace AM.Kotik.Avalonia;
+#nullable enable
+
+namespace AM.Kotik.Avalonia.Controls;
 
 /// <summary>
 /// Класс окна для создания из скриптов.

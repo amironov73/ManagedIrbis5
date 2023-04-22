@@ -2,29 +2,42 @@ func createMainWindow()
 {
     window = new BarsikWindow()
     {
-        .Title = "Hello, Avalonia";
-        .Height = 600;
-        .Width = 800;
+        .Title = "Привет, Avalonia";
+        .Height = 300;
+        .Width = 600;
     }
 
-//    panel = new StackPanel()
-//    children = panel.Children
-//    stretchHorizontally (panel)
-//    stretchVertically (panel)
-//    window.Content = panel
-
-    textBox = new TextBox()
+    panel = new StackPanel()
     {
-        .Text = "Here is text"
+        .Spacing = 5;
+        .Margin = new Thickness (10);
+        .Background = getBrush ("#000033");
+        .HorizontalAlignment = HorizontalStretch;
+        .VerticalAlignment = VerticalStretch;
     }
-    // children.Add (textBox)
-    window.Content = textBox
+    window.Content = panel
 
-//    button = new Button()
-//    {
-//        .Content = "Here is button"
-//    }
-//    panel.Children.Add (button)
+    panel.Children.Add (new BarsikTextBlock ()
+    {
+        .HorizontalAlignment = HorizontalCenter;
+        .Background = getBrush ("#330000");
+        .Text = "Первая строчка";
+    })
+    panel.Children.Add (new BarsikTextBlock ()
+    {
+        .Margin = new Thickness (10);
+        .Foreground = getBrush ("Red");
+        .HorizontalAlignment = HorizontalCenter;
+        .Text = "Вторая строчка";
+    })
+
+    button = new Button()
+    {
+        .Background = getBrush ("Green");
+        .HorizontalAlignment = HorizontalCenter;
+        .Content = "Here is button";
+    }
+    panel.Children.Add (button)
 
 
     return window

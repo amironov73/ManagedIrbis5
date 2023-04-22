@@ -6,6 +6,16 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="Scripts\Hello.meow" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="Scripts\Hello.meow">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
       <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj" />
       <ProjectReference Include="..\..\Libs\AM.Kotik.Avalonia\AM.Kotik.Avalonia.csproj" />
@@ -38,12 +48,6 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="XamlNameReferenceGenerator" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <None Update="Scripts\Hello.meow">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
     </ItemGroup>
 
 </Project>
