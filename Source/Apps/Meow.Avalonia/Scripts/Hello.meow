@@ -7,40 +7,46 @@ func createMainWindow()
         .Width = 600;
     }
 
-    panel = new StackPanel()
+    window.Content = panel = new StackPanel()
     {
         .Spacing = 5;
         .Margin = new Thickness (10);
-        .Background = getBrush ("#000033");
-        .HorizontalAlignment = HorizontalStretch;
-        .VerticalAlignment = VerticalStretch;
+        .Background = Brush.Parse ("#000033");
+        .HorizontalAlignment = HorizontalAlignment.Stretch;
+        .VerticalAlignment = VerticalAlignment.Stretch;
     }
-    window.Content = panel
 
     panel.Children.Add (new BarsikTextBlock ()
     {
-        .HorizontalAlignment = HorizontalCenter;
-        .Background = getBrush ("#330000");
+        .HorizontalAlignment = HorizontalAlignment.Stretch;
+        .TextAlignment = TextAlignment.Center;
+        .Background = Brush.Parse ("#333300");
         .Text = "Первая строчка";
     })
+
     panel.Children.Add (new BarsikTextBlock ()
     {
         .Margin = new Thickness (10);
-        .Foreground = getBrush ("Red");
-        .HorizontalAlignment = HorizontalCenter;
+        .Foreground = Brushes.Red;
+        .HorizontalAlignment = HorizontalAlignment.Center;
         .Text = "Вторая строчка";
     })
 
     button = new Button()
     {
-        .Background = getBrush ("Green");
-        .HorizontalAlignment = HorizontalCenter;
+        .Background = Brush.Parse ("Green");
+        .HorizontalAlignment = HorizontalAlignment.Center;
         .Content = "Here is button";
     }
     panel.Children.Add (button)
-
+    subscribe (button, "Click", buttonHandler)
 
     return window
+}
+
+func buttonHandler (sender, eventArgs)
+{
+    alert ("Вас приветствует обработчик событий из скрипта!")
 }
 
 runDesktopApplication (createMainWindow)

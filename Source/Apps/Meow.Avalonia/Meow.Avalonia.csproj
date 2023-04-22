@@ -7,6 +7,7 @@
 
     <ItemGroup>
       <None Remove="Scripts\Hello.meow" />
+      <None Remove="Properties\launchSettings.json" />
     </ItemGroup>
 
     <ItemGroup>
@@ -48,6 +49,9 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="XamlNameReferenceGenerator" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Properties\" />
     </ItemGroup>
 
 </Project>

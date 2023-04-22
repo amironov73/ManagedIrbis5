@@ -17,8 +17,10 @@
 using System;
 using System.Collections.Generic;
 
+using AM.Avalonia;
 using AM.Kotik.Barsik;
 
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 
@@ -34,6 +36,19 @@ namespace AM.Kotik.Avalonia.Controls;
 public sealed class BarsikWindow
     : Window
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public BarsikWindow()
+    {
+        this.AttachDevTools();
+        this.SetWindowIcon ("Assets/barsik.ico");
+    }
+
+    #endregion
+
     #region Public methods
 
     // TODO добавить методы

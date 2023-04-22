@@ -17,12 +17,16 @@
 using System;
 using System.Collections.Generic;
 
+using AM.Avalonia;
 using AM.Kotik.Barsik;
 using AM.Kotik.Barsik.Ast;
 
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
+
+using MessageBox.Avalonia;
+using MessageBox.Avalonia.DTO;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -49,7 +53,6 @@ public sealed class AvaloniaModule
     {
         { "alert", new FunctionDescriptor ("alert", Alert) },
         { "confirm", new FunctionDescriptor ("confirm", Confirm) },
-        { "getBrush", new FunctionDescriptor ("getBrush", GetBrush) },
         { "prompt", new FunctionDescriptor ("prompt", Prompt) },
         { "runDesktopApplication", new FunctionDescriptor ("runDesktopApplication", RunDesktopApplication) },
     };
@@ -67,7 +70,29 @@ public sealed class AvaloniaModule
             dynamic?[] args
         )
     {
-        throw new NotImplementedException();
+        if (Compute (context, args, 0) is string message)
+        {
+            var parameters = new MessageBoxStandardParams
+            {
+                ContentTitle = "Barsik interpreter",
+                ContentMessage = message
+            };
+
+            if (OperatingSystem.IsWindows())
+            {
+                using var stream = AvaloniaUtility.OpenAssetStream (typeof (AvaloniaModule), "Assets/barsik.ico");
+                if (stream is not null)
+                {
+                    parameters.WindowIcon = new WindowIcon (stream);
+                }
+            }
+
+            MessageBoxManager
+                .GetMessageBoxStandardWindow (parameters)
+                .Show();
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -110,23 +135,6 @@ public sealed class AvaloniaModule
         )
     {
         throw new NotImplementedException();
-    }
-
-    /// <summary>
-    /// Получение кисти указанного цвета.
-    /// </summary>
-    public static dynamic? GetBrush
-        (
-            Context context,
-            dynamic?[] args
-        )
-    {
-        if (Compute (context, args, 0) is string brushName)
-        {
-            return Brush.Parse (brushName);
-        }
-
-        return Brushes.Black;
     }
 
     /// <summary>
@@ -184,16 +192,6 @@ public sealed class AvaloniaModule
         {
             context.Functions[descriptor.Key] = descriptor.Value;
         }
-
-        // удобные константы
-        context.SetDefine ("HorizontalCenter", HorizontalAlignment.Center);
-        context.SetDefine ("HorizontalStretch", HorizontalAlignment.Stretch);
-        context.SetDefine ("AlignLeft", HorizontalAlignment.Left);
-        context.SetDefine ("AlignRight", HorizontalAlignment.Right);
-        context.SetDefine ("VerticalCenter", VerticalAlignment.Center);
-        context.SetDefine ("VerticalStretch", VerticalAlignment.Stretch);
-        context.SetDefine ("AlignTop", VerticalAlignment.Top);
-        context.SetDefine ("AlignBottom", VerticalAlignment.Bottom);
 
         return true;
     }
