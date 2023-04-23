@@ -174,7 +174,7 @@ public sealed class Context
     {
         Sure.NotNull (instance);
 
-        if (!Commmon.Modules.Contains (instance) 
+        if (!Commmon.Modules.Contains (instance)
             && instance.AttachModule (this))
         {
             Commmon.Modules.Add (instance);
@@ -430,7 +430,7 @@ public sealed class Context
         {
             return;
         }
-        
+
         if (Path.IsPathRooted (fileName))
         {
             throw new BarsikException ($"Can't include '{fileName}'");
@@ -548,14 +548,41 @@ public sealed class Context
     }
 
     /// <summary>
-    /// Загрузка модуля.
+    /// Загрузка указанного модуля.
     /// </summary>
     public void LoadModule
         (
-            string moduleName
+            ModuleDefinition moduleDefinition
         )
     {
-        Sure.NotNullNorEmpty (moduleName);
+        Sure.NotNull (moduleDefinition);
+        Sure.NotNull (moduleDefinition.ModuleType);
+
+        if (moduleDefinition.AssembliesToLoad is { } assembliesToLoad)
+        {
+            foreach (var assemblyName in assembliesToLoad)
+            {
+                LoadAssembly (assemblyName);
+            }
+        }
+
+        var moduleTypeName = moduleDefinition.ModuleType.ThrowIfNull();
+        LoadModule (moduleTypeName);
+    }
+
+    /// <summary>
+    /// Загрузка модуля по его имени.
+    /// </summary>
+    /// <remarks>
+    /// Нужно короткое (без namespace и не Assembly-qualified)
+    /// имя типа.
+    /// </remarks>
+    public void LoadModule
+        (
+            string moduleTypeName
+        )
+    {
+        Sure.NotNullNorEmpty (moduleTypeName);
 
         foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
         {
@@ -574,7 +601,10 @@ public sealed class Context
                     }
                 }
 
-                if (alreadyHave || type.Name != moduleName)
+                if (
+                        alreadyHave
+                        || string.CompareOrdinal (type.Name, moduleTypeName) != 0
+                   )
                 {
                     continue;
                 }
@@ -584,6 +614,8 @@ public sealed class Context
                 {
                     AttachModule (instance);
                 }
+
+                return;
             }
         }
     }

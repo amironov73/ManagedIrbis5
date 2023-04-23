@@ -1,0 +1,17 @@
+﻿{
+  "assemblies": [
+    "Avalonia",
+    "Avalonia.Base",
+    "Avalonia.Controls",
+    "Avalonia.Desktop",
+    "Avalonia.Diagnostics",
+    "Avalonia.Dialogs",
+    "Avalonia.Markup",
+    "Avalonia.Markup.Xaml",
+    "Avalonia.Markup.Xaml.Loader",
+    "Avalonia.Native",
+    "Avalonia.Skia",
+    "Am.Kotik.Avalonia"
+  ],
+  "module-type": "AvaloniaModule"
+}

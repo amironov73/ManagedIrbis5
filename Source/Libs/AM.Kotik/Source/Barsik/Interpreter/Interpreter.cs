@@ -260,6 +260,15 @@ public sealed class Interpreter
         paths.Clear();
         paths.AddRange (settings.Paths);
 
+        if (Context.Commmon.Settings.ModulesToLoad is { }
+                modulesToLoad)
+        {
+            foreach (var moduleDefinition in modulesToLoad)
+            {
+                Context.LoadModule (moduleDefinition);
+            }
+        }
+
         foreach (var ns in settings.UseNamespaces)
         {
             Context.Commmon.Resolver.Namespaces.Add (ns);

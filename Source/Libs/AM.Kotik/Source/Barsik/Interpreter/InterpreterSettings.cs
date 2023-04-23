@@ -182,6 +182,12 @@ public sealed class InterpreterSettings
     [JsonPropertyName ("allow-new")]
     public bool AllowNewOperator { get; set; }
 
+    /// <summary>
+    /// Список модулей, которые необходимо.
+    /// </summary>
+    [JsonPropertyName ("modules")]
+    public List<ModuleDefinition>? ModulesToLoad { get; set; }
+
     #endregion
 
     #region Construciton
@@ -301,6 +307,13 @@ public sealed class InterpreterSettings
             {
                 DumpAst = true;
             }
+            else if (arg is "--module")
+            {
+                var fileName = args[++index];
+                var moduleDefinition = ModuleDefinition.Load (fileName);
+                ModulesToLoad ??= new ();
+                ModulesToLoad.Add (moduleDefinition);
+            }
             else if (arg is "--grammar")
             {
                 var typeName = args[++index];
@@ -359,7 +372,8 @@ public sealed class InterpreterSettings
                 var items = value.Split
                     (
                         Path.PathSeparator,
-                        StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries
+                        StringSplitOptions.TrimEntries
+                        | StringSplitOptions.RemoveEmptyEntries
                     );
                 foreach (var item in items)
                 {
@@ -402,7 +416,10 @@ public sealed class InterpreterSettings
     {
         var result = new InterpreterSettings();
 
-        result.Tokenizer = KotikUtility.CreateTokenizerForBarsik (result.TokenizerSettings);
+        result.Tokenizer = KotikUtility.CreateTokenizerForBarsik
+            (
+                result.TokenizerSettings
+            );
         result.Grammar = AM.Kotik.Barsik.Grammar.CreateDefaultBarsikGrammar();
 
         result.Paths.Add ("include");

@@ -18,6 +18,8 @@ using AM.Kotik.Barsik;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Diagnostics;
 using Avalonia.Dialogs;
 
 using JetBrains.Annotations;
@@ -51,10 +53,13 @@ public static class AvaloniaBarsikUtility
         var assemblies = resolver.Assemblies;
         var namespaces = resolver.Namespaces;
 
-        assemblies.Add (typeof (Window).Assembly); // Avalonia.Controls
         assemblies.Add (typeof (Thickness).Assembly); // Avalonia.Base
+        assemblies.Add (typeof (Window).Assembly); // Avalonia.Controls
+        assemblies.Add (typeof (ClassicDesktopStyleApplicationLifetime).Assembly); // Avalonia.Desktop
         assemblies.Add (typeof (DataGrid).Assembly); // Avalonia.DataGrid
+        assemblies.Add (typeof (DevTools).Assembly); // Avalonia.Diagnostics
         assemblies.Add (typeof (ManagedFileChooser).Assembly); // Avalonia.Dialogs
+        // TODO: Avalonia.Skia?
         assemblies.Add (typeof (AvaloniaUtility).Assembly); // AM.Avalonia
         assemblies.Add (typeof (BarsikWindow).Assembly); // эта сборка
 

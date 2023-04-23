@@ -57,4 +57,11 @@
         <AvaloniaResource Include="Assets\**" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="AvaloniaModule.json" />
+      <Content Include="AvaloniaModule.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
 </Project>

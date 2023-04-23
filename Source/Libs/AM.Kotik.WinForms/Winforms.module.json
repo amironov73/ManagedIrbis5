@@ -1,0 +1,8 @@
+﻿{
+  "assemblies": [
+    "System.Drawing",
+    "System.Windows.Forms",
+    "Am.Kotik.WinForms"
+  ],
+  "module-type": "WinFormsModule"
+}
