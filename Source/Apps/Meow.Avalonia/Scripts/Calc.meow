@@ -1,0 +1,84 @@
+﻿func createMainWindow()
+{
+    window = new BarsikWindow()
+    {
+        .Title = "Калькулятор Avalonia";
+        .Height = 300;
+        .MinHeight = 300;
+        .Width = 300;
+        .MinWidth = 300;
+    }
+
+    window.Content = panel = new StackPanel()
+    {
+        .Spacing = 10;
+        .Margin = new Thickness (10);
+        .HorizontalAlignment = HorizontalAlignment.Stretch;
+        .VerticalAlignment = VerticalAlignment.Stretch;
+    }
+
+    panel.Children.Add (new Label()
+    {
+        .Content = "Первое слагаемое";
+    })
+
+    firstBox = new TextBox()
+    {
+       .HorizontalAlignment = HorizontalAlignment.Stretch;
+       .Text = "123";
+    }
+    panel.Children.Add (firstBox)
+
+    panel.Children.Add (new Label()
+    {
+        .Content = "Второе слагаемое";
+    })
+
+    secondBox = new TextBox()
+    {
+       .HorizontalAlignment = HorizontalAlignment.Stretch;
+       .Text = "456";
+    }
+    panel.Children.Add (secondBox)
+
+    button = new Button()
+    {
+        .Margin = new Thickness (0, 10, 0, 0);
+        .HorizontalAlignment = HorizontalAlignment.Stretch;
+        .HorizontalContentAlignment = HorizontalAlignment.Center;
+        .Content = "Сложить";
+    }
+    panel.Children.Add (button)
+    subscribe (button, "Click", buttonHandler)
+
+    panel.Children.Add (new Label()
+    {
+        .Content = "Сумма";
+    })
+
+    sumBox = new TextBox()
+    {
+       .HorizontalAlignment = HorizontalAlignment.Stretch;
+       .ReadOnly = true;
+    }
+    panel.Children.Add (sumBox)
+
+    return window
+}
+
+func buttonHandler (sender, eventArgs)
+{
+    try
+    {
+        firstNumber = Double.Parse (firstBox.Text)
+        secondNumber = Double.Parse (secondBox.Text)
+        sum = firstNumber + secondNumber
+        sumBox.Text = sum.ToString()
+    }
+    catch (exception)
+    {
+        alert (exception.ToString())
+    }
+}
+
+runDesktopApplication (createMainWindow)

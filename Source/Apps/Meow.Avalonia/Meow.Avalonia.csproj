@@ -14,6 +14,10 @@
       <Content Include="Scripts\Hello.meow">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+      <None Remove="Scripts\Calc.meow" />
+      <Content Include="Scripts\Calc.meow">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
