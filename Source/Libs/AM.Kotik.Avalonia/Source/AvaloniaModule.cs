@@ -55,6 +55,7 @@ public sealed class AvaloniaModule
         { "confirm", new FunctionDescriptor ("confirm", Confirm) },
         { "prompt", new FunctionDescriptor ("prompt", Prompt) },
         { "runDesktopApplication", new FunctionDescriptor ("runDesktopApplication", RunDesktopApplication) },
+        { "runSingleViewApplication", new FunctionDescriptor ("runSingleViewApplication", RunSingleViewApplication) },
     };
 
     #endregion
@@ -165,6 +166,27 @@ public sealed class AvaloniaModule
             Window MainWindowCreator() => (Window) descriptor.CallPoint.Invoke (context, args)!;
 
             BarsikApplication.RunDesktopApplication (MainWindowCreator);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Запуск мобильного приложения.
+    /// </summary>
+    public static dynamic? RunSingleViewApplication
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        Sure.NotNull (context);
+
+        if (Compute (context, args, 0) is FunctionDescriptor descriptor)
+        {
+            Control MainViewCreator() => (Control) descriptor.CallPoint.Invoke (context, args)!;
+
+            BarsikApplication.RunSingleViewApplication (MainViewCreator);
         }
 
         return null;

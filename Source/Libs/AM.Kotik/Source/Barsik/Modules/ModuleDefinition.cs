@@ -52,6 +52,38 @@ public sealed class ModuleDefinition
 
     #endregion
 
+    #region Private members
+
+    private void CopyFile
+        (
+            string fileName,
+            string sourceFolder,
+            string targetFolder,
+            bool mandatory
+        )
+    {
+        var targetFileName = Path.Combine (targetFolder, fileName);
+        if (File.Exists (targetFileName))
+        {
+            return;
+        }
+
+        var sourceFileName = Path.Combine (sourceFolder);
+        if (!File.Exists (sourceFileName))
+        {
+            if (mandatory)
+            {
+                throw new FileNotFoundException (sourceFileName);
+            }
+
+            return;
+        }
+
+        File.Copy (sourceFileName, targetFileName);
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -60,18 +92,24 @@ public sealed class ModuleDefinition
     public void Deploy
         (
             string sourceFolder,
-            string targetFolder
+            string destinationFolder
         )
     {
         Sure.DirectoryExists (sourceFolder);
-        Sure.NotNullNorEmpty (targetFolder);
+        Sure.NotNullNorEmpty (destinationFolder);
 
-        Directory.CreateDirectory (targetFolder);
+        if (string.CompareOrdinal (sourceFolder, destinationFolder) == 0)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory (destinationFolder);
         if (AssembliesToLoad is not null)
         {
             foreach (var assemblyName in AssembliesToLoad)
             {
-                // TODO: реализовать деплоймент
+                CopyFile (assemblyName + ".dll", sourceFolder, destinationFolder, true);
+                CopyFile (assemblyName + ".pdb", sourceFolder, destinationFolder, false);
             }
         }
     }

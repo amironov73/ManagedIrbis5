@@ -1,4 +1,4 @@
-// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
@@ -21,19 +21,22 @@ using System.Threading.Tasks;
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
+using Avalonia.Data;
+using Avalonia.Layout;
+
+using ReactiveUI;
 
 #endregion
 
 #nullable enable
+
 
 namespace AM.Avalonia.Dialogs;
 
 /// <summary>
 /// Простой диалог ввода строкового значения.
 /// </summary>
-public sealed partial class InputDialog
+public sealed class InputDialog
     : Window
 {
     #region Properties
@@ -77,41 +80,53 @@ public sealed partial class InputDialog
     /// </summary>
     public InputDialog()
     {
-        AvaloniaXamlLoader.Load (this);
-
+        this.AttachDevTools();
         DataContext = this;
 
-#if DEBUG
-        this.AttachDevTools();
-#endif
-    }
+        Content = new StackPanel
+        {
+            Margin = new Thickness (10),
+            Orientation = Orientation.Vertical,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Center,
+            Children =
+            {
+                new Label
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    [!ContentProperty] = new Binding (nameof (Prompt))
+                },
 
-    #endregion
+                new TextBox
+                {
+                    Margin = new Thickness (0, 10, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    [!TextBox.TextProperty] = new Binding (nameof (Value))
+                },
 
-    #region Private members
+                new StackPanel
+                {
+                    Margin = new Thickness (10),
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Children =
+                    {
+                        new Button
+                        {
+                            Content = "OK",
+                            Command = ReactiveCommand.Create (() => Close (true))
+                        },
 
-    /// <summary>
-    /// Обработчик кнопки "ОК".
-    /// </summary>
-    private void OkButton_OnClick
-        (
-            object? sender,
-            RoutedEventArgs eventArgs
-        )
-    {
-        Close (true);
-    }
-
-    /// <summary>
-    /// Обработчик кнопки "Отмена".
-    /// </summary>
-    private void CancelButton_OnClick
-        (
-            object? sender,
-            RoutedEventArgs eventArgs
-        )
-    {
-        Close (false);
+                        new Button
+                        {
+                            Content = "Отмена",
+                            Margin = new Thickness (3, 0, 0, 0),
+                            Command = ReactiveCommand.Create (() => Close (false))
+                        }
+                    }
+                }
+            }
+        };
     }
 
     #endregion
@@ -139,7 +154,7 @@ public sealed partial class InputDialog
             Value = data.Value
         };
 
-        var result = await window.ShowDialog<bool> (owner);
+        var result = await window.ShowDialog<bool> (owner!);
         if (result)
         {
             data.Value = window.Value;

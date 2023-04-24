@@ -72,10 +72,4 @@
         <AvaloniaXaml Remove="Source\ExtendedToolkit\Styles\Themes\Theme.Template.axaml" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Source\Dialogs\InputDialog.axaml.cs">
-            <DependentUpon>InputDialog.axaml</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
 </Project>

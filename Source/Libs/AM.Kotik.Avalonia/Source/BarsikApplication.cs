@@ -79,23 +79,17 @@ public class BarsikApplication
     #region Private members
 
     private static Func <Window>? _mainWindowCreator;
+    private static Func <Control>? _mainViewCreator;
 
     #endregion
 
     #region Public methods
 
     /// <summary>
-    /// Запуск десктопного приложения с указанным главным окном.
+    /// Обшая инициализация.
     /// </summary>
-    public static void RunDesktopApplication
-        (
-            Func<Window> mainWindowCreator
-        )
+    public static void CommonInitialization()
     {
-        Sure.NotNull (mainWindowCreator);
-
-        _mainWindowCreator = mainWindowCreator;
-
         var builder = Host.CreateDefaultBuilder (Arguments);
         Configuration = new ConfigurationBuilder()
             .SetBasePath (AppContext.BaseDirectory)
@@ -117,6 +111,42 @@ public class BarsikApplication
 
         ApplicationHost = builder.Build();
         Logger = ApplicationHost.Services.GetRequiredService<ILogger<BarsikApplication>>();
+
+    }
+
+    /// <summary>
+    /// Запуск десктопного приложения с указанным главным окном.
+    /// </summary>
+    public static void RunDesktopApplication
+        (
+            Func<Window> mainWindowCreator
+        )
+    {
+        Sure.NotNull (mainWindowCreator);
+
+        _mainWindowCreator = mainWindowCreator;
+        CommonInitialization();
+
+        var app = AppBuilder.Configure<BarsikApplication>()
+            .UsePlatformDetect()
+            .UseReactiveUI()
+            .LogToTrace();
+
+        app.StartWithClassicDesktopLifetime (Arguments);
+    }
+
+    /// <summary>
+    /// Запуск мобильного приложения с указанным главным видом.
+    /// </summary>
+    public static void RunSingleViewApplication
+        (
+            Func<Control> mainViewCreator
+        )
+    {
+        Sure.NotNull (mainViewCreator);
+
+        _mainViewCreator = mainViewCreator;
+        CommonInitialization();
 
         var app = AppBuilder.Configure<BarsikApplication>()
             .UsePlatformDetect()
@@ -147,6 +177,10 @@ public class BarsikApplication
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = _mainWindowCreator.ThrowIfNull()();
+        }
+        if (ApplicationLifetime is ISingleViewApplicationLifetime mobile)
+        {
+            mobile.MainView = _mainViewCreator.ThrowIfNull()();
         }
 
         base.OnFrameworkInitializationCompleted();
