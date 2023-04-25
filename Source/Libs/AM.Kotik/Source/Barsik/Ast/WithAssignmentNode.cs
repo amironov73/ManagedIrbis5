@@ -102,6 +102,14 @@ internal sealed class WithAssignmentNode
                 return;
             }
 
+            if (context.Commmon.Error is { } error1)
+            {
+                error1.WriteLine ("Can't handle assignment");
+                error1.WriteLine ($"Line number: {Line}");
+                error1.WriteLine ($"Type: {type}");
+                error1.WriteLine ($"Property name: {_propertyName}");
+            }
+
             return;
         }
 
@@ -131,7 +139,13 @@ internal sealed class WithAssignmentNode
             return;
         }
 
-        context.Commmon.Error?.WriteLine ("Can't handle assignment");
+        if (context.Commmon.Error is { } error2)
+        {
+            error2.WriteLine ("Can't handle assignment");
+            error2.WriteLine ($"Line number: {Line}");
+            error2.WriteLine ($"Object: {objectValue}");
+            error2.WriteLine ($"Property name: {_propertyName}");
+        }
     }
 
     #endregion

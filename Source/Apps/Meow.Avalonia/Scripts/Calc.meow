@@ -59,7 +59,7 @@
     sumBox = new TextBox()
     {
        .HorizontalAlignment = HorizontalAlignment.Stretch;
-       .ReadOnly = true;
+       .IsReadOnly = true;
     }
     panel.Children.Add (sumBox)
 
