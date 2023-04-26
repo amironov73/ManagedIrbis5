@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* SerializationUtility.cs -- возня вокруг сериализации
  * Ars Magna project, http://arsmagna.ru
@@ -17,10 +12,14 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq.Expressions;
 
 using AM.IO;
+
+using JetBrains.Annotations;
 
 #endregion
 
@@ -31,9 +30,85 @@ namespace AM.Runtime;
 /// <summary>
 /// Возня вокруг сериализации.
 /// </summary>
+[PublicAPI]
 public static class SerializationUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// Глубокая копия объекта, созданная через деревья выражений.
+    /// </summary>
+    public static T DeepCopy<T>
+        (
+            T input
+        )
+    {
+        return GenerateDeepCopy<T>()(input);
+    }
+
+    /// <summary>
+    /// Generate deep copy function.
+    /// </summary>
+    public static Func<T, T> GenerateDeepCopy<T>()
+    {
+        // TODO кешировать
+
+        var inputParameter = Expression.Parameter
+            (
+                typeof(T),
+                "input"
+            );
+
+        var memberBindings = new List<MemberBinding>();
+        foreach (var propertyInfo in typeof (T).GetProperties())
+        {
+            var propertyExpression = Expression.Property
+                (
+                    inputParameter,
+                    propertyInfo
+                );
+
+            if (propertyInfo.PropertyType.IsClass
+                && propertyInfo.PropertyType != typeof(string))
+            {
+                var copyMethod = typeof (SerializationUtility)
+                    .GetMethod (nameof (DeepCopy))!
+                    .MakeGenericMethod (propertyInfo.PropertyType);
+
+                var propertyCopyExpression = Expression.Call
+                    (
+                        copyMethod,
+                        propertyExpression
+                    );
+
+                memberBindings.Add (Expression.Bind
+                    (
+                        propertyInfo,
+                        propertyCopyExpression
+                    ));
+            }
+            else
+            {
+                memberBindings.Add (Expression.Bind
+                    (
+                        propertyInfo,
+                        propertyExpression
+                    ));
+            }
+        }
+
+        var memberInitExpression = Expression.MemberInit
+            (
+                Expression.New (typeof(T)), memberBindings
+            );
+
+        return Expression.Lambda<Func<T, T>>
+            (
+                memberInitExpression,
+                inputParameter
+            )
+            .Compile();
+    }
 
     /// <summary>
     /// Чтение массива сериализованных объектов из потока.

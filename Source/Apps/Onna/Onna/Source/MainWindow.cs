@@ -200,7 +200,11 @@ public sealed class MainWindow
         _folder = Folder.LoadFolder (dirName);
         DataContext = _folder;
 
-        _folder.SelectedFile = _folder.Files?.FirstOrDefault();
+        if (string.IsNullOrEmpty (_folder.SelectedFile))
+        {
+            _folder.SelectedFile = _folder.Files?.FirstOrDefault();
+        }
+
         _fileList.Focus();
     }
 

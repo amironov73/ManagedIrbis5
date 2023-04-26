@@ -1,0 +1,6 @@
+﻿<linker>
+  <!-- Can be removed if CompiledBinding and no reflection are used -->
+  <assembly fullname="Onna" preserve="All" />
+  <assembly fullname="Avalonia.Themes.Fluent" preserve="All" />
+  <assembly fullname="Avalonia.Controls.DataGrid" preserve="All" />
+</linker>

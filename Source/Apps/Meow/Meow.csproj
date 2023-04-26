@@ -10,6 +10,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj" />
       <ProjectReference Include="..\..\Libs\SampleData\SampleData.csproj" />
+      <TrimmerRootDescriptor Include="Roots.xml" />
     </ItemGroup>
 
     <ItemGroup>

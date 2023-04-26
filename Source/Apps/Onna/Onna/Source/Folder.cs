@@ -14,6 +14,8 @@
 using System;
 using System.IO;
 
+using AM;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -57,10 +59,24 @@ public class Folder
             string dirName
         )
     {
+        Sure.NotNullNorEmpty (dirName);
+
+        string? fileToSelect = null;
+        if (File.Exists (dirName))
+        {
+            var temporary = Path.GetDirectoryName (dirName);
+            if (!string.IsNullOrEmpty (temporary))
+            {
+                fileToSelect = dirName;
+                dirName = temporary;
+            }
+        }
+
         var result = new Folder
         {
             DirectoryName = dirName,
-            Files = Directory.GetFiles (dirName)
+            Files = Directory.GetFiles (dirName),
+            SelectedFile = fileToSelect
         };
 
         Array.Sort (result.Files);
