@@ -120,6 +120,7 @@ public class BlockNode
                 if (!whereLabel.HasValue)
                 {
                     // передаем исключение наверх
+                    // логировать не надо
                     throw;
                 }
 

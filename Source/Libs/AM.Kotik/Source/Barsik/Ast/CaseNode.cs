@@ -91,8 +91,9 @@ internal sealed class CaseNode
     {
         base.DumpHierarchyItem (name, level, writer);
 
-        if (_condition is null)
+        if ((object?) _condition is null)
         {
+            // _condition может быть null в блоке `default`
             DumpHierarchyItem ("Condition", level + 1, writer, "(null)");
         }
         else

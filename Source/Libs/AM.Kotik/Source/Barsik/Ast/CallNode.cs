@@ -11,10 +11,13 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
 using AM.Kotik.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -73,10 +76,19 @@ internal sealed class CallNode
                 return lambda.Execute (context, _arguments);
             }
 
+            Magna.Logger.LogInformation ("Unexpected variable {Name}", _name);
             throw new BarsikException ($"Unexpected variable {_name}");
         }
 
-        _function ??= context.ResolveFunction (_name).ThrowIfNull ($"Can't find function {_name}");
+        try
+        {
+            _function ??= context.ResolveFunction (_name).ThrowIfNull ($"Can't find function {_name}");
+        }
+        catch (Exception)
+        {
+            Magna.Logger.LogInformation ("Can't find function {Name}", _name);
+            throw;
+        }
 
         var args = new List<dynamic?>();
         foreach (var node in _arguments)
@@ -95,6 +107,7 @@ internal sealed class CallNode
         catch (GotoException exception)
         {
             // не позволяем goto сбежать из функции
+            Magna.Logger.LogInformation ("Can't find label {Name}", exception.Label);
             throw new BarsikException ($"Can't find label {exception.Label}");
         }
 

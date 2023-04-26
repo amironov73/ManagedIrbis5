@@ -21,6 +21,8 @@ using AM.Text;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -136,6 +138,12 @@ public sealed class BinaryNode
         }
 
         // для всех прочих типов данных оператор не реализован
+        Magna.Logger.LogInformation
+            (
+                "Same operation not implemented: {Left}, {Right}",
+                (object?) left,
+                (object?) right
+            );
         throw new NotImplementedException();
     }
 
@@ -570,7 +578,8 @@ public sealed class BinaryNode
             "in" => In (context, left, right),
             "<=>" => Shuttle (context, left, right),
             // "??" => Coalesce (context, left, right),
-            _ => throw new InvalidOperationException ($"Unknown operator {operation}")
+            _ => // TODO залогировать
+                throw new InvalidOperationException ($"Unknown operator {operation}")
         };
 
         // context.Output.WriteLine ($"Compute {left} {_operation} {right} = {result}");

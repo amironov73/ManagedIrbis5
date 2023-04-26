@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -72,6 +74,7 @@ internal sealed class WithAssignmentNode
         var center = context.With;
         if (center is null)
         {
+            Magna.Logger.LogInformation ("Bad with block");
             context.Commmon.Error?.WriteLine ("Bad with block");
             return;
         }
@@ -79,7 +82,8 @@ internal sealed class WithAssignmentNode
         var objectValue = center.Compute (context);
         if (objectValue is null)
         {
-            context.Commmon.Error?.WriteLine($"Can't assign to null");
+            Magna.Logger.LogInformation ("Can't assign to null: {Center}", center);
+            context.Commmon.Error?.WriteLine ($"Can't assign to null: {center}");
             return;
         }
 
@@ -101,6 +105,11 @@ internal sealed class WithAssignmentNode
 
                 return;
             }
+
+            Magna.Logger.LogInformation ("Can't handle assignment");
+            Magna.Logger.LogInformation ("Line number: {Line}", Line);
+            Magna.Logger.LogInformation ("Type: {Type}", type);
+            Magna.Logger.LogInformation ("Property name: {Property}", _propertyName);
 
             if (context.Commmon.Error is { } error1)
             {
@@ -138,6 +147,11 @@ internal sealed class WithAssignmentNode
 
             return;
         }
+
+        Magna.Logger.LogInformation ("Can't handle assignment");
+        Magna.Logger.LogInformation ("Line number: {Line}", Line);
+        Magna.Logger.LogInformation ("Object: {Object}", (object) objectValue);
+        Magna.Logger.LogInformation ("Property name: {Property}", _propertyName);
 
         if (context.Commmon.Error is { } error2)
         {

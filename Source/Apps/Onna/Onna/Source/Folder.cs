@@ -5,15 +5,14 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* Folder.cs --
+/* Folder.cs -- папка с файлами
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.IO;
-
-using Avalonia.Platform.Storage;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -23,31 +22,35 @@ using ReactiveUI.Fody.Helpers;
 namespace Onna;
 
 /// <summary>
-/// 
+/// Папка с файлами.
 /// </summary>
 public class Folder
     : ReactiveObject
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    [Reactive]
-    public string? DirectoryName { get; set; }
+    #region Properties
 
     /// <summary>
-    /// 
+    /// Имя директории.
+    /// </summary>
+    [Reactive]
+    public string? DirectoryName { get; init; }
+
+    /// <summary>
+    /// Имя выбранного файла.
     /// </summary>
     [Reactive]
     public string? SelectedFile { get; set; }
 
     /// <summary>
-    /// 
+    /// Файлы, найденные в папке.
     /// </summary>
     [Reactive]
-    public string[]? Files { get; set; }
+    public string[]? Files { get; init; }
+
+    #endregion
 
     /// <summary>
-    /// 
+    /// Загрузка файлов из указанной папки.
     /// </summary>
     public static Folder LoadFolder
         (
@@ -59,6 +62,8 @@ public class Folder
             DirectoryName = dirName,
             Files = Directory.GetFiles (dirName)
         };
+
+        Array.Sort (result.Files);
 
         return result;
     }

@@ -51,6 +51,9 @@ internal sealed class BreakNode
     {
         PreExecute (context);
 
+        // логировать не надо,
+        // это штатный выброс исключения
+        // с целью передачи управления
         throw new BreakException();
     }
 

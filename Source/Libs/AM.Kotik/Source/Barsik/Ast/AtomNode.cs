@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 
 /* AtomNode.cs -- узел, в котором происходят некие вычисления
  * Ars Magna project, http://arsmagna.ru
@@ -18,6 +15,10 @@ using System;
 
 using AM.Kotik.Ast;
 
+using JetBrains.Annotations;
+
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -28,6 +29,7 @@ namespace AM.Kotik.Barsik.Ast;
 /// Узел, в котором происходят некие вычисления,
 /// возможно, константные.
 /// </summary>
+[PublicAPI]
 public abstract class AtomNode
     : AstNode
 {
@@ -52,6 +54,7 @@ public abstract class AtomNode
         )
     {
         // по умолчанию узлы не поддерживают присваивание
+        Magna.Logger.LogInformation ("Assignment in {Type}", GetType().FullName);
         throw new NotSupportedException ($"Assignment in {GetType().FullName}");
     }
 

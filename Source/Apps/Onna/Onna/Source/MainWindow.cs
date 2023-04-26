@@ -71,7 +71,7 @@ public sealed class MainWindow
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        
+
         var theme = AvaloniaUtility.GetThemeResources (this);
         var foreground = theme.ThemeForegroundBrush;
         // var background = theme.ThemeBackgroundBrush;
@@ -92,7 +92,7 @@ public sealed class MainWindow
                         Content = "Дир",
                         Command = ReactiveCommand.Create (_ChangeDirectory)
                     },
-                    
+
                     new Button
                     {
                         Content = "Скролл",
@@ -129,7 +129,7 @@ public sealed class MainWindow
                 Width = 300,
                 Focusable = true,
                 IsTabStop = true,
-                [!ItemsControl.ItemsProperty] = new Binding (nameof (Folder.Files)),
+                [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (Folder.Files)),
                 [!SelectingItemsControl.SelectedItemProperty] = new Binding (nameof (Folder.SelectedFile)),
                 ItemTemplate = new FuncDataTemplate<string> ((data, _) =>
                     new TextBlock { Text = Path.GetFileName (data) })
@@ -252,7 +252,7 @@ public sealed class MainWindow
             _fileList.SelectedIndex = files.Length - 1;
         }
     }
-    
+
     private void _MoveToNextPicture()
     {
         var files = _folder.Files;
@@ -262,14 +262,7 @@ public sealed class MainWindow
         }
 
         var newIndex = _fileList.SelectedIndex + 1;
-        if (newIndex < files.Length)
-        {
-            _fileList.SelectedIndex = newIndex;
-        }
-        else
-        {
-            _fileList.SelectedIndex = 0;
-        }
+        _fileList.SelectedIndex = newIndex < files.Length ? newIndex : 0;
     }
 
     private void _ChangeBang()
@@ -300,7 +293,7 @@ public sealed class MainWindow
         _fileList.SelectedIndex = selected;
         _MoveToNextPicture();
     }
-    
+
     private void _HandleKeys
         (
             KeyEventArgs eventArgs
@@ -322,7 +315,7 @@ public sealed class MainWindow
                 eventArgs.Handled = true;
                 _MoveToPreviousPicture();
                 break;
-            
+
             case { Key: Key.Enter, KeyModifiers: KeyModifiers.None }:
                 eventArgs.Handled = true;
                 _ChangeBang();
