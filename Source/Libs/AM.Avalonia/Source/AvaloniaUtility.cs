@@ -1417,13 +1417,10 @@ public static class AvaloniaUtility
         Sure.NotNull (window);
         Sure.NotNullNorEmpty (iconName);
 
-        if (OperatingSystem.IsWindows())
+        using var stream = OpenAssetStream (window.GetType(), iconName);
+        if (stream is not null)
         {
-            using var stream = OpenAssetStream (window.GetType(), iconName);
-            if (stream is not null)
-            {
-                window.Icon = new WindowIcon (stream);
-            }
+            window.Icon = new WindowIcon (stream);
         }
     }
 
