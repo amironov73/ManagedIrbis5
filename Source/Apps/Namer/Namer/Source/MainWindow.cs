@@ -120,7 +120,7 @@ public sealed class MainWindow
         _specListBox = new ComboBox
         {
             Width = 250,
-            [!ItemsControl.ItemsProperty] = new Binding
+            [!ItemsControl.ItemsSourceProperty] = new Binding
             {
                 Source = _specifications,
                 Path = "."
@@ -231,7 +231,7 @@ public sealed class MainWindow
             HorizontalGridLinesBrush = Brushes.Gray,
             VerticalGridLinesBrush = Brushes.Gray,
             GridLinesVisibility = DataGridGridLinesVisibility.All,
-            [!DataGrid.ItemsProperty] = new Binding (nameof (_folder.Files)),
+            [!DataGrid.ItemsSourceProperty] = new Binding (nameof (_folder.Files)),
             Columns =
             {
                 new DataGridCheckBoxColumn

@@ -204,7 +204,7 @@ public sealed class MainWindow
             _mfnList.Add (mfn);
         }
 
-        _mfnListBox.Items = _mfnList;
+        _mfnListBox.ItemsSource = _mfnList;
         AddDescriptionsNear (1);
     }
 

@@ -184,7 +184,7 @@ internal sealed class MainWindow
                     // список посетителей
                     HorizontalAlignment = HorizontalAlignment.Stretch,
                     VerticalAlignment = VerticalAlignment.Stretch,
-                    [!ItemsControl.ItemsProperty] = new Binding (nameof (_model.Events)),
+                    [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (_model.Events)),
                     Styles =
                     {
                         new Style (x => x.OfType<ListBoxItem>())

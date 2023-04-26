@@ -89,7 +89,7 @@ public sealed class MainWindow
         {
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ItemsControl.ItemsProperty] = new Binding (nameof (SearcherModel.Found)),
+            [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (SearcherModel.Found)),
             ItemTemplate = new FuncDataTemplate<FoundItem> ((_, _) =>
             {
                 var firstBlock = new TextBlock

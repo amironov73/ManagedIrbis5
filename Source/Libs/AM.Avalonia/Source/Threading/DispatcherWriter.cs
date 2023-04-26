@@ -20,6 +20,8 @@ using AM.Collections;
 
 using Avalonia.Threading;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -29,6 +31,7 @@ namespace AM.Avalonia.Threading;
 /// <summary>
 /// Вывод текста, синхронизированный с UI-потоком.
 /// </summary>
+[PublicAPI]
 public sealed class DispatcherWriter
     : TextWriter
 {
@@ -79,7 +82,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -104,7 +110,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (buffer)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -134,7 +143,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (buffer, index, count)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -159,7 +171,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -186,7 +201,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (array)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
 
             ArrayPool<char>.Shared.Return (array);
         }
@@ -213,7 +231,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -238,7 +259,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.Write (value)
                 )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -252,10 +276,13 @@ public sealed class DispatcherWriter
         else
         {
             Dispatcher.UIThread.InvokeAsync
-            (
-                () => Writer.WriteLine()
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+                (
+                    () => Writer.WriteLine()
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -272,10 +299,13 @@ public sealed class DispatcherWriter
         else
         {
             Dispatcher.UIThread.InvokeAsync
-            (
-                () => Writer.WriteLine (value)
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+                (
+                    () => Writer.WriteLine (value)
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -297,10 +327,13 @@ public sealed class DispatcherWriter
         else
         {
             Dispatcher.UIThread.InvokeAsync
-            (
-                () => Writer.WriteLine (buffer)
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+                (
+                    () => Writer.WriteLine (buffer)
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -330,7 +363,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.WriteLine (buffer, index, count)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -355,7 +391,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.WriteLine (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -380,7 +419,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.WriteLine (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -405,7 +447,10 @@ public sealed class DispatcherWriter
                 (
                     () => Writer.WriteLine(value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 

@@ -20,7 +20,6 @@
 using System;
 
 using Avalonia;
-using Avalonia.Collections;
 using Avalonia.Controls;
 
 #endregion
@@ -128,7 +127,7 @@ public class NotificationMessageContainer
             INotificationMessage message
         )
     {
-        (Items as AvaloniaList<object>).Remove (message);
+        Items.Remove (message);
     }
 
     /// <summary>
@@ -147,14 +146,11 @@ public class NotificationMessageContainer
             throw new InvalidOperationException(
                 "Can't use both ItemsSource and Items collection at the same time.");*/
 
-        (Items as AvaloniaList<object>).Add (args.Message);
+        Items.Add (args.Message);
 
-        if (args.Message is INotificationAnimation animatableMessage)
+        if (args.Message is INotificationAnimation { Animates: true } animatableMessage)
         {
-            if (animatableMessage.Animates)
-            {
-                animatableMessage.AnimatableElement.StartAnimation = true;
-            }
+            animatableMessage.AnimatableElement.StartAnimation = true;
         }
     }
 

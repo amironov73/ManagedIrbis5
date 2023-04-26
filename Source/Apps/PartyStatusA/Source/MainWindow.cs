@@ -152,6 +152,7 @@ public sealed class MainWindow
                     _logBox.Text += format + _logBox.NewLine;
                     _logBox.CaretIndex = int.MaxValue;
             })
+            .GetTask()
             .Forget();
     }
 
@@ -249,7 +250,7 @@ public sealed class MainWindow
 
             if (connected && _menu is not null)
             {
-                _statusBox.Items = _menu.Entries.ToArray();
+                _statusBox.ItemsSource = _menu.Entries.ToArray();
                 if (_menu.Entries.Count != 0)
                 {
                     _statusBox.SelectedIndex = 0;

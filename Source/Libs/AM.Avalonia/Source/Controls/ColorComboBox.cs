@@ -21,6 +21,8 @@ using Avalonia.Data;
 using Avalonia.Media;
 using Avalonia.Styling;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -30,6 +32,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Комбобокс, позволяющий выбрать цвет из списка.
 /// </summary>
+[PublicAPI]
 public sealed class ColorComboBox
     : ComboBox, IStyleable
 {
@@ -78,7 +81,7 @@ public sealed class ColorComboBox
             }
         );
 
-        Items = new[]
+        ItemsSource = new[]
         {
             Colors.Black,
             Colors.White,

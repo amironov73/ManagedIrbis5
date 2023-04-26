@@ -19,6 +19,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -28,6 +30,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Простые, но полезные контролы.
 /// </summary>
+[PublicAPI]
 public static class UsefulControls
 {
     #region Public methods
@@ -55,9 +58,9 @@ public static class UsefulControls
             ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
-            }),
+            })!,
 
-            Items = items,
+            ItemsSource = items,
 
             ItemTemplate = itemTemplate
         };
@@ -88,9 +91,9 @@ public static class UsefulControls
             ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
-            }),
+            })!,
 
-            Items = items,
+            ItemsSource = items,
 
             ItemTemplate = new FuncDataTemplate<TItem> (itemTemplate)
         };
@@ -119,9 +122,9 @@ public static class UsefulControls
             ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
-            }),
+            })!,
 
-            Items = items,
+            ItemsSource = items,
 
             ItemTemplate = itemTemplate
         };
@@ -152,9 +155,9 @@ public static class UsefulControls
             ItemsPanel = new FuncTemplate<Panel> (() => new WrapPanel
             {
                 Orientation = orientation
-            }),
+            })!,
 
-            Items = items,
+            ItemsSource = items,
 
             ItemTemplate = new FuncDataTemplate<TItem> (itemTemplate)
         };

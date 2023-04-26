@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* DriveComboBox.cs -- комбобокс, отображающий список дисков
  * Ars Magna project, http://arsmagna.ru
@@ -26,6 +23,8 @@ using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Styling;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -35,6 +34,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Комбобокс, отображающий список дисков.
 /// </summary>
+[PublicAPI]
 public sealed class DriveComboBox
     : ComboBox, IStyleable
 {
@@ -54,7 +54,7 @@ public sealed class DriveComboBox
     /// </summary>
     public DriveComboBox()
     {
-        ItemTemplate = new FuncDataTemplate<DriveInfo> ((value, namescope) =>
+        ItemTemplate = new FuncDataTemplate<DriveInfo> ((_, _) =>
             new StackPanel
             {
                 Orientation = Orientation.Horizontal,
@@ -93,11 +93,11 @@ public sealed class DriveComboBox
     {
         try
         {
-            Items = DriveInfo.GetDrives();
+            ItemsSource = DriveInfo.GetDrives();
         }
         catch
         {
-            Items = null;
+            ItemsSource = null;
         }
     }
 

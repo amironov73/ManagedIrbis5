@@ -2,13 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* FieldEditorWindow.cs -- окно редактора полей
  * Ars Magna project, http://arsmagna.ru
@@ -28,6 +25,8 @@ using Avalonia;
 using Avalonia.Data;
 using Avalonia.Layout;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Workspace;
 
 #endregion
@@ -39,6 +38,7 @@ namespace ManagedIrbis.Avalonia;
 /// <summary>
 /// Окно редактора полей.
 /// </summary>
+[PublicAPI]
 public sealed class FieldEditorWindow
     : Window
 {
@@ -172,7 +172,7 @@ public sealed class FieldEditorWindow
     {
         Sure.NotNull (lines);
 
-        FieldGrid.Items = _lines = lines;
+        FieldGrid.ItemsSource = _lines = lines;
     }
 
     /// <summary>

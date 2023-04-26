@@ -65,11 +65,11 @@ public sealed class EnumComboBox
     {
         if (enumType is null)
         {
-            Items = null;
+            ItemsSource = null;
             return;
         }
 
-        Items = Enum.GetValues (enumType);
+        ItemsSource = Enum.GetValues (enumType);
     }
 
     /// <inheritdoc cref="IStyleable.StyleKey"/>

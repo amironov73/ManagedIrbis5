@@ -82,6 +82,8 @@ public sealed class InputDialog
     {
         this.AttachDevTools();
         DataContext = this;
+        Width = MinWidth = 400;
+        Height = MinHeight = 200;
 
         Content = new StackPanel
         {

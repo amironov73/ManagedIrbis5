@@ -1,15 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* ChairComboBox.cs -- выпадающий список кафедр обслуживания
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +21,8 @@ using AM;
 using Avalonia.Controls;
 using Avalonia.Styling;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
 
@@ -36,6 +35,7 @@ namespace ManagedIrbis.Avalonia;
 /// <summary>
 /// Выпадающий список кафедр обслуживания.
 /// </summary>
+[PublicAPI]
 public sealed class ChairComboBox
     : ComboBox, IStyleable
 {
@@ -62,7 +62,7 @@ public sealed class ChairComboBox
         Sure.NotNull (connection);
         connection.EnsureConnected();
 
-        Items = ChairInfo.Read
+        ItemsSource = ChairInfo.Read
             (
                 connection,
                 ChairInfo.ChairMenu,
@@ -82,7 +82,7 @@ public sealed class ChairComboBox
         Sure.NotNull (connection);
         connection.EnsureConnected();
 
-        Items = ChairInfo.Read
+        ItemsSource = ChairInfo.Read
             (
                 connection,
                 ChairInfo.PlacesMenu,

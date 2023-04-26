@@ -17,6 +17,8 @@ using System.IO;
 
 using Avalonia.Threading;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,6 +28,7 @@ namespace AM.Avalonia.Threading;
 /// <summary>
 /// Ввод-вывод, синхронизированный с UI-потоком.
 /// </summary>
+[PublicAPI]
 public sealed class DispatcherStream
     : Stream
 {
@@ -70,7 +73,10 @@ public sealed class DispatcherStream
                 (
                     () => InnerStream.Flush()
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -94,7 +100,10 @@ public sealed class DispatcherStream
             (
                 () => InnerStream.Read (buffer, offset, count)
             )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+            .GetTask()
+            .ConfigureAwait (false)
+            .GetAwaiter()
+            .GetResult();
     }
 
     /// <inheritdoc cref="Stream.Read(System.Span{byte})"/>
@@ -118,7 +127,10 @@ public sealed class DispatcherStream
             (
                 () => InnerStream.Read (array, 0, array.Length)
             )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+            .GetTask()
+            .ConfigureAwait (false)
+            .GetAwaiter()
+            .GetResult();
 
         array.AsSpan (0, result).CopyTo (buffer);
         ArrayPool<byte>.Shared.Return (array);
@@ -138,7 +150,10 @@ public sealed class DispatcherStream
             (
                 () => InnerStream.ReadByte()
             )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+            .GetTask()
+            .ConfigureAwait (false)
+            .GetAwaiter()
+            .GetResult();
     }
 
     /// <inheritdoc cref="Stream.Seek"/>
@@ -159,7 +174,10 @@ public sealed class DispatcherStream
             (
                 () => InnerStream.Seek (offset, origin)
             )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+            .GetTask()
+            .ConfigureAwait (false)
+            .GetAwaiter()
+            .GetResult();
     }
 
     /// <inheritdoc cref="Stream.SetLength"/>
@@ -180,7 +198,10 @@ public sealed class DispatcherStream
                 (
                     () => InnerStream.SetLength (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -210,7 +231,10 @@ public sealed class DispatcherStream
                 (
                     () => InnerStream.Write (buffer, offset, count)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -237,7 +261,10 @@ public sealed class DispatcherStream
                 (
                     () => InnerStream.Write (array, 0, array.Length)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -257,7 +284,10 @@ public sealed class DispatcherStream
                 (
                     () => InnerStream.WriteByte (value)
                 )
-                .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
         }
     }
 
@@ -272,7 +302,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.CanRead
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
         }
     }
 
@@ -287,7 +320,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.CanSeek
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
         }
     }
 
@@ -302,7 +338,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.CanWrite
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
         }
     }
 
@@ -317,7 +356,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.Length
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
         }
     }
 
@@ -332,7 +374,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.Position
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
         }
 
         set
@@ -347,7 +392,10 @@ public sealed class DispatcherStream
                     (
                         () => InnerStream.Position = value
                     )
-                    .ConfigureAwait (false).GetAwaiter().GetResult();
+                    .GetTask()
+                    .ConfigureAwait (false)
+                    .GetAwaiter()
+                    .GetResult();
             }
         }
     }

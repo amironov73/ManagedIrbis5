@@ -45,7 +45,7 @@ public sealed class DataGridDemo
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
-            Items = People.FamousPeople,
+            ItemsSource = People.FamousPeople,
             AutoGenerateColumns = false,
             Columns =
             {

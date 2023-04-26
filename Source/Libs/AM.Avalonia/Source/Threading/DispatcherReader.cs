@@ -17,6 +17,8 @@ using System.IO;
 
 using Avalonia.Threading;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,6 +28,7 @@ namespace AM.Avalonia.Threading;
 /// <summary>
 /// Чтение текста, синхронизированное с UI-потоком.
 /// </summary>
+[PublicAPI]
 public sealed class DispatcherReader
     : TextReader
 {
@@ -60,31 +63,31 @@ public sealed class DispatcherReader
     /// <inheritdoc cref="TextReader.Peek"/>
     public override int Peek()
     {
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.Peek();
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.Peek()
-            )
-        .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.Peek()
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.Peek()
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     /// <inheritdoc cref="TextReader.Read()"/>
     public override int Read()
     {
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.Read();
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.Read()
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.Read()
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.Read()
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     /// <inheritdoc cref="TextReader.Read(char[],int,int)"/>
@@ -98,16 +101,16 @@ public sealed class DispatcherReader
         Sure.NotNull (buffer);
         Sure.InRange (index, count, buffer);
 
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.Read (buffer, index, count);
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.Read (buffer, index, count)
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.Read (buffer, index, count)
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.Read (buffer, index, count)
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     /// <inheritdoc cref="TextReader.Read(System.Span{char})"/>
@@ -131,7 +134,10 @@ public sealed class DispatcherReader
             (
                 () => Reader.Read (array)
             )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+            .GetTask()
+            .ConfigureAwait (false)
+            .GetAwaiter()
+            .GetResult();
 
         array.AsSpan (0, result).CopyTo (buffer);
         ArrayPool<char>.Shared.Return (array);
@@ -150,16 +156,16 @@ public sealed class DispatcherReader
         Sure.NotNull (buffer);
         Sure.InRange (index, count, buffer);
 
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.ReadBlock (buffer, index, count);
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.ReadBlock (buffer, index, count)
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.ReadBlock (buffer, index, count)
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.ReadBlock (buffer, index, count)
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     /// <inheritdoc cref="TextReader.ReadBlock(System.Span{char})"/>
@@ -183,7 +189,10 @@ public sealed class DispatcherReader
                 (
                     () => Reader.ReadBlock (array)
                 )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
 
         array.AsSpan (0, result).CopyTo (buffer);
         ArrayPool<char>.Shared.Return (array);
@@ -194,31 +203,31 @@ public sealed class DispatcherReader
     /// <inheritdoc cref="TextReader.ReadLine"/>
     public override string? ReadLine()
     {
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.ReadLine();
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.ReadLine()
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.ReadLine()
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.ReadLine()
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     /// <inheritdoc cref="TextReader.ReadToEnd"/>
     public override string ReadToEnd()
     {
-        if (Dispatcher.UIThread.CheckAccess())
-        {
-            return Reader.ReadToEnd();
-        }
-
-        return Dispatcher.UIThread.InvokeAsync
-            (
-                () => Reader.ReadToEnd()
-            )
-            .ConfigureAwait (false).GetAwaiter().GetResult();
+        return Dispatcher.UIThread.CheckAccess()
+            ? Reader.ReadToEnd()
+            : Dispatcher.UIThread.InvokeAsync
+                (
+                    () => Reader.ReadToEnd()
+                )
+                .GetTask()
+                .ConfigureAwait (false)
+                .GetAwaiter()
+                .GetResult();
     }
 
     #endregion

@@ -21,6 +21,7 @@ using AM.Avalonia.AppServices;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Layout;
@@ -87,7 +88,9 @@ public sealed class MainWindow
         public async Task Copy()
         {
             var translatedText = TranslatedText;
-            if (Application.Current is { Clipboard: { } clipboard }
+            var mainWindow = ((IClassicDesktopStyleApplicationLifetime?) Application.Current?.ApplicationLifetime)
+                ?.MainWindow;
+            if (mainWindow?.Clipboard is { } clipboard
                 && !string.IsNullOrEmpty (translatedText))
             {
                 await clipboard.SetTextAsync (translatedText);
@@ -99,7 +102,9 @@ public sealed class MainWindow
         /// </summary>
         public async Task Paste()
         {
-            if (Application.Current is { Clipboard: { } clipboard })
+            var mainWindow = ((IClassicDesktopStyleApplicationLifetime?) Application.Current?.ApplicationLifetime)
+                ?.MainWindow;
+            if (mainWindow?.Clipboard is { } clipboard)
             {
                 var sourceText = await clipboard.GetTextAsync();
                 if (!string.IsNullOrEmpty (sourceText))
@@ -224,7 +229,7 @@ public sealed class MainWindow
                             },
                             new ComboBox
                             {
-                                Items = KnownLanguages(),
+                                ItemsSource = KnownLanguages(),
                                 SelectedIndex = 0,
                                 [!SelectingItemsControl.SelectedItemProperty]
                                     = new Binding (nameof (model.FromLanguage))
@@ -236,7 +241,7 @@ public sealed class MainWindow
                             },
                             new ComboBox
                             {
-                                Items = KnownLanguages(),
+                                ItemsSource = KnownLanguages(),
                                 SelectedIndex = 1,
                                 [!SelectingItemsControl.SelectedItemProperty]
                                     = new Binding (nameof (model.ToLanguage))

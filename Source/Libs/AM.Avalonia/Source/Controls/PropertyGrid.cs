@@ -29,6 +29,8 @@ using Avalonia.Media;
 using Avalonia.ReactiveUI;
 using Avalonia.Styling;
 
+using JetBrains.Annotations;
+
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
@@ -41,6 +43,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Простой показ свойств объекта.
 /// </summary>
+[PublicAPI]
 public class PropertyGrid
     : ReactiveUserControl<PropertyGrid.PropertyModel>
 {
@@ -177,7 +180,7 @@ public class PropertyGrid
 
     private void _DiscoverProperties()
     {
-        _dataGrid.Items = null;
+        _dataGrid.ItemsSource = null;
         if (_selectedObject is null)
         {
             return;
@@ -199,7 +202,7 @@ public class PropertyGrid
             list.Add (prop);
         }
 
-        _dataGrid.Items = list.ToArray();
+        _dataGrid.ItemsSource = list.ToArray();
     }
 
     #endregion

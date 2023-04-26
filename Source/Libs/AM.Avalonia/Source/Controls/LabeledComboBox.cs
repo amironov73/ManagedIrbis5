@@ -17,6 +17,8 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,6 +28,7 @@ namespace AM.Avalonia.Controls;
 /// <summary>
 /// Комбобокс с текстовой меткой.
 /// </summary>
+[PublicAPI]
 public sealed class LabeledComboBox
     : UserControl
 {
@@ -34,10 +37,10 @@ public sealed class LabeledComboBox
     /// <summary>
     /// Элементы списка.
     /// </summary>
-    public IEnumerable? Items
+    public IEnumerable? ItemsSource
     {
         get => _innerComboBox?.Items;
-        set => _innerComboBox?.SetValue (ItemsControl.ItemsProperty, value);
+        set => _innerComboBox?.SetValue (ItemsControl.ItemsSourceProperty, value);
     }
 
     /// <summary>

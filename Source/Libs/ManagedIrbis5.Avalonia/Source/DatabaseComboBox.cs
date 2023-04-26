@@ -1,15 +1,12 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
-// ReSharper disable AutoPropertyCanBeMadeGetOnly.Global
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable LocalizableElement
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* DatabaseComboBox.cs -- выпадающий список баз данных
  * Ars Magna project, http://arsmagna.ru
@@ -24,6 +21,8 @@ using AM;
 using Avalonia.Controls;
 using Avalonia.Styling;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Providers;
 
 #endregion
@@ -35,6 +34,7 @@ namespace ManagedIrbis.Avalonia;
 /// <summary>
 /// Выпадающий список баз данных.
 /// </summary>
+[PublicAPI]
 public sealed class DatabaseComboBox
     : ComboBox, IStyleable
 {
@@ -62,7 +62,7 @@ public sealed class DatabaseComboBox
         Sure.NotNullNorEmpty (listFile);
         connection.EnsureConnected();
 
-        Items = connection.ListDatabases (listFile);
+        ItemsSource = connection.ListDatabases (listFile);
     }
 
     #endregion

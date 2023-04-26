@@ -147,7 +147,7 @@ public sealed class MainWindow
                     var labeledComboBox = new LabeledComboBox
                     {
                         Label = "Это другая метка",
-                        Items = new[]
+                        ItemsSource = new[]
                         {
                             "Первый элемент",
                             "Второй элемент",

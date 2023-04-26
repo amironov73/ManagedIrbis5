@@ -55,7 +55,7 @@ public sealed class MainWindow
         {
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ItemsControl.ItemsProperty] = new Binding (nameof (BbkModel.Found)),
+            [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (BbkModel.Found)),
             ItemTemplate = new FuncDataTemplate<BbkEntry> ((_, _) =>
             {
                 var firstBlock = new TextBlock
@@ -156,7 +156,7 @@ public sealed class MainWindow
             var text = entry.Index;
             if (!string.IsNullOrEmpty (text))
             {
-                Application.Current?.Clipboard?.SetTextAsync (text);
+                Clipboard?.SetTextAsync (text);
             }
         }
     }
