@@ -11,10 +11,14 @@
 
 #region Using directives
 
+using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 using AM.Kotik.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -38,6 +42,8 @@ internal sealed class AwaitNode
             AtomNode inner
         )
     {
+        Sure.NotNull (inner);
+
         _inner = inner;
     }
 
@@ -47,12 +53,26 @@ internal sealed class AwaitNode
 
     private readonly AtomNode _inner;
 
-    private async void _DoAwait
+    private void DoAwait
         (
+            Context context,
             Task task
         )
     {
-        await task;
+        try
+        {
+            // await task;
+            var awaiter = task.GetAwaiter ();
+            while (!awaiter.IsCompleted)
+            {
+                Thread.Yield();
+            }
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError (exception, "Error during task execution");
+            context.Commmon.Error?.WriteLine("Error during task execution");
+        }
     }
 
     #endregion
@@ -65,14 +85,33 @@ internal sealed class AwaitNode
             Context context
         )
     {
+        Sure.NotNull (context);
+
         // TODO реализовать асинхронно
 
         var value = _inner.Compute (context);
+        if (value is null)
+        {
+            context.Commmon.Error?.WriteLine ("Null task detected");
+            Magna.Logger.LogError ("Null task Detected");
+
+            return value;
+        }
+
+        var type = ((object) value).GetType ();
+        if (type.IsGenericType && type.IsSubclassOf (typeof (Task)))
+        {
+            var genericTask = (Task) value;
+            DoAwait (context, genericTask);
+            var property = type.GetProperty ("Value").ThrowIfNull();
+            value = property.GetValue (genericTask);
+
+            return value;
+        }
+
         if (value is Task task)
         {
-            _DoAwait (task);
-
-            return null;
+            DoAwait (context, task);
         }
 
         return value;
@@ -83,15 +122,15 @@ internal sealed class AwaitNode
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {
         base.DumpHierarchyItem (name, level, writer);
-        
+
         _inner.DumpHierarchyItem ("Inner", level + 1, writer);
     }
 

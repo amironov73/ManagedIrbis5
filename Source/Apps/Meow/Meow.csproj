@@ -215,6 +215,14 @@
       <None Update="Scripts\IncrProblem.meow">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
+      <None Update="Scripts\Tasks.meow">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Remove="Properties\launchSettings.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Properties\" />
     </ItemGroup>
 
 </Project>

@@ -24,6 +24,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 using AM.Configuration;
 using AM.IO;
@@ -70,6 +71,7 @@ public sealed class StdLib
         { "call", new FunctionDescriptor ("call", CallAnyMethod) },
         { "chdir", new FunctionDescriptor ("chdir", ChangeDirectory) },
         { "combine_path", new FunctionDescriptor ("combine_path", CombinePath) },
+        { "create_task", new FunctionDescriptor ("create_task", CreateTask) },
         { "curl", new FunctionDescriptor ("curl", Curl) },
         { "dir_exists", new FunctionDescriptor ("dir_exists", DirectoryExists) },
         { "dirname", new FunctionDescriptor ("dirname", DirectoryName) },
@@ -355,6 +357,32 @@ public sealed class StdLib
         }
 
         return Path.Combine (components.ToArray());
+    }
+
+    /// <summary>
+    /// Создание таска.
+    /// </summary>
+    private static dynamic? CreateTask
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (Compute (context, args, 0) is FunctionDescriptor descriptor)
+        {
+            var callPoint = descriptor.CallPoint;
+            var args2 = Array.Empty<dynamic>();
+            var task = Task.Factory.StartNew (CallPad);
+
+            return task;
+
+            void CallPad()
+            {
+                callPoint (context, args2);
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -845,7 +873,7 @@ public sealed class StdLib
 
         return HtmlText.Encode (text);
     }
-    
+
     /// <summary>
     /// Загрузка указанного скрипта.
     /// </summary>
