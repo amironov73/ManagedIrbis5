@@ -4,9 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
+// ReSharper disable StringLiteralTypo
 
 /* SimpleStatement.cs -- простой стейтмент
  * Ars Magna project, http://arsmagna.ru
@@ -14,9 +12,12 @@
 
 #region Using directives
 
+using System;
 using System.IO;
 
 using AM.Kotik.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -35,7 +36,7 @@ internal sealed class SimpleStatement
     /// <summary>
     /// Выражение.
     /// </summary>
-    public AtomNode Expression;
+    public AtomNode Expression { get; set; }
 
     #endregion
 
@@ -64,9 +65,33 @@ internal sealed class SimpleStatement
             Context context
         )
     {
+        Sure.NotNull (context);
+
         base.Execute (context);
 
-        Expression.Compute (context);
+        try
+        {
+            Expression.Compute (context);
+        }
+        catch (Exception exception)
+        {
+            if (!exception.Data.Contains (KotikUtility.BarsikInternals))
+            {
+                Magna.Logger.LogError
+                    (
+                        exception,
+                        "Error at line {Line}",
+                        Line
+                    );
+
+                context.Commmon.Error?.WriteLine
+                    (
+                        $"Error {exception.Message} at line {Line}"
+                    );
+            }
+
+            throw;
+        }
     }
 
     #endregion

@@ -59,6 +59,8 @@ public sealed class ThrowNode
             Context context
         )
     {
+        Sure.NotNull (context);
+
         var value = _operand.Compute (context);
 
         throw value switch

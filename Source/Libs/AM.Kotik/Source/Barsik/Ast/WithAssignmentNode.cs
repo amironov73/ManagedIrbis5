@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable LocalizableElement
-// ReSharper disable UnusedMember.Global
 
 /* WithAssignmentNode.cs -- with-присваивание
  * Ars Magna project, http://arsmagna.ru
@@ -71,19 +68,21 @@ internal sealed class WithAssignmentNode
     {
         PreExecute (context);
 
+        var logger = Magna.Logger;
+        var errorOutput = context.Commmon.Error;
         var center = context.With;
         if (center is null)
         {
-            Magna.Logger.LogInformation ("Bad with block");
-            context.Commmon.Error?.WriteLine ("Bad with block");
+            logger.LogInformation ("Bad with block at line {Line}", Line);
+            errorOutput?.WriteLine ("Bad with block at line {Line}");
             return;
         }
 
         var objectValue = center.Compute (context);
         if (objectValue is null)
         {
-            Magna.Logger.LogInformation ("Can't assign to null: {Center}", center);
-            context.Commmon.Error?.WriteLine ($"Can't assign to null: {center}");
+            logger.LogInformation ("Can't assign to null: {Center} at line {Line}", center, Line);
+            errorOutput?.WriteLine ($"Can't assign to null '{center}' at line {Line}");
             return;
         }
 
@@ -106,17 +105,17 @@ internal sealed class WithAssignmentNode
                 return;
             }
 
-            Magna.Logger.LogInformation ("Can't handle assignment");
-            Magna.Logger.LogInformation ("Line number: {Line}", Line);
-            Magna.Logger.LogInformation ("Type: {Type}", type);
-            Magna.Logger.LogInformation ("Property name: {Property}", _propertyName);
+            logger.LogInformation ("Can't handle assignment");
+            logger.LogInformation ("Line number: {Line}", Line);
+            logger.LogInformation ("Type: {Type}", type);
+            logger.LogInformation ("Property name: {Property}", _propertyName);
 
-            if (context.Commmon.Error is { } error1)
+            if (errorOutput is not null)
             {
-                error1.WriteLine ("Can't handle assignment");
-                error1.WriteLine ($"Line number: {Line}");
-                error1.WriteLine ($"Type: {type}");
-                error1.WriteLine ($"Property name: {_propertyName}");
+                errorOutput.WriteLine ("Can't handle assignment");
+                errorOutput.WriteLine ($"Line number: {Line}");
+                errorOutput.WriteLine ($"Type: {type}");
+                errorOutput.WriteLine ($"Property name: {_propertyName}");
             }
 
             return;
@@ -148,17 +147,17 @@ internal sealed class WithAssignmentNode
             return;
         }
 
-        Magna.Logger.LogInformation ("Can't handle assignment");
-        Magna.Logger.LogInformation ("Line number: {Line}", Line);
-        Magna.Logger.LogInformation ("Object: {Object}", (object) objectValue);
-        Magna.Logger.LogInformation ("Property name: {Property}", _propertyName);
+        logger.LogInformation ("Can't handle assignment");
+        logger.LogInformation ("Line number: {Line}", Line);
+        logger.LogInformation ("Object: {Object}", (object) objectValue);
+        logger.LogInformation ("Property name: {Property}", _propertyName);
 
-        if (context.Commmon.Error is { } error2)
+        if (errorOutput is not null)
         {
-            error2.WriteLine ("Can't handle assignment");
-            error2.WriteLine ($"Line number: {Line}");
-            error2.WriteLine ($"Object: {objectValue}");
-            error2.WriteLine ($"Property name: {_propertyName}");
+            errorOutput.WriteLine ("Can't handle assignment");
+            errorOutput.WriteLine ($"Line number: {Line}");
+            errorOutput.WriteLine ($"Object: {objectValue}");
+            errorOutput.WriteLine ($"Property name: {_propertyName}");
         }
     }
 

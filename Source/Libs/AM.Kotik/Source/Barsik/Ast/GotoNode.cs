@@ -36,14 +36,14 @@ internal sealed class GotoNode
         (
             int line,
             string label
-        ) 
+        )
         : base (line)
     {
         _label = label;
     }
 
     #endregion
-    
+
     #region Private members
 
     private readonly string _label;
@@ -53,11 +53,20 @@ internal sealed class GotoNode
     #region StatementBase members
 
     /// <inheritdoc cref="StatementBase.Execute"/>
-    public override void Execute (Context context)
+    public override void Execute
+        (
+            Context context
+        )
     {
+        Sure.NotNull (context);
+
         base.Execute (context);
 
-        throw new GotoException (_label);
+        var exception = new GotoException (_label);
+        const string internals = KotikUtility.BarsikInternals;
+        exception.Data[internals] = internals;
+
+        throw exception;
     }
 
     #endregion
@@ -65,15 +74,15 @@ internal sealed class GotoNode
     #region AstNode members
 
     /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
-    internal override void DumpHierarchyItem 
+    internal override void DumpHierarchyItem
         (
-            string? name, 
-            int level, 
+            string? name,
+            int level,
             TextWriter writer
         )
     {
         base.DumpHierarchyItem (name, level, writer);
-        
+
         DumpHierarchyItem ("Label:", level + 1, writer, _label);
     }
 

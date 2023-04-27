@@ -1,7 +1,7 @@
 ﻿try
 {
     println ("Inside try block 1")
-    throw ("Hello, exception")
+    throw "Hello, exception"
 }
 catch (e)
 {
@@ -11,7 +11,7 @@ catch (e)
 try
 {
     println ("Inside try block 2")
-    throw (123)
+    throw 123
 }
 catch (e)
 {

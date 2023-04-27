@@ -11,10 +11,11 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 using AM.Kotik.Ast;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -63,6 +64,8 @@ internal sealed class VariableNode
             Context context
         )
     {
+        Sure.NotNull (context);
+
         if (context.TryGetVariable (Name, out var value))
         {
             return value;
@@ -71,6 +74,7 @@ internal sealed class VariableNode
         var type = context.ResolveType (Name);
         if (type is not null)
         {
+            // это может быть именем типа
             return type;
         }
 
@@ -80,9 +84,9 @@ internal sealed class VariableNode
             return descriptor;
         }
 
+        Magna.Logger.LogError ("Variable or type {Name} not defined", Name);
         context.Commmon.Error?.WriteLine ($"Variable or type '{Name}' not defined");
-
-        return null;
+        throw new BarsikException ($"Variable or type '{Name}' not defined");
     }
 
     /// <inheritdoc cref="AtomNode.Assign"/>
@@ -99,11 +103,11 @@ internal sealed class VariableNode
         {
             if (!context.TryGetVariable (Name, out variableValue))
             {
+                Magna.Logger.LogError ("Variable {Name} not found", Name);
                 context.Commmon.Error?.WriteLine ($"Variable {Name} not found");
+                throw new BarsikException ($"Variable {Name} not found");
             }
         }
-
-        // context.Output.WriteLine ($"AssignVariable {Name} ({variableValue}) {operation} {value}");
 
         value = operation switch
         {
@@ -118,12 +122,19 @@ internal sealed class VariableNode
             "^=" => variableValue ^ value,
             "<<=" => variableValue << value,
             ">>=" => variableValue >> value,
-            _ => throw new InvalidOperationException()
+            _ => throw UnknownOperation()
         };
 
         context.SetVariable (Name, value);
 
         return value;
+
+        BarsikException UnknownOperation()
+        {
+            context.Commmon.Error?.WriteLine ($"Unknown operation '{operation}'");
+            Magna.Logger.LogError ("Unknown operation {Operation}", operation);
+            return new BarsikException ($"Unknown operation '{operation}'");
+        }
     }
 
     #endregion
@@ -146,10 +157,7 @@ internal sealed class VariableNode
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"VariableNode '{Name}'";
-    }
+    public override string ToString() => $"VariableNode '{Name}'";
 
     #endregion
 }

@@ -194,7 +194,7 @@ public sealed class Grammar
             )
             .Labeled ("Ternary");
 
-        var throwOperator = Atom.RoundBrackets()
+        var throwOperator = Atom.OptionalRoundBrackets()
             .After (Reserved ("throw"))
             .Map (x => (AtomNode) new ThrowNode (x))
             .Labeled ("Throw");

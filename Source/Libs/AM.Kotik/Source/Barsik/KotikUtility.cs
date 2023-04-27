@@ -37,6 +37,15 @@ namespace AM.Kotik.Barsik;
 /// </summary>
 public static class KotikUtility
 {
+    #region Constants
+
+    /// <summary>
+    /// Признак внутреннего использования.
+    /// </summary>
+    public const string BarsikInternals = "Barsik Internals";
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
