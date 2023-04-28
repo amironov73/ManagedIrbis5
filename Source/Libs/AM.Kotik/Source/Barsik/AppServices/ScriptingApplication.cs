@@ -3,14 +3,9 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -32,6 +27,8 @@ using System.Threading.Tasks;
 using AM.AppServices;
 using AM.Interactivity;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -48,6 +45,7 @@ namespace AM.Kotik.Barsik.AppServices;
 /// <summary>
 /// Класс-приложение.
 /// </summary>
+[PublicAPI]
 public class ScriptingApplication
     : IMagnaApplication
 {
@@ -163,7 +161,8 @@ public class ScriptingApplication
     {
         if (IsInitialized)
         {
-            throw new ApplicationException ("Too late");
+            Logger.LogCritical ("Too late initialization of scripting application");
+            throw new ApplicationException ("Too late initialization of scripting application");
         }
     }
 
@@ -174,7 +173,8 @@ public class ScriptingApplication
     {
         if (!IsInitialized)
         {
-            throw new ApplicationException ("Not initialized");
+            Logger.LogCritical ("Scripting application not initialized properly");
+            throw new ApplicationException ("Scripting application not initialized properly");
         }
     }
 
@@ -185,7 +185,8 @@ public class ScriptingApplication
     {
         if (IsShutdown)
         {
-            throw new ApplicationException ("Application is already completed");
+            Logger.LogCritical ("Scripting application is already completed");
+            throw new ApplicationException ("Scripting application is already completed");
         }
     }
 
@@ -278,7 +279,7 @@ public class ScriptingApplication
     /// </summary>
     protected virtual void Cleanup()
     {
-        // пустое тело метода
+        Logger.LogInformation ("Scripting application cleanup requested");
     }
 
     #endregion
@@ -550,7 +551,8 @@ public class ScriptingApplication
     {
         if (!FinalInitialization())
         {
-            throw new ArsMagnaException();
+            Logger.LogCritical ("Scripting application can't run");
+            throw new ArsMagnaException ("Scripting application can't run");
         }
 
         ApplicationHost.Start();

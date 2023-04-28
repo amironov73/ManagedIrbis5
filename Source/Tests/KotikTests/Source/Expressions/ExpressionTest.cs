@@ -57,9 +57,9 @@ public sealed class ExpressionTest
         grammar.Rebuild();
         var parser = grammar.Expression.End();
         var value = (BinaryNode) parser.ParseOrThrow (state);
-        Assert.AreEqual (1, ((ConstantNode) value.left).Value);
+        Assert.AreEqual (1, ((ConstantNode) value.leftOperand).Value);
         Assert.AreEqual ("+", value.operation);
-        Assert.AreEqual (2, ((ConstantNode) value.right).Value);
+        Assert.AreEqual (2, ((ConstantNode) value.rightOperand).Value);
     }
 
     [TestMethod]
@@ -71,9 +71,9 @@ public sealed class ExpressionTest
         grammar.Rebuild();
         var parser = grammar.Expression.End();
         var value = (BinaryNode) parser.ParseOrThrow (state);
-        Assert.AreEqual ("x", ((VariableNode) value.left).Name);
+        Assert.AreEqual ("x", ((VariableNode) value.leftOperand).Name);
         Assert.AreEqual ("+", value.operation);
-        Assert.AreEqual ("y", ((VariableNode) value.right).Name);
+        Assert.AreEqual ("y", ((VariableNode) value.rightOperand).Name);
     }
 
     [TestMethod]

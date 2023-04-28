@@ -1,0 +1,14 @@
+Before
+Begin task
+Waiting: 0
+Waiting: 1
+Waiting: 2
+Waiting: 3
+Waiting: 4
+Waiting: 5
+Waiting: 6
+Waiting: 7
+Waiting: 8
+Waiting: 9
+End task
+After

@@ -4,9 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable UnusedMember.Global
 
 /* Block.cs -- блок стейтментов
  * Ars Magna project, http://arsmagna.ru
@@ -20,6 +17,8 @@ using System.IO;
 
 using AM.Kotik.Ast;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -29,6 +28,7 @@ namespace AM.Kotik.Barsik.Ast;
 /// <summary>
 /// Блок стейтментов.
 /// </summary>
+[PublicAPI]
 public class BlockNode
     : StatementBase,
     IStatementBlock

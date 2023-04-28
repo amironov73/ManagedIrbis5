@@ -1,0 +1,17 @@
+﻿func payload()
+{
+    println ("Begin task")
+    for (i = 0; i < 10; i++)
+    {
+        println ("Waiting: ", i)
+    }
+
+    println ("End task")
+}
+
+println ("Before")
+
+some = create_task (payload)
+await some
+
+println ("After")

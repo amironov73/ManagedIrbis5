@@ -43,18 +43,18 @@ public sealed class BinaryNode
     /// </summary>
     public BinaryNode
         (
-            AtomNode left,
+            AtomNode leftOperand,
             string operation,
-            AtomNode right
+            AtomNode rightOperand
         )
     {
-        Sure.NotNull (left);
+        Sure.NotNull (leftOperand);
         Sure.NotNull (operation);
-        Sure.NotNull (right);
+        Sure.NotNull (rightOperand);
 
-        this.left = left;
+        this.leftOperand = leftOperand;
         this.operation = operation;
-        this.right = right;
+        this.rightOperand = rightOperand;
     }
 
     #endregion
@@ -62,9 +62,9 @@ public sealed class BinaryNode
     #region Private members
 
     // internal здесь для тестов
-    internal readonly AtomNode left;
+    internal readonly AtomNode leftOperand;
     internal readonly string operation;
-    internal readonly AtomNode right;
+    internal readonly AtomNode rightOperand;
 
     /// <summary>
     /// Оператор сравнения вида `left &lt;=&gt; right`.
@@ -144,7 +144,7 @@ public sealed class BinaryNode
                 (object?) left,
                 (object?) right
             );
-        throw new NotImplementedException();
+        throw new NotImplementedException ($"Same operation not implemented: {left}, {right}");
     }
 
     /// <summary>
@@ -547,36 +547,36 @@ public sealed class BinaryNode
             Context context
         )
     {
-        var left = this.left.Compute (context);
-        var right = this.right.Compute (context);
+        var leftValue = leftOperand.Compute (context);
+        var rightValue = rightOperand.Compute (context);
 
         var result = operation switch
         {
-            "+" => Addition (context, left, right),
-            "-" => left - right,
-            "*" => Multiplication (context, left, right),
-            "/" => left / right,
-            "%" => left % right,
-            "<" => Less (context, left, right),
-            ">" => More (context, left, right),
-            "<=" => LessOrEqual (context, left, right),
-            ">=" => MoreOrEqual (context, left, right),
-            "==" => Equality (context, left, right),
-            "!=" => !Equality (context, left, right),
-            "===" => StrictEquality (context, left, right),
-            "!==" => !StrictEquality (context, left, right),
-            "<<" => LeftShift (context, left, right),
-            ">>" => RightShift (context, left, right),
-            "|" => left | right,
-            "||" => Or (context, left, right),
-            "&" => left & right,
-            "&&" => And (context, left, right),
-            "^" => left ^ right,
-            "^^" => KotikUtility.ToBoolean (left) != KotikUtility.ToBoolean (right),
-            "~" => Same (context, left, right),
-            "~~" => RegexMatch (context, left, right),
-            "in" => In (context, left, right),
-            "<=>" => Shuttle (context, left, right),
+            "+" => Addition (context, leftValue, rightValue),
+            "-" => leftValue - rightValue,
+            "*" => Multiplication (context, leftValue, rightValue),
+            "/" => leftValue / rightValue,
+            "%" => leftValue % rightValue,
+            "<" => Less (context, leftValue, rightValue),
+            ">" => More (context, leftValue, rightValue),
+            "<=" => LessOrEqual (context, leftValue, rightValue),
+            ">=" => MoreOrEqual (context, leftValue, rightValue),
+            "==" => Equality (context, leftValue, rightValue),
+            "!=" => !Equality (context, leftValue, rightValue),
+            "===" => StrictEquality (context, leftValue, rightValue),
+            "!==" => !StrictEquality (context, leftValue, rightValue),
+            "<<" => LeftShift (context, leftValue, rightValue),
+            ">>" => RightShift (context, leftValue, rightValue),
+            "|" => leftValue | rightValue,
+            "||" => Or (context, leftValue, rightValue),
+            "&" => leftValue & rightValue,
+            "&&" => And (context, leftValue, rightValue),
+            "^" => leftValue ^ rightValue,
+            "^^" => KotikUtility.ToBoolean (leftValue) != KotikUtility.ToBoolean (rightValue),
+            "~" => Same (context, leftValue, rightValue),
+            "~~" => RegexMatch (context, leftValue, rightValue),
+            "in" => In (context, leftValue, rightValue),
+            "<=>" => Shuttle (context, leftValue, rightValue),
             // "??" => Coalesce (context, left, right),
             _ => // TODO залогировать
                 throw new InvalidOperationException ($"Unknown operator {operation}")
@@ -601,9 +601,9 @@ public sealed class BinaryNode
     {
         base.DumpHierarchyItem (name, level, writer, ToString());
 
-        left.DumpHierarchyItem ("Left", level + 1, writer);
+        leftOperand.DumpHierarchyItem ("Left", level + 1, writer);
         DumpHierarchyItem ("Op", level + 1, writer, operation);
-        right.DumpHierarchyItem ("Right", level + 1, writer);
+        rightOperand.DumpHierarchyItem ("Right", level + 1, writer);
     }
 
     /// <inheritdoc cref="AstNode.GetNodeInfo"/>
@@ -618,8 +618,8 @@ public sealed class BinaryNode
                     Description = operation
                 },
 
-                left.GetNodeInfo().WithName ("left"),
-                right.GetNodeInfo().WithName ("right")
+                leftOperand.GetNodeInfo().WithName ("left"),
+                rightOperand.GetNodeInfo().WithName ("right")
             }
         };
 
