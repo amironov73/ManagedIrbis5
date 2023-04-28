@@ -3,10 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable ConditionIsAlwaysTrueOrFalse
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* TestContext.cs -- контекст прогона тестов
  * Ars Magna project, http://arsmagna.ru
@@ -14,12 +11,9 @@
 
 #region Using directives
 
-using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 
-using AM.Text;
+using JetBrains.Annotations;
 
 #endregion
 
@@ -30,6 +24,7 @@ namespace AM.Kotik.Barsik;
 /// <summary>
 /// Контекст прогона тестов.
 /// </summary>
+[PublicAPI]
 public sealed class TestContext
 {
     #region Properties

@@ -152,7 +152,7 @@ public static class TestUtility
             throw new DirectoryNotFoundException (outputFolder);
         }
 
-        var context = new TestContext (Console.Out);
+        var context = new TestContext (Console.Out, Console.Error);
         var tester = new Tester (context);
 
         var stopwatch = new Stopwatch();

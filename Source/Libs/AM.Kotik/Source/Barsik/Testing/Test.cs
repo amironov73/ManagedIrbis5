@@ -101,6 +101,7 @@ sealed class Test
             expectedExceptionType = File.ReadAllText (exceptionFileName).Trim();
         }
 
+        var errorStream = new StringWriter();
         try
         {
             var descriptionFile = GetFullName (TestUtility.DescriptionFileName);
@@ -145,7 +146,8 @@ sealed class Test
             var interpreter = new Interpreter
                 (
                     input: inputStream,
-                    output: outputStream
+                    output: outputStream,
+                    error: errorStream
                 )
                 .WithStdLib();
 
@@ -163,6 +165,12 @@ sealed class Test
 
             if (expectedExceptionType is not null && !result.Failed)
             {
+                var errorMessage = errorStream.ToString();
+                if (!string.IsNullOrEmpty (errorMessage))
+                {
+                    context.Error.WriteLine ($"\tERROR {errorMessage}");
+                }
+
                 result.Failed = true;
                 context.Output.WriteLine();
                 context.Output.WriteLine ($"Expected exception={exceptionFileName}, no exception thrown");
@@ -184,6 +192,12 @@ sealed class Test
                 var actualExceptionType = exception.GetType().FullName;
                 if (actualExceptionType != expectedExceptionType)
                 {
+                    var errorMessage = errorStream.ToString();
+                    if (!string.IsNullOrEmpty (errorMessage))
+                    {
+                        context.Error.WriteLine ($"\tERROR {errorMessage}");
+                    }
+
                     context.Output.WriteLine();
                     context.Output.WriteLine
                         (
@@ -208,6 +222,13 @@ sealed class Test
                 && expectedExceptionType is null
             )
         {
+            var errorMessage = errorStream.ToString();
+            if (!string.IsNullOrEmpty (errorMessage))
+            {
+                context.Error.WriteLine ($"\tERROR {errorMessage}");
+            }
+
+            context.Error.WriteLine();
             context.Output.WriteLine ($"\tEXPECTED <{result.Expected}>");
             context.Output.WriteLine ($"\tACTUAL <{result.Output}>");
             if (result.Output is not null)
