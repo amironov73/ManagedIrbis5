@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.IO;
 
 using AM.Kotik.Ast;
+using AM.Text;
 
 using Microsoft.Extensions.Logging;
 
@@ -68,6 +69,10 @@ internal sealed class CallNode
             Context context
         )
     {
+        Sure.NotNull (context);
+
+        var logger = Magna.Logger;
+
         // это может быть вызов лямбды
         if (context.TryGetVariable (_name, out var value))
         {
@@ -76,7 +81,7 @@ internal sealed class CallNode
                 return lambda.Execute (context, _arguments);
             }
 
-            Magna.Logger.LogInformation ("Unexpected variable {Name}", _name);
+            logger.LogInformation ("Unexpected variable {Name}", _name);
             throw new BarsikException ($"Unexpected variable {_name}");
         }
 
@@ -86,7 +91,7 @@ internal sealed class CallNode
         }
         catch (Exception)
         {
-            Magna.Logger.LogInformation ("Can't find function {Name}", _name);
+            logger.LogInformation ("Can't find function {Name}", _name);
             throw;
         }
 
@@ -107,7 +112,7 @@ internal sealed class CallNode
         catch (GotoException exception)
         {
             // не позволяем goto сбежать из функции
-            Magna.Logger.LogInformation ("Can't find label {Name}", exception.Label);
+            logger.LogInformation ("Can't find label {Name}", exception.Label);
             throw new BarsikException ($"Can't find label {exception.Label}");
         }
 
@@ -149,6 +154,22 @@ internal sealed class CallNode
         }
 
         return result;
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="AstNode.ToString"/>
+    public override string ToString()
+    {
+        var builder = StringBuilderPool.Shared.Get();
+        builder.Append (_name);
+        builder.Append ('(');
+        builder.AppendJoin (',', _arguments);
+        builder.Append (')');
+
+        return builder.ReturnShared();
     }
 
     #endregion

@@ -34,7 +34,7 @@ internal sealed class ContinueNode
         (
             int line
         )
-        : base(line)
+        : base (line)
     {
         // пустое тело конструктора
     }
@@ -49,6 +49,8 @@ internal sealed class ContinueNode
             Context context
         )
     {
+        Sure.NotNull (context);
+
         PreExecute (context);
 
         throw new ContinueException();

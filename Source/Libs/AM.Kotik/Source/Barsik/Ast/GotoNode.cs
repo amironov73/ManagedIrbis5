@@ -87,4 +87,11 @@ internal sealed class GotoNode
     }
 
     #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="StatementBase.ToString"/>
+    public override string ToString() => $"Goto {_label}";
+
+    #endregion
 }
