@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -60,7 +59,7 @@ internal sealed class NewLineNode
 
     #region Private members
 
-    private readonly char _mode;
+    private char _mode;
 
     #endregion
 
@@ -95,7 +94,7 @@ internal sealed class NewLineNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write (_mode);
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -104,7 +103,7 @@ internal sealed class NewLineNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        _mode = reader.ReadChar();
     }
 
     #endregion

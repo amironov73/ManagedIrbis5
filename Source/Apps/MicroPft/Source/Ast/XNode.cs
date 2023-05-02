@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -43,7 +42,7 @@ internal sealed class XNode
 
     #region Private members
 
-    private readonly int _length;
+    private int _length;
 
     #endregion
 
@@ -71,7 +70,7 @@ internal sealed class XNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write7BitEncodedInt (_length);
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -80,7 +79,7 @@ internal sealed class XNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        _length = reader.Read7BitEncodedInt();
     }
 
     #endregion

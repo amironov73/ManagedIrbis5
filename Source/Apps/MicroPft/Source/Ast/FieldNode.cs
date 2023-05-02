@@ -20,6 +20,8 @@ using AM;
 
 using ManagedIrbis;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -29,7 +31,7 @@ namespace MicroPft.Ast;
 /// <summary>
 /// Команда вывода поля.
 /// </summary>
-sealed class FieldNode
+internal sealed class FieldNode
     : PftNode
 {
     #region Properties
@@ -47,17 +49,17 @@ sealed class FieldNode
     /// <summary>
     /// Команда вывода поля: <c>v, n, d</c>.
     /// </summary>
-    public char Command { get; }
+    public char Command { get; set; }
 
     /// <summary>
     /// Метка поля.
     /// </summary>
-    public int Tag { get; }
+    public int Tag { get; set; }
 
     /// <summary>
     /// Код подполя.
     /// </summary>
-    public char Code { get; }
+    public char Code { get; set; }
 
     /// <summary>
     /// Смещение.
@@ -94,10 +96,13 @@ sealed class FieldNode
         Sure.NonNegative (offset);
         Sure.NonNegative (width);
 
+        var logger = Magna.Logger;
+
         code = char.ToLowerInvariant (code);
         command = char.ToLowerInvariant (command);
         if (command != 'v' && command != 'n' && command != 'd')
         {
+            logger.LogError ("Unknown command: {Command}", command);
             throw new ArgumentOutOfRangeException (nameof (command));
         }
 
@@ -270,10 +275,10 @@ sealed class FieldNode
                     {
                         width = Width;
                     }
-                    
+
                     value = value.SafeSubstring (Offset, width);
                 }
-                
+
                 context.Write (value);
             }
 
@@ -334,7 +339,21 @@ sealed class FieldNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write (Command);
+        writer.Write7BitEncodedInt (Tag);
+        writer.Write (Code);
+
+        writer.Write7BitEncodedInt (LeftHand.Count);
+        foreach (var item in LeftHand)
+        {
+            PftSerializer.Serialize (writer, item);
+        }
+
+        writer.Write7BitEncodedInt (RightHand.Count);
+        foreach (var item in RightHand)
+        {
+            PftSerializer.Serialize (writer, item);
+        }
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -343,7 +362,25 @@ sealed class FieldNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        Command = reader.ReadChar();
+        Tag = reader.Read7BitEncodedInt();
+        Code = reader.ReadChar();
+
+        var count = reader.Read7BitEncodedInt();
+        LeftHand.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            var item = PftSerializer.Deserialize (reader);
+            LeftHand.Add (item);
+        }
+
+        count = reader.Read7BitEncodedInt();
+        RightHand.Clear();
+        for (var i = 0; i < count; i++)
+        {
+            var item = PftSerializer.Deserialize (reader);
+            RightHand.Add (item);
+        }
     }
 
     #endregion

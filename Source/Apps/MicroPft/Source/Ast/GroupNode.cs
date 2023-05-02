@@ -88,7 +88,11 @@ sealed class GroupNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write7BitEncodedInt (Items.Count);
+        foreach (var item in Items)
+        {
+            PftSerializer.Serialize (writer, item);
+        }
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -97,7 +101,13 @@ sealed class GroupNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        Items.Clear();
+        var count = reader.Read7BitEncodedInt();
+        for (var i = 0; i < count; i++)
+        {
+            var item = PftSerializer.Deserialize (reader);
+            Items.Add (item);
+        }
     }
 
     #endregion

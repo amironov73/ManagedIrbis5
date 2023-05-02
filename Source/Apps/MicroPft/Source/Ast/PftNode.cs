@@ -14,7 +14,10 @@
 using System;
 using System.IO;
 
+using AM;
 using AM.Runtime.Mere;
+
+using Microsoft.Extensions.Logging;
 
 #endregion
 
@@ -89,7 +92,8 @@ internal abstract class PftNode
             )
         {
             // метод обязательно должен быть переопределен в потомке
-            throw new NotImplementedException();
+            Magna.Logger.LogError ("The method must be overridden in the child");
+            throw new ApplicationException ("The method must be overridden in the child");
         }
 
         #endregion
@@ -120,7 +124,8 @@ internal abstract class PftNode
         )
     {
         // метод обязательно должен быть переопределен в потомке
-        throw new NotImplementedException();
+        Magna.Logger.LogError ("The method must be overridden in the child");
+        throw new ApplicationException ("The method must be overridden in the child");
     }
 
     /// <inheritdoc cref="IMereSerializable.MereDeserialize"/>
@@ -134,7 +139,8 @@ internal abstract class PftNode
         )
     {
         // метод обязательно должен быть переопределен в потомке
-        throw new NotImplementedException();
+        Magna.Logger.LogError ("The method must be overridden in the child");
+        throw new ApplicationException ("The method must be overridden in the child");
     }
 
     #endregion

@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -54,9 +53,9 @@ internal sealed class RepeatingNode
 
     #region Private members
 
-    private readonly string _value;
+    private string _value;
 
-    private readonly bool _plus;
+    private bool _plus;
 
     #endregion
 
@@ -101,7 +100,8 @@ internal sealed class RepeatingNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write (_value);
+        writer.Write (_plus);
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -110,7 +110,8 @@ internal sealed class RepeatingNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        _value = reader.ReadString();
+        _plus = reader.ReadBoolean();
     }
 
     #endregion
@@ -124,5 +125,4 @@ internal sealed class RepeatingNode
     }
 
     #endregion
-
 }

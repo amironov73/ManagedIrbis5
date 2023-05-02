@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -46,7 +45,7 @@ internal sealed class CommaNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        // пустое тело метода
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -55,7 +54,7 @@ internal sealed class CommaNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        // пустое тело метода
     }
 
     #endregion

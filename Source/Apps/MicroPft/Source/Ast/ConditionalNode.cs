@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -52,7 +51,7 @@ internal sealed class ConditionalNode
 
     #region Private members
 
-    private readonly string _value;
+    private string _value;
 
     #endregion
 
@@ -90,7 +89,8 @@ internal sealed class ConditionalNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write (LeftHand);
+        writer.Write (_value);
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -99,7 +99,8 @@ internal sealed class ConditionalNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        LeftHand = reader.ReadBoolean();
+        _value = reader.ReadString();
     }
 
     #endregion

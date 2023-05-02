@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using System;
 using System.IO;
 
 #endregion
@@ -71,8 +70,8 @@ internal sealed class ModeNode
 
     #region Private members
 
-    private readonly char _mode;
-    private readonly bool _upper;
+    private char _mode;
+    private bool _upper;
 
     #endregion
 
@@ -101,7 +100,8 @@ internal sealed class ModeNode
             BinaryWriter writer
         )
     {
-        throw new NotImplementedException();
+        writer.Write (_mode);
+        writer.Write (_upper);
     }
 
     /// <inheritdoc cref="PftNode.MereDeserialize"/>
@@ -110,7 +110,8 @@ internal sealed class ModeNode
             BinaryReader reader
         )
     {
-        throw new NotImplementedException();
+        _mode = reader.ReadChar();
+        _upper = reader.ReadBoolean();
     }
 
     #endregion

@@ -27,6 +27,8 @@ using AM.Kotik.Tokenizers;
 using MicroPft.Ast;
 using MicroPft.Tokenizers;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -130,6 +132,8 @@ internal static class Grammar
         // алгоритм таков: в результирующем списке могут быть лишь:
         // группа, команда вывода поля и безусловный литерал
 
+        var logger = Magna.Logger;
+
         var result = new List<PftNode>();
         GroupNode? group = null;
         var stack = new List<PftNode>(); // сюда помещаем левую часть
@@ -231,7 +235,8 @@ internal static class Grammar
                 if (group is not null)
                 {
                     // вложенная группа
-                    throw new Exception();
+                    logger.LogError ("Nested group detected");
+                    throw new ApplicationException ("Nested group detected");
                 }
 
                 group = new GroupNode();
@@ -244,7 +249,8 @@ internal static class Grammar
                 if (group is null)
                 {
                     // группа еще не открыта
-                    throw new Exception();
+                    logger.LogError ("Closing an unopened group");
+                    throw new ApplicationException ("Closing an unopened group");
                 }
 
                 group = null;
