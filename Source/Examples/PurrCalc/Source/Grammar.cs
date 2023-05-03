@@ -1,4 +1,4 @@
-﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
@@ -14,22 +14,23 @@
 
 using System;
 
-using AM.Kotik;
-using AM.Kotik.Tokenizers;
+using AM.Purr.Expressions;
+using AM.Purr.Parsers;
+using AM.Purr.Tokenizers;
 
 #endregion
 
 #nullable enable
 
-namespace ToyCalc;
+namespace PurrCalc;
 
 internal static class Grammar
 {
     /// <summary>
     /// Литерал.
     /// </summary>
-    private static readonly Parser<Computable> _literal = new LiteralParser()
-        .Map (x => new Computable { Value = Convert.ToDouble (x) });
+    private static readonly Parser<double> _literal = new LiteralParser()
+        .Map (Convert.ToDouble);
 
     /// <summary>
     /// Терм.
@@ -39,7 +40,7 @@ internal static class Grammar
     /// <summary>
     /// Операция сложения/вычитания.
     /// </summary>
-    private static readonly InfixOperator<Computable> _addition = Operator.LeftAssociative<Computable>
+    private static readonly InfixOperator<double> _addition = Operator.LeftAssociative<double>
         (
             Term ("+", "-"),
             "Addition",
@@ -47,18 +48,18 @@ internal static class Grammar
             {
                 var value = operation switch
                 {
-                    "+" => left.Value + right.Value,
-                    "-" => left.Value - right.Value,
+                    "+" => left + right,
+                    "-" => left - right,
                     _ => throw new InvalidOperationException()
                 };
 
-                return new Computable { Value = value };
+                return value;
             });
 
     /// <summary>
     /// Операция умножения/деления.
     /// </summary>
-    private static readonly InfixOperator<Computable> _multiplication = Operator.LeftAssociative<Computable>
+    private static readonly InfixOperator<double> _multiplication = Operator.LeftAssociative<double>
         (
             Term ("*", "/"),
             "Multiplication",
@@ -66,27 +67,27 @@ internal static class Grammar
             {
                 var value = operation switch
                 {
-                    "*" => left.Value * right.Value,
-                    "/" => left.Value / right.Value,
+                    "*" => left * right,
+                    "/" => left / right,
                     _ => throw new InvalidOperationException()
                 };
 
-                return new Computable { Value = value };
+                return value;
             });
 
-    private static readonly Parser<Func<Computable, Computable>> _unaryMinus =
-        Operator.Unary<string, Computable>
-        (
-            Term ("-"),
-            "UnaryMinus",
-            _ => target => new Computable { Value = -target.Value }
-        );
+    private static readonly Parser<Func<double, double>> _unaryMinus =
+        Operator.Unary<string, double>
+            (
+                Term ("-"),
+                "UnaryMinus",
+                _ => target => -target
+            );
 
-    private static readonly Parser<Computable> _math = ExpressionBuilder.Build
+    private static readonly Parser<double> _math = ExpressionBuilder.Build
         (
             _literal,
             new [] { _unaryMinus },
-            Array.Empty<Parser<Func<Computable, Computable>>>(),
+            Array.Empty<Parser<Func<double, double>>>(),
             new[]
             {
                 _multiplication,
@@ -98,16 +99,16 @@ internal static class Grammar
         {
             KnownTerms = new [] { "+", "-", "*", "/", "(", ")" }
         })
-    {
-        Refiner = null,
-        Tokenizers =
         {
-            new WhitespaceTokenizer(),
-            new NumberTokenizer(),
-            new IntegerTokenizer(),
-            new TermTokenizer()
-        }
-    };
+            Refiner = null,
+            Tokenizers =
+            {
+                new WhitespaceTokenizer(),
+                new NumberTokenizer(),
+                new IntegerTokenizer(),
+                new TermTokenizer()
+            }
+        };
 
     public static double Compute
         (
@@ -115,9 +116,9 @@ internal static class Grammar
         )
     {
         var tokens = _tokenizer.Tokenize (expression);
-        var state = new ParseState (tokens, Console.Out);
+        var state = new ParseState (tokens);
         var result = _math.ParseOrThrow (state);
 
-        return result.Value;
+        return result;
     }
 }

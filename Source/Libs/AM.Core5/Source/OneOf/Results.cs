@@ -294,6 +294,15 @@ public readonly struct Result<T>
     }
 
     #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="ValueType.ToString"/>
+    public override string ToString() => IsSuccess
+        ? Convert.ToString (Value) ?? "(empty)"
+        : "FAILURE";
+
+    #endregion
 }
 
 /// <summary>
