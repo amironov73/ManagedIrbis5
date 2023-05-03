@@ -82,7 +82,7 @@ public sealed class MainWindow
                         () => _button.IsEnabled = _menu is not null
                     );
             })
-            .Forget();
+            .FireAndForget();
     }
 
     private void InitializeControls()
@@ -153,7 +153,7 @@ public sealed class MainWindow
                     _logBox.CaretIndex = int.MaxValue;
             })
             .GetTask()
-            .Forget();
+            .FireAndForget();
     }
 
     private async Task Run

@@ -9,6 +9,7 @@
 // ReSharper disable UnusedParameter.Local
 
 using System;
+using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -54,5 +55,31 @@ public sealed class UtilityTest
         Assert.AreEqual ("(null)", text.ToVisibleString());
 
         // ReSharper restore ExpressionIsAlwaysNull
+    }
+
+    [TestMethod]
+    [Description ("Соединение последовательности в строку")]
+    public void Utility_JoinText_1()
+    {
+        const string separator = "|";
+        var items = (IEnumerable<string>) new[] { "1", "2", "3" };
+        // ReSharper disable InvokeAsExtensionMethod
+        var joined = Utility.JoinText (items, separator);
+        Assert.AreEqual ("1|2|3", joined);
+
+        // ReSharper restore InvokeAsExtensionMethod
+    }
+
+    [TestMethod]
+    [Description ("Соединение последовательности в строку")]
+    public void Utility_JoinText_2()
+    {
+        const string separator = "|";
+        var items = (IEnumerable<int>) new[] { 1, 2, 3 };
+        // ReSharper disable InvokeAsExtensionMethod
+        var joined = Utility.JoinText (items, separator);
+        Assert.AreEqual ("1|2|3", joined);
+
+        // ReSharper restore InvokeAsExtensionMethod
     }
 }

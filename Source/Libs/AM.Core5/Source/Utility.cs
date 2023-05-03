@@ -35,7 +35,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 
 using AM.Collections;
@@ -75,7 +74,7 @@ public static class Utility
     {
         Magna.Logger.LogDebug
             (
-                "variable {VariableName} ({Member} on {File}: {Line}) not used",
+                "Variable {VariableName} ({Member} on {File}: {Line}) not used",
                 variableName,
                 member,
                 file,
@@ -6292,32 +6291,46 @@ public static class Utility
     /// "Запустить и забыть".
     /// </summary>
     /// <remarks>
-    /// https://www.meziantou.net/fire-and-forget-a-task-in-dotnet.htm
+    ///  https://steven-giesel.com/blogPost/d38e70b4-6f36-41ff-8011-b0b0d1f54f6e
     /// </remarks>
-    public static void Forget
+    public static void FireAndForget
         (
-            this Task task
+            this Task task,
+            Action<Exception?>? errorHandler = null
         )
     {
-        // Only care about tasks that may fault or are faulted,
-        // so fast-path for SuccessfullyCompleted and Canceled tasks
-        if (!task.IsCompleted || task.IsFaulted)
-        {
-            _ = ForgetAwaited (task);
-        }
+        Sure.NotNull (task);
 
-        static async Task ForgetAwaited (Task task)
-        {
-            try
+        task.ContinueWith (t =>
             {
-                // No need to resume on the original SynchronizationContext
-                await task.ConfigureAwait (false);
-            }
-            catch
-            {
-                // Nothing to do here
-            }
-        }
+                if (t.IsFaulted && errorHandler is not null)
+                {
+                    errorHandler (t.Exception);
+                }
+            }, TaskContinuationOptions.OnlyOnFaulted
+        );
+
+        // https://www.meziantou.net/fire-and-forget-a-task-in-dotnet.htm
+        //
+        // // Only care about tasks that may fault or are faulted,
+        // // so fast-path for SuccessfullyCompleted and Canceled tasks
+        // if (!task.IsCompleted || task.IsFaulted)
+        // {
+        //     _ = ForgetAwaited (task);
+        // }
+        //
+        // static async Task ForgetAwaited (Task task)
+        // {
+        //     try
+        //     {
+        //         // No need to resume on the original SynchronizationContext
+        //         await task.ConfigureAwait (false);
+        //     }
+        //     catch
+        //     {
+        //         // Nothing to do here
+        //     }
+        // }
     }
 
     /// <summary>
@@ -6331,7 +6344,9 @@ public static class Utility
             string separator = ", "
         )
     {
-        return string.Join (separator, sequence.ToArray());
+        Sure.NotNull (sequence);
+
+        return string.Join (separator, sequence);
     }
 
     /// <summary>
@@ -6342,6 +6357,7 @@ public static class Utility
     /// с .NET6 теперь считается интринсиком и разворачивается джитом
     /// в эффективный код, если на момент компиляции известен тип.
     /// </remarks>
+    [Pure]
     public static unsafe bool IsAnyFlagMatch<T>
         (
             this T value,
@@ -6392,29 +6408,6 @@ public static class Utility
         }
 
         return false;
-    }
-
-    /// <summary>
-    /// Ожидание завершения задачи с таймаутом или отменой по токену.
-    /// </summary>
-    public static async Task<TResult> WithTimeout<TResult>
-        (
-            this Task<TResult> task,
-            TimeSpan timeout,
-            CancellationToken cToken
-        )
-    {
-        Sure.NotNull (task);
-
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource (cToken);
-        var completedTask = await Task.WhenAny (task, Task.Delay (timeout, cts.Token));
-        if (completedTask == task)
-        {
-            cts.Cancel(); // Cancel to stop timer
-            return await task;
-        }
-
-        throw new TimeoutException();
     }
 
     /// <summary>
@@ -6529,7 +6522,7 @@ public static class Utility
     /// Попытка получить <see cref="ReadOnlySpan{T}"/> от коллекции.
     /// </summary>
     /// <remarks>
-    /// Метрод выдран из исходников .NET 7.
+    /// Метод выдран из исходников .NET 7.
     /// </remarks>
     public static bool TryGetSpan<TSource>
         (
@@ -6568,6 +6561,7 @@ public static class Utility
     /// <summary>
     /// Проверка: пустой ли получается склеенный текст?
     /// </summary>
+    [Pure]
     public static bool IsEmptyText
         (
             IEnumerable<string?>? sequence
@@ -6673,5 +6667,58 @@ public static class Utility
         }
     }
 
+    /// <summary>
+    /// Добавление обработчика ошибок.
+    /// </summary>
+    /// <remarks>
+    /// https://steven-giesel.com/blogPost/d38e70b4-6f36-41ff-8011-b0b0d1f54f6e
+    /// </remarks>
+    public static async Task WithFailureHandler
+        (
+            this Task task,
+            Action<Exception> onFailure
+        )
+    {
+        Sure.NotNull (task);
+        Sure.NotNull (onFailure);
+
+        try
+        {
+            await task.ConfigureAwait (false);
+        }
+        catch (TaskCanceledException)
+        {
+            // задача была просто отменена
+            // не нужно никаких действий
+        }
+        catch (Exception exception)
+        {
+            onFailure (exception);
+        }
+    }
+
+    /// <summary>
+    /// Выполнение задачи со значением по умолчанию.
+    /// </summary>
+    /// <remarks>
+    /// https://steven-giesel.com/blogPost/d38e70b4-6f36-41ff-8011-b0b0d1f54f6e
+    /// </remarks>
+    public static async Task<TResult> WithFallback<TResult>
+        (
+            this Task<TResult> task,
+            TResult fallbackValue
+        )
+    {
+        Sure.NotNull (task);
+
+        try
+        {
+            return await task.ConfigureAwait (false);
+        }
+        catch
+        {
+            return fallbackValue;
+        }
+    }
     #endregion
 }

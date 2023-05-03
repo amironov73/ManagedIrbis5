@@ -203,7 +203,7 @@ internal sealed class MainWindow
         DispatcherTimer.Run
             (() =>
                 {
-                    _model.AutoUpdate().Forget();
+                    _model.AutoUpdate().FireAndForget();
                     return true;
                 },
                 TimeSpan.FromMinutes (1)
@@ -221,7 +221,7 @@ internal sealed class MainWindow
         DispatcherTimer.RunOnce (() =>
         {
             _barcodeBox.Focus();
-            _model.AutoUpdate().Forget();
+            _model.AutoUpdate().FireAndForget();
         }, TimeSpan.FromMilliseconds (100));
     }
 

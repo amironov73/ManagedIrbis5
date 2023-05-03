@@ -88,6 +88,6 @@ public class ProgressStripeDemo
 
     private void StartProgress()
     {
-        Task.Run (SomeActivity).Forget();
+        Task.Run (SomeActivity).FireAndForget();
     }
 }

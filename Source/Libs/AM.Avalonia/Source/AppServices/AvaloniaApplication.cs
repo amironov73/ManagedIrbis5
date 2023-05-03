@@ -497,7 +497,7 @@ public class AvaloniaApplication
                 async () =>
                 await ExceptionDialog.Show (MainWindow, exception)
             )
-            .Forget();
+            .FireAndForget();
 
     }
 
