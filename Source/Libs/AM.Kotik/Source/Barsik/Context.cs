@@ -24,6 +24,8 @@ using AM.Kotik.Barsik.Ast;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -279,6 +281,7 @@ public sealed class Context
                 var name = node.Name;
                 if (Builtins.IsBuiltinFunction (name))
                 {
+                    Magna.Logger.LogError ("Name {Name} used by builtin function", name);
                     throw new BarsikException ($"Name {name} used by builtin function");
                 }
 
@@ -386,6 +389,7 @@ public sealed class Context
 
         if (!FindFunction (name, out var result))
         {
+            Magna.Logger.LogError ("Function {Name} not found", name);
             throw new Exception ($"Function {name} not found");
         }
 
@@ -418,6 +422,7 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (fileName);
 
+        var logger = Magna.Logger;
         var extension = Path.GetExtension (fileName);
         if (string.IsNullOrEmpty (extension))
         {
@@ -456,6 +461,11 @@ public sealed class Context
             }
         }
 
+        logger.LogError
+            (
+                "Can't include '{FileName}'",
+                fileName
+            );
         throw new BarsikException ($"Can't include '{fileName}'");
     }
 
@@ -471,6 +481,7 @@ public sealed class Context
 
         // TODO сделать умное сравнение имен сборок
         name = name.Trim();
+        var logger = Magna.Logger;
         if (string.IsNullOrEmpty (name))
         {
             throw new BarsikException();
@@ -481,18 +492,29 @@ public sealed class Context
             if (assembly.GetName().Name.SameString (name))
             {
                 // уже загружено, пропускаем
+                logger.LogInformation
+                    (
+                        "Assembly {Name} is already loaded",
+                        name
+                    );
                 return assembly;
             }
         }
 
         var allAssemblies = AppDomain.CurrentDomain.GetAssemblies();
-        foreach (var asm in allAssemblies)
+        foreach (var assembly in allAssemblies)
         {
-            var asmName = asm.GetName().Name;
+            var asmName = assembly.GetName().Name;
             if (asmName.SameString (name))
             {
-                Commmon.Resolver.Assemblies.Add (asm);
-                return asm;
+                // уже загружено, пропускаем, предварительно добавив в список
+                logger.LogInformation
+                    (
+                        "Assembly {Name} is already loaded",
+                        name
+                    );
+                Commmon.Resolver.Assemblies.Add (assembly);
+                return assembly;
             }
         }
 
@@ -646,9 +668,9 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (variableName);
 
-        for (var ctx = this; ctx is not null; ctx = ctx.Parent)
+        for (var context = this; context is not null; context = context.Parent)
         {
-            if (ctx.Variables.Remove (variableName))
+            if (context.Variables.Remove (variableName))
             {
                 return;
             }
@@ -677,11 +699,22 @@ public sealed class Context
 
         if (Builtins.IsBuiltinFunction (name))
         {
-            throw new BarsikException ($"{name} used by builtin function");
+            Magna.Logger.LogError
+                (
+                    "Name {Name} is reserved for builtin function",
+                    name
+                );
+            throw new BarsikException
+                (
+                    $"Name {name} is reserved for builtin function"
+                );
         }
 
-        // TODO пройтись по всем контекстам
-        Variables.Remove (name);
+        for (var context = this; context is not null; context = context.Parent)
+        {
+            context.Variables.Remove (name);
+        }
+
         Commmon.Defines[name] = value;
     }
 
@@ -697,13 +730,16 @@ public sealed class Context
     {
         Sure.NotNullNorEmpty (name);
 
+        var logger = Magna.Logger;
         if (Builtins.IsBuiltinFunction (name))
         {
-            throw new BarsikException ($"{name} used by builtin function");
+            logger.LogError ("{Name} reserved for builtin function", name);
+            throw new BarsikException ($"{name} reserved for builtin function");
         }
 
         if (Commmon.Defines.ContainsKey (name))
         {
+            logger.LogError ("Can't redefine {Name}", name);
             throw new BarsikException ($"Can't redefine {name}");
         }
 
@@ -722,6 +758,7 @@ public sealed class Context
             }
         }
 
+        // сюда мы попадаем, если переменная не нашлась ни в одном из контекстов
         Variables[name] = value;
     }
 
