@@ -32,7 +32,7 @@ public sealed class TermParser
     /// </summary>
     public TermParser
         (
-            string[]? expected
+            params string[] expected
         )
     {
         _expected = expected;

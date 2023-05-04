@@ -15,6 +15,7 @@
 using System.Runtime.CompilerServices;
 
 using AM.Collections;
+using AM.Purr.Tokenizers;
 using AM.Results;
 
 using JetBrains.Annotations;
@@ -204,6 +205,41 @@ public abstract class Parser<TResult>
     /// <summary>
     /// Разбор потока токенов с текущей позиции.
     /// </summary>
+    public Result<TResult> Parse
+        (
+            string source,
+            Tokenizer tokenizer
+        )
+    {
+        Sure.NotNull (source);
+
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return Parse (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public Result<TResult> Parse
+        (
+            string source,
+            params string[] knownTerms
+        )
+    {
+        Sure.NotNull (source);
+
+        var tokenizer = new UniversalTokenizer (knownTerms);
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return Parse (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
     public TResult ParseOrThrow
         (
             ParseState state
@@ -217,6 +253,41 @@ public abstract class Parser<TResult>
         }
 
         return new Result<TResult> (temporary).Value;
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public TResult ParseOrThrow
+        (
+            string source,
+            Tokenizer tokenizer
+        )
+    {
+        Sure.NotNull (source);
+
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return ParseOrThrow (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public TResult ParseOrThrow
+        (
+            string source,
+            params string[] knownTerms
+        )
+    {
+        Sure.NotNull (source);
+
+        var tokenizer = new UniversalTokenizer (knownTerms);
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return ParseOrThrow (state);
     }
 
     /// <summary>
