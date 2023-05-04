@@ -36,7 +36,7 @@ public sealed class DynamicParser<TResult>
     /// Функция, вычисляющая парсер.
     /// Обратите внимание, функцию в любой момент можно поменять.
     /// </summary>
-    public Func<Parser<TResult>> Function
+    public Func<IParser<TResult>> Function
     {
         get => _function;
         set
@@ -56,7 +56,7 @@ public sealed class DynamicParser<TResult>
     /// </summary>
     public DynamicParser
         (
-            Func<Parser<TResult>> inner
+            Func<IParser<TResult>> inner
         )
     {
         Sure.NotNull (inner);
@@ -68,7 +68,7 @@ public sealed class DynamicParser<TResult>
 
     #region Private members
 
-    private Func<Parser<TResult>> _function;
+    private Func<IParser<TResult>> _function;
 
     #endregion
 

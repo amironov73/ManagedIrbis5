@@ -35,8 +35,8 @@ public sealed class PeepingParser<TPeep, TResult>
     /// <param name="mainParser">Парсер, выдающий результат.</param>
     public PeepingParser
         (
-            Parser<TPeep> peepFor,
-            Parser<TResult> mainParser
+            IParser<TPeep> peepFor,
+            IParser<TResult> mainParser
         )
     {
         Sure.NotNull (peepFor);
@@ -50,8 +50,8 @@ public sealed class PeepingParser<TPeep, TResult>
 
     #region Private members
 
-    private readonly Parser<TPeep> _peepFor;
-    private readonly Parser<TResult> _mainParser;
+    private readonly IParser<TPeep> _peepFor;
+    private readonly IParser<TResult> _mainParser;
 
     #endregion
 

@@ -34,7 +34,7 @@ public sealed class LabeledParserInstance<TResult>
     /// </summary>
     public LabeledParserInstance
         (
-            Parser<TResult> inner,
+            IParser<TResult> inner,
             string label
         )
     {
@@ -49,7 +49,7 @@ public sealed class LabeledParserInstance<TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _inner;
+    private readonly IParser<TResult> _inner;
 
     #endregion
 

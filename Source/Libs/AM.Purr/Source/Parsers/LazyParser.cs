@@ -56,19 +56,19 @@ public sealed class LazyParser<TResult>
     /// </summary>
     public LazyParser
         (
-            Func<Parser<TResult>> function
+            Func<IParser<TResult>> function
         )
     {
         Sure.NotNull (function);
 
-        _function = new Lazy<Parser<TResult>> (function);
+        _function = new (function);
     }
 
     #endregion
 
     #region Private members
 
-    private readonly Lazy<Parser<TResult>> _function;
+    private readonly Lazy<IParser<TResult>> _function;
 
     #endregion
 

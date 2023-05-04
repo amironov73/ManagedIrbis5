@@ -13,6 +13,8 @@
 
 using AM.Collections;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -22,6 +24,7 @@ namespace AM.Purr.Parsers;
 /// <summary>
 /// Парсит термы.
 /// </summary>
+[PublicAPI]
 public sealed class TermParser
     : Parser<string>
 {

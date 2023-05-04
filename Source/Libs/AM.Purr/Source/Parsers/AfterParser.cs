@@ -35,8 +35,8 @@ public sealed class AfterParser<TAfter, TResult>
     /// </summary>
     public AfterParser
         (
-            Parser<TResult> useful,
-            Parser<TAfter> concomitant
+            IParser<TResult> useful,
+            IParser<TAfter> concomitant
         )
     {
         Sure.NotNull (useful);
@@ -50,8 +50,8 @@ public sealed class AfterParser<TAfter, TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _useful;
-    private readonly Parser<TAfter> _concomitant;
+    private readonly IParser<TResult> _useful;
+    private readonly IParser<TAfter> _concomitant;
 
     #endregion
 

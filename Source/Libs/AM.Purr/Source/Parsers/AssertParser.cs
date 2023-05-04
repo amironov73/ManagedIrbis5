@@ -33,7 +33,7 @@ public sealed class AssertParser<TResult>
     /// </summary>
     public AssertParser
         (
-            Parser<TResult> inner,
+            IParser<TResult> inner,
             Func<TResult, bool> predicate,
             string message
         )
@@ -51,7 +51,7 @@ public sealed class AssertParser<TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _inner;
+    private readonly IParser<TResult> _inner;
     private readonly Func<TResult, bool> _predicate;
     private readonly string _message;
 

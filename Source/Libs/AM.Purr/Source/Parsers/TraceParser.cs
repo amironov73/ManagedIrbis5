@@ -33,7 +33,7 @@ public sealed class TraceParser<TResult>
     /// </summary>
     public TraceParser
         (
-            Parser<TResult> parser
+            IParser<TResult> parser
         )
     {
         _parser = parser;
@@ -43,7 +43,7 @@ public sealed class TraceParser<TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _parser;
+    private readonly IParser<TResult> _parser;
 
     #endregion
 

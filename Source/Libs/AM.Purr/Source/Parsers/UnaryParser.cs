@@ -37,8 +37,8 @@ public sealed class UnaryParser<TResult>
     public UnaryParser
         (
             bool isPrefix,
-            Parser<TResult> root,
-            IList<Parser<Func<TResult, TResult>>> allowed
+            IParser<TResult> root,
+            IList<IParser<Func<TResult, TResult>>> allowed
         )
     {
         Sure.NotNull (root);
@@ -54,8 +54,8 @@ public sealed class UnaryParser<TResult>
     #region Private members
 
     private readonly bool _isPrefix;
-    private readonly Parser<TResult> _root;
-    private readonly IList<Parser<Func<TResult, TResult>>> _allowed;
+    private readonly IParser<TResult> _root;
+    private readonly IList<IParser<Func<TResult, TResult>>> _allowed;
 
     #endregion
 

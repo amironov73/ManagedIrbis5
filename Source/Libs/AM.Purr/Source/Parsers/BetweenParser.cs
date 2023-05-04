@@ -35,9 +35,9 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
     /// </summary>
     public BetweenParser
         (
-            Parser<TBefore> before,
-            Parser<TResult> inside,
-            Parser<TAfter> after
+            IParser<TBefore> before,
+            IParser<TResult> inside,
+            IParser<TAfter> after
         )
     {
         Sure.NotNull (before);
@@ -53,9 +53,9 @@ public sealed class BetweenParser<TBefore, TResult, TAfter>
 
     #region Private members
 
-    private readonly Parser<TBefore> _before;
-    private readonly Parser<TResult> _inside;
-    private readonly Parser<TAfter> _after;
+    private readonly IParser<TBefore> _before;
+    private readonly IParser<TResult> _inside;
+    private readonly IParser<TAfter> _after;
 
     #endregion
 

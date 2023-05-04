@@ -35,8 +35,8 @@ public sealed class InfixParser<TResult>
     /// </summary>
     public InfixParser
         (
-            Parser<TResult> itemParser,
-            Parser<string> operationsParser,
+            IParser<TResult> itemParser,
+            IParser<string> operationsParser,
             Func<TResult, string, TResult, TResult> function,
             InfixOperatorKind operatorKind
         )
@@ -56,8 +56,8 @@ public sealed class InfixParser<TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _itemParser;
-    private readonly Parser<string> _operationParser;
+    private readonly IParser<TResult> _itemParser;
+    private readonly IParser<string> _operationParser;
     private readonly Func<TResult, string, TResult, TResult> _function;
     private readonly InfixOperatorKind _operatorKind;
 

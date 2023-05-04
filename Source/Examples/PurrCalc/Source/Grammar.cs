@@ -16,7 +16,6 @@ using System;
 
 using AM.Purr.Expressions;
 using AM.Purr.Parsers;
-using AM.Purr.Tokenizers;
 
 #endregion
 
@@ -29,7 +28,7 @@ internal static class Grammar
     /// <summary>
     /// Литерал.
     /// </summary>
-    private static readonly Parser<double> _literal = new LiteralParser()
+    private static readonly Parser<double> _literal = Parser.Literal
         .Map (Convert.ToDouble);
 
     /// <summary>
@@ -75,7 +74,7 @@ internal static class Grammar
                 return value;
             });
 
-    private static readonly Parser<Func<double, double>> _unaryMinus =
+    private static readonly IParser<Func<double, double>> _unaryMinus =
         Operator.Unary<string, double>
             (
                 Term ("-"),
@@ -87,7 +86,7 @@ internal static class Grammar
         (
             _literal,
             new [] { _unaryMinus },
-            Array.Empty<Parser<Func<double, double>>>(),
+            Array.Empty<IParser<Func<double, double>>>(),
             new[]
             {
                 _multiplication,
@@ -95,29 +94,13 @@ internal static class Grammar
             }
         );
 
-    private static readonly Tokenizer _tokenizer = new (new TokenizerSettings
-        {
-            KnownTerms = new [] { "+", "-", "*", "/", "(", ")" }
-        })
-        {
-            Refiner = null,
-            Tokenizers =
-            {
-                new WhitespaceTokenizer(),
-                new NumberTokenizer(),
-                new IntegerTokenizer(),
-                new TermTokenizer()
-            }
-        };
-
     public static double Compute
         (
             string expression
         )
     {
-        var tokens = _tokenizer.Tokenize (expression);
-        var state = new ParseState (tokens);
-        var result = _math.ParseOrThrow (state);
+        var knownTerms = new[] { "+", "-", "*", "/", "(", ")" };
+        var result = _math.ParseOrThrow (expression, knownTerms);
 
         return result;
     }

@@ -33,9 +33,9 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
     /// </summary>
     public SeparatedParser
         (
-            Parser<TResult> itemParser,
-            Parser<TSeparator> separatorParser,
-            Parser<TDelimiter>? delimiterParser = null,
+            IParser<TResult> itemParser,
+            IParser<TSeparator> separatorParser,
+            IParser<TDelimiter>? delimiterParser = null,
             int mininum = 0,
             int maximum = int.MaxValue
         )
@@ -56,9 +56,9 @@ public sealed class SeparatedParser<TResult, TSeparator, TDelimiter>
 
     private readonly int _mininum;
     private readonly int _maximum;
-    private readonly Parser<TResult> _itemParser;
-    private readonly Parser<TSeparator> _separatorParser;
-    private readonly Parser<TDelimiter>? _delimiterParser;
+    private readonly IParser<TResult> _itemParser;
+    private readonly IParser<TSeparator> _separatorParser;
+    private readonly IParser<TDelimiter>? _delimiterParser;
 
     #endregion
 

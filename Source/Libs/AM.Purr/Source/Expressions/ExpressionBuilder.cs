@@ -35,8 +35,8 @@ public static class ExpressionBuilder
     public static Parser<TNode> Build<TNode>
         (
             Parser<TNode> root,
-            IList<Parser<Func<TNode, TNode>>> prefixOps,
-            IList<Parser<Func<TNode, TNode>>> postfixOps,
+            IList<IParser<Func<TNode, TNode>>> prefixOps,
+            IList<IParser<Func<TNode, TNode>>> postfixOps,
             IList<InfixOperator<TNode>> infixOps
         )
     {

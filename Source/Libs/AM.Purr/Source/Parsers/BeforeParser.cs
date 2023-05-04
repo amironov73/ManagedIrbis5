@@ -36,8 +36,8 @@ public sealed class BeforeParser<TBefore, TResult>
     /// </summary>
     public BeforeParser
         (
-            Parser<TResult> useful,
-            Parser<TBefore> concomitant
+            IParser<TResult> useful,
+            IParser<TBefore> concomitant
         )
     {
         Sure.NotNull (useful);
@@ -51,8 +51,8 @@ public sealed class BeforeParser<TBefore, TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _useful;
-    private readonly Parser<TBefore> _concomitant;
+    private readonly IParser<TResult> _useful;
+    private readonly IParser<TBefore> _concomitant;
 
     #endregion
 

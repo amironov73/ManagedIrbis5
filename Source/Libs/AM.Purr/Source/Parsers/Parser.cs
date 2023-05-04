@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
 
-/* Parser.cs -- базовы класс для парсеров
+/* Parser.cs -- базовый класс для парсеров
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,12 +31,11 @@ namespace AM.Purr.Parsers;
 /// </summary>
 [PublicAPI]
 public abstract class Parser<TResult>
+    : IParser<TResult>
 {
     #region Properties
 
-    /// <summary>
-    /// Метка для упрощения отладки.
-    /// </summary>
+    /// <inheritdoc cref="IParser{TResult}.Label"/>
     [UsedImplicitly]
     public string? Label { get; set; }
 
@@ -73,308 +72,7 @@ public abstract class Parser<TResult>
 
     #region Public methods
 
-    /// <summary>
-    /// Навешивает дополнительное условие на парсер.
-    /// </summary>
-    public Parser<TResult> Assert
-        (
-            Func<TResult, bool> predicate,
-            [CallerArgumentExpression (nameof (predicate))] string? message = null
-        )
-    {
-        Sure.NotNull (predicate);
-
-        return new AssertParser<TResult> (this, predicate, message!);
-    }
-
-    /// <summary>
-    /// Создание псевдо-экземпляра.
-    /// Этот вызов нужен, чтобы защитить статические экземпляры
-    /// парсеров, используемые для разных нужд.
-    /// В прочих случаях можно без проблем использовать метод.
-    /// <see cref="Labeled"/>.
-    /// </summary>
-    public Parser<TResult> Instance
-        (
-            string label
-        )
-    {
-        Sure.NotNullNorEmpty (label);
-
-        return new LabeledParserInstance<TResult> (this, label);
-    }
-
-    /// <summary>
-    /// Пометка парсера для упрощения отладки.
-    /// Предупреждение: не используйте больше одного раза для
-    /// одного экземпляра парсера, т.к . результат предыдущего
-    /// вызова будет потерян. Пометить один экземпляр разными
-    /// метками можно с помощью вызова <see cref="Instance"/>.
-    /// </summary>
-    public Parser<TResult> Labeled
-        (
-            string label
-        )
-    {
-        Sure.NotNull (label);
-
-        Label = label;
-
-        return this;
-    }
-
-    /// <summary>
-    /// Подключение альтернативы.
-    /// </summary>
-    public Parser<TResult> Or
-        (
-            Parser<TResult> other
-        )
-    {
-        Sure.NotNull (other);
-
-        return new OneOfParser<TResult> (this, other);
-    }
-
-    /// <summary>
-    /// Подключение альтернатив.
-    /// </summary>
-    public Parser<TResult> Or
-        (
-            Parser<TResult> other1,
-            Parser<TResult> other2
-        )
-    {
-        Sure.NotNull (other1);
-        Sure.NotNull (other2);
-
-        return new OneOfParser<TResult> (this, other1, other2);
-    }
-
-    /// <summary>
-    /// Подключение альтернатив.
-    /// </summary>
-    public Parser<TResult> Or
-        (
-            Parser<TResult> other1,
-            Parser<TResult> other2,
-            Parser<TResult> other3
-        )
-    {
-        Sure.NotNull (other1);
-        Sure.NotNull (other2);
-        Sure.NotNull (other3);
-
-        return new OneOfParser<TResult> (this, other1, other2, other3);
-    }
-
-    /// <summary>
-    /// Подключение альтернатив.
-    /// </summary>
-    public Parser<TResult> Or
-        (
-            params Parser<TResult>[] others
-        )
-    {
-        Sure.AssertState (!others.IsNullOrEmpty());
-
-        var list = new List<Parser<TResult>> (others);
-        list.Insert (0, this);
-
-        return new OneOfParser<TResult> (list.ToArray());
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public Result<TResult> Parse
-        (
-            ParseState state
-        )
-    {
-        Sure.NotNull (state);
-
-        if (!TryParse (state, out var temporary))
-        {
-            return Result<TResult>.Failure;
-        }
-
-        return new Result<TResult> (temporary);
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public Result<TResult> Parse
-        (
-            string source,
-            Tokenizer tokenizer
-        )
-    {
-        Sure.NotNull (source);
-
-        var tokens = tokenizer.Tokenize (source);
-        var state = new ParseState (tokens);
-
-        return Parse (state);
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public Result<TResult> Parse
-        (
-            string source,
-            params string[] knownTerms
-        )
-    {
-        Sure.NotNull (source);
-
-        var tokenizer = new UniversalTokenizer (knownTerms);
-        var tokens = tokenizer.Tokenize (source);
-        var state = new ParseState (tokens);
-
-        return Parse (state);
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public TResult ParseOrThrow
-        (
-            ParseState state
-        )
-    {
-        Sure.NotNull (state);
-
-        if (!TryParse (state, out var temporary))
-        {
-            throw new SyntaxException (state);
-        }
-
-        return new Result<TResult> (temporary).Value;
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public TResult ParseOrThrow
-        (
-            string source,
-            Tokenizer tokenizer
-        )
-    {
-        Sure.NotNull (source);
-
-        var tokens = tokenizer.Tokenize (source);
-        var state = new ParseState (tokens);
-
-        return ParseOrThrow (state);
-    }
-
-    /// <summary>
-    /// Разбор потока токенов с текущей позиции.
-    /// </summary>
-    public TResult ParseOrThrow
-        (
-            string source,
-            params string[] knownTerms
-        )
-    {
-        Sure.NotNull (source);
-
-        var tokenizer = new UniversalTokenizer (knownTerms);
-        var tokens = tokenizer.Tokenize (source);
-        var state = new ParseState (tokens);
-
-        return ParseOrThrow (state);
-    }
-
-    /// <summary>
-    /// Запоминание успешного выполнения парсера
-    /// в <see cref="ParseState"/> под указанным ключом.
-    /// </summary>
-    public Parser<TResult> Remember
-        (
-            string key
-        )
-    {
-        Sure.NotNullNorEmpty (key);
-
-        return new RememberParser<TResult> (key, this);
-    }
-
-    /// <summary>
-    /// Парсинг последовательности однообразных токенов.
-    /// </summary>
-    public Parser<IList<TResult>> Repeated
-        (
-            int minCount = 0,
-            int maxCount = int.MaxValue
-        )
-    {
-        Sure.NonNegative (minCount);
-        Sure.NonNegative (maxCount);
-
-        return new RepeatParser<TResult> (this, minCount, maxCount);
-    }
-
-    /// <summary>
-    /// Парсинг разделенных однообразных токенов.
-    /// </summary>
-    public Parser<IList<TResult>> SeparatedBy<TSeparator>
-        (
-            Parser<TSeparator> separator,
-            int minCount = 0,
-            int maxCount = int.MaxValue
-        )
-    {
-        Sure.NotNull (separator);
-        Sure.NonNegative (minCount);
-        Sure.NonNegative (maxCount);
-
-        return new SeparatedParser<TResult, TSeparator, string>
-            (
-                itemParser: this,
-                separator,
-                delimiterParser: null,
-                minCount,
-                maxCount
-            );
-    }
-
-    /// <summary>
-    /// Парсинг разделенных однообразных токенов.
-    /// </summary>
-    public Parser<IList<TResult>> SeparatedBy<TSeparator, TDelimiter>
-        (
-            Parser<TSeparator> separator,
-            Parser<TDelimiter> delimiter,
-            int minCount = 0,
-            int maxCount = int.MaxValue
-        )
-    {
-        Sure.NotNull (separator);
-        Sure.NotNull (delimiter);
-        Sure.NonNegative (minCount);
-        Sure.NonNegative (maxCount);
-
-        return new SeparatedParser<TResult, TSeparator, TDelimiter>
-            (
-                this,
-                separator,
-                delimiter,
-                minCount,
-                maxCount
-            );
-    }
-
-    /// <summary>
-    /// Разбор входного потока (попытка).
-    /// Является правилом хорошего тона, чтобы парсер
-    /// восстанавливал состояние <paramref name="state"/>,
-    /// если возвращает <c>false</c>.
-    /// </summary>
+    /// <inheritdoc cref="IParser{TResult}.TryParse"/>
     public abstract bool TryParse
         (
             ParseState state,
@@ -404,22 +102,43 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> After<TAfter, TResult>
         (
-            this Parser<TResult> parser,
-            Parser<TAfter> other
+            this IParser<TResult> parser,
+            IParser<TAfter> other
         )
     {
+        Sure.NotNull (parser);
+        Sure.NotNull (other);
+
         return new AfterParser<TAfter, TResult> (parser, other);
     }
 
+    /// <summary>
+    /// Навешивает дополнительное условие на парсер.
+    /// </summary>
+    public static Parser<TResult> Assert<TResult>
+        (
+            this IParser<TResult> parser,
+            Func<TResult, bool> predicate,
+            [CallerArgumentExpression (nameof (predicate))] string? message = null
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (predicate);
+
+        return new AssertParser<TResult> (parser, predicate, message!);
+    }
     /// <summary>
     /// "Нужное перед ненужным".
     /// </summary>
     public static Parser<TResult> Before<TBefore, TResult>
         (
-            this Parser<TResult> parser,
-            Parser<TBefore> other
+            this IParser<TResult> parser,
+            IParser<TBefore> other
         )
     {
+        Sure.NotNull (parser);
+        Sure.NotNull (other);
+
         return new BeforeParser<TBefore, TResult> (parser, other);
     }
 
@@ -428,11 +147,15 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Between<TBefore, TResult, TAfter>
         (
-            this Parser<TResult> parser,
-            Parser<TBefore> before,
-            Parser<TAfter> after
+            this IParser<TResult> parser,
+            IParser<TBefore> before,
+            IParser<TAfter> after
         )
     {
+        Sure.NotNull (parser);
+        Sure.NotNull (before);
+        Sure.NotNull (after);
+
         return new BetweenParser<TBefore, TResult, TAfter> (before, parser, after);
     }
 
@@ -441,11 +164,15 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
+            IParser<T1> first,
+            IParser<T2> second,
             Func<T1, T2, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (function);
+
         return new ChainParser<T1, T2, TResult> (first, second, function);
     }
 
@@ -454,14 +181,24 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
             Func<T1, T2, T3, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, TResult> (first, second,
-            third, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, TResult>
+            (
+                first,
+                second,
+                third,
+                function
+            );
     }
 
     /// <summary>
@@ -469,15 +206,27 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
             Func<T1, T2, T3, T4, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, TResult> (first, second,
-            third, fourth, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                function
+            );
     }
 
     /// <summary>
@@ -485,16 +234,30 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
             Func<T1, T2, T3, T4, T5, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, T5, TResult> (first, second,
-            third, fourth, fifth, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, T5, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                function
+            );
     }
 
     /// <summary>
@@ -502,17 +265,33 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
             Func<T1, T2, T3, T4, T5, T6, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, T5, T6, TResult> (first,
-            second, third, fourth, fifth, sixth, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, T5, T6, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                function
+            );
     }
 
     /// <summary>
@@ -520,18 +299,36 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
             Func<T1, T2, T3, T4, T5, T6, T7, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult> (first,
-            second, third, fourth, fifth, sixth, seventh, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                function
+            );
     }
 
     /// <summary>
@@ -539,19 +336,39 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eight,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eight,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult> (first,
-            second, third, fourth, fifth, sixth, seventh, eight, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eight);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                eight,
+                function
+            );
     }
 
     /// <summary>
@@ -559,20 +376,42 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eight,
-            Parser<T9> nineth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eight,
+            IParser<T9> nineth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> function
         )
     {
-        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> (first,
-            second, third, fourth, fifth, sixth, seventh, eight, nineth, function);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eight);
+        Sure.NotNull (nineth);
+        Sure.NotNull (function);
+
+        return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                eight,
+                nineth,
+                function
+            );
     }
 
     /// <summary>
@@ -580,22 +419,45 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eight,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eight,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eight);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (function);
+
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult>
-            (first, second, third, fourth, fifth, sixth, seventh, eight, nineth,
-                tenth, function);
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                eight,
+                nineth,
+                tenth,
+                function
+            );
     }
 
     /// <summary>
@@ -603,23 +465,48 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eight,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
-            Parser<T11> eleventh,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eight,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
+            IParser<T11> eleventh,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eight);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (eleventh);
+        Sure.NotNull (function);
+
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult>
-            (first, second, third, fourth, fifth, sixth, seventh, eight, nineth,
-                tenth, eleventh, function);
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                eight,
+                nineth,
+                tenth,
+                eleventh,
+                function
+            );
     }
 
     /// <summary>
@@ -627,24 +514,51 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Chain<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eight,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
-            Parser<T11> eleventh,
-            Parser<T12> twelveth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eight,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
+            IParser<T11> eleventh,
+            IParser<T12> twelveth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> function
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+        Sure.NotNull (fifth);
+        Sure.NotNull (sixth);
+        Sure.NotNull (seventh);
+        Sure.NotNull (eight);
+        Sure.NotNull (nineth);
+        Sure.NotNull (tenth);
+        Sure.NotNull (eleventh);
+        Sure.NotNull (twelveth);
+        Sure.NotNull (function);
+
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult>
-            (first, second, third, fourth, fifth, sixth, seventh, eight, nineth,
-                tenth, eleventh, twelveth, function);
+            (
+                first,
+                second,
+                third,
+                fourth,
+                fifth,
+                sixth,
+                seventh,
+                eight,
+                nineth,
+                tenth,
+                eleventh,
+                twelveth,
+                function
+            );
     }
 
     /// <summary>
@@ -652,7 +566,7 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> CornerBrackets<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new BetweenParser<string, TResult, string>
@@ -668,7 +582,7 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> CurlyBrackets<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new BetweenParser<string, TResult, string>
@@ -684,7 +598,7 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> End<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new BeforeParser<Unit, TResult> (parser, new EndParser());
@@ -701,13 +615,55 @@ public static class Parser
     public static readonly IdentifierParser Identifier = new ();
 
     /// <summary>
+    /// Создание псевдо-экземпляра.
+    /// Этот вызов нужен, чтобы защитить статические экземпляры
+    /// парсеров, используемые для разных нужд.
+    /// В прочих случаях можно без проблем использовать метод.
+    /// <see cref="Labeled{TResult}"/>.
+    /// </summary>
+    public static Parser<TResult> Instance<TResult>
+        (
+            this IParser<TResult> parser,
+            string label
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNullNorEmpty (label);
+
+        return new LabeledParserInstance<TResult> (parser, label);
+    }
+
+    /// <summary>
+    /// Пометка парсера для упрощения отладки.
+    /// Предупреждение: не используйте больше одного раза для
+    /// одного экземпляра парсера, т.к . результат предыдущего
+    /// вызова будет потерян. Пометить один экземпляр разными
+    /// метками можно с помощью вызова <see cref="Instance{TResult}"/>.
+    /// </summary>
+    public static IParser<TResult> Labeled<TResult>
+        (
+            this IParser<TResult> parser,
+            string label
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (label);
+
+        parser.Label = label;
+
+        return parser;
+    }
+
+    /// <summary>
     /// Парсер с отложенной инициализацией.
     /// </summary>
     public static Parser<TResult> Lazy<TResult>
         (
-            Func<Parser<TResult>> function
+            Func<IParser<TResult>> function
         )
     {
+        Sure.NotNull (function);
+
         return new LazyParser<TResult> (function);
     }
 
@@ -721,10 +677,13 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Map<TIntermediate, TResult>
         (
-            this Parser<TIntermediate> parser,
+            this IParser<TIntermediate> parser,
             Func<TIntermediate, TResult> function
         )
     {
+        Sure.NotNull (parser);
+        Sure.NotNull (function);
+
         return new MapParser<TIntermediate, TResult> (parser, function);
     }
 
@@ -733,10 +692,13 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OneOf<TResult>
         (
-            Parser<TResult> first,
-            Parser<TResult> second
+            IParser<TResult> first,
+            IParser<TResult> second
         )
     {
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+
         return new OneOfParser<TResult> (first, second);
     }
 
@@ -745,12 +707,21 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OneOf<TResult>
         (
-            Parser<TResult> first,
-            Parser<TResult> second,
-            Parser<TResult> third
+            IParser<TResult> first,
+            IParser<TResult> second,
+            IParser<TResult> third
         )
     {
-        return new OneOfParser<TResult> (first, second, third);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+
+        return new OneOfParser<TResult>
+            (
+                first,
+                second,
+                third
+            );
     }
 
     /// <summary>
@@ -758,13 +729,24 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OneOf<TResult>
         (
-            Parser<TResult> first,
-            Parser<TResult> second,
-            Parser<TResult> third,
-            Parser<TResult> fourth
+            IParser<TResult> first,
+            IParser<TResult> second,
+            IParser<TResult> third,
+            IParser<TResult> fourth
         )
     {
-        return new OneOfParser<TResult> (first, second, third, fourth);
+        Sure.NotNull (first);
+        Sure.NotNull (second);
+        Sure.NotNull (third);
+        Sure.NotNull (fourth);
+
+        return new OneOfParser<TResult>
+            (
+                first,
+                second,
+                third,
+                fourth
+            );
     }
 
     /// <summary>
@@ -772,9 +754,11 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OneOf<TResult>
         (
-            params Parser<TResult>[] parsers
+            params IParser<TResult>[] parsers
         )
     {
+        Sure.NotNull (parsers);
+
         return new OneOfParser<TResult> (parsers);
     }
 
@@ -783,9 +767,11 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OneOf<TResult>
         (
-            IList<Parser<TResult>> parsers
+            IList<IParser<TResult>> parsers
         )
     {
+        Sure.NotNull (parsers);
+
         return new OneOfParser<TResult> (parsers);
     }
 
@@ -794,9 +780,11 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> Optional<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
+        Sure.NotNull (parser);
+
         return new OptionalParser<TResult> (parser);
     }
 
@@ -805,9 +793,11 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> OptionalRoundBrackets<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
+        Sure.NotNull (parser);
+
         return new OptionalBetweenParser<string, TResult, string>
             (
                 Term ("("),
@@ -817,9 +807,233 @@ public static class Parser
     }
 
     /// <summary>
+    /// Подключение альтернативы.
+    /// </summary>
+    public static Parser<TResult> Or<TResult>
+        (
+            this IParser<TResult> parser,
+            IParser<TResult> other
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (other);
+
+        return new OneOfParser<TResult> (parser, other);
+    }
+
+    /// <summary>
+    /// Подключение альтернатив.
+    /// </summary>
+    public static Parser<TResult> Or<TResult>
+        (
+            this IParser<TResult> parser,
+            IParser<TResult> other1,
+            IParser<TResult> other2
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (other1);
+        Sure.NotNull (other2);
+
+        return new OneOfParser<TResult> (parser, other1, other2);
+    }
+
+    /// <summary>
+    /// Подключение альтернатив.
+    /// </summary>
+    public static Parser<TResult> Or<TResult>
+        (
+            this IParser<TResult> parser,
+            IParser<TResult> other1,
+            IParser<TResult> other2,
+            IParser<TResult> other3
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (other1);
+        Sure.NotNull (other2);
+        Sure.NotNull (other3);
+
+        return new OneOfParser<TResult> (parser, other1, other2, other3);
+    }
+
+    /// <summary>
+    /// Подключение альтернатив.
+    /// </summary>
+    public static Parser<TResult> Or<TResult>
+        (
+            this IParser<TResult> parser,
+            params IParser<TResult>[] others
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.AssertState (!others.IsNullOrEmpty());
+
+        var list = new List<IParser<TResult>> (others);
+        list.Insert (0, parser);
+
+        return new OneOfParser<TResult> (list.ToArray());
+    }
+
+        /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static Result<TResult> Parse<TResult>
+        (
+            this IParser<TResult> parser,
+            ParseState state
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (state);
+
+        if (!parser.TryParse (state, out var temporary))
+        {
+            return Result<TResult>.Failure;
+        }
+
+        return new Result<TResult> (temporary);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static Result<TResult> Parse<TResult>
+        (
+            this IParser<TResult> parser,
+            string source,
+            Tokenizer tokenizer
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (source);
+        Sure.NotNull (tokenizer);
+
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return parser.Parse (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static Result<TResult> Parse<TResult>
+        (
+            this IParser<TResult> parser,
+            string source,
+            params string[] knownTerms
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (source);
+        Sure.NotNull (knownTerms);
+
+        var tokenizer = new UniversalTokenizer (knownTerms);
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return parser.Parse (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static TResult ParseOrThrow<TResult>
+        (
+            this IParser<TResult> parser,
+            ParseState state
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (state);
+
+        if (!parser.TryParse (state, out var temporary))
+        {
+            throw new SyntaxException (state);
+        }
+
+        return new Result<TResult> (temporary).Value;
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static TResult ParseOrThrow<TResult>
+        (
+            this IParser<TResult> parser,
+            string source,
+            Tokenizer tokenizer
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (source);
+        Sure.NotNull (tokenizer);
+
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return parser.ParseOrThrow (state);
+    }
+
+    /// <summary>
+    /// Разбор потока токенов с текущей позиции.
+    /// </summary>
+    public static TResult ParseOrThrow<TResult>
+        (
+            this IParser<TResult> parser,
+            string source,
+            params string[] knownTerms
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (source);
+        Sure.NotNull (knownTerms);
+
+        var tokenizer = new UniversalTokenizer (knownTerms);
+        var tokens = tokenizer.Tokenize (source);
+        var state = new ParseState (tokens);
+
+        return parser.ParseOrThrow (state);
+    }
+
+    /// <summary>
     /// Выдает текущую позицию в исходном тексте скрипта.
     /// </summary>
     public static readonly SourcePositionParser Position = new ();
+
+    /// <summary>
+    /// Запоминание успешного выполнения парсера
+    /// в <see cref="ParseState"/> под указанным ключом.
+    /// </summary>
+    public static Parser<TResult> Remember<TResult>
+        (
+            this IParser<TResult> parser,
+            string key
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNullNorEmpty (key);
+
+        return new RememberParser<TResult> (key, parser);
+    }
+
+    /// <summary>
+    /// Парсинг последовательности однообразных токенов.
+    /// </summary>
+    public static Parser<IList<TResult>> Repeated<TResult>
+        (
+            this IParser<TResult> parser,
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+
+        return new RepeatParser<TResult> (parser, minCount, maxCount);
+    }
 
     /// <summary>
     /// Зарезервированное слово.
@@ -837,7 +1051,7 @@ public static class Parser
     /// </summary>
     public static Parser<TResult> RoundBrackets<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new BetweenParser<string, TResult, string>
@@ -849,11 +1063,65 @@ public static class Parser
     }
 
     /// <summary>
+    /// Парсинг разделенных однообразных токенов.
+    /// </summary>
+    public static Parser<IList<TResult>> SeparatedBy<TResult, TSeparator>
+        (
+            this IParser<TResult> parser,
+            IParser<TSeparator> separator,
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (separator);
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+
+        return new SeparatedParser<TResult, TSeparator, string>
+            (
+                parser,
+                separator,
+                delimiterParser: null,
+                minCount,
+                maxCount
+            );
+    }
+
+    /// <summary>
+    /// Парсинг разделенных однообразных токенов.
+    /// </summary>
+    public static Parser<IList<TResult>> SeparatedBy<TResult, TSeparator, TDelimiter>
+        (
+            this IParser<TResult> parser,
+            IParser<TSeparator> separator,
+            IParser<TDelimiter> delimiter,
+            int minCount = 0,
+            int maxCount = int.MaxValue
+        )
+    {
+        Sure.NotNull (parser);
+        Sure.NotNull (separator);
+        Sure.NotNull (delimiter);
+        Sure.NonNegative (minCount);
+        Sure.NonNegative (maxCount);
+
+        return new SeparatedParser<TResult, TSeparator, TDelimiter>
+            (
+                parser,
+                separator,
+                delimiter,
+                minCount,
+                maxCount
+            );
+    }
+
+    /// <summary>
     /// Выражение в квадратных скобках.
     /// </summary>
     public static Parser<TResult> SquareBrackets<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new BetweenParser<string, TResult, string>
@@ -874,7 +1142,7 @@ public static class Parser
     /// </summary>
     public static TraceParser<TResult> Trace<TResult>
         (
-            this Parser<TResult> parser
+            this IParser<TResult> parser
         )
     {
         return new TraceParser<TResult> (parser);
@@ -885,8 +1153,8 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2>
         (
-            Parser<T1> first,
-            Parser<T2> second
+            IParser<T1> first,
+            IParser<T2> second
         )
     {
         return new ChainParser<T1, T2, Unit> (first, second, (_, _) => Unit.Value);
@@ -897,9 +1165,9 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third
         )
     {
         return new ChainParser<T1, T2, T3, Unit> (first, second,
@@ -911,10 +1179,10 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3, T4>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth
         )
     {
         return new ChainParser<T1, T2, T3, T4, Unit> (first, second,
@@ -926,11 +1194,11 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3, T4, T5>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth
         )
     {
         return new ChainParser<T1, T2, T3, T4, T5, Unit> (first, second,
@@ -942,12 +1210,12 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth
         )
     {
         return new ChainParser<T1, T2, T3, T4, T5, T6, Unit> (first, second,
@@ -959,13 +1227,13 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6, T7>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh
         )
     {
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, Unit> (first, second,
@@ -978,14 +1246,14 @@ public static class Parser
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2, T3, T4, T5, T6, T7, T8>
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth
         )
     {
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, Unit> (first, second,

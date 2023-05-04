@@ -35,7 +35,7 @@ public sealed class RememberParser<TResult>
     public RememberParser
         (
             string key,
-            Parser<TResult> inner
+            IParser<TResult> inner
         )
     {
         Sure.NotNullNorEmpty (key);
@@ -50,7 +50,7 @@ public sealed class RememberParser<TResult>
     #region Private members
 
     private readonly string _key;
-    private readonly Parser<TResult> _inner;
+    private readonly IParser<TResult> _inner;
 
     #endregion
 

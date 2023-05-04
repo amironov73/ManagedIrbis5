@@ -103,9 +103,9 @@ public static class Operator
     /// <summary>
     /// Создание унарного оператора.
     /// </summary>
-    public static Parser<Func<TResult, TResult>> Unary<TOperation, TResult>
+    public static IParser<Func<TResult, TResult>> Unary<TOperation, TResult>
         (
-            Parser<TOperation> parser,
+            IParser<TOperation> parser,
             string label,
             Func<TOperation, Func<TResult, TResult>> function
         )

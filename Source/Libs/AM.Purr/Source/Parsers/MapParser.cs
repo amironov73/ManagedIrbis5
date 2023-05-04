@@ -33,7 +33,7 @@ public sealed class MapParser<TIntermediate, TResult>
     /// </summary>
     public MapParser
         (
-            Parser<TIntermediate> parser,
+            IParser<TIntermediate> parser,
             Func<TIntermediate, TResult> function
         )
     {
@@ -45,7 +45,7 @@ public sealed class MapParser<TIntermediate, TResult>
 
     #region Private members
 
-    private readonly Parser<TIntermediate> _parser;
+    private readonly IParser<TIntermediate> _parser;
     private readonly Func<TIntermediate, TResult> _function;
 
     #endregion

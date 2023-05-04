@@ -33,8 +33,8 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<TFirst> first,
-            Parser<TSecond> second,
+            IParser<TFirst> first,
+            IParser<TSecond> second,
             Func<TFirst, TSecond, TResult> function
         )
     {
@@ -51,8 +51,8 @@ public sealed class ChainParser<TFirst, TSecond, TResult>
 
     #region Private members
 
-    private readonly Parser<TFirst> _first;
-    private readonly Parser<TSecond> _second;
+    private readonly IParser<TFirst> _first;
+    private readonly IParser<TSecond> _second;
     private readonly Func<TFirst, TSecond, TResult> _function;
 
     #endregion
@@ -108,9 +108,9 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<TFirst> first,
-            Parser<TSecond> second,
-            Parser<TThird> third,
+            IParser<TFirst> first,
+            IParser<TSecond> second,
+            IParser<TThird> third,
             Func<TFirst, TSecond, TThird, TResult> function
         )
     {
@@ -129,9 +129,9 @@ public sealed class ChainParser<TFirst, TSecond, TThird, TResult>
 
     #region Private members
 
-    private readonly Parser<TFirst> _first;
-    private readonly Parser<TSecond> _second;
-    private readonly Parser<TThird> _third;
+    private readonly IParser<TFirst> _first;
+    private readonly IParser<TSecond> _second;
+    private readonly IParser<TThird> _third;
     private readonly Func<TFirst, TSecond, TThird, TResult> _function;
 
     #endregion
@@ -193,10 +193,10 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
             Func<T1, T2, T3, T4, TResult> function
         )
     {
@@ -217,10 +217,10 @@ public sealed class ChainParser<T1, T2, T3, T4, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
     private readonly Func<T1, T2, T3, T4, TResult> _function;
 
     #endregion
@@ -288,11 +288,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
             Func<T1, T2, T3, T4, T5, TResult> function
         )
     {
@@ -315,11 +315,11 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
     private readonly Func<T1, T2, T3, T4, T5, TResult> _function;
 
     #endregion
@@ -393,12 +393,12 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
             Func<T1, T2, T3, T4, T5, T6, TResult> function
         )
     {
@@ -423,12 +423,12 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
     private readonly Func<T1, T2, T3, T4, T5, T6, TResult> _function;
 
     #endregion
@@ -508,13 +508,13 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
             Func<T1, T2, T3, T4, T5, T6, T7, TResult> function
         )
     {
@@ -541,13 +541,13 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, TResult> _function;
 
     #endregion
@@ -633,14 +633,14 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> function
         )
     {
@@ -669,14 +669,14 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
-    private readonly Parser<T8> _eighth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
+    private readonly IParser<T8> _eighth;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, TResult> _function;
 
     #endregion
@@ -769,15 +769,15 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth,
-            Parser<T9> nineth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth,
+            IParser<T9> nineth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> function
         )
     {
@@ -808,15 +808,15 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult>
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
-    private readonly Parser<T8> _eighth;
-    private readonly Parser<T9> _nineth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
+    private readonly IParser<T8> _eighth;
+    private readonly IParser<T9> _nineth;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, TResult> _function;
 
     #endregion
@@ -915,16 +915,16 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> function
         )
     {
@@ -957,16 +957,16 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
-    private readonly Parser<T8> _eighth;
-    private readonly Parser<T9> _nineth;
-    private readonly Parser<T10> _tenth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
+    private readonly IParser<T8> _eighth;
+    private readonly IParser<T9> _nineth;
+    private readonly IParser<T10> _tenth;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, TResult> _function;
 
     #endregion
@@ -1071,17 +1071,17 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TR
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
-            Parser<T11> eleventh,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
+            IParser<T11> eleventh,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> function
         )
     {
@@ -1116,17 +1116,17 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TR
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
-    private readonly Parser<T8> _eighth;
-    private readonly Parser<T9> _nineth;
-    private readonly Parser<T10> _tenth;
-    private readonly Parser<T11> _eleventh;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
+    private readonly IParser<T8> _eighth;
+    private readonly IParser<T9> _nineth;
+    private readonly IParser<T10> _tenth;
+    private readonly IParser<T11> _eleventh;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, TResult> _function;
 
     #endregion
@@ -1237,18 +1237,18 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T1
     /// </summary>
     public ChainParser
         (
-            Parser<T1> first,
-            Parser<T2> second,
-            Parser<T3> third,
-            Parser<T4> fourth,
-            Parser<T5> fifth,
-            Parser<T6> sixth,
-            Parser<T7> seventh,
-            Parser<T8> eighth,
-            Parser<T9> nineth,
-            Parser<T10> tenth,
-            Parser<T11> eleventh,
-            Parser<T12> twelveth,
+            IParser<T1> first,
+            IParser<T2> second,
+            IParser<T3> third,
+            IParser<T4> fourth,
+            IParser<T5> fifth,
+            IParser<T6> sixth,
+            IParser<T7> seventh,
+            IParser<T8> eighth,
+            IParser<T9> nineth,
+            IParser<T10> tenth,
+            IParser<T11> eleventh,
+            IParser<T12> twelveth,
             Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> function
         )
     {
@@ -1285,18 +1285,18 @@ public sealed class ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T1
 
     #region Private members
 
-    private readonly Parser<T1> _first;
-    private readonly Parser<T2> _second;
-    private readonly Parser<T3> _third;
-    private readonly Parser<T4> _fourth;
-    private readonly Parser<T5> _fifth;
-    private readonly Parser<T6> _sixth;
-    private readonly Parser<T7> _seventh;
-    private readonly Parser<T8> _eighth;
-    private readonly Parser<T9> _nineth;
-    private readonly Parser<T10> _tenth;
-    private readonly Parser<T11> _eleventh;
-    private readonly Parser<T12> _twelveth;
+    private readonly IParser<T1> _first;
+    private readonly IParser<T2> _second;
+    private readonly IParser<T3> _third;
+    private readonly IParser<T4> _fourth;
+    private readonly IParser<T5> _fifth;
+    private readonly IParser<T6> _sixth;
+    private readonly IParser<T7> _seventh;
+    private readonly IParser<T8> _eighth;
+    private readonly IParser<T9> _nineth;
+    private readonly IParser<T10> _tenth;
+    private readonly IParser<T11> _eleventh;
+    private readonly IParser<T12> _twelveth;
     private readonly Func<T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, TResult> _function;
 
     #endregion

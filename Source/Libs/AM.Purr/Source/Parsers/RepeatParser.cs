@@ -33,7 +33,7 @@ public sealed class RepeatParser<TResult>
     /// </summary>
     public RepeatParser
         (
-            Parser<TResult> parser,
+            IParser<TResult> parser,
             int minCount = 0,
             int maxCount = int.MaxValue
         )
@@ -53,7 +53,7 @@ public sealed class RepeatParser<TResult>
     private readonly int _minCount;
     private readonly int _maxCount;
 
-    private readonly Parser<TResult> _parser;
+    private readonly IParser<TResult> _parser;
 
     #endregion
 

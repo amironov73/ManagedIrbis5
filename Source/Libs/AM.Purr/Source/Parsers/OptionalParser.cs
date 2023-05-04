@@ -33,7 +33,7 @@ public sealed class OptionalParser<TResult>
     /// </summary>
     public OptionalParser
         (
-            Parser<TResult> parser
+            IParser<TResult> parser
         )
     {
         Sure.NotNull (parser);
@@ -45,7 +45,7 @@ public sealed class OptionalParser<TResult>
 
     #region Private members
 
-    private readonly Parser<TResult> _parser;
+    private readonly IParser<TResult> _parser;
 
     #endregion
 

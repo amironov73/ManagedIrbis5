@@ -33,7 +33,7 @@ public sealed class OneOfParser<TResult>
     /// </summary>
     public OneOfParser
         (
-            params Parser<TResult>[] alternatives
+            params IParser<TResult>[] alternatives
         )
     {
         Sure.NotNull (alternatives);
@@ -47,7 +47,7 @@ public sealed class OneOfParser<TResult>
     /// </summary>
     public OneOfParser
         (
-            IList<Parser<TResult>> alternatives
+            IList<IParser<TResult>> alternatives
         )
     {
         Sure.NotNull (alternatives);
@@ -60,7 +60,7 @@ public sealed class OneOfParser<TResult>
 
     #region Private members
 
-    private readonly IList<Parser<TResult>> _alternatives;
+    private readonly IList<IParser<TResult>> _alternatives;
 
     #endregion
 
