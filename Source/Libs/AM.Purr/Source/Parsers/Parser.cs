@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
+// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
 /* Parser.cs -- базовый класс для парсеров
  * Ars Magna project, http://arsmagna.ru
@@ -12,11 +12,14 @@
 
 #region Using directives
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 using AM.Collections;
 using AM.Purr.Tokenizers;
 using AM.Results;
+
+using Google.Protobuf.WellKnownTypes;
 
 using JetBrains.Annotations;
 
@@ -76,7 +79,7 @@ public abstract class Parser<TResult>
     public abstract bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNull] out TResult result
         );
 
     #endregion
@@ -892,7 +895,7 @@ public static class Parser
             return Result<TResult>.Failure;
         }
 
-        return new Result<TResult> (temporary);
+        return new Result<TResult> (temporary!);
     }
 
     /// <summary>
@@ -953,7 +956,7 @@ public static class Parser
             throw new SyntaxException (state);
         }
 
-        return new Result<TResult> (temporary).Value;
+        return temporary!;
     }
 
     /// <summary>
@@ -1133,22 +1136,6 @@ public static class Parser
     }
 
     /// <summary>
-    /// Терм.
-    /// </summary>
-    public static TermParser Term (params string[] terms) => new (terms);
-
-    /// <summary>
-    /// Трассировка парсера.
-    /// </summary>
-    public static TraceParser<TResult> Trace<TResult>
-        (
-            this IParser<TResult> parser
-        )
-    {
-        return new TraceParser<TResult> (parser);
-    }
-
-    /// <summary>
     /// Последовательность из двух парсеров.
     /// </summary>
     public static Parser<Unit> Sequence<T1, T2>
@@ -1259,6 +1246,35 @@ public static class Parser
         return new ChainParser<T1, T2, T3, T4, T5, T6, T7, T8, Unit> (first, second,
             third, fourth, fifth, sixth, seventh, eighth,
             (_, _, _, _, _, _, _, _) => Unit.Value);
+    }
+
+    /// <summary>
+    /// Заставляет парсер запоминать результат.
+    /// </summary>
+    public static ValueParser<TResult> StoreValue<TResult>
+        (
+            this IParser<TResult> parser
+        )
+    {
+        Sure.NotNull (parser);
+
+        return new (parser);
+    }
+
+    /// <summary>
+    /// Терм.
+    /// </summary>
+    public static TermParser Term (params string[] terms) => new (terms);
+
+    /// <summary>
+    /// Трассировка парсера.
+    /// </summary>
+    public static TraceParser<TResult> Trace<TResult>
+        (
+            this IParser<TResult> parser
+        )
+    {
+        return new TraceParser<TResult> (parser);
     }
 
     #endregion

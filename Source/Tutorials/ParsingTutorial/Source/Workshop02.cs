@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable LocalizableElement
 
-/* Workshop01.cs --
+/* Workshop02.cs --
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -24,9 +24,9 @@ using AM.Purr.Tokenizers;
 namespace ParsingTutorial;
 
 /// <summary>
-/// Простая последовательность чисел, разделенных запятыми.
+/// Сохранение разобранных значений.
 /// </summary>
-internal static class Workshop01
+internal static class Workshop02
 {
     private static TermParser Term (params string[] terms) => new (terms);
 
@@ -38,10 +38,15 @@ internal static class Workshop01
         // термы, которые могут встретиться в тексте
         var knownTerms = new[] { ",", "-" };
 
+        var comma = Term (",");
         var number = new LiteralParser().Map (Convert.ToInt32);
-        var parser = number.SeparatedBy (Term (","), minCount: 1).End();
+        var first = number.Instance ("First").StoreValue();
+        var second = number.Instance ("Second").StoreValue();
+        var third = number.Instance ("Third").StoreValue();
+        var parser = Parser.Sequence (first, comma, second, comma, third)
+            .End();
 
-        var series = parser.ParseOrThrow (sourceCode, knownTerms);
-        Console.WriteLine (series.JoinText());
+        parser.ParseOrThrow (sourceCode, knownTerms);
+        Console.WriteLine ($"{first}, {second}, {third}");
     }
 }

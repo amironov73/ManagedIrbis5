@@ -23,5 +23,6 @@ internal static class Program
     public static void Main (string[] args)
     {
         Workshop01.Step1();
+        Workshop02.Step1();
     }
 }

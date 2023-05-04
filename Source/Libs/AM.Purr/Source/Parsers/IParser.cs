@@ -5,12 +5,15 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UseNullableAnnotationInsteadOfAttribute
 
 /* IParser.cs -- интерфейс парсера
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.Diagnostics.CodeAnalysis;
 
 using JetBrains.Annotations;
 
@@ -40,7 +43,7 @@ public interface IParser<TResult>
     public bool TryParse
         (
             ParseState state,
-            out TResult result
+            [MaybeNull] out TResult result
         );
 
 }
