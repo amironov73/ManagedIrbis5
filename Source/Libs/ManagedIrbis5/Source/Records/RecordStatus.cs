@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* RecordStatus.cs -- статус записи (флаги)
  * Ars Magna project, http://arsmagna.ru
@@ -15,66 +13,66 @@
 
 using System;
 
+using JetBrains.Annotations;
+
 #endregion
 
-namespace ManagedIrbis
+namespace ManagedIrbis;
+
+/// <summary>
+/// Статус библиографической записи (флаги).
+/// </summary>
+[Flags]
+[PublicAPI]
+public enum RecordStatus
 {
     /// <summary>
-    /// Статус библиографической записи (флаги).
+    /// Нет статуса -- запись только что создана.
     /// </summary>
-    [Flags]
-    public enum RecordStatus
-    {
-        /// <summary>
-        /// Нет статуса -- запись только что создана.
-        /// </summary>
-        None = 0,
+    None = 0,
 
-        /// <summary>
-        /// Запись логически удалена.
-        /// </summary>
-        LogicallyDeleted = 1,
+    /// <summary>
+    /// Запись логически удалена.
+    /// </summary>
+    LogicallyDeleted = 1,
 
-        /// <summary>
-        /// Запись физически удалена.
-        /// </summary>
-        PhysicallyDeleted = 2,
+    /// <summary>
+    /// Запись физически удалена.
+    /// </summary>
+    PhysicallyDeleted = 2,
 
-        /// <summary>
-        /// Запись отсутствует.
-        /// </summary>
-        Absent = 4,
+    /// <summary>
+    /// Запись отсутствует.
+    /// </summary>
+    Absent = 4,
 
-        /// <summary>
-        /// Запись не актуализирована.
-        /// </summary>
-        NonActualized = 8,
+    /// <summary>
+    /// Запись не актуализирована.
+    /// </summary>
+    NonActualized = 8,
 
-        /// <summary>
-        /// Первый экземпляр записи.
-        /// </summary>
-        NewRecord = 16,
+    /// <summary>
+    /// Первый экземпляр записи.
+    /// </summary>
+    NewRecord = 16,
 
-        /// <summary>
-        /// Последний экземпляр записи.
-        /// </summary>
-        Last = 32,
+    /// <summary>
+    /// Последний экземпляр записи.
+    /// </summary>
+    Last = 32,
 
-        /// <summary>
-        /// Запись заблокирована.
-        /// </summary>
-        Locked = 64,
+    /// <summary>
+    /// Запись заблокирована.
+    /// </summary>
+    Locked = 64,
 
-        /// <summary>
-        /// Ошибка в Autoin.gbl.
-        /// </summary>
-        AutoinError = 128,
+    /// <summary>
+    /// Ошибка в Autoin.gbl.
+    /// </summary>
+    AutoinError = 128,
 
-        /// <summary>
-        /// Полный текст не актуализирован.
-        /// </summary>
-        FullTextNotActualized = 256
-
-    } // enum RecordStatus
-
-} // namespace ManagedIrbis
+    /// <summary>
+    /// Полный текст не актуализирован.
+    /// </summary>
+    FullTextNotActualized = 256
+}
