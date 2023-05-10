@@ -4,9 +4,9 @@
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <AvaloniaVersion>11.0.0-preview6</AvaloniaVersion>
-    <AvaloniaPrevious>11.0.0-preview5</AvaloniaPrevious>
-    <CommunityToolkitVersion>8.1.0</CommunityToolkitVersion>
+    <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
+    <AvaloniaPrevious>11.0.0-preview6</AvaloniaPrevious>
+    <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.5.0</NugetVersion>
   </PropertyGroup>
   <!-- Централизованное управление пакетами -->
@@ -47,6 +47,7 @@
     <PackageVersion Include="MailKit" Version="3.6.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview3.145-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
+    <PackageVersion Include="MessageBox.Avalonia" Version="2.3.1-prev6" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
     <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.14" />
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="0.4.0" />
@@ -81,6 +82,11 @@
     <PackageVersion Include="MSTest.TestFramework" Version="3.0.2" />
     <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.119" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageVersion Include="Nito.Cancellation" Version="1.1.2" />
+    <PackageVersion Include="Nito.Comparers" Version="6.2.2" />
+    <PackageVersion Include="Nito.Disposables" Version="2.4.0" />
+    <PackageVersion Include="Nito.StructuredConcurrency" Version="1.0.0-alpha.9" />
+    <PackageVersion Include="Nito.Try" Version="1.1.1" />
     <PackageVersion Include="NLog" Version="5.1.3" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.2.3" />
     <PackageVersion Include="NLog.Schema" Version="5.1.3" />
