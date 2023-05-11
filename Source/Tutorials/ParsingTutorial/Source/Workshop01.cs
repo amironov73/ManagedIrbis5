@@ -14,8 +14,8 @@ using System;
 using System.Collections.Generic;
 
 using AM;
-using AM.Purr.Parsers;
-using AM.Purr.Tokenizers;
+using AM.Purr.Parsing;
+using AM.Purr.Tokenizing;
 
 #endregion
 

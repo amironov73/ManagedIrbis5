@@ -12,7 +12,7 @@
 
 #region Using directives
 
-using AM.Purr.Parsers;
+using AM.Purr.Parsing;
 
 using JetBrains.Annotations;
 

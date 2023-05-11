@@ -15,7 +15,7 @@
 using System;
 
 using AM.Purr.Expressions;
-using AM.Purr.Parsers;
+using AM.Purr.Parsing;
 
 #endregion
 
