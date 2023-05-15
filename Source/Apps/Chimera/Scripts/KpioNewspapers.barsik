@@ -1,0 +1,42 @@
+﻿//
+// Подсчет числа годовых комплектов газет в КПИО
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+counter = {}
+papers = batch_search ("V=01") // отбираем сводные описания газет
+foreach (paper in papers)
+{
+    index = fm (paper, 903)
+    expression = "I=" + index + "/$ * V=NJ"
+    println (expression) // чтобы не было скучно
+    found = batch_search (expression) // отбираем отдельные выпуски
+    foreach (one in found)
+    {
+        exemplars = get_exemplars (one)
+        foreach (exemplar in exemplars)
+        {
+            if (exemplar.Place == "Ф403")
+            {
+                oneIndex = index + "/" + fm (one, 934)
+                counter[oneIndex] = 1
+            }
+        }
+    }
+}
+
+println()
+println(len(counter))
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
