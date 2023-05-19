@@ -9,7 +9,7 @@
         <Product>Ars Magna</Product>
         <Company>Ars Magna Project</Company>
         <Authors>Alexey Mironov</Authors>
-        <Copyright>Copyright Alexey Mironov 2006-2022</Copyright>
+        <Copyright>Copyright Alexey Mironov 2006-2023</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>

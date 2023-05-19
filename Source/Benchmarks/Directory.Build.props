@@ -5,9 +5,10 @@
     <!-- Assembly version and strong name -->
     <Import Project="..\Common\ArsMagna.targets" />
 
+    <!-- .NET and C# versions -->
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <LangVersion>11</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>

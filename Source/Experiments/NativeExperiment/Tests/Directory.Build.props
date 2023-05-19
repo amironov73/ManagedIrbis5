@@ -4,8 +4,7 @@
 
     <!-- Framework and language -->
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <LangVersion>11</LangVersion>
+        <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <SignAssembly>false</SignAssembly>
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>

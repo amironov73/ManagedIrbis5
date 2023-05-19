@@ -15,8 +15,8 @@
 
     <!-- Framework and language -->
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <LangVersion>11</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
         <NoWarn>NU1507</NoWarn>

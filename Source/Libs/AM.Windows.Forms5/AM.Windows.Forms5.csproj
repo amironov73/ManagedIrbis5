@@ -5,7 +5,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net7.0-windows</TargetFramework>
+        <TargetFramework>net8.0-windows</TargetFramework>
         <UseWindowsForms>true</UseWindowsForms>
         <RootNamespace>AM.Windows.Forms</RootNamespace>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

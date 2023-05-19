@@ -1,13 +1,13 @@
 # ManagedIrbis5
 
-Client framework for IRBIS64 system ported to .NET 7
+Client framework for IRBIS64 system ported to .NET 8
 
 Currently supports:
 
 * Windows 7/10/11 x64
 * MacOS 10.14
-* .NET runtime 7.0.0 and higher
-* .NET SDK 7.0.100 and higher
+* .NET runtime 8.0.0 and higher
+* .NET SDK 8.0.0 and higher
 
 ```c#
 using System;

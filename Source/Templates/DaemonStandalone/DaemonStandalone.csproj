@@ -6,7 +6,6 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
         <!-- Не забыть сменить идентификатор! -->
         <UserSecretsId>64d00067-c938-4fb6-ae1e-8f27af9673f4</UserSecretsId>

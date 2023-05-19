@@ -13,8 +13,8 @@ init:
   - git config --global core.autocrlf true
 
 install:
-  - rem cmd: appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
-  - rem ps: .\dotnet-install.ps1 -Version 7.0.100 -InstallDir $env:ProgramFiles/dotnet
+  - cmd: appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
+  - ps: .\dotnet-install.ps1 -Version 8.0.100-preview.4 -InstallDir $env:ProgramFiles/dotnet
   - cmd: dotnet tool install --tool-path . nbgv
   - cmd: dotnet tool install --tool-path . coverlet.console
 
