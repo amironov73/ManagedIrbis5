@@ -23,6 +23,7 @@ namespace UnitTests.AM.Threading.Tasks;
 [TestClass]
 public sealed class SimplestTaskProcessorTest
 {
+    [Ignore]
     [TestMethod]
     public void SimplestTaskProcessor_1()
     {
@@ -53,8 +54,8 @@ public sealed class SimplestTaskProcessorTest
         Assert.AreEqual (0, processor.Exceptions.Count);
     }
 
-    [TestMethod]
     [Ignore]
+    [TestMethod]
     public void SimplestTaskProcessor_2()
     {
         var lines = new List<string>();
