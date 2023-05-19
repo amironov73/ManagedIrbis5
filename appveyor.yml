@@ -14,7 +14,7 @@ init:
 
 install:
   - cmd: appveyor DownloadFile https://dot.net/v1/dotnet-install.ps1
-  - ps: .\dotnet-install.ps1 -Version 8.0.100-preview.4 -InstallDir $env:ProgramFiles/dotnet
+  - ps: .\dotnet-install.ps1 -Version 8.0.100-preview.4.23260.5 -InstallDir $env:ProgramFiles/dotnet
   - cmd: dotnet tool install --tool-path . nbgv
   - cmd: dotnet tool install --tool-path . coverlet.console
 
