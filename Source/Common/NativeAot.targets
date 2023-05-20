@@ -1,0 +1,10 @@
+﻿<Project>
+
+    <PropertyGroup>
+        <!-- Native image -->
+        <PublishAot>true</PublishAot>
+        <InvariantGlobalization>true</InvariantGlobalization>
+        <StripSymbols>true</StripSymbols>
+    </PropertyGroup>
+
+</Project>

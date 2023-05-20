@@ -2,6 +2,15 @@
 
 <Project>
 
+    <!-- Framework and language  -->
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+        <Nullable>enable</Nullable>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    </PropertyGroup>
+
     <!-- NuGet related stuff -->
 
     <PropertyGroup>

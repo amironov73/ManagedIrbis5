@@ -2,24 +2,15 @@
 
 <Project>
 
+    <!-- Common stuff -->
+    <Import Project="..\Common\ArsMagna.targets"/>
+
     <!-- NuGet related stuff -->
     <PropertyGroup>
         <IsPackable>true</IsPackable>
         <DebugType>portable</DebugType>
         <EmbedAllSources>true</EmbedAllSources>
         <PackageIcon>arsmagna-icon.png</PackageIcon>
-    </PropertyGroup>
-
-    <!-- Assembly version and strong name -->
-    <Import Project="..\Common\ArsMagna.targets"/>
-
-    <!-- Framework and language -->
-    <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <LangVersion>preview</LangVersion>
-        <Nullable>enable</Nullable>
-        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-        <NoWarn>NU1507</NoWarn>
     </PropertyGroup>
 
     <!-- disable NETSDK1057 warning "You are using a preview version" -->

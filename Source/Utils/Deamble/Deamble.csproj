@@ -4,10 +4,6 @@
         <OutputType>Exe</OutputType>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- Native image -->
-        <PublishAot>true</PublishAot>
-        <StripSymbols>true</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\NativeAot.targets"/>
 
 </Project>

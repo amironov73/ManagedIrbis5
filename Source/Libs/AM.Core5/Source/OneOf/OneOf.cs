@@ -92,7 +92,7 @@ public class OneOf<T1, T2>
     #region Public methods
 
     /// <summary>
-    /// Прверка: хранится значение первого типа?
+    /// Проверка: хранится значение первого типа?
     /// </summary>
     public bool Is1 => _index == 0;
 
