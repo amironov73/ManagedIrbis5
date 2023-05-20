@@ -2,13 +2,16 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <Nullable>enable</Nullable>
         <ApplicationIcon>listen.ico</ApplicationIcon>
-        <PublishAot>true</PublishAot>
     </PropertyGroup>
 
+    <Import Project="..\..\Common\NativeAot.targets" />
+
     <ItemGroup>
-      <None Update="run.cmd">
+      <None Update="run-ceptor.cmd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="run-ceptor.sh">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

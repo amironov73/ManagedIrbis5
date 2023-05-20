@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <ApplicationIcon>header.ico</ApplicationIcon>
     </PropertyGroup>
 
     <Import Project="..\..\Common\NativeAot.targets"/>
