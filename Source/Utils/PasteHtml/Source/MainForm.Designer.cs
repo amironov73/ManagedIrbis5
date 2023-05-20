@@ -36,9 +36,9 @@
             this._saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             this._menuStrip.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // _menuStrip
-            // 
+            //
             this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this._pasteMenuItem,
             this._saveMenuItem,
@@ -48,30 +48,30 @@
             this._menuStrip.Size = new System.Drawing.Size(800, 24);
             this._menuStrip.TabIndex = 0;
             this._menuStrip.Text = "menuStrip1";
-            // 
+            //
             // _pasteMenuItem
-            // 
+            //
             this._pasteMenuItem.Name = "_pasteMenuItem";
             this._pasteMenuItem.Size = new System.Drawing.Size(47, 20);
             this._pasteMenuItem.Text = "&Paste";
             this._pasteMenuItem.Click += new System.EventHandler(this._pasteMenuItem_Click);
-            // 
+            //
             // _saveMenuItem
-            // 
+            //
             this._saveMenuItem.Name = "_saveMenuItem";
             this._saveMenuItem.Size = new System.Drawing.Size(52, 20);
             this._saveMenuItem.Text = "&Save...";
             this._saveMenuItem.Click += new System.EventHandler(this._saveMenuItem_Click);
-            // 
+            //
             // _copyMenuItem
-            // 
+            //
             this._copyMenuItem.Name = "_copyMenuItem";
             this._copyMenuItem.Size = new System.Drawing.Size(47, 20);
             this._copyMenuItem.Text = "&Copy";
             this._copyMenuItem.Click += new System.EventHandler(this._copyMenuItem_Click);
-            // 
+            //
             // _textBox
-            // 
+            //
             this._textBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this._textBox.Location = new System.Drawing.Point(0, 24);
             this._textBox.Multiline = true;
@@ -79,9 +79,9 @@
             this._textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._textBox.Size = new System.Drawing.Size(800, 426);
             this._textBox.TabIndex = 1;
-            // 
+            //
             // MainForm
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
@@ -99,11 +99,11 @@
 
         #endregion
 
-        private MenuStrip _menuStrip;
-        private ToolStripMenuItem _pasteMenuItem;
-        private TextBox _textBox;
-        private ToolStripMenuItem _saveMenuItem;
-        private ToolStripMenuItem _copyMenuItem;
-        private SaveFileDialog _saveFileDialog;
+        private System.Windows.Forms.MenuStrip _menuStrip;
+        private System.Windows.Forms.ToolStripMenuItem _pasteMenuItem;
+        private System.Windows.Forms.TextBox _textBox;
+        private System.Windows.Forms.ToolStripMenuItem _saveMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem _copyMenuItem;
+        private System.Windows.Forms.SaveFileDialog _saveFileDialog;
     }
 }

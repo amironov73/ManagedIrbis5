@@ -3,15 +3,9 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net8.0-windows</TargetFramework>
-        <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
-        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- Native image -->
-        <PublishAot>false</PublishAot>
-        <StripSymbols>false</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\NativeAot.targets"/>
 
 </Project>
