@@ -2,12 +2,9 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <Nullable>enable</Nullable>
+        <ApplicationIcon>namecoin.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <PublishAot>true</PublishAot>
-        <StripSymbols>true</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\NativeAot.targets"/>
 
 </Project>
