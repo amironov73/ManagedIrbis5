@@ -2,12 +2,9 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <ApplicationIcon>versions.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- Native image -->
-        <PublishAot>true</PublishAot>
-        <StripSymbols>true</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\NativeAot.targets"/>
 
 </Project>
