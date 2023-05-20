@@ -1,6 +1,7 @@
 ﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
+// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
 /* MainForm.cs -- main application form
@@ -50,7 +51,7 @@ public sealed partial class MainForm
             string value
         )
     {
-        var item = new ListViewItem(new [] { name, value });
+        var item = new ListViewItem(new[] { name, value });
         group.Items.Add(item);
         _listView.Items.Add(item);
     }
@@ -60,11 +61,11 @@ public sealed partial class MainForm
         var systemGroup = _listView.Groups["System"];
         if (systemGroup is not null)
         {
-            AddLine (systemGroup, "Operating system", RuntimeInformation.OSDescription);
-            AddLine (systemGroup, "OS architecture", RuntimeInformation.OSArchitecture.ToString());
-            AddLine (systemGroup, "Framework", RuntimeInformation.FrameworkDescription);
-            AddLine (systemGroup, "Runtime", RuntimeInformation.RuntimeIdentifier);
-            AddLine (systemGroup, "Logged in user", Environment.UserName);
+            AddLine(systemGroup, "Operating system", RuntimeInformation.OSDescription);
+            AddLine(systemGroup, "OS architecture", RuntimeInformation.OSArchitecture.ToString());
+            AddLine(systemGroup, "Framework", RuntimeInformation.FrameworkDescription);
+            AddLine(systemGroup, "Runtime", RuntimeInformation.RuntimeIdentifier);
+            AddLine(systemGroup, "Logged in user", Environment.UserName);
         }
     }
 
@@ -74,11 +75,11 @@ public sealed partial class MainForm
         var networkGroup = _listView.Groups["Network"];
         if (networkGroup is not null)
         {
-            AddLine (networkGroup, "Host name", hostEntry.HostName);
+            AddLine(networkGroup, "Host name", hostEntry.HostName);
 
             foreach (var address in hostEntry.AddressList)
             {
-                AddLine (networkGroup, "Address", address.ToString());
+                AddLine(networkGroup, "Address", address.ToString());
             }
         }
     }
@@ -122,7 +123,7 @@ public sealed partial class MainForm
                     var driveName = drive.Name;
                     var driveDescription = $"Total: {(drive.TotalSize / gigabyte):N} Gb, " +
                                            $"available: {(drive.AvailableFreeSpace / gigabyte):N} Gb";
-                    AddLine (driveGroup, driveName, driveDescription);
+                    AddLine(driveGroup, driveName, driveDescription);
                 }
             }
         }
@@ -134,7 +135,7 @@ public sealed partial class MainForm
             EventArgs eventArgs
         )
     {
-        Clipboard.SetText (GatherInformation());
+        Clipboard.SetText(GatherInformation());
     }
 
     private void _listView_ClientSizeChanged
@@ -152,8 +153,8 @@ public sealed partial class MainForm
             ListViewGroup group
         )
     {
-        builder.AppendLine (group.Header);
-        builder.AppendLine ();
+        builder.AppendLine(group.Header);
+        builder.AppendLine();
 
         foreach (ListViewItem item in group.Items)
         {
@@ -163,10 +164,10 @@ public sealed partial class MainForm
                     item.SubItems[0].Text,
                     item.SubItems[1].Text
                 );
-            builder.AppendLine ();
+            builder.AppendLine();
         }
 
-        builder.AppendLine (new string ('-', 70));
+        builder.AppendLine(new string('-', 70));
     }
 
     private string GatherInformation()
@@ -175,8 +176,8 @@ public sealed partial class MainForm
 
         foreach (ListViewGroup group in _listView.Groups)
         {
-            GatherGroup (builder, group);
-            builder.AppendLine ();
+            GatherGroup(builder, group);
+            builder.AppendLine();
         }
 
         return builder.ToString();

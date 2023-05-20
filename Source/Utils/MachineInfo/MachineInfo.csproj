@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
@@ -7,10 +7,6 @@
         <ApplicationIcon>MachineInfo.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- Native image -->
-        <PublishAot>false</PublishAot>
-        <StripSymbols>false</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\NativeAot.targets"/>
 
 </Project>

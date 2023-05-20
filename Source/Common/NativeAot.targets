@@ -1,10 +1,15 @@
 ﻿<Project>
 
+    <!-- Compile to native image -->
     <PropertyGroup>
-        <!-- Native image -->
         <PublishAot>true</PublishAot>
         <InvariantGlobalization>true</InvariantGlobalization>
         <StripSymbols>true</StripSymbols>
+    </PropertyGroup>
+
+    <!-- NETSDK1175: WinForms is not supported or recommended with trimming enabled -->
+    <PropertyGroup>
+        <_SuppressWinFormsTrimError>true</_SuppressWinFormsTrimError>
     </PropertyGroup>
 
 </Project>
