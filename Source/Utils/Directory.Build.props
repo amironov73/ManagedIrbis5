@@ -5,14 +5,14 @@
     <!-- Common stuff -->
     <Import Project="..\Common\ArsMagna.targets"/>
 
+   <!-- Where to place artifacts -->
+    <PropertyGroup>
+        <ArtifactsPath>$(MSBuildThisFileDirectory)artifacts</ArtifactsPath>
+    </PropertyGroup>
+
     <!-- disable NETSDK1057 warning "You are using a preview version" -->
     <PropertyGroup>
         <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
-    </PropertyGroup>
-
-    <!-- Icon -->
-    <PropertyGroup>
-        <ApplicationIcon>..\..\Common\BlueBook.ico</ApplicationIcon>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)'=='Debug'">
@@ -30,7 +30,7 @@
         <PackageVersion>5.0.0</PackageVersion>
         <Company>Ars Magna Project</Company>
         <Authors>Alexey Mironov</Authors>
-        <Copyright>Copyright Alexey Mironov 2006-2021</Copyright>
+        <Copyright>Copyright Alexey Mironov 2006-2023</Copyright>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageProjectUrl>https://arsmagna.ru</PackageProjectUrl>
         <RepositoryUrl>https://github.com/amironov73/ManagedIrbis5</RepositoryUrl>

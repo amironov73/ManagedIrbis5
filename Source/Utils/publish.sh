@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-dotnet publish --runtime linux-x64 --configuration Release
+dotnet publish --runtime linux-x64 --configuration Release Utils.sln

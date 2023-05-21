@@ -1,14 +1,17 @@
 <Project>
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
     <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
     <AvaloniaPrevious>11.0.0-preview6</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.5.0</NugetVersion>
   </PropertyGroup>
+
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
     <PackageVersion Include="Autofac" Version="6.5.0" />
@@ -137,4 +140,5 @@
     <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.5.1" />
   </ItemGroup>
+
 </Project>
