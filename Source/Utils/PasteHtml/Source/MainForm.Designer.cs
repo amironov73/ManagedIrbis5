@@ -28,73 +28,71 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this._menuStrip = new System.Windows.Forms.MenuStrip();
-            this._pasteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._copyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._textBox = new System.Windows.Forms.TextBox();
-            this._saveFileDialog = new System.Windows.Forms.SaveFileDialog();
-            this._menuStrip.SuspendLayout();
-            this.SuspendLayout();
-            //
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            _menuStrip = new System.Windows.Forms.MenuStrip();
+            _pasteMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            _saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            _copyMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            _textBox = new System.Windows.Forms.TextBox();
+            _saveFileDialog = new System.Windows.Forms.SaveFileDialog();
+            _menuStrip.SuspendLayout();
+            SuspendLayout();
+            // 
             // _menuStrip
-            //
-            this._menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._pasteMenuItem,
-            this._saveMenuItem,
-            this._copyMenuItem});
-            this._menuStrip.Location = new System.Drawing.Point(0, 0);
-            this._menuStrip.Name = "_menuStrip";
-            this._menuStrip.Size = new System.Drawing.Size(800, 24);
-            this._menuStrip.TabIndex = 0;
-            this._menuStrip.Text = "menuStrip1";
-            //
+            // 
+            _menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { _pasteMenuItem, _saveMenuItem, _copyMenuItem });
+            _menuStrip.Location = new System.Drawing.Point(0, 0);
+            _menuStrip.Name = "_menuStrip";
+            _menuStrip.Size = new System.Drawing.Size(800, 24);
+            _menuStrip.TabIndex = 0;
+            _menuStrip.Text = "menuStrip1";
+            // 
             // _pasteMenuItem
-            //
-            this._pasteMenuItem.Name = "_pasteMenuItem";
-            this._pasteMenuItem.Size = new System.Drawing.Size(47, 20);
-            this._pasteMenuItem.Text = "&Paste";
-            this._pasteMenuItem.Click += new System.EventHandler(this._pasteMenuItem_Click);
-            //
+            // 
+            _pasteMenuItem.Name = "_pasteMenuItem";
+            _pasteMenuItem.Size = new System.Drawing.Size(47, 20);
+            _pasteMenuItem.Text = "&Paste";
+            _pasteMenuItem.Click += _pasteMenuItem_Click;
+            // 
             // _saveMenuItem
-            //
-            this._saveMenuItem.Name = "_saveMenuItem";
-            this._saveMenuItem.Size = new System.Drawing.Size(52, 20);
-            this._saveMenuItem.Text = "&Save...";
-            this._saveMenuItem.Click += new System.EventHandler(this._saveMenuItem_Click);
-            //
+            // 
+            _saveMenuItem.Name = "_saveMenuItem";
+            _saveMenuItem.Size = new System.Drawing.Size(52, 20);
+            _saveMenuItem.Text = "&Save...";
+            _saveMenuItem.Click += _saveMenuItem_Click;
+            // 
             // _copyMenuItem
-            //
-            this._copyMenuItem.Name = "_copyMenuItem";
-            this._copyMenuItem.Size = new System.Drawing.Size(47, 20);
-            this._copyMenuItem.Text = "&Copy";
-            this._copyMenuItem.Click += new System.EventHandler(this._copyMenuItem_Click);
-            //
+            // 
+            _copyMenuItem.Name = "_copyMenuItem";
+            _copyMenuItem.Size = new System.Drawing.Size(47, 20);
+            _copyMenuItem.Text = "&Copy";
+            _copyMenuItem.Click += _copyMenuItem_Click;
+            // 
             // _textBox
-            //
-            this._textBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._textBox.Location = new System.Drawing.Point(0, 24);
-            this._textBox.Multiline = true;
-            this._textBox.Name = "_textBox";
-            this._textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this._textBox.Size = new System.Drawing.Size(800, 426);
-            this._textBox.TabIndex = 1;
-            //
+            // 
+            _textBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            _textBox.Location = new System.Drawing.Point(0, 24);
+            _textBox.Multiline = true;
+            _textBox.Name = "_textBox";
+            _textBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            _textBox.Size = new System.Drawing.Size(800, 426);
+            _textBox.TabIndex = 1;
+            // 
             // MainForm
-            //
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this._textBox);
-            this.Controls.Add(this._menuStrip);
-            this.MainMenuStrip = this._menuStrip;
-            this.Name = "MainForm";
-            this.Text = "Paste text as HTML";
-            this._menuStrip.ResumeLayout(false);
-            this._menuStrip.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            // 
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(800, 450);
+            Controls.Add(_textBox);
+            Controls.Add(_menuStrip);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            MainMenuStrip = _menuStrip;
+            Name = "MainForm";
+            Text = "Paste text as HTML";
+            _menuStrip.ResumeLayout(false);
+            _menuStrip.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

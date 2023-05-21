@@ -4,7 +4,9 @@
 
     <!-- Framework and language  -->
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <UseWindowsForms>true</UseWindowsForms>
         <LangVersion>preview</LangVersion>
         <Nullable>enable</Nullable>
         <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>

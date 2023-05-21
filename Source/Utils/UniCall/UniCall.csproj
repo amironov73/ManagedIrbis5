@@ -2,12 +2,9 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
+        <ApplicationIcon>call.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <!-- Native image -->
-        <PublishAot>false</PublishAot>
-        <StripSymbols>false</StripSymbols>
-    </PropertyGroup>
+    <Import Project="..\..\Common\SingleFile.targets"/>
 
 </Project>

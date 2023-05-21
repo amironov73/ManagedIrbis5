@@ -1,0 +1,11 @@
+﻿<Project>
+
+    <!-- Compile to native image -->
+    <PropertyGroup>
+        <RestoreLockedMode>true</RestoreLockedMode>
+        <PublishTrimmed>false</PublishTrimmed>
+        <PublishSingleFile>true</PublishSingleFile>
+        <StripSymbols>true</StripSymbols>
+    </PropertyGroup>
+
+</Project>

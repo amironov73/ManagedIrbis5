@@ -35,6 +35,7 @@ namespace MachineInfo
             var listViewGroup2 = new System.Windows.Forms.ListViewGroup("Network", System.Windows.Forms.HorizontalAlignment.Left);
             var listViewGroup3 = new System.Windows.Forms.ListViewGroup("Memory", System.Windows.Forms.HorizontalAlignment.Left);
             var listViewGroup4 = new System.Windows.Forms.ListViewGroup("Drives", System.Windows.Forms.HorizontalAlignment.Left);
+            var resources = new ComponentResourceManager(typeof(MainForm));
             _listView = new System.Windows.Forms.ListView();
             _nameColumn = new System.Windows.Forms.ColumnHeader();
             _valueColumn = new System.Windows.Forms.ColumnHeader();
@@ -86,6 +87,7 @@ namespace MachineInfo
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(624, 441);
             Controls.Add(_listView);
+            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
             MinimumSize = new System.Drawing.Size(640, 480);
             Name = "MainForm";
             Text = "Machine info";

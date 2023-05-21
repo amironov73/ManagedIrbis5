@@ -1,11 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
-        <UseWindowsForms>true</UseWindowsForms>
+        <ApplicationIcon>html5.ico</ApplicationIcon>
     </PropertyGroup>
 
-    <Import Project="..\..\Common\NativeAot.targets"/>
+    <ItemGroup>
+        <TrimmerRootDescriptor Include="Roots.xml" />
+    </ItemGroup>
+
+    <Import Project="..\..\Common\WinForms.targets"/>
+    <Import Project="..\..\Common\NotTrimmed.targets"/>
 
 </Project>

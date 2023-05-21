@@ -1,0 +1,5 @@
+﻿<linker>
+  <assembly fullname="System.Drawing" preserve="All" />
+  <assembly fullname="System.Windows.Forms" preserve="All" />
+  <assembly fullname="PasteHtml" preserve="All" />
+</linker>
