@@ -1,6 +1,6 @@
 ﻿<Project>
 
-    <!-- Compile to native image -->
+    <!-- Compile to NON-native image -->
     <PropertyGroup>
         <RestoreLockedMode>true</RestoreLockedMode>
         <PublishTrimmed>true</PublishTrimmed>

@@ -5,4 +5,6 @@
         <ApplicationIcon>verify.ico</ApplicationIcon>
     </PropertyGroup>
 
+    <Import Project="..\..\Common\NativeAot.targets"/>
+
 </Project>

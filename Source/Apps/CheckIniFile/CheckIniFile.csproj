@@ -9,4 +9,10 @@
         <PackageReference Include="System.CommandLine"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <TrimmerRootDescriptor Include="Roots.xml" />
+    </ItemGroup>
+
+    <Import Project="..\..\Common\NativeAot.targets"/>
+
 </Project>
