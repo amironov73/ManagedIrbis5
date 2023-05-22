@@ -37,8 +37,8 @@
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="$(CommunityToolkitVersion)" />
-    <PackageVersion Include="coverlet.collector" Version="3.2.0" />
-    <PackageVersion Include="coverlet.msbuild" Version="3.2.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.0" />
+    <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
     <PackageVersion Include="Google.Protobuf" Version="3.21.12" />
