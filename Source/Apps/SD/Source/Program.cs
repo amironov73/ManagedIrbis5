@@ -1,3 +1,12 @@
+#region Using directives
+
+using System;
+using System.Windows.Forms;
+
+#endregion
+
+#nullable enable
+
 namespace SDHelper;
 
 static class Program
@@ -12,5 +21,5 @@ static class Program
         // see https://aka.ms/applicationconfiguration.
         ApplicationConfiguration.Initialize();
         Application.Run(new MainForm());
-    }    
+    }
 }

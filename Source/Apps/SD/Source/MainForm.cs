@@ -3,8 +3,12 @@
 
 #region Using directives
 
+using System;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 #endregion
 
@@ -77,7 +81,11 @@ public partial class MainForm : Form
             EventArgs eventArgs
         )
     {
-        Clipboard.SetText(_resultBox.Text.Trim());
+        var resultText = _resultBox.Text;
+        if (!string.IsNullOrEmpty (resultText))
+        {
+            Clipboard.SetText(resultText.Trim());
+        }
     }
 
 

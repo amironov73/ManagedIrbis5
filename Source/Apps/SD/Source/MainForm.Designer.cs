@@ -1,4 +1,7 @@
-﻿namespace SDHelper;
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace SDHelper;
 
 partial class MainForm
 {
@@ -227,17 +230,17 @@ partial class MainForm
 
     #endregion
 
-    private ToolStripContainer _toolStripContainer;
-    private ToolStrip _toolStrip;
-    private FlowLayoutPanel flowLayoutPanel1;
-    private DataGridView _dataGrid;
-    private BindingSource _bindingSource;
-    private SplitContainer _splitContainer;
-    private TextBox _resultBox;
-    private BindingSource _suggestionsSource;
-    private ToolStripButton _copyButton;
-    private ToolStripSeparator toolStripSeparator1;
-    private ToolStripLabel _countLabel;
-    private DataGridViewTextBoxColumn _titleColumn;
-    private DataGridViewComboBoxColumn _valueColumn;
+    private System.Windows.Forms.ToolStripContainer _toolStripContainer;
+    private System.Windows.Forms.ToolStrip _toolStrip;
+    private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
+    private System.Windows.Forms.DataGridView _dataGrid;
+    private System.Windows.Forms.BindingSource _bindingSource;
+    private System.Windows.Forms.SplitContainer _splitContainer;
+    private System.Windows.Forms.TextBox _resultBox;
+    private System.Windows.Forms.BindingSource _suggestionsSource;
+    private System.Windows.Forms.ToolStripButton _copyButton;
+    private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+    private System.Windows.Forms.ToolStripLabel _countLabel;
+    private System.Windows.Forms.DataGridViewTextBoxColumn _titleColumn;
+    private System.Windows.Forms.DataGridViewComboBoxColumn _valueColumn;
 }

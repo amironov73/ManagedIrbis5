@@ -1,16 +1,24 @@
 [
   {
     "title": "What",
-    "suggestions": [ "professional photograph of", "instagram of" ]
+    "suggestions": [ "professional photography of", "instagram of",
+                     "artistic photo of", "painting of", "oil painting of",
+                     "watercolor painting of", "pencil drawing of",
+                     "charcoal drawing of", "pen drawing of" ]
   },
   {
     "title": "Dressed / undressed",
-    "suggestions": [ "naked", "half-dressed", "fashion dressed" ]
+    "suggestions": [ "naked", "half-dressed", "fashion dressed",
+                     "naked, frontal nudity, full nudity" ]
   },
   {
     "title": "Nationality",
-    "suggestions": [ "Russian", "Czech", "French", "Ukrainian",
-                     "Belarusian", "Slavic", "Caucasian" ]
+    "suggestions": [ "Russian", "Ukrainian", "Czech", "Belarusian",
+                      "Polish", "Hungarian", "Romanian", "Slavic",
+                      "French", "English", "German", "Jewish",
+                      "Dutch", "Finnish", "Swedish", "Caucasian",
+                      "Japanese", "Korean", "Asian",
+                      "Indian", "Vietnamese", "African" ]
   },
   {
     "title": "Beautiful",
@@ -28,15 +36,20 @@
   },
   {
     "title": "Mood",
-    "suggestions": [ "smiling happy cheerful", "thinkful", "sad", "embarrassed",
-                     "provocative", "reflective", "gloomy", "humorous",
-                     "melancholy", "idyllic", "whimsical", "romantic"
-    ]
+    "suggestions": [ "smiling happy cheerful", "thinkful", "sad",
+                     "embarrassed", "provocative", "reflective",
+                     "gloomy", "humorous", "melancholy", "idyllic",
+                     "whimsical", "romantic" ]
+  },
+  {
+    "title": "Age",
+    "suggestions": [ "15 years old", "18 years old", "mature" ]
   },
   {
     "title": "Woman",
-    "suggestions": [ "18 years old girl", "girl", "teen girl", "mature woman",
-                     "15 years old teen girl", "maid", "slave" ]
+    "suggestions": [ "teen girl", "girl", "woman", "lady",
+                     "maid", "slave", "princess", "queen",
+                     "goddess", "librarian" ]
   },
   {
     "title": "What is she doing?",
@@ -51,7 +64,14 @@
                      "stuffing", "hugging", "bowing", "painting", "diving",
                      "skiing", "stacking", "buying", "shaking", "selling",
                      "prostitution", "sexing", "trading", "working", "walking",
-                     "running", "gives blowjob", "gives pussy", "gives herself"
+                     "running", "gives blowjob", "gives pussy", "gives herself",
+                     "having sex", "having anal sex", "having group sex",
+                     "hard penetration", "doing hardcore", "doing softcore",
+                     "intercourse", "doing perversion", "abused", "raped",
+                     "violated", "tied",
+                     "gynecological examination",
+                     ", sex toys", "dildo",
+                     "erotic posing", "MET-ART", "Femjoy", "MPLStudio"
     ]
   },
   {
@@ -80,10 +100,14 @@
   },
   {
     "title": "Chest",
-    "suggestions": [ ", small tits, small breast",
-                     ", medium tits, medium breasts",
-                     ", real tits",
-                     ", flatchested"
+    "suggestions": [ ", small tits, small breast, small boobs",
+                     ", tiny tits, tiny breasts, tiny boobies",
+                     ", medium tits, medium breasts, medium boobs",
+                     ", big tits, big breasts, big boobs",
+                     ", huge tits, huge breasts, huge boobs",
+                     ", real tits, real breasts",
+                     ", natural tits, natural breasts",
+                     ", flat chested"
     ]
   },
   {
@@ -94,43 +118,67 @@
   {
     "title": "Shaved",
     "suggestions": [ ", pubic hair, hairy pussy, unshaven pussy",
-                     ", shaved pussy"
-    ]
+                     ", shaved pussy" ]
   },
   {
     "title": "Oiled or wet",
-    "suggestions": [ ", oiled body, oiled tits", ", wet body, wet hair" ]
+    "suggestions": [ ", oiled body, oiled tits",
+                     ", wet body, wet hair",
+                     ", (covered in cum:1.5), (cum covered:1.5), (sperm:1.5)" ]
   },
   {
     "title": "Face",
     "suggestions": [
       ", pretty face, attractive",
       ", angelic face",
-      ", innocent face"
+      ", innocent face",
+      ", slut's face",
+      ", prostitute face",
+      ", indifferent face, apathetic face",
+      ", suffering face",
+      ", in great pain"
     ]
   },
   {
+    "title": "State",
+    "suggestions": [ ", very tired", ", worn out", ", powerless" ]
+  },
+  {
+    "title": "Poses",
+    "suggestions": [ ", doggystyle sex", ", missionary pose sex",
+      ", cowgirl pose", ", double penetration", "ass up", "legs up" ]
+  },
+  {
     "title": "Looks at",
-    "suggestions": [ ", looks at the camera", ", facing away from the camera" ]
+    "suggestions": [ ", looks at the camera", ", facing away from the camera",
+                     ", looks to the left", ", looks to the right" ]
   },
   {
     "title": "Lighting",
-    "suggestions": [ ", dramatic lighting", ", natural lighting", ", sun rays" ]
+    "suggestions": [ ", dramatic lighting", ", natural lighting",
+                     ", sun rays", ", lightning", ", all-round lighting" ]
   },
   {
     "title": "Full body?",
-    "suggestions": [ ", full-body portrait", ", chest-length portrait", ", full body" ]
+    "suggestions": [ ", full-body portrait", ", chest-length portrait",
+                     ", full body" ]
   },
   {
-    "title": "Detalization",
+    "title": "Detailing",
     "suggestions": [ ", detailed face, detailed eyes, skin pores, perfect lips", "" ]
   },
   {
     "title": "Dramatic",
-    "suggestions": [ ", dramatic", ", creepy", ", horror", ", exciting", ", arousing" ]
+    "suggestions": [ ", dramatic", ", creepy", ", horror", ", exciting",
+                     ", arousing" ]
+  },
+  {
+    "title": "Focus",
+    "suggestions": [ "sharp focus", "bokeh", "depth of field" ]
   },
   {
     "title": "Masterpiece",
-    "suggestions": [ ", masterpiece, ultra-realistic, 4k, 8k" ]
+    "suggestions": [ ", masterpiece, ultra-realistic, sharp focus, 4k, 8k",
+                    ", what the fuck" ]
   }
 ]
