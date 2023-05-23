@@ -1,0 +1,31 @@
+<!-- Common settings for applications -->
+
+<Project>
+
+    <!-- Assembly version and strong name -->
+    <Import Project="..\..\Common\ArsMagna.targets" />
+
+    <PropertyGroup>
+        <Nullable>enable</Nullable>
+        <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+        <NoWarn>NU1507</NoWarn>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <!-- disable NETSDK1057 warning "You are using a preview version" -->
+    <PropertyGroup>
+        <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
+    </PropertyGroup>
+
+    <!-- Простановка версии по Git-истории -->
+    <ItemGroup>
+       <PackageReference Include="Nerdbank.GitVersioning">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+       </PackageReference>
+    </ItemGroup>
+
+</Project>
