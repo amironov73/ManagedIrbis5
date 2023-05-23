@@ -18,7 +18,8 @@
                       "French", "English", "German", "Jewish",
                       "Dutch", "Finnish", "Swedish", "Caucasian",
                       "Japanese", "Korean", "Asian",
-                      "Indian", "Vietnamese", "African" ]
+                      "Indian", "Vietnamese", "African",
+                      "American", "Canadian" ]
   },
   {
     "title": "Beautiful",
@@ -27,8 +28,10 @@
                      "pretty" ]
   },
   {
-    "title": "Hair length",
-    "suggestions": [ "short-haired", "long-haired" ]
+    "title": "Hair style",
+    "suggestions": [ "short-haired", "long-haired",
+                     "pigtails", "ponytails", "ribbon in hair",
+                     "bow in hair" ]
   },
   {
     "title": "Hair color",
@@ -49,7 +52,11 @@
     "title": "Woman",
     "suggestions": [ "teen girl", "girl", "woman", "lady",
                      "maid", "slave", "princess", "queen",
-                     "goddess", "librarian" ]
+                     "model", "fashion model", "cosplayer girl",
+                     "goddess", "librarian", "actress", "pornoactress",
+                     "Emma Watson", "Chloe Grace Moretz",
+                     "Scarlett Johansson", "Joey King", "Olivia Cooke",
+                     "Alisa Selezneva" ]
   },
   {
     "title": "What is she doing?",
@@ -64,18 +71,19 @@
                      "stuffing", "hugging", "bowing", "painting", "diving",
                      "skiing", "stacking", "buying", "shaking", "selling",
                      "prostitution", "sexing", "trading", "working", "walking",
+                     "working on notebook computer", "talking by phone",
                      "running", "gives blowjob", "gives pussy", "gives herself",
                      "having sex", "having anal sex", "having group sex",
                      "hard penetration", "doing hardcore", "doing softcore",
                      "intercourse", "doing perversion", "abused", "raped",
-                     "violated", "tied",
+                     "violated", "tied", "tortured",
                      "gynecological examination",
-                     ", sex toys", "dildo",
+                     ", sex toys", ". dildo",
                      "erotic posing", "MET-ART", "Femjoy", "MPLStudio"
     ]
   },
   {
-    "title": "Где?",
+    "title": "Where",
     "suggestions": [
       "in the library",
       "in the classroom",
@@ -96,7 +104,8 @@
   {
     "title": "Slim or fat",
     "suggestions": [ ", slim girl, slim body, lean girl",
-                     ", skinny girl", ", petite girl" ]
+                     ", skinny girl", ", petite girl",
+                     ", curvy girl" ]
   },
   {
     "title": "Chest",
@@ -107,8 +116,7 @@
                      ", huge tits, huge breasts, huge boobs",
                      ", real tits, real breasts",
                      ", natural tits, natural breasts",
-                     ", flat chested"
-    ]
+                     ", flat chested" ]
   },
   {
     "title": "Pussy",
@@ -119,6 +127,15 @@
     "title": "Shaved",
     "suggestions": [ ", pubic hair, hairy pussy, unshaven pussy",
                      ", shaved pussy" ]
+  },
+  {
+    "title": "Anatomy",
+    "suggestions": [ ", big white angel wings", ", cat ears",
+                     ", fox tail" ]
+  },
+  {
+    "title": "Accessories",
+    "suggestions": [ ", bandages", ", handcuffs", ", tattoos" ]
   },
   {
     "title": "Oiled or wet",
@@ -141,7 +158,8 @@
   },
   {
     "title": "State",
-    "suggestions": [ ", very tired", ", worn out", ", powerless" ]
+    "suggestions": [ ", very tired", ", worn out", ", powerless",
+                     ", tormented" ]
   },
   {
     "title": "Poses",
@@ -173,8 +191,17 @@
                      ", arousing" ]
   },
   {
+    "title": "Scene",
+    "suggestions": [ ", close up", ", short lens", ", telephoto lens" ]
+  },
+  {
     "title": "Focus",
-    "suggestions": [ "sharp focus", "bokeh", "depth of field" ]
+    "suggestions": [ ", sharp focus", ", bokeh", ", depth of field" ]
+  },
+  {
+    "title": "Colors and contrast",
+    "suggestions": [ ", vivid colors", ", muted colors", ", solarization",
+                     ", HDR", ", high contrast" ]
   },
   {
     "title": "Masterpiece",
