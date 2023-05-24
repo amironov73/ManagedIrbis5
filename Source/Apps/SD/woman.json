@@ -9,23 +9,32 @@
   {
     "title": "Dressed / undressed",
     "suggestions": [ "naked", "half-dressed", "fashion dressed",
+                     "topless", "bottomless", "seethru",
+                     "undressing", "undressing top", "undressing bottom",
                      "naked, frontal nudity, full nudity" ]
   },
   {
     "title": "Nationality",
     "suggestions": [ "Russian", "Ukrainian", "Czech", "Belarusian",
-                      "Polish", "Hungarian", "Romanian", "Slavic",
-                      "French", "English", "German", "Jewish",
-                      "Dutch", "Finnish", "Swedish", "Caucasian",
-                      "Japanese", "Korean", "Asian",
-                      "Indian", "Vietnamese", "African",
-                      "American", "Canadian" ]
+                     "Polish", "Hungarian", "Romanian", "Slavic",
+                     "French", "English", "German", "Jewish",
+                     "Dutch", "Finnish", "Swedish", "Caucasian",
+                     "Japanese", "Korean", "Asian",
+                     "Indian", "Vietnamese", "African",
+                     "American", "Canadian" ]
   },
   {
     "title": "Beautiful",
     "suggestions": [ "stunningly beautiful pretty",
-                     "beautiful",
-                     "pretty" ]
+                     "beautiful", "pretty", "attractive", "handsome",
+                     "good-looking", "nice-looking", "alluring",
+                     "prepossessing", "as pretty as a picture",
+                     "lovely", "charming", "delightful", "appealing",
+                     "engaging", "winsome", "ravishing", "gorgeous",
+                     "stunning", "glamorous", "graceful", "elegant",
+                     "exquisite", "aesthetic", "artistic", "magnificent",
+                     "hot", "tasty", "divine", "drop-dead gorgeous",
+                     "fanciable", "beddable", "fit", "cute", "foxy" ]
   },
   {
     "title": "Hair style",
@@ -53,6 +62,7 @@
     "suggestions": [ "teen girl", "girl", "woman", "lady",
                      "maid", "slave", "princess", "queen",
                      "model", "fashion model", "cosplayer girl",
+                     "exhibitionist girl",
                      "goddess", "librarian", "actress", "pornoactress",
                      "Emma Watson", "Chloe Grace Moretz",
                      "Scarlett Johansson", "Joey King", "Olivia Cooke",
@@ -72,13 +82,14 @@
                      "skiing", "stacking", "buying", "shaking", "selling",
                      "prostitution", "sexing", "trading", "working", "walking",
                      "working on notebook computer", "talking by phone",
+                     "inside the bus", "in the train car",
                      "running", "gives blowjob", "gives pussy", "gives herself",
                      "having sex", "having anal sex", "having group sex",
                      "hard penetration", "doing hardcore", "doing softcore",
                      "intercourse", "doing perversion", "abused", "raped",
                      "violated", "tied", "tortured",
                      "gynecological examination",
-                     ", sex toys", ". dildo",
+                     ", sex toys", ". dildo", "upskirt", "skirt up",
                      "erotic posing", "MET-ART", "Femjoy", "MPLStudio"
     ]
   },
@@ -98,8 +109,13 @@
       "in the city",
       "in nature",
       "in the forest",
-      "at the lake"
+      "at the lake",
+      "in the barracks"
     ]
+  },
+  {
+    "title": "Surrounding",
+    "suggestions": [ "surrounded by a crowd", "with a cat", "with a dog" ]
   },
   {
     "title": "Slim or fat",
@@ -153,7 +169,8 @@
       ", prostitute face",
       ", indifferent face, apathetic face",
       ", suffering face",
-      ", in great pain"
+      ", in great pain",
+      ", mouth slightly open"
     ]
   },
   {
@@ -174,6 +191,8 @@
   {
     "title": "Lighting",
     "suggestions": [ ", dramatic lighting", ", natural lighting",
+                     ", dim lighting", ", spot lighting",
+                     ", insufficient lighting", ", electric lighting",
                      ", sun rays", ", lightning", ", all-round lighting" ]
   },
   {
@@ -183,16 +202,17 @@
   },
   {
     "title": "Detailing",
-    "suggestions": [ ", detailed face, detailed eyes, skin pores, perfect lips", "" ]
+    "suggestions": [ ", detailed face, detailed eyes, skin pores, perfect skin, perfect lips", "" ]
   },
   {
     "title": "Dramatic",
     "suggestions": [ ", dramatic", ", creepy", ", horror", ", exciting",
-                     ", arousing" ]
+                     ", arousing", ", dark atmosphere" ]
   },
   {
     "title": "Scene",
-    "suggestions": [ ", close up", ", short lens", ", telephoto lens" ]
+    "suggestions": [ ", close up", ", away from camera", ", far from camera",
+                     ", short lens", ", telephoto lens" ]
   },
   {
     "title": "Focus",

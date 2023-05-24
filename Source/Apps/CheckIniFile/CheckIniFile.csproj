@@ -13,6 +13,6 @@
         <TrimmerRootDescriptor Include="Roots.xml" />
     </ItemGroup>
 
-    <Import Project="..\..\Common\NativeAot.targets"/>
+    <!-- Import Project="..\..\Common\NativeAot.targets"/ -->
 
 </Project>
