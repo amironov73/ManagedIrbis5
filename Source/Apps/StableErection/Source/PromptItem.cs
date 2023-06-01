@@ -13,24 +13,9 @@
 
 #region Using directives
 
-using System;
-using System.Diagnostics;
 using System.Text.Json.Serialization;
 
-using AM;
-using AM.Collections;
-using AM.Text;
-
 using JetBrains.Annotations;
-
-using ManagedIrbis;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-
-using Spectre.Console;
-using Spectre.Console.Rendering;
 
 #endregion
 
@@ -45,6 +30,17 @@ namespace StableErection;
 public sealed class PromptItem
 {
     #region Properties
+
+    /// <summary>
+    /// Нестандартный префикс (стандартный - пробел).
+    /// </summary>
+    [JsonPropertyName ("prefix")]
+    public string? Prefix { get; set; }
+
+    /// <summary>
+    /// Нестандартный разделитель (стандартный - запятая).
+    /// </summary>
+    public string? Separator { get; set; }
 
     /// <summary>
     /// Логика сборки элемента запроса из представленных вариантов.

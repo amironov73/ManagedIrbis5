@@ -32,6 +32,12 @@ public sealed class PromptVariant
     #region Properties
 
     /// <summary>
+    /// Выбрано по умолчанию?
+    /// </summary>
+    [JsonPropertyName ("default")]
+    public bool IsDefault { get; set; }
+
+    /// <summary>
     /// Предлагаемое значение.
     /// </summary>
     [JsonPropertyName ("value")]
