@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
-    <AvaloniaPrevious>11.0.0-preview6</AvaloniaPrevious>
+    <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
+    <AvaloniaPrevious>11.0.0-preview8</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.5.0</NugetVersion>
   </PropertyGroup>

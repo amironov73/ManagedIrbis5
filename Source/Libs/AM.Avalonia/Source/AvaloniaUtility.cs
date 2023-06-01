@@ -172,7 +172,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T : IContentControl
+        where T : ContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Center;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -422,7 +422,7 @@ public static class AvaloniaUtility
             AvaloniaProperty property,
             object value
         )
-        where TControl: Control
+        where TControl : Control
     {
         Sure.NotNull (property);
 
@@ -568,7 +568,7 @@ public static class AvaloniaUtility
             return Brushes.Black;
         }
 
-        return (IBrush) found;
+        return (IBrush)found;
     }
 
     /// <summary>
@@ -594,7 +594,7 @@ public static class AvaloniaUtility
             return Colors.Black;
         }
 
-        return (Color) found;
+        return (Color)found;
     }
 
     /// <summary>
@@ -614,7 +614,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (CornerRadius) found;
+        return (CornerRadius)found;
     }
 
     /// <summary>
@@ -654,7 +654,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (Size) found;
+        return (Size)found;
     }
 
     /// <summary>
@@ -674,7 +674,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (Thickness) found;
+        return (Thickness)found;
     }
 
     /// <summary>
@@ -727,7 +727,7 @@ public static class AvaloniaUtility
         (
             this Control control
         )
-        where TDataContext: class
+        where TDataContext : class
     {
         Sure.NotNull (control);
 
@@ -753,7 +753,7 @@ public static class AvaloniaUtility
         (
             this Control control
         )
-        where TDataContext: class
+        where TDataContext : class
     {
         Sure.NotNull (control);
 
@@ -867,7 +867,7 @@ public static class AvaloniaUtility
     /// <summary>
     /// Включение ссылки на наши стили.
     /// </summary>
-    public static IStyle IncludeArsMagnaStyles ()
+    public static IStyle IncludeArsMagnaStyles()
     {
         var uri = new Uri ("avares://AM.Avalonia/Styles.axaml");
         var result = new StyleInclude (uri)
@@ -931,7 +931,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T : IContentControl
+        where T : ContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Left;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -1026,16 +1026,12 @@ public static class AvaloniaUtility
         Sure.NotNull (type);
         Sure.NotNullNorEmpty (assetName);
 
-        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-        if (assets is not null)
+        var assembly = type.Assembly;
+        var name = assembly.GetName().Name;
+        if (!string.IsNullOrEmpty (name))
         {
-            var assembly = type.Assembly;
-            var name = assembly.GetName().Name;
-            if (!string.IsNullOrEmpty (name))
-            {
-                var uri = "avares://" + name + "/" + assetName;
-                return assets.Open (new Uri (uri));
-            }
+            var uri = "avares://" + name + "/" + assetName;
+            return AssetLoader.Open (new Uri (uri));
         }
 
         return null;
@@ -1179,7 +1175,7 @@ public static class AvaloniaUtility
             this T control,
             Thickness thickness
         )
-        where T: ContentControl
+        where T : ContentControl
     {
         Sure.NotNull (control);
 
@@ -1251,7 +1247,7 @@ public static class AvaloniaUtility
             this T block,
             Thickness thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -1268,7 +1264,7 @@ public static class AvaloniaUtility
             this T block,
             double thickness
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -1286,7 +1282,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -1306,7 +1302,7 @@ public static class AvaloniaUtility
             double right,
             double bottom
         )
-        where T: TextBlock
+        where T : TextBlock
     {
         Sure.NotNull (block);
 
@@ -1323,7 +1319,7 @@ public static class AvaloniaUtility
             this T control,
             Thickness thickness
         )
-        where T: Panel
+        where T : Panel
     {
         Sure.NotNull (control);
 
@@ -1340,7 +1336,7 @@ public static class AvaloniaUtility
             this T control,
             double uniform
         )
-        where T: Panel
+        where T : Panel
     {
         Sure.NotNull (control);
 
@@ -1348,6 +1344,7 @@ public static class AvaloniaUtility
 
         return control;
     }
+
     /// <summary>
     /// Установка полей снаружи панели.
     /// </summary>
@@ -1357,7 +1354,7 @@ public static class AvaloniaUtility
             double horizontal,
             double vertical
         )
-        where T: Panel
+        where T : Panel
     {
         Sure.NotNull (control);
 

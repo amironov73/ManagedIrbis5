@@ -31,7 +31,7 @@ namespace AM.Avalonia.ImageLoading;
 /// </summary>
 public class RamCachedWebImageLoader : BaseWebImageLoader
 {
-    private readonly ConcurrentDictionary<string, Task<IBitmap?>> _memoryCache = new ();
+    private readonly ConcurrentDictionary<string, Task<Bitmap?>> _memoryCache = new ();
 
     /// <inheritdoc />
     public RamCachedWebImageLoader()
@@ -45,7 +45,7 @@ public class RamCachedWebImageLoader : BaseWebImageLoader
     }
 
     /// <inheritdoc />
-    public override async Task<IBitmap?> ProvideImageAsync (string url)
+    public override async Task<Bitmap?> ProvideImageAsync (string url)
     {
         var bitmap = await _memoryCache.GetOrAdd (url, LoadAsync);
 

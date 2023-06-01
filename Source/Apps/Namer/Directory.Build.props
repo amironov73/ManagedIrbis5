@@ -3,7 +3,12 @@
 <Project>
 
     <!-- Assembly version and strong name -->
-    <!-- Import Project="..\Common\ArsMagna.targets" / -->
+    <Import Project="..\..\Common\ArsMagna.targets" />
+
+    <!-- Вложенность директорий изменилась, поэтому переопределяем путь к ключу -->
+    <PropertyGroup>
+        <AssemblyOriginatorKeyFile>..\..\..\Common\ArsMagna.private.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 
     <PropertyGroup>
         <LangVersion>preview</LangVersion>

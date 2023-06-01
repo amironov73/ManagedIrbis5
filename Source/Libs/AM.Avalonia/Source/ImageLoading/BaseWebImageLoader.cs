@@ -17,7 +17,6 @@ using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-using Avalonia;
 using Avalonia.Logging;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
@@ -43,6 +42,7 @@ public class BaseWebImageLoader
     /// </summary>
     public BaseWebImageLoader() : this (new HttpClient(), true)
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -57,10 +57,13 @@ public class BaseWebImageLoader
         _logger = Logger.TryGet (LogEventLevel.Information, ImageLoader.AsyncImageLoaderLogArea);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected HttpClient HttpClient { get; }
 
     /// <inheritdoc />
-    public virtual Task<IBitmap?> ProvideImageAsync (string url)
+    public virtual Task<Bitmap?> ProvideImageAsync (string url)
     {
         return LoadAsync (url);
     }
@@ -70,15 +73,21 @@ public class BaseWebImageLoader
     /// </summary>
     /// <param name="url">Target url</param>
     /// <returns>Bitmap</returns>
-    protected virtual async Task<IBitmap?> LoadAsync (string url)
+    protected virtual async Task<Bitmap?> LoadAsync (string url)
     {
         var internalOrCachedBitmap = await LoadFromInternalAsync (url) ?? await LoadFromGlobalCache (url);
-        if (internalOrCachedBitmap != null) return internalOrCachedBitmap;
+        if (internalOrCachedBitmap != null)
+        {
+            return internalOrCachedBitmap;
+        }
 
         try
         {
             var externalBytes = await LoadDataFromExternalAsync (url);
-            if (externalBytes == null) return null;
+            if (externalBytes == null)
+            {
+                return null;
+            }
 
             using var memoryStream = new MemoryStream (externalBytes);
             var bitmap = new Bitmap (memoryStream);
@@ -110,16 +119,17 @@ public class BaseWebImageLoader
                 return Task.FromResult<Bitmap?> (null);
             }
 
-            if (uri.IsAbsoluteUri && uri.IsFile)
+            if (uri is { IsAbsoluteUri: true, IsFile: true })
+            {
                 return Task.FromResult (new Bitmap (uri.LocalPath))!;
+            }
 
-            var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-            return Task.FromResult (new Bitmap (assets.Open (uri)))!;
+            return Task.FromResult (new Bitmap (AssetLoader.Open (uri)))!;
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
             _logger?.Log (this, "Failed to resolve image from request with uri: {RequestUri}\nException: {Exception}",
-                url, e);
+                url, exception);
             return Task.FromResult<Bitmap?> (null);
         }
     }
@@ -170,12 +180,16 @@ public class BaseWebImageLoader
         Dispose (false);
     }
 
+    /// <inheritdoc cref="IDisposable.Dispose"/>
     public void Dispose()
     {
         Dispose (true);
         GC.SuppressFinalize (this);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
     protected virtual void Dispose (bool disposing)
     {
         if (disposing && _shouldDisposeHttpClient)
