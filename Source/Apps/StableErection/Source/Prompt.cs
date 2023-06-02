@@ -14,8 +14,8 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using AM;
@@ -68,6 +68,27 @@ public sealed class Prompt
 
     #endregion
 
+    #region Private members
+
+    private static string[] GetIncludePaths()
+    {
+        var result = new List<string>();
+        var currentDirectory = Directory.GetCurrentDirectory();
+        result.Add (currentDirectory);
+        result.Add (Path.Combine (currentDirectory, "include"));
+
+        var appDirectory = AppContext.BaseDirectory;
+        if (appDirectory != currentDirectory)
+        {
+            result.Add (appDirectory);
+            result.Add (Path.Combine (appDirectory, "include"));
+        }
+
+        return result.ToArray();
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -80,14 +101,10 @@ public sealed class Prompt
     {
         Sure.FileExists (fileName);
 
-        var content = File.ReadAllBytes(fileName);
-        var options = new JsonReaderOptions
-        {
-            CommentHandling = JsonCommentHandling.Skip
-        };
-        var reader = new Utf8JsonReader(content, options);
+        var paths = GetIncludePaths();
+        var loader = new PromptLoader (paths);
 
-        return JsonSerializer.Deserialize<Prompt>(ref reader)!;
+        return loader.LoadFromFile (fileName);
     }
 
     #endregion

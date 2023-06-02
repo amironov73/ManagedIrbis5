@@ -72,5 +72,11 @@ public sealed class PromptItem
     [JsonPropertyName ("include")]
     public string? Include { get; set; }
 
+    /// <summary>
+    /// Вложенные элементы.
+    /// </summary>
+    [JsonIgnore]
+    public PromptItem[]? SubItems { get; set; }
+
     #endregion
 }
