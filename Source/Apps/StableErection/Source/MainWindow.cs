@@ -16,19 +16,15 @@
 #region Using directives
 
 using System;
-using System.Reactive.Linq;
 
-using AM;
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
 
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Data;
 using Avalonia.Layout;
-using Avalonia.ReactiveUI;
 
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 
 #endregion
 
@@ -40,62 +36,8 @@ namespace StableErection;
 /// Главное окно приложения
 /// </summary>
 public sealed class MainWindow
-    : ReactiveWindow<MainWindow.Model>
+    : Window
 {
-    #region View model
-
-    /// <summary>
-    /// Модель данных.
-    /// </summary>
-    public sealed class Model
-        : ReactiveObject
-    {
-        #region Properties
-
-        /// <summary>
-        /// Первое слагаемое.
-        /// </summary>
-        [Reactive]
-        public double FirstTerm { get; set; }
-
-        /// <summary>
-        /// Второе слагаемое.
-        /// </summary>
-        [Reactive]
-        public double SecondTerm { get; set; }
-
-        /// <summary>
-        /// Сумма.
-        /// </summary>
-        [ObservableAsProperty]
-        public double Sum => 0;
-
-        #endregion
-
-        #region Construction
-
-        /// <summary>
-        /// Конструктор.
-        /// </summary>
-        public Model()
-        {
-            this.WhenAnyValue
-                    (
-                        first => first.FirstTerm,
-                        second => second.SecondTerm
-                    )
-                .Select
-                    (
-                        data => data.Item1 + data.Item2
-                    )
-                .ToPropertyEx (this, vm => vm.Sum);
-        }
-
-        #endregion
-    }
-
-    #endregion
-
     #region Window members
 
     /// <summary>
@@ -104,39 +46,78 @@ public sealed class MainWindow
     protected override void OnInitialized()
     {
         base.OnInitialized();
+        this.AttachDevTools();
 
-        Title = "Калькулятор Avalonia";
+        Title = "Книжные богини Avalonia";
         Width = MinWidth = 400;
-        Height = MinHeight = 250;
+        Height = MinHeight = 600;
 
-        DataContext = new Model
-        {
-            FirstTerm = 123.45,
-            SecondTerm = 567.89
-        };
+        var goddess1 = this.LoadBitmapFromAssets ("Assets/goddess1.jpg");
+        var goddess2 = this.LoadBitmapFromAssets ("Assets/goddess2.jpg");
+        var goddess3 = this.LoadBitmapFromAssets ("Assets/goddess3.jpg");
+        var goddess4 = this.LoadBitmapFromAssets ("Assets/goddess4.jpg");
 
-        Content = new StackPanel
+        var carousel = new Carousel
         {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Spacing = 5,
-            Children =
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            // PageTransition = new CompositePageTransition
+            // {
+            //     PageTransitions =
+            //     {
+            //         new PageSlide
+            //         {
+            //             Duration = TimeSpan.FromMilliseconds (1500),
+            //             Orientation = PageSlide.SlideAxis.Horizontal
+            //         }
+            //     }
+            // },
+            Items =
             {
-                CreateTextBox (nameof (Model.FirstTerm)),
-                CreateTextBox (nameof (Model.SecondTerm)),
-                CreateTextBox (nameof (Model.Sum), isReadOnly: true)
+                new Image { Source = goddess1 },
+                new Image { Source = goddess2 },
+                new Image { Source = goddess3 },
+                new Image { Source = goddess4 }
             }
         };
 
-        TextBox CreateTextBox (string propertyName, bool isReadOnly = false) =>
-            new()
+        Content = new DockPanel
+        {
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            Children =
             {
-                Name = propertyName,
-                Width = 200,
-                IsReadOnly = isReadOnly,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                [!TextBox.TextProperty] = new Binding (propertyName)
-            };
+                new Grid
+                {
+                    ColumnDefinitions =
+                    {
+                        new ColumnDefinition (GridLength.Star),
+                        new ColumnDefinition (GridLength.Star)
+                    },
+                    [DockPanel.DockProperty] = Dock.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch,
+                    Children =
+                    {
+                        CreateButton (0, "<<", () => carousel.Previous()),
+                        CreateButton (1, ">>", () => carousel.Next()),
+                    }
+                },
+                carousel
+            }
+        };
+
+        Button CreateButton (int column, string content, Action action) => new()
+        {
+            [Grid.ColumnProperty] = column,
+            [Grid.RowProperty] = 0,
+            HorizontalAlignment = HorizontalAlignment.Stretch,
+            VerticalAlignment = VerticalAlignment.Stretch,
+            HorizontalContentAlignment = HorizontalAlignment.Center,
+            VerticalContentAlignment = VerticalAlignment.Center,
+            Command = ReactiveCommand.Create (action),
+            Content = content
+        };
     }
 
     #endregion
