@@ -31,6 +31,7 @@
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="DynamicData" />
         <PackageReference Include="DynamicData.ReactiveUI" />
+        <PackageReference Include="Faker.Net" />
         <PackageReference Include="GridExtra.Avalonia" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Configuration" />

@@ -7,6 +7,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
+// ReSharper disable PropertyCanBeMadeInitOnly.Global
 // ReSharper disable StringLiteralTypo
 
 /* MainWindow.cs -- главное окно приложения
@@ -18,9 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using AM.Avalonia;
-using AM.Avalonia.AppServices;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -34,10 +32,10 @@ using ReactiveUI;
 
 #nullable enable
 
-namespace StableErection;
+namespace TreeDataGridDemo;
 
 /// <summary>
-/// Главное окно приложения
+/// Главное окно приложения.
 /// </summary>
 public sealed class MainWindow
     : Window
@@ -95,6 +93,12 @@ public sealed class MainWindow
     protected override void OnInitialized()
     {
         base.OnInitialized();
+
+        Title = "Калькулятор Avalonia";
+        Width = MinWidth = 400;
+        Height = MinHeight = 250;
+
+        base.OnInitialized();
         this.AttachDevTools();
 
         Title = "Деревянная таблица Avalonia";
@@ -141,24 +145,6 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             Source = source
         };
-    }
-
-    #endregion
-
-    #region Program entry point
-
-    /// <summary>
-    /// Точка входа в программу.
-    /// </summary>
-    /// <param name="args">Аргументы командной строки</param>
-    [STAThread]
-    public static void Main
-        (
-            string[] args
-        )
-    {
-        DesktopApplication
-            .Run<MainWindow> (args);
     }
 
     #endregion

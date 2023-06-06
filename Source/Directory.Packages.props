@@ -19,7 +19,7 @@
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.0.0-preview1" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
@@ -43,6 +43,7 @@
     <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
+    <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="Google.Protobuf" Version="3.21.12" />
     <PackageVersion Include="Grpc.Tools" Version="2.51.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
