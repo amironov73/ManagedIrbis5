@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <ApplicationIcon>diffusion.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <RootNamespace>AM.StableDiffusion</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Description>Ars Magna Stable Diffusion services</Description>
+        <Title>ArsMagna Stable Diffusion services</Title>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+        <DocumentationFile>bin\Debug\AM.StableDiffusion.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <DocumentationFile>bin\Release\AM.StableDiffusion.xml</DocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+    </ItemGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="SixLabors.ImageSharp" />
+    </ItemGroup>
+
+</Project>
