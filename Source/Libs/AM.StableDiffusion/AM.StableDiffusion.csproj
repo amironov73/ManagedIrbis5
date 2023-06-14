@@ -25,10 +25,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\AM.Web\AM.Web.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="RestSharp" />
         <PackageReference Include="SixLabors.ImageSharp" />
     </ItemGroup>
 
