@@ -16,6 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 using JetBrains.Annotations;
 
@@ -88,7 +91,7 @@ public sealed class CivitClient
     #region Public methods
 
     /// <summary>
-    /// Получение информации о создателях.
+    /// Синхронное получение информации о создателях.
     /// </summary>
     public CreatorsResponse? GetCreators
         (
@@ -97,23 +100,43 @@ public sealed class CivitClient
             string? query = default
         )
     {
-        var request = new RestRequest
-            (
-                "/creators"
-            );
-
-        request.AddNonDefaultQueryParameter (limit)
+        var request = new RestRequest ("/creators")
+            .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query);
 
         var response = _restClient.Execute (request);
+
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<CreatorsResponse> (content)
             : null;
     }
 
     /// <summary>
-    /// Получение информации об изображениях.
+    /// Асинхронное получение информации о создателях.
+    /// </summary>
+    public async Task<CreatorsResponse?> GetCreatorsAsync
+        (
+            int limit = default,
+            int page = default,
+            string? query = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        var request = new RestRequest ("/creators")
+            .AddNonDefaultQueryParameter (limit)
+            .AddNonDefaultQueryParameter (page)
+            .AddNonDefaultQueryParameter (query);
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<CreatorsResponse> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Синхронное получение информации об изображениях.
     /// </summary>
     public ImagesResponse? GetImages
         (
@@ -125,12 +148,8 @@ public sealed class CivitClient
             string? username = default
         )
     {
-        var request = new RestRequest
-            (
-                "/images"
-            );
-
-        request.AddNonDefaultQueryParameter (limit)
+        var request = new RestRequest ("/images")
+            .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (postId)
             .AddNonDefaultQueryParameter (modelId)
@@ -138,13 +157,43 @@ public sealed class CivitClient
             .AddNonDefaultQueryParameter (username);
 
         var response = _restClient.Execute (request);
+
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<ImagesResponse> (content)
             : null;
     }
 
     /// <summary>
-    /// Перечисление всех изображений, соответствующих запросу.
+    /// Асинхронное получение информации об изображениях.
+    /// </summary>
+    public async Task<ImagesResponse?> GetImagesAsync
+        (
+            int limit = default,
+            int page = default,
+            int postId = default,
+            int modelId = default,
+            string? notSafe = default,
+            string? username = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        var request = new RestRequest ("/images")
+            .AddNonDefaultQueryParameter (limit)
+            .AddNonDefaultQueryParameter (page)
+            .AddNonDefaultQueryParameter (postId)
+            .AddNonDefaultQueryParameter (modelId)
+            .AddNonDefaultQueryParameter (notSafe)
+            .AddNonDefaultQueryParameter (username);
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ImagesResponse> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Синхронное перечисление всех изображений, соответствующих запросу.
     /// </summary>
     public IEnumerable<ImageInfo> EnumerateImages
         (
@@ -182,7 +231,64 @@ public sealed class CivitClient
     }
 
     /// <summary>
-    /// Получение модели по ее имени.
+    /// Асинхронное перечисление всех изображений, соответствующих запросу.
+    /// </summary>
+    public async IAsyncEnumerable<ImageInfo> EnumerateImagesAsync
+        (
+            int postId = default,
+            int modelId = default,
+            string? notSafe = default,
+            string? username = default,
+            [EnumeratorCancellation] CancellationToken cancellationToken = default
+        )
+    {
+        const int Limit = 100;
+
+        var response = await GetImagesAsync
+            (
+                Limit,
+                page: 0,
+                postId,
+                modelId,
+                notSafe,
+                username,
+                cancellationToken
+            );
+        var items = response?.Items;
+        var meta = response?.Metadata;
+        if (items is not null && meta is not null)
+        {
+            foreach (var item in items)
+            {
+                yield return item;
+            }
+
+            for (var pageNumber = 2; pageNumber < meta.TotalPages; pageNumber++)
+            {
+                response = await GetImagesAsync
+                    (
+                        Limit,
+                        pageNumber,
+                        postId,
+                        modelId,
+                        notSafe,
+                        username,
+                        cancellationToken
+                    );
+                items = response?.Items;
+                if (items is not null)
+                {
+                    foreach (var item in items)
+                    {
+                        yield return item;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Синхронное получение модели по ее имени.
     /// </summary>
     public ModelInfo? GetModel
         (
@@ -211,7 +317,41 @@ public sealed class CivitClient
     }
 
     /// <summary>
-    /// Получение модели по ее идентификатору.
+    /// Асинхронное получение модели по ее имени.
+    /// </summary>
+    public async Task<ModelInfo?> GetModelAsync
+        (
+            string modelName,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNullNorEmpty (modelName);
+
+        var models = await GetModelsAsync
+            (
+                query: modelName,
+                cancellationToken: cancellationToken
+            );
+        var items = models?.Items;
+        if (items is null || items.Length == 0)
+        {
+            return null;
+        }
+
+        var found = items
+            .FirstOrDefault (it => it.Name.SameString (modelName));
+        if (found is null)
+        {
+            return null;
+        }
+
+        var result = await GetModelAsync (found.Id, cancellationToken);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Синхронное получение модели по ее идентификатору.
     /// </summary>
     public ModelInfo? GetModel
         (
@@ -220,20 +360,39 @@ public sealed class CivitClient
     {
         Sure.Positive (modelId);
 
-        var request = new RestRequest
-            (
-                "/models/{id}"
-            );
-        request.AddUrlSegment ("id", modelId);
+        var request = new RestRequest ("/models/{id}")
+            .AddUrlSegment ("id", modelId);
 
         var response = _restClient.Execute (request);
+
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<ModelInfo> (content)
             : null;
     }
 
     /// <summary>
-    /// Получение модели по ее идентификатору.
+    /// Асинхронное получение модели по ее идентификатору.
+    /// </summary>
+    public async Task<ModelInfo?> GetModelAsync
+        (
+            int modelId,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.Positive (modelId);
+
+        var request = new RestRequest ("/models/{id}")
+            .AddUrlSegment ("id", modelId);
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ModelInfo> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Синхронное получение модели по ее идентификатору.
     /// </summary>
     public ModelVersion? GetModelVersion
         (
@@ -242,19 +401,39 @@ public sealed class CivitClient
     {
         Sure.Positive (versionId);
 
-        var request = new RestRequest
-            (
-                $"/models-versions/:{versionId.ToInvariantString()}"
-            );
+        var request = new RestRequest ($"/models-versions/{versionId}")
+            .AddUrlSegment ("versionId", versionId);
 
         var response = _restClient.Execute (request);
+
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<ModelVersion> (content)
             : null;
     }
 
     /// <summary>
-    /// Получение информации о моделях.
+    /// Асинхронное получение модели по ее идентификатору.
+    /// </summary>
+    public async Task<ModelVersion?> GetModelVersionAsync
+        (
+            int versionId,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.Positive (versionId);
+
+        var request = new RestRequest ($"/models-versions/{versionId}")
+            .AddUrlSegment ("versionId", versionId);
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ModelVersion> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Синхронное получение информации о моделях.
     /// </summary>
     public ModelsResponse? GetModels
         (
@@ -268,12 +447,8 @@ public sealed class CivitClient
             string? notSafe = default
         )
     {
-        var request = new RestRequest
-            (
-                "/models"
-            );
-
-        request.AddNonDefaultQueryParameter (limit)
+        var request = new RestRequest ("/models")
+            .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query)
             .AddNonDefaultQueryParameter (tag)
@@ -296,9 +471,48 @@ public sealed class CivitClient
     }
 
     /// <summary>
-    /// Получение информации о метке.
+    /// Асинхронное получение информации о моделях.
     /// </summary>
-    /// <returns></returns>
+    public async Task<ModelsResponse?> GetModelsAsync
+        (
+            int limit = default,
+            int page = default,
+            string? query = default,
+            string? tag = default,
+            string? username = default,
+            string[]? types = default,
+            int rating = default,
+            string? notSafe = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        var request = new RestRequest ("/models")
+            .AddNonDefaultQueryParameter (limit)
+            .AddNonDefaultQueryParameter (page)
+            .AddNonDefaultQueryParameter (query)
+            .AddNonDefaultQueryParameter (tag)
+            .AddNonDefaultQueryParameter (username)
+            .AddNonDefaultQueryParameter (rating)
+            .AddNonDefaultQueryParameter (notSafe);
+
+        if (types is not null)
+        {
+            foreach (var type in types)
+            {
+                request.AddQueryParameter ("types", type);
+            }
+        }
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ModelsResponse> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Синхронное получение информации о метке.
+    /// </summary>
     public TagsResponse? GetTag
         (
             string query,
@@ -308,16 +522,38 @@ public sealed class CivitClient
     {
         Sure.NotNullNorEmpty (query);
 
-        var request = new RestRequest
-            (
-                "/tags"
-            );
-
-        request.AddQueryParameter ("query", query);
-        request.AddNonDefaultQueryParameter (page)
+        var request = new RestRequest ("/tags")
+            .AddQueryParameter ("query", query)
+            .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (limit);
 
         var response = _restClient.Execute (request);
+
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<TagsResponse> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Асинхронное получение информации о метке.
+    /// </summary>
+    public async Task<TagsResponse?> GetTagAsync
+        (
+            string query,
+            int page = default,
+            int limit = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNullNorEmpty (query);
+
+        var request = new RestRequest ("/tags")
+            .AddQueryParameter ("query", query)
+            .AddNonDefaultQueryParameter (page)
+            .AddNonDefaultQueryParameter (limit);
+
+        var response = await _restClient.ExecuteAsync (request, cancellationToken);
+
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<TagsResponse> (content)
             : null;
@@ -341,6 +577,35 @@ public sealed class CivitClient
 
         var request = new RestRequest (url);
         var data = _restClient.DownloadData (request);
+        if (data is null)
+        {
+            return null;
+        }
+
+        var result = Image.Load (data);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание указанного изображения.
+    /// </summary>
+    public async Task<Image?> DownloadImageAsync
+        (
+            ImageInfo imageInfo,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (imageInfo);
+
+        var url = imageInfo.Url;
+        if (string.IsNullOrEmpty (url))
+        {
+            return null;
+        }
+
+        var request = new RestRequest (url);
+        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
         if (data is null)
         {
             return null;
@@ -393,6 +658,48 @@ public sealed class CivitClient
     }
 
     /// <summary>
+    /// Асинхронное скачивание указанного изображения.
+    /// </summary>
+    public async Task<bool> SaveImageAsync
+        (
+            ImageInfo imageInfo,
+            string? directoryToSave = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (imageInfo);
+
+        directoryToSave ??= Directory.GetCurrentDirectory();
+        Directory.CreateDirectory (directoryToSave);
+        var url = imageInfo.Url;
+        if (string.IsNullOrEmpty (url))
+        {
+            return false;
+        }
+
+        var uri = new Uri (url);
+        var fileName = Path.GetFileName (uri.LocalPath);
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return false;
+        }
+
+        fileName = Path.Combine (directoryToSave, fileName);
+        File.Delete (fileName);
+
+        var request = new RestRequest (url);
+        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
+        if (data is null)
+        {
+            return false;
+        }
+
+        await File.WriteAllBytesAsync (fileName, data, cancellationToken);
+
+        return true;
+    }
+
+    /// <summary>
     /// Синхронное скачивание файла модели.
     /// </summary>
     public bool SaveFile
@@ -428,6 +735,47 @@ public sealed class CivitClient
         }
 
         File.WriteAllBytes (fileName, data);
+
+        return true;
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание файла модели.
+    /// </summary>
+    public async Task<bool> SaveFileAsync
+        (
+            FileInfo fileInfo,
+            string? directoryToSave = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (fileInfo);
+
+        directoryToSave ??= Directory.GetCurrentDirectory();
+        Directory.CreateDirectory (directoryToSave);
+        var url = fileInfo.DownloadUrl;
+        if (string.IsNullOrEmpty (url))
+        {
+            return false;
+        }
+
+        var fileName = fileInfo.Name;
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return false;
+        }
+
+        fileName = Path.Combine (directoryToSave, fileName);
+        File.Delete (fileName);
+
+        var request = new RestRequest (url);
+        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
+        if (data is null)
+        {
+            return false;
+        }
+
+        await File.WriteAllBytesAsync (fileName, data, cancellationToken);
 
         return true;
     }
@@ -493,6 +841,74 @@ public sealed class CivitClient
                 }
 
                 File.WriteAllBytes (fileName, data);
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание указанной модели.
+    /// </summary>
+    public async Task<bool> SaveModelAsync
+        (
+            ModelInfo modelInfo,
+            string? versionName = default,
+            string? directoryToSave = default,
+            bool withImage = false,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (modelInfo);
+
+        var version = modelInfo.GetVersion (versionName);
+        var files = version?.Files;
+        if (files is null || files.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var file in files)
+        {
+            if (!await SaveFileAsync (file, directoryToSave, cancellationToken))
+            {
+                return false;
+            }
+        }
+
+        if (withImage)
+        {
+            directoryToSave ??= Directory.GetCurrentDirectory();
+            Directory.CreateDirectory (directoryToSave);
+            var images = version?.Images;
+            var primaryName =
+                (
+                    files.FirstOrDefault (it => it.Primary)
+                    ?? files.FirstOrDefault()
+                )
+                ?.Name;
+            var imageUrl = images?.FirstOrDefault()?.Url;
+            if (!string.IsNullOrEmpty (primaryName)
+                && !string.IsNullOrEmpty (imageUrl))
+            {
+                var fileName = Path.GetFileNameWithoutExtension (primaryName);
+                var uri = new Uri (imageUrl);
+                var extension = Path.GetExtension (uri.LocalPath);
+                fileName = Path.Combine
+                    (
+                        directoryToSave,
+                        fileName + extension
+                    );
+                File.Delete (fileName);
+
+                var request = new RestRequest (imageUrl);
+                var data = await _restClient.DownloadDataAsync (request, cancellationToken);
+                if (data is null)
+                {
+                    return false;
+                }
+
+                await File.WriteAllBytesAsync (fileName, data, cancellationToken);
             }
         }
 

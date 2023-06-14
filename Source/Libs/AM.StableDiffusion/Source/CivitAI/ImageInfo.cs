@@ -118,7 +118,7 @@ public sealed class ImageInfo
             builder.Append ($" {Width} x {Height}");
         }
 
-        if (!string.IsNullOrEmpty (NotSafe))
+        if (CivitUtility.IsNotSafe (NotSafe))
         {
             builder.Append ($" NSFW ({Level})");
         }
