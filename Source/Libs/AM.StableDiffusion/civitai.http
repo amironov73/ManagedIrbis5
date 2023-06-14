@@ -3,3 +3,15 @@
 #####
 
 https://civitai.com/api/v1/creators?limit=3&query=amironov
+
+#####
+
+https://civitai.com/api/v1/images?limit=3&postId=297562
+
+#####
+
+https://civitai.com/api/v1/models?username=amironov73762
+
+#####
+
+https://civitai.com/api/v1/models?username=amironov73762&types=Checkpoint&types=TextualInversion

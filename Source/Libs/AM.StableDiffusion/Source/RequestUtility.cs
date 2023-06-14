@@ -30,10 +30,10 @@ public static class RequestUtility
     #region Public methods
 
     /// <summary>
-    /// Добавление сегмента в URL при условии, что переданное значение
+    /// Добавление параметра в URL при условии, что переданное значение
     /// не дефолтное.
     /// </summary>
-    public static RestRequest AddNonDefaultUrlSegment<TValue>
+    public static RestRequest AddNonDefaultQueryParameter<TValue>
         (
             this RestRequest request,
             TValue value,
@@ -45,7 +45,7 @@ public static class RequestUtility
 
         if (!Equals (value, default (TValue)))
         {
-            request.AddUrlSegment (name!, value.ToInvariantString());
+            request.AddQueryParameter (name!, value.ToInvariantString());
         }
 
         return request;

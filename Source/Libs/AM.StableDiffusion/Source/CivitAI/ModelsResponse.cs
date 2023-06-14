@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-/* CreatorsResponse.cs -- ответ на запрос о создателях
+/* ModelsResponse.cs -- ответ на запрос о моделях
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,17 +21,17 @@ using Newtonsoft.Json;
 namespace AM.StableDiffusion.CivitAI;
 
 /// <summary>
-/// Ответ на запрос о создателях.
+/// Ответ на запрос о моделях.
 /// </summary>
-public sealed class CreatorsResponse
+public sealed class ModelsResponse
 {
     #region Properties
 
     /// <summary>
-    /// Массив создателей.
+    /// Массив моделей.
     /// </summary>
     [JsonProperty ("items")]
-    public CreatorInfo[]? Items { get; set; }
+    public ModelInfo[]? Items { get; set; }
 
     /// <summary>
     /// Метаданные.

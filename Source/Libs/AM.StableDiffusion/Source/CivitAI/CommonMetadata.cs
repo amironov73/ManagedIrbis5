@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-/* CivitMetadata.cs -- метаданные
+/* CommonMetadata.cs -- общие для всех запросов метаданные
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,10 +23,10 @@ using Newtonsoft.Json;
 namespace AM.StableDiffusion.CivitAI;
 
 /// <summary>
-/// Метаданные.
+/// Общие для всех запросов метаданные.
 /// </summary>
 [PublicAPI]
-public sealed class CivitMetadata
+public sealed class CommonMetadata
 {
     #region Properties
 
@@ -65,6 +65,13 @@ public sealed class CivitMetadata
     /// </summary>
     [JsonProperty ("prevPage")]
     public string? PreviousPage { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => TotalItems.ToInvariantString();
 
     #endregion
 }

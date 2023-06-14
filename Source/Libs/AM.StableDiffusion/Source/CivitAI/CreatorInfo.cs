@@ -55,4 +55,11 @@ public sealed class CreatorInfo
     public string? Image { get; set; }
 
     #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => UserName.ToVisibleString();
+
+    #endregion
 }
