@@ -6,6 +6,7 @@
 #region Using directives
 
 using System;
+using System.Threading;
 
 using AM.StableDiffusion.CivitAI;
 
@@ -30,23 +31,55 @@ internal static class Program
         //     }
         // }
 
-        var images = client.GetImages (postId: 297562);
-        if (images?.Items is { } imagesItems)
-        {
-            foreach (var image in imagesItems)
-            {
-                Console.WriteLine (image);
-                client.SaveImage (image, directoryToSave: "images");
-            }
-        }
+        // var images = client.GetImages (postId: 297562);
+        // if (images?.Items is { } imagesItems)
+        // {
+        //     foreach (var image in imagesItems)
+        //     {
+        //         Console.WriteLine (image);
+        //         client.SaveImage (image, directoryToSave: "images");
+        //     }
+        // }
+        //
+        // var models = client.GetModels (username: "amironov73762");
+        // if (models?.Items is { } modelsItems)
+        // {
+        //     foreach (var model in modelsItems)
+        //     {
+        //         Console.WriteLine (model);
+        //         client.SaveModel (model, withImage: true, directoryToSave: "models");
+        //     }
+        // }
 
-        var models = client.GetModels (username: "amironov73762");
-        if (models?.Items is { } modelsItems)
+        // var tags = client.GetTag ("school");
+        // if (tags?.Items is { } tagsItems)
+        // {
+        //     foreach (var tag in tagsItems)
+        //     {
+        //         Console.WriteLine (tag.Name);
+        //         Console.WriteLine();
+        //         var tagModels = client.GetModels (tag: tag.Name);
+        //         if (tagModels?.Items is { } tagModelItems)
+        //         {
+        //             foreach (var tagModel in tagModelItems)
+        //             {
+        //                 Console.WriteLine (tagModel);
+        //             }
+        //         }
+        //
+        //         Console.WriteLine();
+        //     }
+        // }
+
+        var deliberate = client.GetModel ("deliberate");
+        if (deliberate is not null)
         {
-            foreach (var model in modelsItems)
+            var images = client.EnumerateImages (modelId: deliberate.Id);
+            foreach (var image in images)
             {
-                Console.WriteLine (model);
-                client.SaveModel (model, withImage: true, directoryToSave: "models");
+                Console.WriteLine (image.Id);
+                client.SaveImage (image, "images");
+                Thread.Sleep (50);
             }
         }
     }

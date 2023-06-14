@@ -13,6 +13,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -143,6 +144,116 @@ public sealed class CivitClient
     }
 
     /// <summary>
+    /// Перечисление всех изображений, соответствующих запросу.
+    /// </summary>
+    public IEnumerable<ImageInfo> EnumerateImages
+        (
+            int postId = default,
+            int modelId = default,
+            string? notSafe = default,
+            string? username = default
+        )
+    {
+        const int Limit = 100;
+
+        var response = GetImages (Limit, 0, postId, modelId, notSafe, username);
+        var items = response?.Items;
+        var meta = response?.Metadata;
+        if (items is not null && meta is not null)
+        {
+            foreach (var item in items)
+            {
+                yield return item;
+            }
+
+            for (var pageNumber = 2; pageNumber < meta.TotalPages; pageNumber++)
+            {
+                response = GetImages (Limit, pageNumber, postId, modelId, notSafe, username);
+                items = response?.Items;
+                if (items is not null)
+                {
+                    foreach (var item in items)
+                    {
+                        yield return item;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Получение модели по ее имени.
+    /// </summary>
+    public ModelInfo? GetModel
+        (
+            string modelName
+        )
+    {
+        Sure.NotNullNorEmpty (modelName);
+
+        var models = GetModels (query: modelName);
+        var items = models?.Items;
+        if (items is null || items.Length == 0)
+        {
+            return null;
+        }
+
+        var found = items
+            .FirstOrDefault (it => it.Name.SameString (modelName));
+        if (found is null)
+        {
+            return null;
+        }
+
+        var result = GetModel (found.Id);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Получение модели по ее идентификатору.
+    /// </summary>
+    public ModelInfo? GetModel
+        (
+            int modelId
+        )
+    {
+        Sure.Positive (modelId);
+
+        var request = new RestRequest
+            (
+                "/models/{id}"
+            );
+        request.AddUrlSegment ("id", modelId);
+
+        var response = _restClient.Execute (request);
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ModelInfo> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Получение модели по ее идентификатору.
+    /// </summary>
+    public ModelVersion? GetModelVersion
+        (
+            int versionId
+        )
+    {
+        Sure.Positive (versionId);
+
+        var request = new RestRequest
+            (
+                $"/models-versions/:{versionId.ToInvariantString()}"
+            );
+
+        var response = _restClient.Execute (request);
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<ModelVersion> (content)
+            : null;
+    }
+
+    /// <summary>
     /// Получение информации о моделях.
     /// </summary>
     public ModelsResponse? GetModels
@@ -181,6 +292,34 @@ public sealed class CivitClient
         var response = _restClient.Execute (request);
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<ModelsResponse> (content)
+            : null;
+    }
+
+    /// <summary>
+    /// Получение информации о метке.
+    /// </summary>
+    /// <returns></returns>
+    public TagsResponse? GetTag
+        (
+            string query,
+            int page = default,
+            int limit = default
+        )
+    {
+        Sure.NotNullNorEmpty (query);
+
+        var request = new RestRequest
+            (
+                "/tags"
+            );
+
+        request.AddQueryParameter ("query", query);
+        request.AddNonDefaultQueryParameter (page)
+            .AddNonDefaultQueryParameter (limit);
+
+        var response = _restClient.Execute (request);
+        return response.Content is { } content
+            ? JsonConvert.DeserializeObject<TagsResponse> (content)
             : null;
     }
 
@@ -358,6 +497,43 @@ public sealed class CivitClient
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Массированная загрузка изображений по метке.
+    /// </summary>
+    public bool SaveImagesByTag
+        (
+            string tagName,
+            string? directoryToSave = default
+        )
+    {
+        Sure.NotNull (tagName);
+
+        directoryToSave ??= Directory.GetCurrentDirectory();
+        Directory.CreateDirectory (directoryToSave);
+
+        var result = true;
+        var tags = GetTag (tagName);
+        var tagItems = tags?.Items;
+        if (tagItems is null || tagItems.Length == 0)
+        {
+            return false;
+        }
+
+        foreach (var tagItem in tagItems)
+        {
+            var tagModels = GetModels (tag: tagItem.Name);
+            if (tagModels?.Items is { } tagModelItems)
+            {
+                foreach (var tagModel in tagModelItems)
+                {
+                    Console.WriteLine (tagModel);
+                }
+            }
+        }
+
+        return result;
     }
 
     #endregion

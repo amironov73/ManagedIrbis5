@@ -73,6 +73,12 @@ public sealed class ModelVersion
     public string? BaseModel { get; set; }
 
     /// <summary>
+    /// Модель.
+    /// </summary>
+    [JsonProperty ("model")]
+    public ModelInfo? Model { get; set; }
+
+    /// <summary>
     /// Статистика по версии.
     /// </summary>
     [JsonProperty ("stats")]

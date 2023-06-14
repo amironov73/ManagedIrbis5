@@ -38,7 +38,7 @@ public sealed class ImageMeta
     /// Сид.
     /// </summary>
     [JsonProperty ("seed")]
-    public ulong Seed { get; set; }
+    public long Seed { get; set; }
 
     /// <summary>
     /// Модель.
