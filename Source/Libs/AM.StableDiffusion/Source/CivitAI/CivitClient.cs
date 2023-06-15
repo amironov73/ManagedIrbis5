@@ -20,6 +20,8 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AM.Net;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
@@ -76,7 +78,13 @@ public sealed class CivitClient
         Sure.NotNullNorEmpty (baseUrl);
 
         _apiKey = apiKey;
-        _restClient = new RestClient (baseUrl);
+        _httpClient = new HttpClientWithProgress();
+
+        var options = new RestClientOptions
+        {
+            BaseUrl = new Uri (baseUrl)
+        };
+        _restClient = new RestClient (_httpClient, options);
     }
 
     #endregion
@@ -84,6 +92,7 @@ public sealed class CivitClient
     #region Private members
 
     private readonly string? _apiKey;
+    private readonly HttpClientWithProgress _httpClient;
     private readonly RestClient _restClient;
 
     #endregion
@@ -200,7 +209,8 @@ public sealed class CivitClient
             int postId = default,
             int modelId = default,
             string? notSafe = default,
-            string? username = default
+            string? username = default,
+            IProgress<ProgressInfo<int>>? progress = default
         )
     {
         const int Limit = 100;
@@ -210,9 +220,19 @@ public sealed class CivitClient
         var meta = response?.Metadata;
         if (items is not null && meta is not null)
         {
+            var count = 0;
+            var progressInfo = new ProgressInfo<int>
+            {
+                StartedAt = DateTime.Now,
+                Total = meta.TotalItems
+            };
+
             foreach (var item in items)
             {
                 yield return item;
+                progressInfo.Done = ++count;
+                progressInfo.ExtraInfo = item;
+                progress?.Report (progressInfo);
             }
 
             for (var pageNumber = 2; pageNumber < meta.TotalPages; pageNumber++)
@@ -224,6 +244,9 @@ public sealed class CivitClient
                     foreach (var item in items)
                     {
                         yield return item;
+                        progressInfo.Done = ++count;
+                        progressInfo.ExtraInfo = item;
+                        progress?.Report (progressInfo);
                     }
                 }
             }
@@ -564,35 +587,8 @@ public sealed class CivitClient
     /// </summary>
     public Image? DownloadImage
         (
-            ImageInfo imageInfo
-        )
-    {
-        Sure.NotNull (imageInfo);
-
-        var url = imageInfo.Url;
-        if (string.IsNullOrEmpty (url))
-        {
-            return null;
-        }
-
-        var request = new RestRequest (url);
-        var data = _restClient.DownloadData (request);
-        if (data is null)
-        {
-            return null;
-        }
-
-        var result = Image.Load (data);
-
-        return result;
-    }
-
-    /// <summary>
-    /// Асинхронное скачивание указанного изображения.
-    /// </summary>
-    public async Task<Image?> DownloadImageAsync
-        (
             ImageInfo imageInfo,
+            IDownloadProgress? progress = default,
             CancellationToken cancellationToken = default
         )
     {
@@ -604,14 +600,50 @@ public sealed class CivitClient
             return null;
         }
 
-        var request = new RestRequest (url);
-        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
-        if (data is null)
+        var memory = new MemoryStream();
+        var headers = _httpClient.Download
+            (
+                new Uri (url),
+                memory,
+                progress,
+                cancellationToken
+            );
+        var result = headers is null
+            ? null
+            : Image.Load (memory);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание указанного изображения.
+    /// </summary>
+    public async Task<Image?> DownloadImageAsync
+        (
+            ImageInfo imageInfo,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (imageInfo);
+
+        var url = imageInfo.Url;
+        if (string.IsNullOrEmpty (url))
         {
             return null;
         }
 
-        var result = Image.Load (data);
+        var memory = new MemoryStream();
+        var headers = await _httpClient.DownloadAsync
+            (
+                new Uri (url),
+                memory,
+                progress,
+                cancellationToken
+            );
+        var result = headers is null
+            ? null
+            : await Image.LoadAsync (memory, cancellationToken);
 
         return result;
     }
@@ -622,7 +654,9 @@ public sealed class CivitClient
     public bool SaveImage
         (
             ImageInfo imageInfo,
-            string? directoryToSave = default
+            string? directoryToSave = default,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
         )
     {
         Sure.NotNull (imageInfo);
@@ -644,15 +678,7 @@ public sealed class CivitClient
 
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
-
-        var request = new RestRequest (url);
-        var data = _restClient.DownloadData (request);
-        if (data is null)
-        {
-            return false;
-        }
-
-        File.WriteAllBytes (fileName, data);
+        SaveFile (uri, fileName, progress, cancellationToken);
 
         return true;
     }
@@ -664,6 +690,7 @@ public sealed class CivitClient
         (
             ImageInfo imageInfo,
             string? directoryToSave = default,
+            IDownloadProgress? progress = default,
             CancellationToken cancellationToken = default
         )
     {
@@ -686,15 +713,7 @@ public sealed class CivitClient
 
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
-
-        var request = new RestRequest (url);
-        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
-        if (data is null)
-        {
-            return false;
-        }
-
-        await File.WriteAllBytesAsync (fileName, data, cancellationToken);
+        await SaveFileAsync (uri, fileName, progress, cancellationToken);
 
         return true;
     }
@@ -705,7 +724,9 @@ public sealed class CivitClient
     public bool SaveFile
         (
             FileInfo fileInfo,
-            string? directoryToSave = default
+            string? directoryToSave = default,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
         )
     {
         Sure.NotNull (fileInfo);
@@ -726,17 +747,55 @@ public sealed class CivitClient
 
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
-
-        var request = new RestRequest (url);
-        var data = _restClient.DownloadData (request);
-        if (data is null)
-        {
-            return false;
-        }
-
-        File.WriteAllBytes (fileName, data);
+        SaveFile (new Uri (url), fileName, progress, cancellationToken);
 
         return true;
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание файла.
+    /// </summary>
+    public void SaveFile
+        (
+            Uri requestUri,
+            string fileName,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (requestUri);
+        Sure.NotNullNorEmpty (fileName);
+
+        _httpClient.DownloadFile
+            (
+                requestUri,
+                fileName,
+                progress,
+                cancellationToken
+            );
+    }
+
+    /// <summary>
+    /// Асинхронное скачивание файла.
+    /// </summary>
+    public async Task SaveFileAsync
+        (
+            Uri requestUri,
+            string fileName,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
+        )
+    {
+        Sure.NotNull (requestUri);
+        Sure.NotNullNorEmpty (fileName);
+
+        await _httpClient.DownloadFileAsync
+            (
+                requestUri,
+                fileName,
+                progress,
+                cancellationToken
+            );
     }
 
     /// <summary>
@@ -746,6 +805,7 @@ public sealed class CivitClient
         (
             FileInfo fileInfo,
             string? directoryToSave = default,
+            IDownloadProgress? progress = default,
             CancellationToken cancellationToken = default
         )
     {
@@ -768,14 +828,7 @@ public sealed class CivitClient
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
 
-        var request = new RestRequest (url);
-        var data = await _restClient.DownloadDataAsync (request, cancellationToken);
-        if (data is null)
-        {
-            return false;
-        }
-
-        await File.WriteAllBytesAsync (fileName, data, cancellationToken);
+        await SaveFileAsync (new Uri (url), fileName, progress, cancellationToken);
 
         return true;
     }
@@ -788,73 +841,7 @@ public sealed class CivitClient
             ModelInfo modelInfo,
             string? versionName = default,
             string? directoryToSave = default,
-            bool withImage = false
-        )
-    {
-        Sure.NotNull (modelInfo);
-
-        var version = modelInfo.GetVersion (versionName);
-        var files = version?.Files;
-        if (files is null || files.Length == 0)
-        {
-            return false;
-        }
-
-        foreach (var file in files)
-        {
-            if (!SaveFile (file, directoryToSave))
-            {
-                return false;
-            }
-        }
-
-        if (withImage)
-        {
-            directoryToSave ??= Directory.GetCurrentDirectory();
-            Directory.CreateDirectory (directoryToSave);
-            var images = version?.Images;
-            var primaryName =
-                (
-                    files.FirstOrDefault (it => it.Primary)
-                    ?? files.FirstOrDefault()
-                )
-                ?.Name;
-            var imageUrl = images?.FirstOrDefault()?.Url;
-            if (!string.IsNullOrEmpty (primaryName)
-                && !string.IsNullOrEmpty (imageUrl))
-            {
-                var fileName = Path.GetFileNameWithoutExtension (primaryName);
-                var uri = new Uri (imageUrl);
-                var extension = Path.GetExtension (uri.LocalPath);
-                fileName = Path.Combine
-                    (
-                        directoryToSave,
-                        fileName + extension
-                    );
-                File.Delete (fileName);
-
-                var request = new RestRequest (imageUrl);
-                var data = _restClient.DownloadData (request);
-                if (data is null)
-                {
-                    return false;
-                }
-
-                File.WriteAllBytes (fileName, data);
-            }
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Асинхронное скачивание указанной модели.
-    /// </summary>
-    public async Task<bool> SaveModelAsync
-        (
-            ModelInfo modelInfo,
-            string? versionName = default,
-            string? directoryToSave = default,
+            IDownloadProgress? progress = default,
             bool withImage = false,
             CancellationToken cancellationToken = default
         )
@@ -870,7 +857,7 @@ public sealed class CivitClient
 
         foreach (var file in files)
         {
-            if (!await SaveFileAsync (file, directoryToSave, cancellationToken))
+            if (!SaveFile (file, directoryToSave, progress, cancellationToken))
             {
                 return false;
             }
@@ -900,15 +887,7 @@ public sealed class CivitClient
                         fileName + extension
                     );
                 File.Delete (fileName);
-
-                var request = new RestRequest (imageUrl);
-                var data = await _restClient.DownloadDataAsync (request, cancellationToken);
-                if (data is null)
-                {
-                    return false;
-                }
-
-                await File.WriteAllBytesAsync (fileName, data, cancellationToken);
+                SaveFile (uri, fileName, progress, cancellationToken);
             }
         }
 
@@ -916,40 +895,70 @@ public sealed class CivitClient
     }
 
     /// <summary>
-    /// Массированная загрузка изображений по метке.
+    /// Асинхронное скачивание указанной модели.
     /// </summary>
-    public bool SaveImagesByTag
+    public async Task<bool> SaveModelAsync
         (
-            string tagName,
-            string? directoryToSave = default
+            ModelInfo modelInfo,
+            string? versionName = default,
+            string? directoryToSave = default,
+            bool withImage = false,
+            IDownloadProgress? progress = default,
+            CancellationToken cancellationToken = default
         )
     {
-        Sure.NotNull (tagName);
+        Sure.NotNull (modelInfo);
 
-        directoryToSave ??= Directory.GetCurrentDirectory();
-        Directory.CreateDirectory (directoryToSave);
-
-        var result = true;
-        var tags = GetTag (tagName);
-        var tagItems = tags?.Items;
-        if (tagItems is null || tagItems.Length == 0)
+        var version = modelInfo.GetVersion (versionName);
+        var files = version?.Files;
+        if (files is null || files.Length == 0)
         {
             return false;
         }
 
-        foreach (var tagItem in tagItems)
+        foreach (var file in files)
         {
-            var tagModels = GetModels (tag: tagItem.Name);
-            if (tagModels?.Items is { } tagModelItems)
+            if (!await SaveFileAsync (file, directoryToSave, progress, cancellationToken))
             {
-                foreach (var tagModel in tagModelItems)
-                {
-                    Console.WriteLine (tagModel);
-                }
+                return false;
             }
         }
 
-        return result;
+        if (withImage)
+        {
+            directoryToSave ??= Directory.GetCurrentDirectory();
+            Directory.CreateDirectory (directoryToSave);
+            var images = version?.Images;
+            var primaryName =
+                (
+                    files.FirstOrDefault (it => it.Primary)
+                    ?? files.FirstOrDefault()
+                )
+                ?.Name;
+            var imageUrl = images?.FirstOrDefault()?.Url;
+            if (!string.IsNullOrEmpty (primaryName)
+                && !string.IsNullOrEmpty (imageUrl))
+            {
+                var fileName = Path.GetFileNameWithoutExtension (primaryName);
+                var uri = new Uri (imageUrl);
+                var extension = Path.GetExtension (uri.LocalPath);
+                fileName = Path.Combine
+                    (
+                        directoryToSave,
+                        fileName + extension
+                    );
+                File.Delete (fileName);
+                await SaveFileAsync
+                    (
+                        new Uri (imageUrl),
+                        fileName,
+                        progress,
+                        cancellationToken
+                    );
+            }
+        }
+
+        return true;
     }
 
     #endregion

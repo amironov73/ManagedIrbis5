@@ -30,6 +30,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="RestSharp" />
         <PackageReference Include="SixLabors.ImageSharp" />
     </ItemGroup>
