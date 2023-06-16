@@ -18,7 +18,10 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 
@@ -34,6 +37,31 @@ namespace AM.Net;
 public static class NetUtility
 {
     #region Public methods
+
+    /// <summary>
+    /// Извлечение имени файла из заголовка <c>Content-Disposition</c>,
+    /// если оно там есть.
+    /// </summary>
+    public static string? GetFileNameFromContentDisposition
+        (
+            HttpHeaders headers
+        )
+    {
+        Sure.NotNull (headers);
+
+        var headerText = headers
+            .GetValues ("Content-Disposition")
+            .FirstOrDefault();
+        if (string.IsNullOrEmpty (headerText))
+        {
+            return null;
+        }
+
+        var disposition = new ContentDisposition (headerText);
+        var result = disposition.FileName;
+
+        return result;
+    }
 
     /// <summary>
     /// Получение массива локальных адресов хоста.

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -651,7 +652,7 @@ public sealed class CivitClient
     /// <summary>
     /// Синхронное скачивание указанного изображения.
     /// </summary>
-    public bool SaveImage
+    public HttpHeaders? SaveImage
         (
             ImageInfo imageInfo,
             string? directoryToSave = default,
@@ -666,21 +667,20 @@ public sealed class CivitClient
         var url = imageInfo.Url;
         if (string.IsNullOrEmpty (url))
         {
-            return false;
+            return null;
         }
 
         var uri = new Uri (url);
         var fileName = Path.GetFileName (uri.LocalPath);
         if (string.IsNullOrEmpty (fileName))
         {
-            return false;
+            return null;
         }
 
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
-        SaveFile (uri, fileName, progress, cancellationToken);
 
-        return true;
+        return SaveFile (uri, fileName, progress, cancellationToken);
     }
 
     /// <summary>
@@ -721,7 +721,7 @@ public sealed class CivitClient
     /// <summary>
     /// Синхронное скачивание файла модели.
     /// </summary>
-    public bool SaveFile
+    public HttpHeaders? SaveFile
         (
             FileInfo fileInfo,
             string? directoryToSave = default,
@@ -736,26 +736,25 @@ public sealed class CivitClient
         var url = fileInfo.DownloadUrl;
         if (string.IsNullOrEmpty (url))
         {
-            return false;
+            return null;
         }
 
         var fileName = fileInfo.Name;
         if (string.IsNullOrEmpty (fileName))
         {
-            return false;
+            return null;
         }
 
         fileName = Path.Combine (directoryToSave, fileName);
         File.Delete (fileName);
-        SaveFile (new Uri (url), fileName, progress, cancellationToken);
 
-        return true;
+        return SaveFile (new Uri (url), fileName, progress, cancellationToken);
     }
 
     /// <summary>
     /// Асинхронное скачивание файла.
     /// </summary>
-    public void SaveFile
+    public HttpHeaders? SaveFile
         (
             Uri requestUri,
             string fileName,
@@ -766,7 +765,7 @@ public sealed class CivitClient
         Sure.NotNull (requestUri);
         Sure.NotNullNorEmpty (fileName);
 
-        _httpClient.DownloadFile
+        return _httpClient.DownloadFile
             (
                 requestUri,
                 fileName,
@@ -857,7 +856,7 @@ public sealed class CivitClient
 
         foreach (var file in files)
         {
-            if (!SaveFile (file, directoryToSave, progress, cancellationToken))
+            if (SaveFile (file, directoryToSave, progress, cancellationToken) is null)
             {
                 return false;
             }

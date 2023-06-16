@@ -220,7 +220,7 @@ public class HttpClientWithProgress
     /// <summary>
     /// Асинхронная загрузка файла.
     /// </summary>
-    public void DownloadFile
+    public HttpHeaders? DownloadFile
         (
             Uri requestUri,
             string fileName,
@@ -233,7 +233,7 @@ public class HttpClientWithProgress
         Sure.NotNullNorEmpty (fileName);
 
         using var destination = File.Create (fileName);
-        Download
+        return Download
             (
                 requestUri,
                 destination,
