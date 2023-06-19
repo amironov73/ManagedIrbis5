@@ -30,4 +30,4 @@ https://civitai.com/api/v1/tags?query=school
 
 ####
 
-https://civitai.com/api/v1/models?tag=school
+https://civitai.com/api/v1/models?tag=school&limit=3&page=1

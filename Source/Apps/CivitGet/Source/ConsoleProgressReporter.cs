@@ -29,6 +29,8 @@ internal sealed class ConsoleProgressReporter
     : IDownloadProgress,
     IProgress<ProgressInfo<int>>
 {
+    #region Public methods
+
     public void OnDownloadBegin
         (
             DownloadStat stat
@@ -69,4 +71,6 @@ internal sealed class ConsoleProgressReporter
     {
         Console.WriteLine ($"\rDone {value.Done} of {value.Total}");
     }
+
+    #endregion
 }

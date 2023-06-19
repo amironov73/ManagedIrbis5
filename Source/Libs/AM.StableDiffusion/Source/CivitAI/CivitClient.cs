@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -216,7 +217,7 @@ public sealed class CivitClient
     {
         const int Limit = 100;
 
-        var response = GetImages (Limit, 0, postId, modelId, notSafe, username);
+        var response = GetImages (Limit, page: 1, postId, modelId, notSafe, username);
         var items = response?.Items;
         var meta = response?.Metadata;
         if (items is not null && meta is not null)
@@ -254,6 +255,68 @@ public sealed class CivitClient
         }
     }
 
+    private ModelsResponse? GetModelsForTag
+        (
+            string tag,
+            int limit,
+            int pageNumber
+        )
+    {
+        var request = new RestRequest ("/models")
+            .AddQueryParameter ("tag", tag)
+            .AddQueryParameter ("limit", limit)
+            .AddQueryParameter ("page", pageNumber);
+        var response = _restClient.Execute (request);
+        return string.IsNullOrEmpty (response.Content)
+            ? null
+            : JsonConvert.DeserializeObject<ModelsResponse> (response.Content);
+    }
+
+    /// <summary>
+    /// Синхронное перечисление всех изображений для указанной метки.
+    /// </summary>
+    public IEnumerable<ImageInfo> EnumerateImagesForTag
+        (
+            string tag,
+            IProgress<ProgressInfo<int>>? progress = default
+        )
+    {
+        const int Limit = 20;
+
+        Sure.NotNullNorEmpty (tag);
+
+        var response = GetModelsForTag (tag, Limit, pageNumber: 1);
+        if (response is { Items: {} items1, Metadata: {} meta })
+        {
+            var progressInfo = new ProgressInfo<int>
+            {
+                StartedAt = DateTime.Now,
+                Total = meta.TotalItems
+            };
+            var modelList = new List<ModelInfo>();
+            modelList.AddRange (items1);
+            for (var pageNumber = 2; pageNumber < meta.TotalPages; pageNumber++)
+            {
+                response = GetModelsForTag (tag, Limit, pageNumber);
+                if (response is { Items: {} items2 })
+                {
+                    modelList.AddRange (items2);
+                }
+
+                ++progressInfo.Done;
+                progress?.Report (progressInfo);
+            }
+
+            foreach (var model in modelList)
+            {
+                foreach (var image in EnumerateImages (modelId: model.Id, progress: progress))
+                {
+                    yield return image;
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Асинхронное перечисление всех изображений, соответствующих запросу.
     /// </summary>
@@ -271,7 +334,7 @@ public sealed class CivitClient
         var response = await GetImagesAsync
             (
                 Limit,
-                page: 0,
+                page: 1,
                 postId,
                 modelId,
                 notSafe,
@@ -305,6 +368,47 @@ public sealed class CivitClient
                     foreach (var item in items)
                     {
                         yield return item;
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Синхронное перечисление всех изображений для указанной метки.
+    /// </summary>
+    public async IAsyncEnumerable<ImageInfo> EnumerateImagesForTagAsync
+        (
+            string tag,
+            IProgress<ProgressInfo<int>>? progress = default,
+            [EnumeratorCancellation]
+            CancellationToken cancellationToken = default
+        )
+    {
+        var url = $"{BaseUrl}models?tag={tag}";
+        var request = new RestRequest (url);
+        var rawResponse = await _restClient.ExecuteAsync (request, cancellationToken);
+        if (!string.IsNullOrEmpty (rawResponse.Content))
+        {
+            var response = JsonConvert.DeserializeObject<ModelsResponse> (rawResponse.Content);
+            var items = response?.Items;
+            var meta = response?.Metadata;
+            if (items is not null && meta is not null)
+            {
+                var count = 0;
+                var progressInfo = new ProgressInfo<int>
+                {
+                    StartedAt = DateTime.Now
+                };
+                foreach (var model in items)
+                {
+                    await foreach (var image in EnumerateImagesAsync (modelId: model.Id,
+                                       cancellationToken: cancellationToken))
+                    {
+                        yield return image;
+                        progressInfo.Done = ++count;
+                        progressInfo.ExtraInfo = image;
+                        progress?.Report (progressInfo);
                     }
                 }
             }
@@ -668,6 +772,23 @@ public sealed class CivitClient
         if (string.IsNullOrEmpty (url))
         {
             return null;
+        }
+
+        if (imageInfo.Width is not 0)
+        {
+            // возможно, есть версия бОльшего размера
+            var regex = new Regex ("/width=(\\d+)/");
+            var match = regex.Match (url);
+            if (match.Success
+                && int.TryParse (match.Groups[1].Value, out var proposedWitdth)
+                && proposedWitdth < imageInfo.Width)
+            {
+                url = regex.Replace
+                    (
+                        url,
+                        $"/width={imageInfo.Width}/"
+                    );
+            }
         }
 
         var uri = new Uri (url);

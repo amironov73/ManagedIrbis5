@@ -37,6 +37,16 @@ public sealed class ProgressInfo<TValue>
     public DateTime StartedAt { get; set; }
 
     /// <summary>
+    /// Вызвано первый раз?
+    /// </summary>
+    public bool FirstTime { get; set; }
+
+    /// <summary>
+    /// Заголовок задачи.
+    /// </summary>
+    public string? Title { get; set; }
+
+    /// <summary>
     /// Общее количество элементов, подлежащих обработке
     /// (или байт, подлежащих скачиванию).
     /// </summary>

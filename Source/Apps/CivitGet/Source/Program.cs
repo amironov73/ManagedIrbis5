@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+using AM;
 using AM.Net;
 using AM.StableDiffusion.CivitAI;
 
@@ -55,6 +56,10 @@ internal class Program
 
                 case "post":
                     downloader.DownloadImages (postId: int.Parse (args[++i]));
+                    break;
+
+                case "tag":
+                    downloader.DownloadImagesForTag (args[++i]);
                     break;
 
                 case "user":

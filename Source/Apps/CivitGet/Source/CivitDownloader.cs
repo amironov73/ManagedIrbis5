@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* CivitDownloader.cs -- загрузчик картинок с CivitAI
@@ -136,6 +136,34 @@ public sealed class CivitDownloader
         {
             Console.WriteLine (image.Id);
             _client.SaveImage (image, DestinationDirectory, _progressReporter);
+            Thread.Sleep (_delay);
+        }
+    }
+
+    /// <summary>
+    /// Загрузка указанных изображений для указанной метки.
+    /// </summary>
+    public void DownloadImagesForTag
+        (
+            string tag
+        )
+    {
+        var images = _client.EnumerateImagesForTag (tag, _progressReporter)
+            .ToList();
+        Console.WriteLine ($"Total images: {images.Count}");
+        var progressInfo = new ProgressInfo<int>
+        {
+            StartedAt = DateTime.Now,
+            Total = images.Count
+        };
+
+        foreach (var image in images)
+        {
+            Console.WriteLine (image.Id);
+            _client.SaveImage (image, DestinationDirectory, _progressReporter);
+            ++progressInfo.Done;
+            progressInfo.ExtraInfo = image;
+            _progressReporter.Report (progressInfo);
             Thread.Sleep (_delay);
         }
 
