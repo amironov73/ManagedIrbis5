@@ -9,15 +9,15 @@
     <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
     <AvaloniaPrevious>11.0.0-preview8</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
-    <NugetVersion>6.5.0</NugetVersion>
+    <NugetVersion>6.6.1</NugetVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
-    <PackageVersion Include="Autofac" Version="6.5.0" />
+    <PackageVersion Include="Autofac" Version="7.0.1" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.0.0-preview1" />
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
@@ -26,7 +26,7 @@
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
@@ -51,7 +51,7 @@
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
-    <PackageVersion Include="MailKit" Version="3.6.0" />
+    <PackageVersion Include="MailKit" Version="4.1.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview3.145-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="2.3.1-prev6" />
@@ -82,7 +82,7 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.3" />
     <PackageVersion Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
-    <PackageVersion Include="MimeKit" Version="3.6.0" />
+    <PackageVersion Include="MimeKit" Version="4.1.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.0.2" />
