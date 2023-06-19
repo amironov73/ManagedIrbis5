@@ -8,6 +8,7 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <Nullable>enable</Nullable>
+        <TargetFramework>net8.0</TargetFramework>
         <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
         <TrimMode>copyused</TrimMode>
         <LangVersion>latest</LangVersion>
@@ -31,13 +32,14 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
+        <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.0-preview1" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
@@ -49,6 +51,7 @@
         <PackageReference Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="DynamicData" Version="7.12.1"/>
         <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
+        <PackageReference Include="Faker.Net" Version="2.0.154" />
         <PackageReference Include="GridExtra.Avalonia" Version="0.9.1"/>
         <PackageReference Include="mameolan.Avalonia.Controlz" Version="1.0.0-CI-20220410-063959" />
         <PackageReference Include="mameolan.Avalonia.ExtendedToolkit" Version="1.0.0-CI-20220410-063959" />

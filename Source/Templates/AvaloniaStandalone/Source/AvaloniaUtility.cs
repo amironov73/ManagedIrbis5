@@ -32,6 +32,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
@@ -108,7 +109,7 @@ public static class AvaloniaUtility
 
         try
         {
-            return new ResourceInclude { Source = uri };
+            return new ResourceInclude (uri) { Source = uri };
         }
         catch (Exception exception)
         {
@@ -571,7 +572,7 @@ public static class AvaloniaUtility
 
         while (controlType.IsAssignableTo (typeof (Control)))
         {
-            if (Application.Current!.Styles.TryGetResource (controlType, out var result))
+            if (Application.Current!.Styles.TryGetResource (controlType, null, out var result))
             {
                 return result as ControlTheme;
             }
@@ -605,9 +606,9 @@ public static class AvaloniaUtility
     /// Поиск родительского контрола с контекстом данных
     /// указанного типа.
     /// </summary>
-    public static IControl? GetParentWithDataContext<TDataContext>
+    public static Control? GetParentWithDataContext<TDataContext>
         (
-            this IControl control
+            this Control control
         )
         where TDataContext : class
     {
@@ -618,7 +619,7 @@ public static class AvaloniaUtility
         {
             if (parent.DataContext is TDataContext)
             {
-                return parent;
+                return (Control) parent;
             }
 
             parent = parent.Parent;
@@ -632,9 +633,9 @@ public static class AvaloniaUtility
     /// </summary>
     public static TParent? GetParentOfType<TParent>
         (
-            this IControl control
+            this Control control
         )
-        where TParent : class, IControl
+        where TParent : Control
     {
         Sure.NotNull (control);
 
@@ -657,7 +658,7 @@ public static class AvaloniaUtility
     /// </summary>
     public static Window GetWindow
         (
-            this IControl control
+            this Control control
         )
     {
         Sure.NotNull (control);
