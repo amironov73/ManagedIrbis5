@@ -1,0 +1,22 @@
+﻿//
+// Книги учебного фонда в ОРФ: построение списка
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+allBooks = batch_format ("@brief", "MHR=ОРФ * NS=$")
+
+foreach (book in allBooks)
+    println (book)
+
+//=================================
+
+disconnect()
+println ("=============================")
