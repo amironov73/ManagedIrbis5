@@ -12,7 +12,6 @@
 #region Using directives
 
 using System;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 using AM;
@@ -150,7 +149,7 @@ public sealed class MainWindow
                 new ListBox
                 {
                     Margin = new Thickness (5),
-                    ItemsPanel = new FuncTemplate<Panel>
+                    ItemsPanel = new FuncTemplate<Panel?>
                         (
                             () => new WrapPanel { Orientation = Orientation.Horizontal }
                         ),

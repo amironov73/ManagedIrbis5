@@ -24,8 +24,6 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-using AM.Text.Output;
-
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -983,52 +981,6 @@ public static class AvaloniaUtility
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Print system information in abstract output.
-    /// </summary>
-    public static void PrintSystemInformation
-        (
-            this AbstractOutput? output
-        )
-    {
-        if (output is not null)
-        {
-            output.WriteLine
-                (
-                    "OS version: {0}",
-                    Environment.OSVersion
-                );
-            output.WriteLine
-                (
-                    "Framework version: {0}",
-                    Environment.Version
-                );
-            var assembly = Assembly.GetEntryAssembly();
-            var vi = assembly?.GetName().Version;
-            if (assembly?.Location is null)
-            {
-                // TODO: в single-exe-application .Location возвращает string.Empty
-                // consider using the AppContext.BaseDirectory
-                return;
-            }
-
-            // TODO: в single-exe-application .Location возвращает string.Empty
-            // consider using the AppContext.BaseDirectory
-            var fi = new FileInfo (assembly.Location);
-            output.WriteLine
-                (
-                    "Application version: {0} ({1})",
-                    vi.ToVisibleString(),
-                    fi.LastWriteTime.ToShortDateString()
-                );
-            output.WriteLine
-                (
-                    "Memory: {0} Mb",
-                    GC.GetTotalMemory (false) / 1024
-                );
-        }
     }
 
     /// <summary>
