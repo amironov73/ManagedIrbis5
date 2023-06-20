@@ -73,7 +73,7 @@ public sealed class MainWindow
             {
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness (0, 1, 0, 0),
-                Padding = new Thickness (5),                
+                Padding = new Thickness (5),
                 Background = Brushes.AliceBlue,
                 Child = new StackPanel
                 {
@@ -155,7 +155,7 @@ public sealed class MainWindow
                             () => new WrapPanel { Orientation = Orientation.Horizontal }
                         ),
                     ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) => new ModelControl()),
-                    [!ItemsRepeater.ItemsProperty] = new Binding (nameof (ViewModel.Models))
+                    [!ItemsRepeater.ItemsSourceProperty] = new Binding (nameof (ViewModel.Models))
                 },
             }
         };

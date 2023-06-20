@@ -284,8 +284,8 @@ public static class AvaloniaUtility
         )
     {
         var baseMode = light ? BaseThemeMode.Light : BaseThemeMode.Dark;
-        var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
-        var result = new MaterialTheme (uri)
+        // var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
+        var result = new MaterialTheme (Magna.Host.Services)
         {
             BaseTheme = baseMode,
             PrimaryColor = PrimaryColor.Blue,

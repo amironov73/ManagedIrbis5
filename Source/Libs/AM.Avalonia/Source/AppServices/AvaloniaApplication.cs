@@ -296,8 +296,8 @@ public class AvaloniaApplication
     {
         if (DesktopApplication._useMaterialTheme)
         {
-            var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
-            var theme = new MaterialTheme (uri)
+            // var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
+            var theme = new MaterialTheme (Magna.Host.Services)
             {
                 BaseTheme = BaseThemeMode.Light,
                 PrimaryColor = PrimaryColor.Blue,

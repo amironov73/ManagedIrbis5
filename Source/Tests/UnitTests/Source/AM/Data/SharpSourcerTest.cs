@@ -164,7 +164,7 @@ public sealed class SharpSourcerTest
     public void SharpSourcer_GenerateDatabase_1()
     {
         var db = _Kladovka();
-        var expected = "namespace AM.Data.Generated\n{\n    using System;\n\n    public sealed class Books\n    {\n        public int Id { get; set; }\n\n        public string Catalog { get; set; }\n\n        public string Number { get; set; }\n\n        public string Card { get; set; }\n\n        public DateTime Moment { get; set; }\n\n        public DateTime Deadline { get; set; }\n\n        public int Prolong { get; set; }\n\n        public bool Pilot { get; set; }\n\n        public decimal Price { get; set; }\n    }\n\n    public sealed class Readers\n    {\n        public string Ticket { get; set; }\n\n        public string Name { get; set; }\n\n        public string Category { get; set; }\n    }\n}\n";
+        var expected = "namespace AM.Data.Generated\n{\n    using System;\n\n    public sealed class Books\n    {\n        public int Id { get; set; }\n        public string Catalog { get; set; }\n        public string Number { get; set; }\n        public string Card { get; set; }\n        public DateTime Moment { get; set; }\n        public DateTime Deadline { get; set; }\n        public int Prolong { get; set; }\n        public bool Pilot { get; set; }\n        public decimal Price { get; set; }\n    }\n\n    public sealed class Readers\n    {\n        public string Ticket { get; set; }\n        public string Name { get; set; }\n        public string Category { get; set; }\n    }\n}\n";
         _Database (db, expected);
     }
 
