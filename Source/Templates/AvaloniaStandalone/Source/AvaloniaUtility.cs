@@ -24,6 +24,8 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using AM.Text.Output;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -34,8 +36,11 @@ using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Avalonia.Themes.Fluent;
+using Avalonia.Themes.Simple;
 
 using SkiaSharp;
 
@@ -109,6 +114,7 @@ public static class AvaloniaUtility
 
         try
         {
+            // TODO разобраться с аргументом конструктора и Source
             return new ResourceInclude (uri) { Source = uri };
         }
         catch (Exception exception)
@@ -160,7 +166,7 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T : IContentControl
+        where T : ContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Center;
         control.VerticalContentAlignment = VerticalAlignment.Center;
@@ -245,6 +251,70 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Создание Fluent-темы.
+    /// </summary>
+    public static IStyle CreateFluentTheme
+        (
+            bool light = true
+        )
+    {
+        // TODO разобраться с light
+        return new FluentTheme();
+
+        // return new FluentTheme (new Uri
+        //     (
+        //         light
+        //         ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
+        //         : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
+        //     ));
+    }
+
+    /// <summary>
+    /// Создание Simple-темы.
+    /// </summary>
+    public static IStyle CreateSimpleTheme
+        (
+            bool light = true
+        )
+    {
+        // TODO разобраться с light
+        return new SimpleTheme();
+
+        // var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
+        // var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
+        // var result = new SimpleTheme (uri)
+        // {
+        //     Mode = mode
+        // };
+
+        // return result;
+    }
+
+    /// <summary>
+    /// Создание Citrus-темы.
+    /// </summary>
+    public static IStyle CreateCitrusTheme
+        (
+            string variant = "Citrus.axaml"
+        )
+    {
+        var simple = CreateSimpleTheme();
+        var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
+        var citrus = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+
+        var result = new Styles
+        {
+            simple,
+            citrus
+        };
+
+        return result;
+    }
+
+    /// <summary>
     /// Создание простого грида.
     /// </summary>
     /// <param name="rowCount">Количество строк.</param>
@@ -316,6 +386,27 @@ public static class AvaloniaUtility
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Создание стиля с сеттером.
+    /// </summary>
+    public static Style CreateStyle<TControl>
+        (
+            AvaloniaProperty property,
+            object value
+        )
+        where TControl : Control
+    {
+        Sure.NotNull (property);
+
+        return new Style (x => x.OfType<TControl>())
+        {
+            Setters =
+            {
+                new Setter (property, value)
+            }
+        };
     }
 
     /// <summary>
@@ -451,7 +542,7 @@ public static class AvaloniaUtility
             return Brushes.Black;
         }
 
-        return (IBrush) found;
+        return (IBrush)found;
     }
 
     /// <summary>
@@ -477,7 +568,7 @@ public static class AvaloniaUtility
             return Colors.Black;
         }
 
-        return (Color) found;
+        return (Color)found;
     }
 
     /// <summary>
@@ -497,7 +588,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (CornerRadius) found;
+        return (CornerRadius)found;
     }
 
     /// <summary>
@@ -537,7 +628,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (Size) found;
+        return (Size)found;
     }
 
     /// <summary>
@@ -557,7 +648,7 @@ public static class AvaloniaUtility
             return default;
         }
 
-        return (Thickness) found;
+        return (Thickness)found;
     }
 
     /// <summary>
@@ -572,6 +663,7 @@ public static class AvaloniaUtility
 
         while (controlType.IsAssignableTo (typeof (Control)))
         {
+            // TODO разобраться с аргументом ThemeVariant
             if (Application.Current!.Styles.TryGetResource (controlType, null, out var result))
             {
                 return result as ControlTheme;
@@ -603,6 +695,31 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Получение родительского контекста указанного типа.
+    /// </summary>
+    public static TDataContext? GetParentDataContext<TDataContext>
+        (
+            this Control control
+        )
+        where TDataContext : class
+    {
+        Sure.NotNull (control);
+
+        var parent = control.Parent;
+        while (parent is not null)
+        {
+            if (parent.DataContext is TDataContext found)
+            {
+                return found;
+            }
+
+            parent = parent.Parent;
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Поиск родительского контрола с контекстом данных
     /// указанного типа.
     /// </summary>
@@ -617,9 +734,10 @@ public static class AvaloniaUtility
         var parent = control.Parent;
         while (parent is not null)
         {
-            if (parent.DataContext is TDataContext)
+            if (parent.DataContext is TDataContext
+                && parent is Control parentControl)
             {
-                return (Control) parent;
+                return parentControl;
             }
 
             parent = parent.Parent;
@@ -678,6 +796,66 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Простая группировка элементов по горизонтали..
+    /// </summary>
+    public static StackPanel HorizontalGroup
+        (
+            params Control[] controls
+        )
+    {
+        var result = new StackPanel
+        {
+            Orientation = Orientation.Horizontal
+        };
+        result.Children.AddRange (controls);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Включение ссылки на наши стили.
+    /// </summary>
+    public static IStyle IncludeArsMagnaStyles()
+    {
+        var uri = new Uri ("avares://AM.Avalonia/Styles.axaml");
+        var result = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Включение ссылки на стили DataGrid.
+    /// </summary>
+    public static IStyle IncludeDataGridStyles
+        (
+            string theme = "Fluent"
+        )
+    {
+        var gridUri = new Uri ($"avares://Avalonia.Controls.DataGrid/Themes/{theme}.xaml");
+        var result = new StyleInclude (gridUri)
+        {
+            Source = gridUri
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Релизная или отладочная версия сборки?
+    /// </summary>
+    public static bool IsProduction()
+    {
+#if DEBUG
+        return false;
+#else
+        return true;
+#endif
+    }
+
+    /// <summary>
     /// Установка наклонного начертания для текстового блока.
     /// </summary>
     public static T Italic<T>
@@ -701,12 +879,30 @@ public static class AvaloniaUtility
         (
             this T control
         )
-        where T : IContentControl
+        where T : ContentControl
     {
         control.HorizontalContentAlignment = HorizontalAlignment.Left;
         control.VerticalContentAlignment = VerticalAlignment.Center;
 
         return control;
+    }
+
+    /// <summary>
+    /// Загрузка картинки из ассетов.
+    /// </summary>
+    public static Bitmap? LoadBitmapFromAssets
+        (
+            this Control control,
+            string assetName
+        )
+    {
+        Sure.NotNull (control);
+        Sure.NotNullNorEmpty (assetName);
+
+        using var stream = OpenAssetStream (control.GetType(), assetName);
+        return stream is not null
+            ? new Bitmap (stream)
+            : null;
     }
 
     /// <summary>
@@ -778,19 +974,61 @@ public static class AvaloniaUtility
         Sure.NotNull (type);
         Sure.NotNullNorEmpty (assetName);
 
-        var assets = AvaloniaLocator.Current.GetService<IAssetLoader>();
-        if (assets is not null)
+        var assembly = type.Assembly;
+        var name = assembly.GetName().Name;
+        if (!string.IsNullOrEmpty (name))
         {
-            var assembly = type.Assembly;
-            var name = assembly.GetName().Name;
-            if (!string.IsNullOrEmpty (name))
-            {
-                var uri = "avares://" + name + "/" + assetName;
-                return assets.Open (new Uri (uri));
-            }
+            var uri = "avares://" + name + "/" + assetName;
+            return AssetLoader.Open (new Uri (uri));
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Print system information in abstract output.
+    /// </summary>
+    public static void PrintSystemInformation
+        (
+            this AbstractOutput? output
+        )
+    {
+        if (output is not null)
+        {
+            output.WriteLine
+                (
+                    "OS version: {0}",
+                    Environment.OSVersion
+                );
+            output.WriteLine
+                (
+                    "Framework version: {0}",
+                    Environment.Version
+                );
+            var assembly = Assembly.GetEntryAssembly();
+            var vi = assembly?.GetName().Version;
+            if (assembly?.Location is null)
+            {
+                // TODO: в single-exe-application .Location возвращает string.Empty
+                // consider using the AppContext.BaseDirectory
+                return;
+            }
+
+            // TODO: в single-exe-application .Location возвращает string.Empty
+            // consider using the AppContext.BaseDirectory
+            var fi = new FileInfo (assembly.Location);
+            output.WriteLine
+                (
+                    "Application version: {0} ({1})",
+                    vi.ToVisibleString(),
+                    fi.LastWriteTime.ToShortDateString()
+                );
+            output.WriteLine
+                (
+                    "Memory: {0} Mb",
+                    GC.GetTotalMemory (false) / 1024
+                );
+        }
     }
 
     /// <summary>
@@ -878,7 +1116,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -895,7 +1133,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -912,7 +1150,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -930,7 +1168,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей внутри контрола.
+    /// Установка полей снаружи контрола.
     /// </summary>
     public static T SetMargin<T>
         (
@@ -950,7 +1188,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -967,7 +1205,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -984,7 +1222,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -1002,7 +1240,7 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Установка полей вокруг текстового блока.
+    /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
         (
@@ -1019,6 +1257,58 @@ public static class AvaloniaUtility
         block.Padding = new Thickness (left, top, right, bottom);
 
         return block;
+    }
+
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            Thickness thickness
+        )
+        where T : Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = thickness;
+
+        return control;
+    }
+
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            double uniform
+        )
+        where T : Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = new Thickness (uniform);
+
+        return control;
+    }
+
+    /// <summary>
+    /// Установка полей снаружи панели.
+    /// </summary>
+    public static T SetPanelMargin<T>
+        (
+            this T control,
+            double horizontal,
+            double vertical
+        )
+        where T : Panel
+    {
+        Sure.NotNull (control);
+
+        control.Margin = new Thickness (horizontal, vertical);
+
+        return control;
     }
 
     /// <summary>
@@ -1072,13 +1362,10 @@ public static class AvaloniaUtility
         Sure.NotNull (window);
         Sure.NotNullNorEmpty (iconName);
 
-        if (OperatingSystem.IsWindows())
+        using var stream = OpenAssetStream (window.GetType(), iconName);
+        if (stream is not null)
         {
-            using var stream = OpenAssetStream (window.GetType(), iconName);
-            if (stream is not null)
-            {
-                window.Icon = new WindowIcon (stream);
-            }
+            window.Icon = new WindowIcon (stream);
         }
     }
 

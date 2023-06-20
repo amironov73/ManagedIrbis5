@@ -6,18 +6,20 @@
   </PropertyGroup>
 
   <PropertyGroup>
+    <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
+    <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
     <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
     <AvaloniaPrevious>11.0.0-preview8</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
-    <NugetVersion>6.5.0</NugetVersion>
+    <NugetVersion>6.6.1</NugetVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
-    <PackageVersion Include="Autofac" Version="6.5.0" />
+    <PackageVersion Include="Autofac" Version="7.0.1" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="11.0.0-preview1" />
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
@@ -26,7 +28,7 @@
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
@@ -43,49 +45,51 @@
     <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
+    <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="Google.Protobuf" Version="3.21.12" />
     <PackageVersion Include="Grpc.Tools" Version="2.51.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.11.46" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.11.48" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
-    <PackageVersion Include="MailKit" Version="3.6.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview3.145-nightly" />
+    <PackageVersion Include="MailKit" Version="4.1.0" />
+    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview5" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="2.3.1-prev6" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="7.0.4" />
-    <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftVersionAlt)" />
+    <PackageVersion Include="Microsoft.AspNetCore.Razor.Language" Version="6.0.18" />
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="0.4.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.4.0" />
-    <PackageVersion Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0-1.final" />
+    <PackageVersion Include="Microsoft.DotNet.PlatformAbstractions" Version="5.0.0-preview.5.20278.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Localization" Version="7.0.5" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="7.0.5" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.1" />
-    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersionAlt)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersionAlt)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="2.3.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.3" />
-    <PackageVersion Include="Microsoft.Windows.Compatibility" Version="7.0.0" />
-    <PackageVersion Include="MimeKit" Version="3.6.0" />
+    <PackageVersion Include="Microsoft.Windows.Compatibility" Version="8.0.0-preview.2.23128.3" />
+    <PackageVersion Include="MimeKit" Version="4.1.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.0.2" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.0.2" />
-    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.5.119" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.0.4" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.0.4" />
+    <PackageVersion Include="Nerdbank.GitVersioning" Version="3.6.133" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageVersion Include="Nito.Cancellation" Version="1.1.2" />
     <PackageVersion Include="Nito.Comparers" Version="6.2.2" />
@@ -124,18 +128,18 @@
     <PackageVersion Include="SharpZipLib" Version="1.4.2" />
     <PackageVersion Include="Spectre.Console" Version="0.46.1-preview.0.7" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageVersion Include="System.CodeDom" Version="7.0.0" />
+    <PackageVersion Include="System.CodeDom" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageVersion Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageVersion Include="System.Drawing.Common" Version="8.0.0-preview.2.23128.3" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Memory" Version="4.5.5" />
-    <PackageVersion Include="System.Resources.Extensions" Version="7.0.0" />
+    <PackageVersion Include="System.Resources.Extensions" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="7.0.0" />
-    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="7.0.1" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.Security.Permissions" Version="7.0.0" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0-preview.2" />
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
     <PackageVersion Include="Topshelf" Version="4.3.0" />

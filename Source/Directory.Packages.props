@@ -9,7 +9,6 @@
     <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
     <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
-    <AvaloniaPrevious>11.0.0-preview8</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.6.1</NugetVersion>
   </PropertyGroup>

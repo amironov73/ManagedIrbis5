@@ -32,16 +32,20 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.0-preview8</AvaloniaVersion>
+        <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
+        <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
+        <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.0-preview1" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
@@ -53,27 +57,25 @@
         <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
         <PackageReference Include="Faker.Net" Version="2.0.154" />
         <PackageReference Include="GridExtra.Avalonia" Version="0.9.1"/>
-        <PackageReference Include="mameolan.Avalonia.Controlz" Version="1.0.0-CI-20220410-063959" />
-        <PackageReference Include="mameolan.Avalonia.ExtendedToolkit" Version="1.0.0-CI-20220410-063959" />
-        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="7.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="7.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0"/>
-        <PackageReference Include="NLog" Version="5.1.0"/>
-        <PackageReference Include="NLog.Extensions.Logging" Version="5.2.0"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersionAlt)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersionAlt)"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="NLog" Version="5.1.3"/>
+        <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3"/>
         <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
         <PackageReference Include="ReactiveUI" Version="18.3.1"/>
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
         <PackageReference Include="SkiaSharp" Version="2.88.3" />
-        <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2"/>
+        <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1"/>
     </ItemGroup>
 
 </Project>
