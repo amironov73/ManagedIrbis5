@@ -29,6 +29,7 @@ using JetBrains.Annotations;
 using Newtonsoft.Json;
 
 using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 
 using SixLabors.ImageSharp;
 
@@ -51,9 +52,9 @@ public sealed class CivitClient
     #region Constants
 
     /// <summary>
-    /// Базовый URL для API.
+    /// URL для API по умолчанию.
     /// </summary>
-    public const string BaseUrl = "https://civitai.com/api/v1/";
+    public const string DefaultUrl = "https://civitai.com/api/v1/";
 
     #endregion
 
@@ -63,7 +64,7 @@ public sealed class CivitClient
     /// Конструктор по умолчанию.
     /// </summary>
     public CivitClient()
-        : this (BaseUrl, null)
+        : this (DefaultUrl, null)
     {
         // пустое тело конструктора
     }
@@ -87,6 +88,7 @@ public sealed class CivitClient
             BaseUrl = new Uri (baseUrl)
         };
         _restClient = new RestClient (_httpClient, options);
+        _restClient.UseNewtonsoftJson();
     }
 
     #endregion
@@ -96,6 +98,21 @@ public sealed class CivitClient
     private readonly string? _apiKey;
     private readonly HttpClientWithProgress _httpClient;
     private readonly RestClient _restClient;
+
+    private RestRequest CreateRequest
+        (
+            string resource,
+            Method method = Method.Get
+        )
+    {
+        var result = new RestRequest (resource, method);
+        if (!string.IsNullOrEmpty (_apiKey))
+        {
+            result.AddHeader ("Authorization", $"Bearer {_apiKey}");
+        }
+
+        return result;
+    }
 
     #endregion
 
@@ -111,7 +128,7 @@ public sealed class CivitClient
             string? query = default
         )
     {
-        var request = new RestRequest ("/creators")
+        var request = CreateRequest ("creators")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query);
@@ -134,7 +151,7 @@ public sealed class CivitClient
             CancellationToken cancellationToken = default
         )
     {
-        var request = new RestRequest ("/creators")
+        var request = CreateRequest ("creators")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query);
@@ -159,7 +176,7 @@ public sealed class CivitClient
             string? username = default
         )
     {
-        var request = new RestRequest ("/images")
+        var request = CreateRequest ("images")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (postId)
@@ -188,7 +205,7 @@ public sealed class CivitClient
             CancellationToken cancellationToken = default
         )
     {
-        var request = new RestRequest ("/images")
+        var request = CreateRequest ("images")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (postId)
@@ -262,7 +279,7 @@ public sealed class CivitClient
             int pageNumber
         )
     {
-        var request = new RestRequest ("/models")
+        var request = CreateRequest ("models")
             .AddQueryParameter ("tag", tag)
             .AddQueryParameter ("limit", limit)
             .AddQueryParameter ("page", pageNumber);
@@ -385,8 +402,8 @@ public sealed class CivitClient
             CancellationToken cancellationToken = default
         )
     {
-        var url = $"{BaseUrl}models?tag={tag}";
-        var request = new RestRequest (url);
+        var resource = $"models?tag={tag}";
+        var request = CreateRequest (resource);
         var rawResponse = await _restClient.ExecuteAsync (request, cancellationToken);
         if (!string.IsNullOrEmpty (rawResponse.Content))
         {
@@ -488,8 +505,8 @@ public sealed class CivitClient
     {
         Sure.Positive (modelId);
 
-        var request = new RestRequest ("/models/{id}")
-            .AddUrlSegment ("id", modelId);
+        var request = CreateRequest ("models/{modelId}")
+            .AddUrlSegment ("modelId", modelId);
 
         var response = _restClient.Execute (request);
 
@@ -509,8 +526,8 @@ public sealed class CivitClient
     {
         Sure.Positive (modelId);
 
-        var request = new RestRequest ("/models/{id}")
-            .AddUrlSegment ("id", modelId);
+        var request = CreateRequest ("models/{modelId}")
+            .AddUrlSegment ("modelId", modelId);
 
         var response = await _restClient.ExecuteAsync (request, cancellationToken);
 
@@ -529,7 +546,7 @@ public sealed class CivitClient
     {
         Sure.Positive (versionId);
 
-        var request = new RestRequest ($"/models-versions/{versionId}")
+        var request = CreateRequest ("/models-versions/{versionId}")
             .AddUrlSegment ("versionId", versionId);
 
         var response = _restClient.Execute (request);
@@ -550,7 +567,7 @@ public sealed class CivitClient
     {
         Sure.Positive (versionId);
 
-        var request = new RestRequest ($"/models-versions/{versionId}")
+        var request = CreateRequest ("/models-versions/{versionId}")
             .AddUrlSegment ("versionId", versionId);
 
         var response = await _restClient.ExecuteAsync (request, cancellationToken);
@@ -575,7 +592,7 @@ public sealed class CivitClient
             string? notSafe = default
         )
     {
-        var request = new RestRequest ("/models")
+        var request = CreateRequest ("models")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query)
@@ -614,7 +631,7 @@ public sealed class CivitClient
             CancellationToken cancellationToken = default
         )
     {
-        var request = new RestRequest ("/models")
+        var request = CreateRequest ("models")
             .AddNonDefaultQueryParameter (limit)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (query)
@@ -650,7 +667,7 @@ public sealed class CivitClient
     {
         Sure.NotNullNorEmpty (query);
 
-        var request = new RestRequest ("/tags")
+        var request = CreateRequest ("tags")
             .AddQueryParameter ("query", query)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (limit);
@@ -675,7 +692,7 @@ public sealed class CivitClient
     {
         Sure.NotNullNorEmpty (query);
 
-        var request = new RestRequest ("/tags")
+        var request = CreateRequest ("tags")
             .AddQueryParameter ("query", query)
             .AddNonDefaultQueryParameter (page)
             .AddNonDefaultQueryParameter (limit);
