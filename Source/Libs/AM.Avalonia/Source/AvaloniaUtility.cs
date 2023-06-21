@@ -3,14 +3,11 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* AvaloniaUtility.cs -- полезные расширения для Avalonia UI
  * Ars Magna project, http://arsmagna.ru
@@ -42,6 +39,8 @@ using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Themes.Simple;
 
+using JetBrains.Annotations;
+
 using Material.Colors;
 using Material.Styles.Themes;
 using Material.Styles.Themes.Base;
@@ -59,6 +58,7 @@ namespace AM.Avalonia;
 /// <summary>
 /// Полезные расширения для Avalonia UI.
 /// </summary>
+[PublicAPI]
 public static class AvaloniaUtility
 {
     #region Public methods
@@ -890,6 +890,34 @@ public static class AvaloniaUtility
         var result = new StyleInclude (gridUri)
         {
             Source = gridUri
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Включение ссылки на стили DataGrid.
+    /// </summary>
+    public static IStyle IncludeLabsStyles()
+    {
+        var labsUri = new Uri ($"avares://Avalonia.Labs.Controls/Themes/ControlThemes.xaml");
+        var result = new StyleInclude (labsUri)
+        {
+            Source = labsUri
+        };
+
+        return result;
+    }
+
+    /// <summary>
+    /// Включение ссылки на стили TreeDataGrid.
+    /// </summary>
+    public static IStyle IncludeTreeDataGridStyles()
+    {
+        var treeDataGridUri = new Uri ("avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml");
+        var result = new StyleInclude (treeDataGridUri)
+        {
+            Source = treeDataGridUri
         };
 
         return result;

@@ -42,8 +42,12 @@
     <ItemGroup>
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
         <PackageReference Include="Avalonia.Desktop" />
         <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Labs.Controls" />
+        <PackageReference Include="Avalonia.Labs.Lottie" />
+        <PackageReference Include="Avalonia.Labs.Qr" />
         <PackageReference Include="Avalonia.Markup.Xaml.Loader" />
         <PackageReference Include="Avalonia.ReactiveUI" />
         <PackageReference Include="Avalonia.ThemeManager" />
