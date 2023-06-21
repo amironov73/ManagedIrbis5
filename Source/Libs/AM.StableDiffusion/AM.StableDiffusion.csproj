@@ -25,6 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+      <ProjectReference Include="..\AM.Scripting\AM.Scripting.csproj" />
       <ProjectReference Include="..\AM.Web\AM.Web.csproj" />
     </ItemGroup>
 

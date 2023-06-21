@@ -14,6 +14,7 @@
 
 #region Using directives
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -47,7 +48,7 @@ public static class EmbeddingUtility
     /// <summary>
     /// Проверка изображения на соответствие требуемым параметрам.
     /// </summary>
-    public static void CheckPreparedImage
+    public static string? CheckPreparedImage
         (
             Image image
         )
@@ -56,14 +57,16 @@ public static class EmbeddingUtility
 
         if (image.Width != 512 || image.Height != 512)
         {
-            throw new InvalidDataException();
+            return $"Invalid image size: {image.Size()}";
         }
+
+        return null;
     }
 
     /// <summary>
     /// Проверка изображения на соответствие требуемым параметрам.
     /// </summary>
-    public static void CheckPreparedImage
+    public static string? CheckPreparedImage
         (
             string fileName
         )
@@ -71,14 +74,20 @@ public static class EmbeddingUtility
         Sure.FileExists (fileName);
 
         using var image = Image.Load (fileName);
-        CheckPreparedImage (image);
+        var result = CheckPreparedImage (image);
+        if (!string.IsNullOrEmpty (result))
+        {
+            result = $"File: {fileName}, {result}";
+        }
+
+        return result;
     }
 
     /// <summary>
     /// Проверка всех изображений в папке
     /// на соответствие требуемым параметрам.
     /// </summary>
-    public static void CheckPreparedImages
+    public static IEnumerable<string> CheckPreparedImages
         (
             string directoryName
         )
@@ -99,7 +108,11 @@ public static class EmbeddingUtility
 
         foreach (var fileName in goodFiles)
         {
-            CheckPreparedImage (fileName);
+            var result = CheckPreparedImage (fileName);
+            if (!string.IsNullOrEmpty (result))
+            {
+                yield return result;
+            }
         }
     }
 
