@@ -57,7 +57,7 @@ public static class EmbeddingUtility
 
         if (image.Width != 512 || image.Height != 512)
         {
-            return $"Invalid image size: {image.Size()}";
+            return $"Invalid image size: {image.Size}";
         }
 
         return null;

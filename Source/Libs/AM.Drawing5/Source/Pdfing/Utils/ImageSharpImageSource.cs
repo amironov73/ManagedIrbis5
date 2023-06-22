@@ -65,24 +65,36 @@ public class ImageSharpImageSource<TPixel>
             int quality = 75
         )
     {
-        var image = Image.Load<TPixel> (imageSource.Invoke(), out var imgFormat);
-        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
+        // var image = Image.Load<TPixel> (imageSource.Invoke(), out var imgFormat);
+        // return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
+
+        var image = Image.Load<TPixel> (imageSource.Invoke());
+        var isPng = image.Metadata.DecodedImageFormat is PngFormat;
+        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, isPng);
     }
 
     /// <inheritdoc cref="ImageSource.FromFileImpl"/>
     protected override IImageSource FromFileImpl (string path, int quality = 75)
     {
-        var image = Image.Load<TPixel> (path, out var imgFormat);
-        return new ImageSharpImageSourceImpl<TPixel> (path, image, quality, imgFormat is PngFormat);
+        // var image = Image.Load<TPixel> (path, out var imgFormat);
+        // return new ImageSharpImageSourceImpl<TPixel> (path, image, quality, imgFormat is PngFormat);
+
+        var image = Image.Load<TPixel> (path);
+        var isPng = image.Metadata.DecodedImageFormat is PngFormat;
+        return new ImageSharpImageSourceImpl<TPixel> (path, image, quality, isPng);
     }
 
     /// <inheritdoc cref="ImageSource.FromStreamImpl"/>
     protected override IImageSource FromStreamImpl (string name, Func<Stream> imageStream, int quality = 75)
     {
         using var stream = imageStream.Invoke();
-        var image = Image.Load<TPixel> (stream, out var imgFormat);
 
-        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
+        // var image = Image.Load<TPixel> (stream, out var imgFormat);
+        // return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, imgFormat is PngFormat);
+
+        var image = Image.Load<TPixel> (stream);
+        var isPng = image.Metadata.DecodedImageFormat is PngFormat;
+        return new ImageSharpImageSourceImpl<TPixel> (name, image, quality, isPng);
     }
 
     private class ImageSharpImageSourceImpl<TPixel2>
