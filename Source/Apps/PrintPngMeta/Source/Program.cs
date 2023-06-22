@@ -36,7 +36,7 @@ internal static class Program
 
         using var image = Image.Load (fileName);
 
-        Console.WriteLine ($"{fileName}: size = {image.Size()}");
+        Console.WriteLine ($"{fileName}: size = {image.Size}");
         Console.WriteLine ($"\tbits = {image.PixelType.BitsPerPixel}");
 
         var genericMeta = image.Metadata;
