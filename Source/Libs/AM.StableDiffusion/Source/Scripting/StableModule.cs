@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 using AM.Scripting.Barsik;
 
@@ -42,6 +43,7 @@ public sealed class StableModule
         { "check_prepared_image", new FunctionDescriptor ("check_prepared_image", CheckPreparedImage) },
         { "check_prepared_images", new FunctionDescriptor ("check_prepared_images", CheckPreparedImages) },
         { "retrieve_text_data", new FunctionDescriptor ("retrieve_text_data", RetrieveTextData) },
+        { "slice_image", new FunctionDescriptor ("slice_image", SliceImage) },
 
     };
 
@@ -108,6 +110,57 @@ public sealed class StableModule
         {
             return ImageUtility.RetrieveTextData (fileName);
         }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Нарезка больного изображения на матрицу мелких..
+    /// </summary>
+    public static dynamic? SliceImage
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length != 8)
+        {
+            context.Error.WriteLine ("Wrong argument number");
+            return null;
+        }
+
+        var originalImagePath = BarsikUtility.ToString (Compute (context, args, 0));
+        if (string.IsNullOrEmpty (originalImagePath))
+        {
+            context.Error.WriteLine ("No original image file specified");
+            return null;
+        }
+
+        if (!File.Exists (originalImagePath))
+        {
+            context.Error.WriteLine ($"File '{originalImagePath}' doesn't exist");
+            return null;
+        }
+
+        var outputDirectory = BarsikUtility.ToString (Compute (context, args, 1));
+        if (string.IsNullOrEmpty (outputDirectory))
+        {
+            context.Error.WriteLine ("No output directory spcified");
+            return null;
+        }
+
+        Directory.CreateDirectory (outputDirectory);
+
+        var originX = BarsikUtility.ToInt32 (Compute (context, args, 2));
+        var originY = BarsikUtility.ToInt32 (Compute (context, args, 3));
+        var chunkWidth = BarsikUtility.ToInt32 (Compute (context, args, 4));
+        var chunkHeight = BarsikUtility.ToInt32 (Compute (context, args, 5));
+        var numberX = BarsikUtility.ToInt32 (Compute (context, args, 6));
+        var numberY = BarsikUtility.ToInt32 (Compute (context, args, 7));
+
+        var slicer = new ImageSlicer (context.Output);
+        slicer.Slice (originalImagePath, outputDirectory, originX, originY,
+                chunkWidth, chunkHeight, numberX, numberY);
 
         return null;
     }

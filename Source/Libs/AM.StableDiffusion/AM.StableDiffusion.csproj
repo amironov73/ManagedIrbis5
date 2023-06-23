@@ -34,6 +34,7 @@
         <PackageReference Include="Microsoft.Extensions.Http" />
         <PackageReference Include="RestSharp" />
         <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" />
+        <PackageReference Include="SkiaSharp" />
         <PackageReference Include="SixLabors.ImageSharp" />
     </ItemGroup>
 

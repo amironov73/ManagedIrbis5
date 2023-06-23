@@ -1,0 +1,34 @@
+﻿//
+// Нарезка большого изображения на матрицу мелких.
+//
+
+leftIndent  = 320
+chunkWidth  = 240
+chunkHeight = 250
+rowCount = 4
+
+slice_image ( "Hairs.png",  "output\\hairs\\length",         leftIndent,  350, chunkWidth, chunkHeight, rowCount, 3)
+slice_image ( "Hairs.png",  "output\\hairs\\color",          leftIndent, 1254, chunkWidth, chunkHeight, rowCount, 8)
+slice_image ( "Hairs.png",  "output\\hairs\\style",          leftIndent, 3410, chunkWidth, chunkHeight, rowCount, 16)
+slice_image ( "Hairs.png",  "output\\hairs\\additional",     leftIndent, 7622, chunkWidth, chunkHeight, rowCount, 5)
+slice_image ( "Hairs.png",  "output\\hairs\\accessories",    leftIndent, 9036, chunkWidth, chunkHeight, rowCount, 2)
+
+chunkWidth = 320
+rowCount = 3
+
+slice_image ( "Camera.png", "output\\camera\\genre",         leftIndent,  316, chunkWidth, 310, rowCount, 4)
+
+slice_image ( "Camera.png", "output\\camera\\position\\1",   leftIndent, 1800, chunkWidth, 324, rowCount, 1)
+slice_image ( "Camera.png", "output\\camera\\position\\2",   leftIndent, 2132, chunkWidth, 360, rowCount, 1)
+slice_image ( "Camera.png", "output\\camera\\position\\3",   leftIndent, 2512, chunkWidth, 324, rowCount, 5)
+slice_image ( "Camera.png", "output\\camera\\position\\4",   leftIndent, 4144,        480, 376,        2, 1)
+
+slice_image ( "Camera.png", "output\\camera\\distance",      leftIndent, 4710, chunkWidth, 330, rowCount, 3)
+
+slice_image ( "Camera.png", "output\\camera\\depth",         leftIndent, 5896, chunkWidth, 350, rowCount, 2)
+
+slice_image ( "Camera.png", "output\\camera\\equipment",     leftIndent, 6780, chunkWidth, 300, rowCount, 5)
+
+slice_image ( "Camera.png", "output\\camera\\photographers", leftIndent, 8726, chunkWidth, 298, rowCount, 14)
+
+println ("ALL DONE")

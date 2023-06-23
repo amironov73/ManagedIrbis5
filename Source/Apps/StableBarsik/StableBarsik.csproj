@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+      <ProjectReference Include="..\..\Libs\AM.StableDiffusion\AM.StableDiffusion.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Scripts\CheckDataset.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Scripts\Slice.barsik">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+</Project>
