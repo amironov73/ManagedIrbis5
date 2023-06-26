@@ -1,0 +1,10 @@
+﻿//
+// Извлечение из изображения информации о ее генерации.
+//
+
+data = retrieve_text_data ("Images/00779.png")
+info = decode_text_data (data)
+foreach (item in info)
+{
+    println (item.Key, " => ", item.Value)
+}

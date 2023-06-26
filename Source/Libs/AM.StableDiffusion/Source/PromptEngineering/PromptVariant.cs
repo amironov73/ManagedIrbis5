@@ -49,5 +49,22 @@ public sealed class PromptVariant
     [JsonPropertyName ("description")]
     public string? Description { get; set; }
 
+    /// <summary>
+    /// Синонимы.
+    /// </summary>
+    [JsonPropertyName ("synonyms")]
+    public string[]? Synonyms { get; set; }
+
+    /// <summary>
+    /// Иллюстрации.
+    /// </summary>
+    [JsonPropertyName ("illustrations")]
+    public string[]? IllustrationPath { get; set; }
+
+    /// <summary>
+    /// Пути к файлам с иллюстрациями.
+    /// </summary>
+    public object[]? Illustration { get; set; }
+
     #endregion
 }

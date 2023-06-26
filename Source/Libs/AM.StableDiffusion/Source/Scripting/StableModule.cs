@@ -42,6 +42,7 @@ public sealed class StableModule
     {
         { "check_prepared_image", new FunctionDescriptor ("check_prepared_image", CheckPreparedImage) },
         { "check_prepared_images", new FunctionDescriptor ("check_prepared_images", CheckPreparedImages) },
+        { "decode_text_data", new FunctionDescriptor ("decode_text_data", DecodeTextData) },
         { "retrieve_text_data", new FunctionDescriptor ("retrieve_text_data", RetrieveTextData) },
         { "slice_image", new FunctionDescriptor ("slice_image", SliceImage) },
 
@@ -96,6 +97,23 @@ public sealed class StableModule
         return Array.Empty<string>();
     }
 
+    /// <summary>
+    /// Декодирование текстовых данных, извлеченных из изображения..
+    /// </summary>
+    public static dynamic? DecodeTextData
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var textData = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (textData))
+        {
+            return ImageUtility.DecodeTextData (textData);
+        }
+
+        return null;
+    }
     /// <summary>
     /// Получение текстовых данных из указанного файла.
     /// </summary>
