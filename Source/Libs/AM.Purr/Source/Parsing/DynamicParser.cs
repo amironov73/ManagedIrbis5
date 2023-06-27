@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using System;
+
 using JetBrains.Annotations;
 
 #endregion
@@ -83,7 +85,7 @@ public sealed class DynamicParser<TResult>
     {
         result = default!;
 
-        return Function().TryParse (state, out result);
+        return Function().TryParse (state, out result!);
     }
 
     #endregion
