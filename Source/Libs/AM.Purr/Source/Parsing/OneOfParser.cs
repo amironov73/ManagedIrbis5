@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using System.Collections.Generic;
+
 using JetBrains.Annotations;
 
 #endregion

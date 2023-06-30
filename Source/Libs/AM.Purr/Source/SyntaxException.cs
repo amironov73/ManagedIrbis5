@@ -16,6 +16,7 @@
 
 #region Using directives
 
+using System;
 using System.Runtime.Serialization;
 
 using AM.Purr.Parsing;

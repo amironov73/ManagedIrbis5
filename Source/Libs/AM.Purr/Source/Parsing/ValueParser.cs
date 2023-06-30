@@ -12,6 +12,7 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 using JetBrains.Annotations;

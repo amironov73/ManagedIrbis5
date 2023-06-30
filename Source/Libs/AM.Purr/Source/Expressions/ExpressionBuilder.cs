@@ -11,6 +11,9 @@
 
 #region Using directives
 
+using System;
+using System.Collections.Generic;
+
 using AM.Purr.Parsing;
 
 using JetBrains.Annotations;
