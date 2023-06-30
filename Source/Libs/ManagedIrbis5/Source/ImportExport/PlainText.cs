@@ -380,7 +380,10 @@ public static class PlainText
 
             foreach (var subField in field.Subfields)
             {
-                writer.Write ("^{0}{1}", subField.Code, subField.Value);
+                if (subField.Code is not SubField.NoCode)
+                {
+                    writer.Write ("^{0}{1}", subField.Code, subField.Value);
+                }
             }
 
             writer.WriteLine();
