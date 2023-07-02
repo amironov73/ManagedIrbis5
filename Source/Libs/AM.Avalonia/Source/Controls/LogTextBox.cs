@@ -24,6 +24,7 @@ using AM.Logging;
 
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Styling;
 using Avalonia.Threading;
@@ -31,6 +32,8 @@ using Avalonia.Threading;
 using NLog;
 
 #endregion
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 #nullable enable
 
@@ -76,11 +79,14 @@ public sealed class LogTextBox
     }
 
     /// <inheritdoc cref="Control.OnUnloaded"/>
-    protected override void OnUnloaded()
+    protected override void OnUnloaded
+        (
+            RoutedEventArgs eventArgs
+        )
     {
         MagnaTarget.Unsubscribe (_Handler);
 
-        base.OnUnloaded();
+        base.OnUnloaded (eventArgs);
     }
 
     private void _Handler
@@ -93,7 +99,10 @@ public sealed class LogTextBox
         {
             Dispatcher.UIThread.Post (() =>
             {
-                var line = $"{eventInfo.TimeStamp}: {eventInfo.Level.ToString().ToUpperInvariant()} : {eventInfo.FormattedMessage}{NewLine}";
+                var timeStemp = eventInfo.TimeStamp;
+                var level = eventInfo.Level.ToString()?.ToUpperInvariant() ?? "(none)";
+                var message = eventInfo.FormattedMessage;
+                var line = $"{timeStemp}: {level} : {message}{NewLine}";
 
                 Text += line;
                 CaretIndex = int.MaxValue;

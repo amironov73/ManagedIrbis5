@@ -6,7 +6,8 @@
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
-    <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
+    <AvaloniaVersion>11.0.0-rc2.2</AvaloniaVersion>
+    <AvaloniaPrevious>11.0.0-rc1.1</AvaloniaPrevious>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.6.1</NugetVersion>
   </PropertyGroup>
@@ -17,22 +18,22 @@
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Labs.Controls" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Labs.Lottie" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Labs.Qr" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Labs.Controls" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.Labs.Lottie" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.Labs.Qr" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
