@@ -879,6 +879,20 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Включение ссылки на стили ColorPicker.
+    /// </summary>
+    public static IStyle IncludeColorPickerStyles()
+    {
+        var uri = new Uri ("avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml");
+        var result = new StyleInclude (uri)
+        {
+            Source = uri
+        };
+
+        return result;
+    }
+
+    /// <summary>
     /// Включение ссылки на стили DataGrid.
     /// </summary>
     public static IStyle IncludeDataGridStyles
