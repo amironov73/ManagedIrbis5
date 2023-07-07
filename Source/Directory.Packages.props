@@ -33,9 +33,9 @@
     <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="11.0.0.1" />
+    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="11.0.0.1" />
+    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.0.0.1" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
@@ -56,7 +56,7 @@
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
     <PackageVersion Include="MailKit" Version="4.1.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview5" />
+    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview5.202-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="2.3.1-prev6" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftVersionAlt)" />
@@ -85,7 +85,7 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.3" />
-    <PackageVersion Include="Microsoft.Windows.Compatibility" Version="8.0.0-preview.2.23128.3" />
+    <PackageVersion Include="Microsoft.Windows.Compatibility" Version="8.0.0-preview.5.23302.2" />
     <PackageVersion Include="MimeKit" Version="4.1.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
@@ -136,7 +136,7 @@
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
     <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.Data.SqlClient" Version="4.8.5" />
-    <PackageVersion Include="System.Drawing.Common" Version="8.0.0-preview.2.23128.3" />
+    <PackageVersion Include="System.Drawing.Common" Version="8.0.0-preview.5.23280.5" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Memory" Version="4.5.5" />
     <PackageVersion Include="System.Resources.Extensions" Version="$(MicrosoftVersion)" />
