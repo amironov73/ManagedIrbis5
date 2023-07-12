@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET 8
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 8.0.100-preview.5.23303.2
+        dotnet-version: 8.0.100-preview.6.23330.14
         
     - name: Install coverlet
       run: dotnet tool install --tool-path . coverlet.console
