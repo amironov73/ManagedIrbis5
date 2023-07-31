@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* DescriptionBase.cs -- база для описаний
+/* ShowcaseBase.cs -- база для витрины
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,10 +19,10 @@ using JetBrains.Annotations;
 namespace AM.StableDiffusion.Mastermind;
 
 /// <summary>
-/// База для описаний.
+/// База для витрины.
 /// </summary>
 [PublicAPI]
-public class DescriptionBase
+public class ShowcaseBase
 {
     #region Proprerties
 

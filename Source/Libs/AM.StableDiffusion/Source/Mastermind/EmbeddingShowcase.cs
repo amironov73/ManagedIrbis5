@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* EmbeddingInfo.cs -- информация о текстовой инверсии
+/* EmbeddingInfo.cs -- витрина текстовой инверсии
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -32,11 +32,11 @@ using SixLabors.ImageSharp;
 namespace AM.StableDiffusion.Mastermind;
 
 /// <summary>
-/// Информация о текстовой инверсии.
+/// Витрина текстовой инверсии.
 /// </summary>
 [PublicAPI]
-public sealed class EmbeddingDescription
-    : DescriptionBase
+public sealed class EmbeddingShowcase
+    : ShowcaseBase
 {
     #region Properties
 

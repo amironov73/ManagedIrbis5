@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* EmbeddingInfo.cs -- информация о текстовой инверсии
+/* EmbeddingInfo.cs -- витрина модели
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -31,10 +31,11 @@ using SixLabors.ImageSharp;
 namespace AM.StableDiffusion.Mastermind;
 
 /// <summary>
-///
+/// Витрина модели.
 /// </summary>
-public class CheckpointDescription
-    : DescriptionBase
+[PublicAPI]
+public class CheckpointShowcase
+    : ShowcaseBase
 {
     #region Properties
 
