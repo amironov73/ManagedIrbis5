@@ -6,7 +6,7 @@
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-preview.6.23329.7</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-preview.6.23329.11</MicrosoftVersionAlt>
-    <AvaloniaVersion>11.0.0</AvaloniaVersion>
+    <AvaloniaVersion>11.0.1</AvaloniaVersion>
     <AvaloniaPrevious>11.0.0-rc2.2</AvaloniaPrevious>
     <SkiaVersion>2.88.4-preview.84</SkiaVersion>
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
@@ -21,7 +21,7 @@
     <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
@@ -31,12 +31,12 @@
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.ThemeManager" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.ThemeManager" Version="11.0.0" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="11.0.0.1" />
-    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="11.0.0.1" />
-    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.0.0.1" />
+    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.5" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
