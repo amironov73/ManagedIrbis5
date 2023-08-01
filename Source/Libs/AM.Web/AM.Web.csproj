@@ -42,6 +42,8 @@
         <PackageReference Include="Newtonsoft.Json" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="RestSharp" />
+        <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" />
         <PackageReference Include="System.Data.SqlClient" />
     </ItemGroup>
 
@@ -55,5 +57,7 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
+
+
 
 </Project>
