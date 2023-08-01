@@ -17,7 +17,9 @@ using JetBrains.Annotations;
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Известные виды токенов.
+/// Известные виды токенов. Вы не обязаны использовать
+/// именно эти виды токенов, всегда можно изобрести
+/// собственный тип и использовать его.
 /// </summary>
 [PublicAPI]
 public static class TokenKind
