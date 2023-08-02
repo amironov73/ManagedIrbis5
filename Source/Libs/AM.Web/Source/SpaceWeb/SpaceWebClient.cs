@@ -16,7 +16,6 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 
 using Newtonsoft.Json;
 
@@ -96,7 +95,7 @@ public sealed class SpaceWebClient
     private RestRequest CreateRequest
         (
             string resource,
-            Method method = Method.Get
+            Method method = Method.Post
         )
     {
         Sure.NotNullNorEmpty (resource);
@@ -108,6 +107,50 @@ public sealed class SpaceWebClient
         }
 
         return result;
+    }
+
+    private RestRequest CreateRequest
+        (
+            string resource,
+            string method,
+            object payload
+        )
+    {
+        Sure.NotNullNorEmpty (resource);
+        Sure.NotNullNorEmpty (method);
+        Sure.NotNull (payload);
+
+        var result = CreateRequest (resource)
+            .AddJsonBody (new
+            {
+                jsonrpc = "2.0",
+                method,
+                @params = payload
+            });
+
+        return result;
+    }
+
+    private static TResult? GetResult<TResult>
+        (
+            RestResponse? response
+        )
+        where TResult: class
+    {
+        if (response is null)
+        {
+            return default;
+        }
+
+        var content = response.Content;
+        if (string.IsNullOrEmpty (content))
+        {
+            return default;
+        }
+
+        var data = JsonConvert.DeserializeObject<SpaceWebResponse<TResult>> (content);
+
+        return data?.Result;
     }
 
     #endregion
@@ -123,28 +166,14 @@ public sealed class SpaceWebClient
             string password
         )
     {
-        var request = CreateRequest ("notAuthorized")
-            .AddJsonBody (new
-            {
-                jsonrpc = "2.0",
-                method = "getToken",
-                @params = new { login, password }
-            });
-
+        var request = CreateRequest
+            (
+                "notAuthorized",
+                "getToken",
+                new { login, password }
+            );
         var response = _restClient.Execute (request);
-        var content = response.Content;
-        if (string.IsNullOrEmpty (content))
-        {
-            return false;
-        }
-
-        var dictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(content);
-        string? token = default;
-        if (!dictionary?.TryGetValue ("result", out token) ?? false)
-        {
-            return false;
-        }
-
+        var token = GetResult<string> (response);
         if (string.IsNullOrEmpty (token))
         {
             return false;
@@ -184,28 +213,16 @@ public sealed class SpaceWebClient
     {
         RequireToken();
 
-        var request = CreateRequest ("sites")
-            .AddJsonBody (new
-            {
-                jsonrpc = "2.0",
-                method = "index",
-                @params = new {
-                    page = pageNumber,
-                    perPage,
-                    filter
-                }
-            });
-
+        var request = CreateRequest
+            (
+                "sites",
+                "index",
+                new { page = pageNumber, perPage, filter }
+            );
         var response = _restClient.Execute (request);
-        var content = response.Content;
-        if (string.IsNullOrEmpty (content))
-        {
-            return null;
-        }
+        var result = GetResult<BriefSiteInfo[]> (response);
 
-        var data = JsonConvert.DeserializeObject<SiteIndexResponse> (content);
-
-        return data?.Sites;
+        return result;
     }
 
     #endregion

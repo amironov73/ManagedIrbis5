@@ -37,7 +37,7 @@ public sealed class BriefSiteInfo
     /// Идентификатор сайта.
     /// </summary>
     [JsonProperty ("id")]
-    public int Id { get; set; }
+    public int? Id { get; set; }
 
     /// <summary>
     /// Домашняя директория.

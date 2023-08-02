@@ -1,0 +1,27 @@
+﻿POST https://api.sweb.ru/notAuthorized/
+Accept: application/json
+
+{
+  "jsonrpc":"2.0",
+  "method":"getToken",
+  "params"
+    "login":"some_login",
+    "password":"some_password"
+  }
+}
+
+####
+
+POST https://api.sweb.ru/sites/
+Accept: application/json
+Authorization: Bearer some_token
+
+{
+  "jsonrpc":"2.0",
+  "method":"index",
+  "params":{
+    "page":1,
+    "perPage":20,
+    "filter":null
+  }
+}
