@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
 
 /* SpaceWebClient.cs -- клиент SpaceWeb API
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +11,8 @@
 #region Using directives
 
 using System;
+
+using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
@@ -31,6 +28,7 @@ namespace AM.SpaceWeb;
 /// <summary>
 /// Клиент SpaceWeb API.
 /// </summary>
+[PublicAPI]
 public sealed class SpaceWebClient
 {
     #region Constants
@@ -225,6 +223,109 @@ public sealed class SpaceWebClient
         return result;
     }
 
-    #endregion
+    /// <summary>
+    /// Получение полной информации о сайте
+    /// с указанной корневой директорией.
+    /// </summary>
+    public FullSiteInfo? GetSiteInfo
+        (
+            string docRoot
+        )
+    {
+        Sure.NotNullNorEmpty (docRoot);
 
+        RequireToken();
+
+        var request = CreateRequest
+            (
+                "sites",
+                "getSiteInfo",
+                new { docRoot }
+            );
+
+        var response = _restClient.Execute (request);
+        var result = GetResult<FullSiteInfo> (response);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Добавление нового сайта.
+    /// </summary>
+    public bool AddSite
+        (
+            NewSite newSite
+        )
+    {
+        Sure.NotNull (newSite);
+
+        RequireToken();
+
+        var request = CreateRequest
+            (
+                "sites",
+                "add",
+                newSite
+            );
+
+        var response = _restClient.Execute (request);
+        var code = GetResult<string> (response).SafeToInt32();
+
+        return code != 0;
+    }
+
+    /// <summary>
+    /// Удаление сайте, расположенного в указанной директории.
+    /// </summary>
+    public bool DeleteSite
+        (
+            string docRoot
+        )
+    {
+        Sure.NotNullNorEmpty (docRoot);
+
+        RequireToken();
+
+        var request = CreateRequest
+            (
+                "sites",
+                "del",
+                new { docRoot }
+            );
+
+        var response = _restClient.Execute (request);
+        var code = GetResult<string> (response).SafeToInt32();
+
+        return code != 0;
+    }
+
+    /// <summary>
+    /// Включение/выключение SSH.
+    /// </summary>
+    /// <param name="on">Включение/выключение.</param>
+    /// <param name="period">На какой период (в часах),
+    /// имеет смысл только для включения.</param>
+    public bool ToggleSsh
+        (
+            bool on,
+            int period = 3
+        )
+    {
+        RequireToken();
+
+        var request = CreateRequest
+            (
+                "vh/utils",
+                on ? "sshOn" : "sshOff",
+                new { period }
+            );
+
+        var response = _restClient.Execute (request);
+        var code = GetResult<string> (response).SafeToInt32();
+
+        return code != 0;
+
+    }
+
+    #endregion
 }
