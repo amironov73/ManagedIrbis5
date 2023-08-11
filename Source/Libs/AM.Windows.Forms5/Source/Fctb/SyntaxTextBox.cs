@@ -2017,7 +2017,7 @@ public class SyntaxTextBox
     {
         if (InvokeRequired)
         {
-            BeginInvoke (new MethodInvoker (Invalidate));
+            BeginInvoke (new System.Windows.Forms.MethodInvoker (Invalidate));
         }
         else
         {
@@ -2623,7 +2623,7 @@ public class SyntaxTextBox
     {
         if (InvokeRequired)
         {
-            BeginInvoke (new MethodInvoker (() => ResetTimer (timer)));
+            BeginInvoke (new System.Windows.Forms.MethodInvoker (() => ResetTimer (timer)));
             return;
         }
 
@@ -3912,15 +3912,15 @@ public class SyntaxTextBox
 
         if (IsHandleCreated)
         {
-            BeginInvoke ((MethodInvoker)OnScrollbarsUpdated);
+            BeginInvoke ((System.Windows.Forms.MethodInvoker) OnScrollbarsUpdated);
         }
     }
 
     private void OnMagicUpdateScrollBars()
     {
-        if (this.InvokeRequired)
+        if (InvokeRequired)
         {
-            Invoke (new MethodInvoker (OnMagicUpdateScrollBars));
+            Invoke (new System.Windows.Forms.MethodInvoker (OnMagicUpdateScrollBars));
         }
         else
         {
