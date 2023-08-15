@@ -139,7 +139,7 @@ public sealed class AutomaticClient
     /// <summary>
     /// Получение текущей модели.
     /// </summary>
-    public async Task<string?> GetCurrentModelAsync()
+    public async Task<string?> GetCurrentCheckpointAsync()
     {
         var options = await GetOptionsAsync();
         return options is not null ?
@@ -368,7 +368,7 @@ public sealed class AutomaticClient
     /// <summary>
     /// Получение списка моделей.
     /// </summary>
-    public async Task<JArray?> ListModelsAsync()
+    public async Task<JArray?> ListCheckpointsAsync()
     {
         var request = CreateRequest ("sd-models");
         try
