@@ -18,8 +18,6 @@ using RestSharp;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion;
 
 /// <summary>

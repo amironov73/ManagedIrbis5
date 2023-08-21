@@ -48,6 +48,7 @@ internal static class Program
             {
                 "checkpoints"
                     or "list-checkpoints" => Checkpoints (args),
+                "create-embedding" => CreateEmbedding (args),
                 "embeddings" => Embeddings (args),
                 "get-checkpoint"
                     or "current-checkpoint" => GetCheckpoint (args),
@@ -119,6 +120,18 @@ internal static class Program
         {
             Console.WriteLine (response);
         }
+
+        return 0;
+    }
+
+    private static int CreateEmbedding
+        (
+            string[] args
+        )
+    {
+        var client = CreateClient (args);
+        var request = CreateEmbeddingRequest.FromCommandLine (args);
+        client.CreateEmbeddingAsync (request).GetAwaiter().GetResult();
 
         return 0;
     }

@@ -12,17 +12,14 @@
 
 #region Using directives
 
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.IO;
 
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
 
 #endregion
-
-#nullable enable
 
 namespace AM.StableDiffusion.Automatic;
 
@@ -64,6 +61,54 @@ public sealed class TextToImageRequest
     #region Public methods
 
     /// <summary>
+    /// Считывание запроса из указанного файла.
+    /// </summary>
+    public static TextToImageRequest FromFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        // TODO определять YAML по расширению
+
+        var content = File.ReadAllText (fileName);
+        var result = JsonConvert.DeserializeObject<TextToImageRequest> (content)
+            .ThrowIfNull();
+
+        return result;
+    }
+
+    /// <summary>
+    /// Объединение с другим.
+    /// </summary>
+    public TextToImageRequest MergeWith
+        (
+            TextToImageRequest? other
+        )
+    {
+        if (other is null)
+        {
+            return this;
+        }
+
+        // TODO Styles
+        Prompt ??= other.Prompt;
+        NegativePrompt ??= other.NegativePrompt;
+        Seed = Seed is 0 ? other.Seed : Seed;
+        SamplerName ??= other.SamplerName;
+        BatchSize = BatchSize is 0 ? other.BatchSize : BatchSize;
+        Iterations = Iterations is 0 ? other.Iterations : Iterations;
+        Steps = Steps is 0 ? other.Steps : Steps;
+        CfgScale = CfgScale is 0.0f ? other.CfgScale : CfgScale;
+        Width = Width is 0 ? other.Width : Width;
+        Height = Height is 0 ? other.Height : Height;
+        // TODO прочие члены
+
+        return this;
+    }
+
+    /// <summary>
     /// Формирование запроса из командной строки.
     /// </summary>
     public static TextToImageRequest FromCommandLine
@@ -92,38 +137,61 @@ public sealed class TextToImageRequest
             switch (arg)
             {
                 case "--batch":
+                case "batch":
                     result.BatchSize = args[++i].SafeToInt32 (1);
                     break;
 
                 case "--cfg":
+                case "cfg":
                     result.CfgScale = float.Parse (args[++i], CultureInfo.InvariantCulture);
                     break;
 
+                case "--file":
+                case "file":
+                case "--from":
+                case "from":
+                    var fromFile = FromFile (args[++i]);
+                    result.MergeWith (fromFile);
+                    break;
+
                 case "--height":
+                case "height":
                     result.Height = args[++i].SafeToInt32 (512);
                     break;
 
                 case "--iter":
+                case "iter":
+                case "--number":
+                case "number":
+                case "--count":
+                case "count":
                     result.Iterations = args[++i].SafeToInt32 (1);
                     break;
 
                 case "--negative":
+                case "--neg":
+                case "negative":
+                case "neg":
                     result.NegativePrompt = args[++i];
                     break;
 
                 case "--prompt":
+                case "prompt":
                     result.Prompt = args[++i];
                     break;
 
                 case "--sampler":
+                case "sampler":
                     result.SamplerName = args[++i];
                     break;
 
                 case "--steps":
+                case "steps":
                     result.Steps = args[++i].SafeToInt32 (20);
                     break;
 
                 case "--width":
+                case "width":
                     result.Width = args[++i].SafeToInt32 (512);
                     break;
             }

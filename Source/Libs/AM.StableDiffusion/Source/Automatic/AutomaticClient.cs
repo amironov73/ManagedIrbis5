@@ -178,7 +178,7 @@ public sealed class AutomaticClient
     /// </summary>
     public async Task<CreateResponse?> CreateEmbeddingAsync
         (
-            JObject payload
+            CreateEmbeddingRequest payload
         )
     {
         Sure.NotNull (payload);
