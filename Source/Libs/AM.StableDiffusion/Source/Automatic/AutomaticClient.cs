@@ -32,8 +32,6 @@ using RestSharp.Serializers.NewtonsoftJson;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 //
@@ -162,13 +160,15 @@ public sealed class AutomaticClient
         Directory.CreateDirectory (OutputPath);
         foreach (var line in lines)
         {
+            var extension = ".png"; // TODO определять расширение по содержимому
             var bytes = TextToBytes (line);
             var fileName = Path.Combine
                 (
                     OutputPath,
                     DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss-ffff")
                 )
-                + ".png";
+                + extension;
+
             File.WriteAllBytes (fileName, bytes);
         }
     }
@@ -524,6 +524,26 @@ public sealed class AutomaticClient
         catch (Exception exception)
         {
             Magna.Logger.LogError (exception, "error during ListUpscalers");
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение списка VAE.
+    /// </summary>
+    public async Task<VaeInfo[]?> ListVaesAsync()
+    {
+        var request = CreateRequest ("sd-vae");
+        try
+        {
+            var result = await _restClient
+                .ExecuteAsync<VaeInfo[]> (request);
+            return result.Data;
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError (exception, "error during ListVaes");
         }
 
         return null;

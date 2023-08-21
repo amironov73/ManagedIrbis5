@@ -16,8 +16,6 @@ using Newtonsoft.Json;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 /// <summary>
@@ -57,6 +55,13 @@ public sealed class EmbeddingInfo
     /// </summary>
     [JsonProperty ("vectors", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Vectors { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => JsonConvert.SerializeObject (this);
 
     #endregion
 }

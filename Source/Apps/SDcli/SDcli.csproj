@@ -9,4 +9,10 @@
       <ProjectReference Include="..\..\Libs\AM.StableDiffusion\AM.StableDiffusion.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="run.cmd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

@@ -20,8 +20,6 @@ using Newtonsoft.Json.Linq;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 /// <summary>
@@ -43,6 +41,13 @@ public sealed class MemoryResponse
     /// </summary>
     [JsonProperty ("cuda")]
     public JObject? Cuda { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => JsonConvert.SerializeObject (this);
 
     #endregion
 }

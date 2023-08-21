@@ -17,8 +17,6 @@ using Newtonsoft.Json.Linq;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 /// <summary>
@@ -47,6 +45,13 @@ public sealed class SamplerInfo
     /// </summary>
     [JsonProperty ("options", NullValueHandling = NullValueHandling.Ignore)]
     public JObject? Options { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => JsonConvert.SerializeObject (this);
 
     #endregion
 }

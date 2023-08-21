@@ -12,6 +12,10 @@
 
 #region Using directives
 
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
@@ -54,6 +58,79 @@ public sealed class TextToImageRequest
     /// </summary>
     [JsonProperty ("hr_resize_y", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeY { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Формирование запроса из командной строки.
+    /// </summary>
+    public static TextToImageRequest FromCommandLine
+        (
+            string[]? args
+        )
+    {
+        var result = new TextToImageRequest
+        {
+            Steps = 20,
+            Iterations = 1,
+            BatchSize = 1,
+            CfgScale = 7,
+            Width = 512,
+            Height = 768
+        };
+
+        if (args is null)
+        {
+            return result;
+        }
+
+        for (var i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            switch (arg)
+            {
+                case "--batch":
+                    result.BatchSize = args[++i].SafeToInt32 (1);
+                    break;
+
+                case "--cfg":
+                    result.CfgScale = float.Parse (args[++i], CultureInfo.InvariantCulture);
+                    break;
+
+                case "--height":
+                    result.Height = args[++i].SafeToInt32 (512);
+                    break;
+
+                case "--iter":
+                    result.Iterations = args[++i].SafeToInt32 (1);
+                    break;
+
+                case "--negative":
+                    result.NegativePrompt = args[++i];
+                    break;
+
+                case "--prompt":
+                    result.Prompt = args[++i];
+                    break;
+
+                case "--sampler":
+                    result.SamplerName = args[++i];
+                    break;
+
+                case "--steps":
+                    result.Steps = args[++i].SafeToInt32 (20);
+                    break;
+
+                case "--width":
+                    result.Width = args[++i].SafeToInt32 (512);
+                    break;
+            }
+        }
+
+        return result;
+    }
 
     #endregion
 }
