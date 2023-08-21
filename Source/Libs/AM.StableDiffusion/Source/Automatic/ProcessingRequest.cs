@@ -27,6 +27,12 @@ public class ProcessingRequest
     #region Properties
 
     /// <summary>
+    /// Имя модели (опционально).
+    /// </summary>
+    [JsonProperty ("checkpoint")]
+    public string? Checkpoint { get; set; }
+
+    /// <summary>
     /// Промпт.
     /// </summary>
     [JsonProperty ("prompt")]

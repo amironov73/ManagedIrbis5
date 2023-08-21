@@ -16,8 +16,6 @@ using Newtonsoft.Json;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 /// <summary>

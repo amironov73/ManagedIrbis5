@@ -276,6 +276,12 @@ internal static class Program
     {
         var client = CreateClient (args);
         var request = TextToImageRequest.FromCommandLine (args);
+        var checkpoint = request.Checkpoint;
+        if (!string.IsNullOrEmpty (checkpoint))
+        {
+            client.SetModelAsync (checkpoint).GetAwaiter().GetResult();
+        }
+
         var response = client.TextToImageAsync (request).GetAwaiter().GetResult();
         client.SaveImages (response?.Images);
 

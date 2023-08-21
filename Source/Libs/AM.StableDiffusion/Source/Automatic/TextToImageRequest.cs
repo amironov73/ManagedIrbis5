@@ -95,14 +95,14 @@ public sealed class TextToImageRequest
         // TODO Styles
         Prompt ??= other.Prompt;
         NegativePrompt ??= other.NegativePrompt;
-        Seed = Seed is 0 ? other.Seed : Seed;
+        Seed = other.Seed is 0 ? Seed : other.Seed;
         SamplerName ??= other.SamplerName;
-        BatchSize = BatchSize is 0 ? other.BatchSize : BatchSize;
-        Iterations = Iterations is 0 ? other.Iterations : Iterations;
-        Steps = Steps is 0 ? other.Steps : Steps;
-        CfgScale = CfgScale is 0.0f ? other.CfgScale : CfgScale;
-        Width = Width is 0 ? other.Width : Width;
-        Height = Height is 0 ? other.Height : Height;
+        BatchSize = other.BatchSize is 0 ? BatchSize : other.BatchSize;
+        Iterations = other.Iterations is 0 ? Iterations : other.Iterations;
+        Steps = other.Steps is 0 ? Steps : other.Steps;
+        CfgScale = other.CfgScale is 0.0f ? CfgScale : other.CfgScale;
+        Width = other.Width is 0 ? Width : other.Width;
+        Height = other.Height is 0 ? Height : other.Height;
         // TODO прочие члены
 
         return this;
