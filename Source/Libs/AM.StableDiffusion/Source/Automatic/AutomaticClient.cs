@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* AutomaticClient.cs -- обертка над API, предоставлемым Automatic1111
@@ -14,6 +15,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,7 +51,16 @@ public sealed class AutomaticClient
     /// <summary>
     /// URL для API по умолчанию.
     /// </summary>
-    public const string DefaultUrl = "http://127.0.0.1/sdapi/v1/";
+    public const string DefaultUrl = "http://127.0.0.1:7860/sdapi/v1/";
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Путь, по которому сохраняются картинки.
+    /// </summary>
+    public string OutputPath { get; set; }
 
     #endregion
 
@@ -74,6 +85,7 @@ public sealed class AutomaticClient
     {
         Sure.NotNullNorEmpty (baseUrl);
 
+        OutputPath = "output";
         var options = new RestClientOptions
         {
             BaseUrl = new Uri (baseUrl)
@@ -105,9 +117,61 @@ public sealed class AutomaticClient
         return new RestRequest (resource, method);
     }
 
+    private void DumpRequest
+        (
+            RestRequest request
+        )
+    {
+        var uri = _restClient.BuildUri (request);
+        Console.WriteLine ($"Request URI: {uri}");
+    }
+
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Преобразование строки в байты.
+    /// </summary>
+    public static byte[] TextToBytes
+        (
+            string text
+        )
+    {
+        if (string.IsNullOrWhiteSpace (text))
+        {
+            return Array.Empty<byte>();
+        }
+
+        return Convert.FromBase64String (text);
+    }
+
+    /// <summary>
+    /// Сохранение полученных картинок.
+    /// </summary>
+    public void SaveImages
+        (
+            IEnumerable<string>? lines
+        )
+    {
+        if (lines is null)
+        {
+            return;
+        }
+
+        Directory.CreateDirectory (OutputPath);
+        foreach (var line in lines)
+        {
+            var bytes = TextToBytes (line);
+            var fileName = Path.Combine
+                (
+                    OutputPath,
+                    DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss-ffff")
+                )
+                + ".png";
+            File.WriteAllBytes (fileName, bytes);
+        }
+    }
 
     /// <summary>
     /// Создание текстовой инверсии.
@@ -595,7 +659,7 @@ public sealed class AutomaticClient
     /// <summary>
     /// Генерация изображения по тексту.
     /// </summary>
-    public async Task<bool> TextToImageAsync
+    public async Task<TextToImageResponse?> TextToImageAsync
         (
             TextToImageRequest payload
         )
@@ -604,18 +668,21 @@ public sealed class AutomaticClient
 
         var request = CreateRequest ("txt2img", Method.Post)
             .AddJsonBody ((object) payload);
+
+        // DumpRequest (request);
+
         try
         {
-            await _restClient
-                .ExecuteAsync<TrainResponse> (request);
-            return true;
+            var response = await _restClient
+                .ExecuteAsync<TextToImageResponse> (request);
+            return response.Data;
         }
         catch (Exception exception)
         {
             Magna.Logger.LogError (exception, "error during TextToImage");
         }
 
-        return false;
+        return null;
     }
 
     /// <summary>

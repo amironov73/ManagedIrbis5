@@ -1,0 +1,17 @@
+﻿POST http://127.0.0.1:7860/sdapi/v1/txt2img
+Content-Type: application/json
+
+{
+  "prompt": "a photo of a beautiful 18 years old ukrainian girl posing outdoors",
+  "negative_prompt": "",
+  "seed": -1,
+  "batch_size": 1,
+  "n_iter": 1,
+  "sampler_name": "DPM++ 2M Karras",
+  "steps": 20,
+  "cfg_scale": 7,
+  "width": 512,
+  "height": 768
+}
+
+#####
