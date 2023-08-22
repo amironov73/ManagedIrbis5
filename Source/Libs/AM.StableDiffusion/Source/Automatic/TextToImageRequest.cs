@@ -13,7 +13,7 @@
 #region Using directives
 
 using System.Globalization;
-using System.IO;
+using System.Text.Json.Serialization;
 
 using JetBrains.Annotations;
 
@@ -35,24 +35,28 @@ public sealed class TextToImageRequest
     /// <summary>
     /// Кратность масштабирования.
     /// </summary>
+    [JsonPropertyName ("hr_scale")]
     [JsonProperty ("hr_scale", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public float Scale { get; set; }
 
     /// <summary>
     /// Применяемый апскейлер, если есть.
     /// </summary>
+    [JsonPropertyName ("hr_upscaler")]
     [JsonProperty ("hr_upscaler", NullValueHandling = NullValueHandling.Ignore)]
     public string? Upscaler { get; set; }
 
     /// <summary>
     /// Масштабирование до указанного размера по ширине.
     /// </summary>
+    [JsonPropertyName ("hr_resize_x")]
     [JsonProperty ("hr_resize_x", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeX { get; set; }
 
     /// <summary>
     /// Масштабирование до указанного размера по высоте.
     /// </summary>
+    [JsonPropertyName ("hr_resize_y")]
     [JsonProperty ("hr_resize_y", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeY { get; set; }
 
@@ -70,13 +74,7 @@ public sealed class TextToImageRequest
     {
         Sure.FileExists (fileName);
 
-        // TODO определять YAML по расширению
-
-        var content = File.ReadAllText (fileName);
-        var result = JsonConvert.DeserializeObject<TextToImageRequest> (content)
-            .ThrowIfNull();
-
-        return result;
+        return StableUtility.FromFile<TextToImageRequest> (fileName);
     }
 
     /// <summary>

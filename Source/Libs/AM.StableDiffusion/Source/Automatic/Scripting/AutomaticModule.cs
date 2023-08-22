@@ -12,6 +12,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AM.Scripting.Barsik;
 
@@ -330,8 +331,7 @@ public sealed class AutomaticModule
             dynamic?[] args
         )
     {
-        var payload = Compute (context, args, 0) as TextToImageRequest;
-        if (payload is null)
+        if (Compute (context, args, 0) is not TextToImageRequest payload)
         {
             return null;
         }
@@ -341,7 +341,13 @@ public sealed class AutomaticModule
             return null;
         }
 
-        return connection.TextToImageAsync (payload).GetAwaiter().GetResult();
+        var response = connection.TextToImageAsync (payload).GetAwaiter().GetResult();
+        if (response is null)
+        {
+            return response;
+        }
+
+        return AutomaticClient.TextToBytes (response.Images?.FirstOrDefault());
     }
 
     /// <summary>
@@ -353,8 +359,7 @@ public sealed class AutomaticModule
             dynamic?[] args
         )
     {
-        var payload = Compute (context, args, 0);
-        if (payload is null)
+        if (Compute (context, args, 0) is not TrainEmbeddingRequest payload)
         {
             return null;
         }

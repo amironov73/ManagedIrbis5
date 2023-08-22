@@ -13,6 +13,8 @@
 
 #region Using directives
 
+using System.Text.Json.Serialization;
+
 using Newtonsoft.Json;
 
 #endregion
@@ -29,91 +31,106 @@ public class ProcessingRequest
     /// <summary>
     /// Имя модели (опционально).
     /// </summary>
-    [JsonProperty ("checkpoint")]
+    [JsonPropertyName ("checkpoint")]
+    [JsonProperty ("checkpoint", NullValueHandling = NullValueHandling.Ignore)]
     public string? Checkpoint { get; set; }
 
     /// <summary>
     /// Промпт.
     /// </summary>
-    [JsonProperty ("prompt")]
+    [JsonPropertyName ("prompt")]
+    [JsonProperty ("prompt", NullValueHandling = NullValueHandling.Ignore)]
     public string? Prompt { get; set; }
 
     /// <summary>
     /// Негативный промпт.
     /// </summary>
+    [JsonPropertyName ("negative_prompt")]
     [JsonProperty ("negative_prompt", NullValueHandling = NullValueHandling.Ignore)]
     public string? NegativePrompt { get; set; }
 
     /// <summary>
     /// Используемые стили.
     /// </summary>
+    [JsonPropertyName ("styles")]
     [JsonProperty ("styles", NullValueHandling = NullValueHandling.Ignore)]
     public string[]? Styles { get; set; }
 
     /// <summary>
     /// Начальное значение.
     /// </summary>
+    [JsonPropertyName ("seed")]
     [JsonProperty ("seed", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Seed { get; set; }
 
     /// <summary>
     /// Имя используемого семплера.
     /// </summary>
+    [JsonPropertyName ("sampler_name")]
     [JsonProperty ("sampler_name", NullValueHandling = NullValueHandling.Ignore)]
     public string? SamplerName { get; set; }
 
     /// <summary>
     /// Размер пачки.
     /// </summary>
+    [JsonPropertyName ("batch_size")]
     [JsonProperty ("batch_size", NullValueHandling = NullValueHandling.Ignore)]
     public int BatchSize { get; set; }
 
     /// <summary>
     /// Количество итераций.
     /// </summary>
+    [JsonPropertyName ("n_iter")]
     [JsonProperty ("n_iter", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Iterations { get; set; }
 
     /// <summary>
     /// Количество шагов семплирования.
     /// </summary>
+    [JsonPropertyName ("steps")]
     [JsonProperty ("steps", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Steps { get; set; }
 
     /// <summary>
     /// Сила промпта.
     /// </summary>
-    [JsonProperty ("cfg_scale")]
+    [JsonPropertyName ("cfg_scale")]
+    [JsonProperty ("cfg_scale", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public float CfgScale { get; set; }
 
     /// <summary>
     /// Ширина изображения в пикселах.
     /// </summary>
-    [JsonProperty ("width")]
+    [JsonPropertyName ("width")]
+    [JsonProperty ("width", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Width { get; set; }
 
     /// <summary>
     /// Высота изображения в пикселах.
     /// </summary>
-    [JsonProperty ("height")]
+    [JsonPropertyName ("height")]
+    [JsonProperty ("height", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int Height { get; set; }
 
     /// <summary>
     /// Исправлять лица?
     /// </summary>
-    [JsonProperty ("restore_faces")]
+    [JsonPropertyName ("restore_faces")]
+    [JsonProperty ("restore_faces", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public bool RestoreFaces { get; set; }
 
     /// <summary>
     /// Генерировать бесшовную текстуру?
     /// </summary>
-    [JsonProperty ("tiling")]
+    [JsonPropertyName ("tiling")]
+    [JsonProperty ("tiling", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public bool Tiling { get; set; }
 
     /// <summary>
     /// Сила обесшумливания.
     /// </summary>
-    [JsonProperty ("denoising_strength")]
+    [JsonPropertyName ("denoising_strength")]
+    [JsonProperty ("denoising_strength", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public float DenoisingStrength { get; set; }
 
     #endregion

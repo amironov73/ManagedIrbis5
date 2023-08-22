@@ -150,8 +150,10 @@
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0" />
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
+    <PackageVersion Include="Tomlyn" Version="0.16.2" />
     <PackageVersion Include="Topshelf" Version="4.3.0" />
     <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.6.1" />
+    <PackageVersion Include="YamlDotNet" Version="13.2.0" />
   </ItemGroup>
 </Project>

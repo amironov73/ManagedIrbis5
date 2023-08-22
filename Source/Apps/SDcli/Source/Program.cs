@@ -72,35 +72,7 @@ internal static class Program
         }
     }
 
-    private static AutomaticClient CreateClient
-        (
-            string[] args
-        )
-    {
-        var baseUrl = AutomaticClient.DefaultUrl;
-        var outputPath = "output";
-        for (var i = 0; i < args.Length; i++)
-        {
-            var arg = args[i];
-            switch (arg)
-            {
-                case "--url":
-                    baseUrl = args[++i];
-                    break;
-
-                case "--output":
-                    outputPath = args[++i];
-                    break;
-            }
-        }
-
-        var result = new AutomaticClient (baseUrl)
-        {
-            OutputPath = outputPath
-        };
-
-        return result;
-    }
+    private static AutomaticClient CreateClient (string[] args) => AutomaticClient.FromEnvironment (args);
 
     private static int ShowHelp()
     {

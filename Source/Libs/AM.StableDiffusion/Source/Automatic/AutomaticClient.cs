@@ -86,7 +86,8 @@ public sealed class AutomaticClient
         OutputPath = "output";
         var options = new RestClientOptions
         {
-            BaseUrl = new Uri (baseUrl)
+            BaseUrl = new Uri (baseUrl),
+            MaxTimeout = 5 * 60 * 1000 // 5 минут
         };
         _restClient = new RestClient (options);
         _restClient.UseNewtonsoftJson();
@@ -133,7 +134,7 @@ public sealed class AutomaticClient
     /// </summary>
     public static byte[] TextToBytes
         (
-            string text
+            string? text
         )
     {
         if (string.IsNullOrWhiteSpace (text))
@@ -142,6 +143,40 @@ public sealed class AutomaticClient
         }
 
         return Convert.FromBase64String (text);
+    }
+
+    /// <summary>
+    /// Создание клиента из окружения.
+    /// </summary>
+    public static AutomaticClient FromEnvironment
+        (
+            string[] args
+        )
+    {
+        var outputPath = "output";
+        var baseUrl = Environment.GetEnvironmentVariable ("AUTOMATIC")
+            ?? AutomaticClient.DefaultUrl;
+        for (var i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+            switch (arg)
+            {
+                case "--url":
+                    baseUrl = args[++i];
+                    break;
+
+                case "--output":
+                    outputPath = args[++i];
+                    break;
+            }
+        }
+
+        var result = new AutomaticClient (baseUrl)
+        {
+            OutputPath = outputPath
+        };
+
+        return result;
     }
 
     /// <summary>

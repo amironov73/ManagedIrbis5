@@ -130,10 +130,39 @@ public class TrainEmbeddingRequest
     #region Public methods
 
     /// <summary>
+    /// Загрузка запроса из указанного файла.
+    /// </summary>
+    public static TrainEmbeddingRequest FromFile
+        (
+            string fileName
+        )
+    {
+        Sure.FileExists (fileName);
+
+        return StableUtility.FromFile<TrainEmbeddingRequest> (fileName);
+    }
+
+    /// <summary>
+    /// Слияние с другим запросом.
+    /// </summary>
+    public TrainEmbeddingRequest MergeWith
+        (
+            TrainEmbeddingRequest? other
+        )
+    {
+        if (other is null)
+        {
+            return this;
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Формирование запроса на обучение текстовой инверсии.
     /// из командной строки.
     /// </summary>
-    public TrainEmbeddingRequest FromCommandLine
+    public static TrainEmbeddingRequest FromCommandLine
         (
             string[] args
         )
@@ -158,71 +187,98 @@ public class TrainEmbeddingRequest
             var arg = args[i];
             switch (arg)
             {
+                case "--file":
+                case "file":
+                    var other = FromFile (args[++i]);
+                    result = result.MergeWith (other);
+                    break;
+
                 case "--name":
+                case "name":
                     result.Name = args[++i];
                     break;
 
                 case "--rate":
+                case "rate":
                     result.LearningRate = args[++i];
                     break;
 
                 case "--batch":
+                case "batch":
                     result.BatchSize = args[++i].SafeToInt32 (1);
                     break;
 
                 case "--gradient":
+                case "gradient":
                     result.GradientStep = args[++i].SafeToInt32 (1);
                     break;
 
                 case "--data":
                 case "--root":
+                case "data":
+                case "root":
                     result.DataRoot = args[++i];
                     break;
 
                 case "--log":
+                case "log":
                     result.LogDirectory = args[++i];
                     break;
 
                 case "--width":
+                case "width":
                     result.Width = args[++i].SafeToInt32 (512);
                     break;
 
                 case "--height":
+                case "height":
                     result.Height = args[++i].SafeToInt32 (512);
                     break;
 
                 case "--step":
                 case "--steps":
                 case "--max-step":
+                case "step":
+                case "steps":
+                case "max-step":
+                case "maxstep":
                     result.MaxStep = args[++i].SafeToInt32 (100);
                     break;
 
                 case "--clip":
                 case "--clipping":
+                case "clip":
+                case "clipping":
                     result.GradientClipping = args[++i];
                     break;
 
                 case "--shuffle":
+                case "shuffle":
                     result.ShuffleTags = true;
                     break;
 
                 case "--drop":
+                case "drop":
                     result.TagDropOut = true;
                     break;
 
                 case "--latent-sampling":
+                case "latent-sampling":
                     result.LatentSamplingMethod = args[++i];
                     break;
 
                 case "--image-every":
+                case "image-every":
                     result.CreateImageEvery = args[++i].SafeToInt32 (100);
                     break;
 
                 case "--save-every":
+                case "save-every":
                     result.SaveEmbeddingEvery = args[++i].SafeToInt32 (100);
                     break;
 
                 case "--template":
+                case "template":
                     result.TemplateFileName = args[++i];
                     break;
             }
