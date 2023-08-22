@@ -657,11 +657,11 @@ public sealed class AutomaticClient
     /// </summary>
     public async Task<TrainResponse?> TrainEmbeddingAsync
         (
-            dynamic payload
+            TrainEmbeddingRequest payload
         )
     {
         var request = CreateRequest ("train/embedding", Method.Post)
-            .AddJsonBody ((object) payload);
+            .AddJsonBody (payload);
         try
         {
             var response = await _restClient
