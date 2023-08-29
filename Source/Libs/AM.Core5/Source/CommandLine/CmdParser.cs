@@ -34,6 +34,11 @@ public sealed class CmdParser
     /// </summary>
     public char Delimiter { get; set; } = '=';
 
+    /// <summary>
+    /// Нечувствителен к регистру символов?
+    /// </summary>
+    public bool CaseInsensitive { get; set; }
+
     #endregion
 
     #region Public methods
@@ -54,18 +59,38 @@ public sealed class CmdParser
     {
         Sure.NotNull (arguments);
 
-        var result = new ParsedCmdLine();
+        var result = new ParsedCmdLine { CaseInsensitive = CaseInsensitive };
+        var comparer = CaseInsensitive
+            ? StringComparer.InvariantCultureIgnoreCase
+            : StringComparer.InvariantCulture;
         foreach (var argument in arguments)
         {
             if (argument.Contains (Delimiter))
             {
                 var parts = argument.Split (Delimiter, 2);
-                var option = new CmdOption
+                var name = parts[0];
+                var value = parts.SafeAt (1);
+
+                // сначала пытаемся найти предыдущую опцию с таким же именем
+                CmdOption? found = default;
+                foreach (var previous in result.Options)
                 {
-                    Name = parts[0],
-                    Value = parts.SafeAt (1)
-                };
-                result.Options.Add (option);
+                    if (comparer.Compare (previous.Name, name) == 0)
+                    {
+                        found = previous;
+                        break;
+                    }
+                }
+
+                if (found is not null)
+                {
+                    found.Value = value;
+                }
+                else
+                {
+                    var option = new CmdOption { Name = name, Value = value };
+                    result.Options.Add (option);
+                }
             }
             else
             {
