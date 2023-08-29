@@ -23,8 +23,6 @@ using System.Reflection;
 
 #endregion
 
-#nullable enable
-
 namespace AM.CommandLine;
 
 /// <summary>

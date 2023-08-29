@@ -47,8 +47,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM;
 
 /// <summary>
@@ -4766,11 +4764,67 @@ public static class Utility
     }
 
     /// <summary>
+    /// Преобразование типа.
+    /// </summary>
+    public static object ConvertTo
+        (
+            object value,
+            Type targetType
+        )
+    {
+        Sure.NotNull (targetType);
+
+        if (ReferenceEquals (value, null))
+        {
+            return default!;
+        }
+
+        var sourceType = value.GetType();
+        if (targetType == typeof (string))
+        {
+            return value.ToString()!;
+        }
+
+        if (targetType == typeof (bool))
+        {
+            return ToBoolean (value);
+        }
+
+        if (targetType.IsAssignableFrom (sourceType))
+        {
+            return value;
+        }
+
+        if (value is IConvertible)
+        {
+            return Convert.ChangeType (value, targetType);
+        }
+
+        var converterFrom = TypeDescriptor.GetConverter (value);
+        if (converterFrom.CanConvertTo (targetType))
+        {
+            return converterFrom.ConvertTo
+                (
+                    value,
+                    targetType
+                )!;
+        }
+
+        var converterTo = TypeDescriptor.GetConverter (targetType);
+        if (converterTo.CanConvertFrom (sourceType))
+        {
+            return converterTo.ConvertFrom (value)!;
+        }
+
+        throw new ArsMagnaException();
+    }
+
+    /// <summary>
     /// Converts given value to the specified type.
     /// </summary>
     /// <param name="value">The value to be converted.</param>
     /// <returns>Converted value.</returns>
-    public static T ConvertTo<T>
+    public static TTarget ConvertTo<TTarget>
         (
             object? value
         )
@@ -4781,27 +4835,32 @@ public static class Utility
         }
 
         var sourceType = value.GetType();
-        var targetType = typeof (T);
+        var targetType = typeof (TTarget);
 
         if (targetType == typeof (string))
         {
-            return (T)(object)value.ToString()!;
+            return (TTarget) (object) value.ToString()!;
+        }
+
+        if (targetType == typeof (bool))
+        {
+            return (TTarget) (object) ToBoolean (value);
         }
 
         if (targetType.IsAssignableFrom (sourceType))
         {
-            return (T)value;
+            return (TTarget) value;
         }
 
         if (value is IConvertible)
         {
-            return (T)Convert.ChangeType (value, targetType);
+            return (TTarget) Convert.ChangeType (value, targetType);
         }
 
         var converterFrom = TypeDescriptor.GetConverter (value);
         if (converterFrom.CanConvertTo (targetType))
         {
-            return (T)converterFrom.ConvertTo
+            return (TTarget) converterFrom.ConvertTo
                 (
                     value,
                     targetType
@@ -4811,7 +4870,7 @@ public static class Utility
         var converterTo = TypeDescriptor.GetConverter (targetType);
         if (converterTo.CanConvertFrom (sourceType))
         {
-            return (T)converterTo.ConvertFrom (value)!;
+            return (TTarget) converterTo.ConvertFrom (value)!;
         }
 
         throw new ArsMagnaException();

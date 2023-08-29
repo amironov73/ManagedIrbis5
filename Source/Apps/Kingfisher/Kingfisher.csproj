@@ -5,4 +5,10 @@
         <ApplicationIcon>Kingfisher.ico</ApplicationIcon>
     </PropertyGroup>
 
+    <ItemGroup>
+      <None Update="run.cmd">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>
