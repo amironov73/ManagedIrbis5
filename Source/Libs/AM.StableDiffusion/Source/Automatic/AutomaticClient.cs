@@ -89,8 +89,11 @@ public sealed class AutomaticClient
             BaseUrl = new Uri (baseUrl),
             MaxTimeout = 5 * 60 * 1000 // 5 минут
         };
-        _restClient = new RestClient (options);
-        _restClient.UseNewtonsoftJson();
+        _restClient = new RestClient
+            (
+                options,
+                configureSerialization: s => s.UseNewtonsoftJson()
+            );
     }
 
     #endregion

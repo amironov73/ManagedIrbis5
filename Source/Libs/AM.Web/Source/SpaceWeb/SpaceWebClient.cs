@@ -21,8 +21,6 @@ using RestSharp.Serializers.NewtonsoftJson;
 
 #endregion
 
-#nullable enable
-
 namespace AM.SpaceWeb;
 
 /// <summary>
@@ -79,8 +77,11 @@ public sealed class SpaceWebClient
         {
             BaseUrl = new Uri (baseUrl)
         };
-        _restClient = new RestClient (options);
-        _restClient.UseNewtonsoftJson();
+        _restClient = new RestClient
+            (
+                options,
+                configureSerialization: s => s.UseNewtonsoftJson()
+            );
     }
 
     #endregion

@@ -35,8 +35,6 @@ using SixLabors.ImageSharp;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.CivitAI;
 
 //
@@ -87,8 +85,12 @@ public sealed class CivitClient
         {
             BaseUrl = new Uri (baseUrl)
         };
-        _restClient = new RestClient (_httpClient, options);
-        _restClient.UseNewtonsoftJson();
+        _restClient = new RestClient
+            (
+                _httpClient,
+                options,
+                configureSerialization: s => s.UseNewtonsoftJson()
+            );
     }
 
     #endregion

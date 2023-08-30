@@ -10,9 +10,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AM;
 using AM.Collections;
 
-#nullable enable
-
 namespace UnitTests.AM;
+
+#pragma warning disable CA1861
 
 [TestClass]
 public sealed class ArrayUtilityTest

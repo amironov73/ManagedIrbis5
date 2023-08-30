@@ -116,12 +116,12 @@ public sealed class Magna
     /// <summary>
     /// Фабрика логгеров.
     /// </summary>
-    public static ILoggerFactory Factory { get; private set; } = new LoggerFactory();
+    public static ILoggerFactory Factory { get; private set; } = NullLoggerFactory.Instance;
 
     /// <summary>
     /// Общий логгер для всего приложения.
     /// </summary>
-    public static ILogger Logger { get; internal set; } = new NullLogger<Magna>();
+    public static ILogger Logger { get; internal set; } = NullLogger<Magna>.Instance;
 
     /// <summary>
     /// Общая конфигурация для всего приложения.
