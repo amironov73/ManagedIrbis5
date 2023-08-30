@@ -34,8 +34,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis.Providers;
 
 /// <summary>

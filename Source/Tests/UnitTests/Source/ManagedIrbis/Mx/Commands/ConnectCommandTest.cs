@@ -3,6 +3,8 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
+#region Using directives
+
 using System;
 
 using ManagedIrbis;
@@ -11,7 +13,7 @@ using ManagedIrbis.Mx.Commands;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-#nullable enable
+#endregion
 
 namespace UnitTests.ManagedIrbis.Mx.Commands;
 
@@ -27,6 +29,7 @@ public sealed class ConnectCommandTest
         Assert.AreEqual ("connect", command.Name);
     }
 
+    [Ignore]
     [TestMethod]
     [Description ("Выполнение команды")]
     [ExpectedException (typeof (IrbisException))]

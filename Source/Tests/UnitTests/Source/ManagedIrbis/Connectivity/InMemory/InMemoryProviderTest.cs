@@ -5,6 +5,8 @@
 using System;
 using System.IO;
 
+using AM.ComponentModel;
+
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.InMemory;
@@ -34,8 +36,7 @@ public sealed class InMemoryProviderTest
     private InMemoryProvider _GetProvider()
     {
         var resources = new InMemoryResourceProvider();
-        var serviceCollection = new ServiceCollection();
-        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var serviceProvider = new ServiceAggregator();
         return new InMemoryProvider (resources, serviceProvider);
     }
 
@@ -44,8 +45,7 @@ public sealed class InMemoryProviderTest
     public void InMemoryProvider_Construction_1()
     {
         var resources = new InMemoryResourceProvider();
-        var serviceCollection = new ServiceCollection();
-        var serviceProvider = serviceCollection.BuildServiceProvider();
+        var serviceProvider = new ServiceAggregator();
         using var provider = new InMemoryProvider (resources, serviceProvider);
         Assert.AreSame (resources, provider.Resources);
         Assert.IsNotNull (provider.Databases);

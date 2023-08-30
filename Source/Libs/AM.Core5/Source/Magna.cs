@@ -27,6 +27,8 @@ using System.Linq;
 using System.Reflection;
 
 using AM.AppServices;
+using AM.Configuration;
+using AM.Hosting;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,8 +43,6 @@ using ILogger = Microsoft.Extensions.Logging.ILogger;
 #endregion
 
 #pragma warning disable CA2211 // поля, не являющиеся констрантами, не должны быть видны
-
-#nullable enable
 
 namespace AM;
 
@@ -111,7 +111,7 @@ public sealed class Magna
     /// <summary>
     /// Хост приложения.
     /// </summary>
-    public static IHost Host { get; internal set; } = new HostBuilder().Build();
+    public static IHost Host { get; internal set; } = new NullHost();
 
     /// <summary>
     /// Фабрика логгеров.
@@ -126,10 +126,7 @@ public sealed class Magna
     /// <summary>
     /// Общая конфигурация для всего приложения.
     /// </summary>
-    public static IConfiguration Configuration { get; set; } = new ConfigurationBuilder()
-        .SetBasePath (AppContext.BaseDirectory)
-        .AddJsonFile ("appsettings.json", true, true)
-        .Build();
+    public static IConfiguration Configuration { get; set; } = new NullConfiguration();
 
     /// <summary>
     /// Глобальные опции программы.
@@ -172,6 +169,11 @@ public sealed class Magna
         }
 
         Args = args;
+
+        Configuration = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", true, true)
+            .Build();
 
         var builder = Microsoft.Extensions.Hosting.Host
             .CreateDefaultBuilder (args);

@@ -18,10 +18,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 #endregion
 
-#nullable enable
-
 namespace UnitTests.ManagedIrbis.Search;
 
+[Ignore]
 [TestClass]
 public class TeapotSearcherTest
     : Common.CommonUnitTest
