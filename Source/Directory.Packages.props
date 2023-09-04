@@ -58,7 +58,7 @@
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
-    <PackageVersion Include="MailKit" Version="4.1.0" />
+    <PackageVersion Include="MailKit" Version="4.2.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview5.225-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.1.2" />
@@ -89,7 +89,7 @@
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.1" />
     <PackageVersion Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.3" />
     <PackageVersion Include="Microsoft.Windows.Compatibility" Version="8.0.0-preview.7.23376.1" />
-    <PackageVersion Include="MimeKit" Version="4.1.0" />
+    <PackageVersion Include="MimeKit" Version="4.2.0" />
     <PackageVersion Include="Mono.Posix.NETStandard" Version="1.0.0" />
     <PackageVersion Include="Moq" Version="4.18.4" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.1.1" />
@@ -122,7 +122,7 @@
     <PackageVersion Include="RestSharp" Version="110.2.0" />
     <PackageVersion Include="RestSharp.Authenticators.Digest" Version="1.3.1" />
     <PackageVersion Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
-    <PackageVersion Include="Rookout" Version="0.1.130" />
+    <PackageVersion Include="Rookout" Version="0.1.139" />
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.0.2" />
     <PackageVersion Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
     <PackageVersion Include="SixLabors.Fonts" Version="1.0.0" />
