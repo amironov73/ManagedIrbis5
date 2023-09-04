@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
 
-/* IdentifierTokenizer.cs -- токенайзер для идентификаторов
+/* IdentifierRecognizer.cs -- распознает идентификаторы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,19 +23,17 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 // поля, не являющиеся константными, не должны быть видимы
 #pragma warning disable CA2211
 
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер для идентификаторов.
+/// Распознает идентификаторы.
 /// </summary>
 [PublicAPI]
-public sealed class IdentifierTokenizer
-    : ITokenizer
+public sealed class IdentifierRecognizer
+    : ITokenRecognizer
 {
     #region Common data
 
@@ -72,9 +70,18 @@ public sealed class IdentifierTokenizer
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Создание экземпляра.
+    /// </summary>
+    public static ITokenRecognizer Create() => new IdentifierRecognizer();
+
+    #endregion
+
     #region ITokenizer members
 
-    /// <inheritdoc cref="ITokenizer.RecognizeToken"/>
+    /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
     public Token? RecognizeToken
         (
             TextNavigator navigator

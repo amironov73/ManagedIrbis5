@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* WhitespaceTokenizer.cs -- токенайзер для пробелов
+/* WhitespaceRecognizer.cs -- распознает пробелы
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,20 +17,45 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер для пробелов.
+/// Распознает пробелы.
 /// </summary>
 [PublicAPI]
-public sealed class WhitespaceTokenizer
-    : ITokenizer
+public sealed class WhitespaceRecognizer
+    : ITokenRecognizer
 {
+    #region Properties
+
+    /// <summary>
+    /// Общий (разделяемый) экземпляр токена.
+    /// </summary>
+    public static readonly Token TokenInstance = new
+        (
+            TokenKind.Whitespace,
+            string.Empty
+        );
+
+    /// <summary>
+    /// Использовать общий экземпляр токена?
+    /// </summary>
+    public static bool UseSharedTokenInstance { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Создание экземпляра.
+    /// </summary>
+    public static ITokenRecognizer Create() => new WhitespaceRecognizer();
+
+    #endregion
+
     #region ITokenizer members
 
-    /// <inheritdoc cref="ITokenizer"/>
+    /// <inheritdoc cref="ITokenRecognizer"/>
     public Token? RecognizeToken
         (
             TextNavigator navigator
@@ -46,6 +71,11 @@ public sealed class WhitespaceTokenizer
 
         if (navigator.Position != offset)
         {
+            if (UseSharedTokenInstance)
+            {
+                return TokenInstance;
+            }
+
             var text = navigator.Substring (offset, navigator.Position - offset).ToString();
             var token = new Token
                 (
@@ -62,7 +92,7 @@ public sealed class WhitespaceTokenizer
             return token;
         }
 
-        return null;
+        return default;
     }
 
     #endregion

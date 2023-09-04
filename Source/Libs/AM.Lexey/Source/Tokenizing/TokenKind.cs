@@ -9,9 +9,11 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
+#region Using directives
 
 using JetBrains.Annotations;
+
+#endregion
 
 namespace AM.Lexey.Tokenizing;
 

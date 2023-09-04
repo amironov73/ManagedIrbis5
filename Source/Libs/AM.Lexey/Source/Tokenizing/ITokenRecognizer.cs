@@ -17,15 +17,13 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
 /// Интерфейс токенайзера.
 /// </summary>
 [PublicAPI]
-public interface ITokenizer
+public interface ITokenRecognizer
 {
     /// <summary>
     /// Распознание следужющего токена.

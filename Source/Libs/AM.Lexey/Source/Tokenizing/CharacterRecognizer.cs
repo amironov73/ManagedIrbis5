@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* CharacterTokenizer.cs -- токенайзер для отдельных символов
+/* CharacterRecognizer.cs -- распознает литералы отдельных символов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,21 +19,28 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер для отдельных символов.
+/// Распознает литералы отдельных символов.
 /// Отдельные символы выглядят так: 'a', 'b' и т. д.
 /// </summary>
 [PublicAPI]
-public sealed class CharacterTokenizer
-    : ITokenizer
+public sealed class CharacterRecognizer
+    : ITokenRecognizer
 {
+    #region Public methods
+
+    /// <summary>
+    /// Создание экземпляра.
+    /// </summary>
+    public static ITokenRecognizer Create() => new CharacterRecognizer();
+
+    #endregion
+
     #region ITokenizer members
 
-    /// <inheritdoc cref="ITokenizer.RecognizeToken"/>
+    /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
     public Token? RecognizeToken
         (
             TextNavigator navigator
