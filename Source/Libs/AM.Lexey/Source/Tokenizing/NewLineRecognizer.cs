@@ -56,7 +56,7 @@ public sealed class NewLineRecognizer
 
     #endregion
 
-    #region Tokenizer members
+    #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
     public Token? RecognizeToken
@@ -71,14 +71,14 @@ public sealed class NewLineRecognizer
         var column = navigator.Column;
 
         var chr = navigator.PeekChar();
-        if (chr != '\r' && chr != '\n')
+        if (chr is not '\r' and not '\n')
         {
             return null;
         }
 
         navigator.ReadChar(); // съедаем символ
-        if (chr == '\r' // обрабатываем сочетание '\r\n'
-            && navigator.PeekChar() == '\n')
+        if (chr is '\r' // обрабатываем сочетание '\r\n'
+            && navigator.PeekChar() is '\n')
         {
             navigator.ReadChar();
         }
