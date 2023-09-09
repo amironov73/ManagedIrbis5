@@ -38,6 +38,11 @@ public static class TokenKind
     public const string Whitespace = "whitespace";
 
     /// <summary>
+    /// Перевод строки.
+    /// </summary>
+    public const string NewLine = "newline";
+
+    /// <summary>
     /// Директива.
     /// </summary>
     public const string Directive = "directive";
