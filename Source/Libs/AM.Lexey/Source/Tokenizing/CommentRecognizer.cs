@@ -18,6 +18,7 @@ using AM.Text;
 using JetBrains.Annotations;
 
 #endregion
+
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
