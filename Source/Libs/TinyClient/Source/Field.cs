@@ -1,0 +1,901 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedMember.Global
+
+/* Field.cs -- поле библиографической записи
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+#endregion
+
+namespace ManagedIrbis
+{
+    /// <summary>
+    /// Поле библиографической записи.
+    /// </summary>
+    public class Field
+        : IEnumerable<SubField>
+    {
+        #region Constants
+
+        /// <summary>
+        /// Специальный код, зарезервированный для
+        /// значения поля до первого разделителя.
+        /// </summary>
+        private const char ValueCode = '\0';
+
+        /// <summary>
+        /// Нет тега, т. е. тег ещё не присвоен.
+        /// </summary>
+        public const int NoTag = 0;
+
+        /// <summary>
+        /// Разделитель подполей.
+        /// </summary>
+        public const char Delimiter = '^';
+
+        /// <summary>
+        /// Количество индикаторов поля.
+        /// </summary>
+        public const int IndicatorCount = 2;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Метка поля.
+        /// </summary>
+        public int Tag { get; set; }
+
+        /// <summary>
+        /// Значение поля до первого разделителя.
+        /// </summary>
+        /// <remarks>
+        /// Значение имитируется с помощью первого подполя,
+        /// код которого должен быть равен '\0'.
+        /// </remarks>
+        public string? Value
+        {
+            get => GetValueSubField()?.Value ?? default;
+            set
+            {
+                Clear();
+                if (value.SafeContains (Delimiter))
+                {
+                    DecodeBody (value!);
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty (value))
+                    {
+                        CreateValueSubField().Value = value;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Список подполей.
+        /// </summary>
+        public List<SubField> Subfields { get; } = new ();
+
+        /// <summary>
+        /// Номер повторения поля.
+        /// </summary>
+        /// <remarks>
+        /// Формируется автоматически.
+        /// </remarks>
+        public int Repeat { get; internal set; }
+
+        /// <summary>
+        /// Запись, которой принадлежит поле.
+        /// </summary>
+        public Record? Record { get; internal set; }
+
+        /// <summary>
+        /// Пустое ли поле?
+        /// </summary>
+        public bool IsEmpty => Subfields.Count == 0;
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор по умолчанию.
+        /// </summary>
+        public Field()
+        {
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="value">Значение поля до первого разделителя
+        /// (опционально).</param>
+        public Field
+            (
+                int tag,
+                string? value
+            )
+        {
+            Tag = tag;
+            Value = value;
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1
+            )
+        {
+            Tag = tag;
+            Subfields.Add (subfield1);
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        /// <param name="subfield2"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2
+            )
+        {
+            Tag = tag;
+            Subfields.Add (subfield1);
+            Subfields.Add (subfield2);
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag"></param>
+        /// <param name="subfield1"></param>
+        /// <param name="subfield2"></param>
+        /// <param name="subfield3"></param>
+        public Field
+            (
+                int tag,
+                SubField subfield1,
+                SubField subfield2,
+                SubField subfield3
+            )
+        {
+            Tag = tag;
+            Subfields.Add (subfield1);
+            Subfields.Add (subfield2);
+            Subfields.Add (subfield3);
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="subfields">Подполя.</param>
+        public Field
+            (
+                int tag,
+                params SubField[] subfields
+            )
+        {
+            Tag = tag;
+            Subfields.AddRange (subfields);
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                ReadOnlyMemory<char> value1 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add (new SubField (code1, value1));
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add (new SubField (code1, value1));
+            Subfields.Add (new SubField (code2, value2));
+        }
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        /// <param name="tag">Метка поля.</param>
+        /// <param name="code1">Код подполя.</param>
+        /// <param name="value1">Значение подполя.</param>
+        /// <param name="code2">Код подполя.</param>
+        /// <param name="value2">Значение подполя.</param>
+        /// <param name="code3">Код подполя.</param>
+        /// <param name="value3">Значение подполя (опционально).</param>
+        public Field
+            (
+                int tag,
+                char code1,
+                string? value1,
+                char code2,
+                string? value2,
+                char code3,
+                string? value3 = default
+            )
+        {
+            Tag = tag;
+            Subfields.Add (new SubField (code1, value1));
+            Subfields.Add (new SubField (code2, value2));
+            Subfields.Add (new SubField (code3, value3));
+        }
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Поле с подполями.
+        /// </summary>
+        public static Field WithSubFields
+            (
+                int tag,
+                params string[] subfields
+            )
+        {
+            var result = new Field (tag);
+            for (var i = 0; i < subfields.Length; i += 2)
+            {
+                var code = subfields[i][0];
+                var value = subfields[i + 1];
+                result.Subfields.Add (new SubField (code, value));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="subfield">Добавляемое подполе.</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                SubField subfield
+            )
+        {
+            Subfields.Add (subfield);
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                char code,
+                ReadOnlyMemory<char> value
+            )
+        {
+            Subfields.Add (new SubField (code, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        /// <param name="code">Код подполя.</param>
+        /// <param name="value">Значение подполя (опционально).</param>
+        /// <returns>this</returns>
+        public Field Add
+            (
+                char code,
+                string? value = default
+            )
+        {
+            Subfields.Add (new SubField (code, value));
+            return this;
+        }
+
+        /// <summary>
+        /// Assign the field from another.
+        /// </summary>
+        public Field AssignFrom
+            (
+                Field source
+            )
+        {
+            Value = source.Value;
+            Subfields.Clear();
+            foreach (var subField in source.Subfields)
+            {
+                Subfields.Add (subField.Clone());
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Compares the specified fields.
+        /// </summary>
+        public static int Compare
+            (
+                Field field1,
+                Field field2
+            )
+        {
+            var result = field1.Tag - field2.Tag;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = string.CompareOrdinal
+                (
+                    field1.Value,
+                    field2.Value
+                );
+            if (result != 0)
+            {
+                return result;
+            }
+
+            result = field1.Subfields.Count - field2.Subfields.Count;
+            if (result != 0)
+            {
+                return result;
+            }
+
+            for (int i = 0; i < field1.Subfields.Count; i++)
+            {
+                var subField1 = field1.Subfields[i];
+                var subField2 = field2.Subfields[i];
+
+                result = SubField.Compare
+                    (
+                        subField1,
+                        subField2
+                    );
+                if (result != 0)
+                {
+                    return result;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Если нет подполя, выделенного для хранения
+        /// значения поля до первого разделителя,
+        /// создаем его (оно должно быть первым в списке подполей).
+        /// </summary>
+        public SubField CreateValueSubField()
+        {
+            SubField result;
+
+            if (Subfields.Count == 0)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Add (result);
+                return result;
+            }
+
+            result = Subfields[0];
+            if (result.Code != ValueCode)
+            {
+                result = new SubField { Code = ValueCode };
+                Subfields.Insert (0, result);
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Получаем подполе, выделенное для хранения
+        /// значения поля до первого разделителя.
+        /// </summary>
+        public SubField? GetValueSubField()
+        {
+            if (Subfields.Count == 0)
+            {
+                return null;
+            }
+
+            var result = Subfields[0];
+            if (result.Code == ValueCode)
+            {
+                return result;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей.
+        /// </summary>
+        public Field Add
+            (
+                char code,
+                object? value
+            )
+        {
+            if (code == ValueCode)
+            {
+                Value = value?.ToString();
+                return this;
+            }
+
+            var text = value?.ToString();
+            var subfield = new SubField { Code = code, Value = text };
+            Subfields.Add (subfield);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление поля, если переданное значение не равно 0.
+        /// </summary>
+        public Field AddNonEmpty
+            (
+                char code,
+                int value
+            )
+        {
+            if (value is not 0)
+            {
+                Add (code, value.ToInvariantString());
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление поля, если переданное значение не равно 0.
+        /// </summary>
+        public Field AddNonEmpty
+            (
+                char code,
+                long value
+            )
+        {
+            if (value is not 0)
+            {
+                Add (code, value.ToInvariantString());
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Добавление подполя в конец списка подполей
+        /// при условии, что значение поля не пустое.
+        /// </summary>
+        public Field AddNonEmpty
+            (
+                char code,
+                object? value
+            )
+        {
+            if (value is not null)
+            {
+                if (code == ValueCode)
+                {
+                    Value = value.ToString();
+                    return this;
+                }
+
+                var text = value.ToString();
+                if (!string.IsNullOrEmpty (text))
+                {
+                    var subfield = new SubField { Code = code, Value = text };
+                    Subfields.Add (subfield);
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Очистка подполей.
+        /// </summary>
+        public Field Clear()
+        {
+            Subfields.Clear();
+
+            return this;
+        }
+
+        /// <summary>
+        /// Клонирование поля.
+        /// </summary>
+        public Field Clone()
+        {
+            var result = (Field)MemberwiseClone();
+
+            for (var i = 0; i < Subfields.Count; i++)
+            {
+                Subfields[i] = Subfields[i].Clone();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Декодирование строки.
+        /// </summary>
+        public void Decode
+            (
+                string line
+            )
+        {
+            var index = line.IndexOf ('#');
+            Tag = line.Substring (0, index).SafeToInt32();
+            line = line.Substring (index + 1);
+            DecodeBody (line);
+        }
+
+        /// <summary>
+        /// Декодирование тела поля.
+        /// </summary>
+        public void DecodeBody
+            (
+                string line
+            )
+        {
+            var index = line.IndexOf ('^');
+            if (index < 0)
+            {
+                Value = line;
+
+                return;
+            }
+
+            if (index != 0)
+            {
+                Value = line.Substring (0, index);
+            }
+
+            line = line.Substring (index + 1);
+
+            while (true)
+            {
+                index = line.IndexOf ('^');
+                if (index < 0)
+                {
+                    Add (line[0], line.Substring (1));
+                    return;
+                }
+
+                Add (line[0], line.Substring (1, index - 1));
+                line = line.Substring (index + 1);
+            }
+        }
+
+        /// <summary>
+        /// Получение первого подполя с указанным кодом.
+        /// </summary>
+        public SubField? GetFirstSubField
+            (
+                char code
+            )
+        {
+            if (code == ValueCode)
+            {
+                var firstSubfield = Subfields.FirstOrDefault();
+                if (firstSubfield?.Code == ValueCode)
+                {
+                    return firstSubfield;
+                }
+
+                return null;
+            }
+
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar (code))
+                {
+                    return subfield;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Перечисление подполей с указанным кодом.
+        /// </summary>
+        public IEnumerable<SubField> EnumerateSubFields
+            (
+                char code
+            )
+        {
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar (code))
+                {
+                    yield return subfield;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Получение всех подполей с указанным кодом.
+        /// </summary>
+        public SubField[] GetSubFields
+            (
+                char code
+            )
+        {
+            var result = new List<SubField>();
+
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar (code))
+                {
+                    result.Add (subfield);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Получение первого подполя с указанным кодом
+        /// либо создание нового подполя, если таковое отсуствует.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <returns>Найденное или созданное подполе.</returns>
+        public SubField GetOrAddSubField
+            (
+                char code
+            )
+        {
+            if (code == '\0')
+            {
+            }
+
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar (code))
+                {
+                    return subfield;
+                }
+            }
+
+            var result = new SubField { Code = code };
+            Subfields.Add (result);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Указанное повторение подполя с данным кодом.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="occurrence">Номер повторения.
+        /// Нумерация начинается с нуля.
+        /// Отрицательные индексы отсчитываются с конца массива.</param>
+        /// <returns>Найденное подполе или <c>null</c>.</returns>
+        public SubField? GetSubField
+            (
+                char code,
+                int occurrence = 0
+            )
+        {
+            if (code == ValueCode)
+            {
+                if (occurrence != 0)
+                {
+                    return null;
+                }
+
+                return GetValueSubField();
+            }
+
+            if (occurrence < 0)
+            {
+                // отрицательные индексы отсчитываются от конца
+                occurrence = Subfields.Count (sf => sf.Code.SameChar (code)) + occurrence;
+                if (occurrence < 0)
+                {
+                    return null;
+                }
+            }
+
+            foreach (var subfield in Subfields)
+            {
+                if (subfield.Code.SameChar (code))
+                {
+                    if (occurrence == 0)
+                    {
+                        return subfield;
+                    }
+
+                    --occurrence;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Получение текста указанного подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="occurrence">Номер повторения.
+        /// Нумерация начинается с нуля.
+        /// Отрицательные индексы отсчитываются с конца массива.</param>
+        /// <returns>Текст найденного подполя или <c>null</c>.</returns>
+        public string? GetSubFieldValue
+            (
+                char code,
+                int occurrence = 0
+            )
+            => GetSubField (code, occurrence)?.Value ?? default;
+
+        /// <summary>
+        /// For * specification.
+        /// </summary>
+        public string? GetValueOrFirstSubField()
+            => Subfields.FirstOrDefault()?.Value ?? default;
+
+        /// <summary>
+        /// Установка значения подполя.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <param name="value">Новое значение подполя.</param>
+        /// <returns>this</returns>
+        public Field SetSubFieldValue
+            (
+                char code,
+                string? value
+            )
+        {
+            if (code == ValueCode)
+            {
+                Value = value;
+            }
+            else
+            {
+                if (string.IsNullOrEmpty (value))
+                {
+                    RemoveSubField (code);
+                }
+                else
+                {
+                    GetOrAddSubField (code).Value = value;
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Удаление подполей с указанным кодом.
+        /// </summary>
+        /// <param name="code">Искомый код подполя.</param>
+        /// <returns>this</returns>
+        public Field RemoveSubField
+            (
+                char code
+            )
+        {
+            while (GetFirstSubField (code) is { } subfield)
+            {
+                Subfields.Remove (subfield);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Текстовое представление только значимой части поля.
+        /// Метка поля не выводится.
+        /// </summary>
+        public string ToText()
+        {
+            var length = Subfields.Sum
+                (
+                    sf => (sf.Value!.Length)
+                          + (sf.Code == ValueCode ? 1 : 2)
+                );
+            var result = new StringBuilder (length);
+
+            // if (!string.IsNullOrEmpty(Value))
+            // {
+            //     result.Append(Value);
+            // }
+
+            foreach (var subField in Subfields)
+            {
+                var subText = subField.ToString();
+                result.Append (subText);
+            }
+
+            return result.ToString();
+        }
+
+        #endregion
+
+        #region IEnumerable<SubField> members
+
+        /// <inheritdoc cref="IEnumerable.GetEnumerator"/>
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+        public IEnumerator<SubField> GetEnumerator() => Subfields.GetEnumerator();
+
+        #endregion
+
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString" />
+        public override string ToString()
+        {
+            var length = 4 + Subfields.Sum
+                (
+                    sf => (sf.Value!.Length)
+                          + (sf.Code == ValueCode ? 1 : 2)
+                );
+            var result = new StringBuilder (length);
+            result.Append (Tag.ToInvariantString())
+                .Append ('#');
+            foreach (var subfield in Subfields)
+            {
+                result.Append (subfield);
+            }
+
+            return result.ToString();
+        }
+
+        #endregion
+    }
+}

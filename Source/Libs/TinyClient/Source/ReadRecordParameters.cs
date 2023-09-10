@@ -1,0 +1,61 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+
+/* ReadRecordParameters.cs -- параметры чтения записи
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+namespace ManagedIrbis
+{
+    /// <summary>
+    /// Параметры чтения записи с ИРБИС-сервера.
+    /// </summary>
+    public sealed class ReadRecordParameters
+    {
+        #region Properties
+
+        /// <summary>
+        /// Результат помещается сюда.
+        /// </summary>
+        public Record? Record { get; set; }
+
+        /// <summary>
+        /// Имя базы данных (опционально).
+        /// </summary>
+        public string? Database { get; set; }
+
+        /// <summary>
+        /// MFN записи (обязательно).
+        /// </summary>
+        public int Mfn { get; set; }
+
+        /// <summary>
+        /// Оставить запись заблокированной?
+        /// </summary>
+        public bool Lock { get; set; }
+
+        /// <summary>
+        /// Номер версии (опционально).
+        /// </summary>
+        public int Version { get; set; }
+
+        /// <summary>
+        /// Формат (опционально).
+        /// </summary>
+        public string? Format { get; set; }
+
+        #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"MFN={Mfn}";
+
+        #endregion
+    }
+}

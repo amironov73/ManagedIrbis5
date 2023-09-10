@@ -1,0 +1,776 @@
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+// ReSharper disable MemberCanBePrivate.Global
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedMember.Global
+
+/* Response.cs -- ответ сервера
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+#endregion
+
+namespace ManagedIrbis
+{
+    /// <summary>
+    /// Ответ сервера ИРБИС64.
+    /// </summary>
+    public sealed class Response
+    {
+        #region Properties
+
+        /// <summary>
+        /// Код команды.
+        /// </summary>
+        public string? Command { get; private set; }
+
+        /// <summary>
+        /// Идентификатор клиента.
+        /// </summary>
+        public int ClientId { get; private set; }
+
+        /// <summary>
+        /// Порядковый номер запроса.
+        /// </summary>
+        public int QueryId { get; private set; }
+
+        /// <summary>
+        /// Код возврвата (не для всех запросов).
+        /// </summary>
+        public int ReturnCode { get; private set; }
+
+        /// <summary>
+        /// Размер запроса в байтах
+        /// (не всегда присылвается сервером).
+        /// </summary>
+        public int AnswerSize { get; private set; }
+
+        /// <summary>
+        /// Версия сервера (присылается в ответ на запрос A,
+        /// т. е. регистрацию клиента).
+        /// </summary>
+        public string? ServerVersion { get; private set; }
+
+        /// <summary>
+        /// Достигнут конец текста?
+        /// </summary>
+        public bool EOT { get; private set; }
+
+        #endregion
+
+        #region Construction
+
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public Response()
+        {
+            _memory = new List<ArraySegment<byte>>();
+        }
+
+        #endregion
+
+        #region Private members
+
+        private readonly List<ArraySegment<byte>> _memory;
+        private ArraySegment<byte> _currentChunk;
+        private int _currentIndex, _currentOffset;
+
+        #endregion
+
+        #region Public methods
+
+        /// <summary>
+        /// Добавление сегмента данных.
+        /// </summary>
+        public void Add
+            (
+                ArraySegment<byte> chunk
+            )
+        {
+            _memory.Add (chunk);
+        }
+
+        /// <summary>
+        /// Проверка кода возврата.
+        /// </summary>
+        public bool CheckReturnCode() => GetReturnCode() >= 0;
+
+        /// <summary>
+        /// Проверка кода возврата.
+        /// </summary>
+        public bool CheckReturnCode
+            (
+                params int[] goodCodes
+            )
+        {
+            if (GetReturnCode() < 0)
+            {
+                if (Array.IndexOf (goodCodes, ReturnCode) < 0)
+                {
+                    // throw new IrbisException(ReturnCode);
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Ищем преамбулу сырых бинарных данных.
+        /// </summary>
+        public bool FindPreamble()
+        {
+            var preamble = Constants.Preamble;
+            var preambleLength = preamble.Length;
+
+            while (!EOT)
+            {
+                var found = true;
+                for (var i = 0; i < preambleLength; i++)
+                {
+                    var b = ReadByte();
+                    if (b != preamble[i])
+                    {
+                        found = false;
+                        break;
+                    }
+                }
+
+                if (found)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Начальный разбор ответа сервера.
+        /// </summary>
+        public void Parse()
+        {
+            if (_memory.Count == 0)
+            {
+                EOT = true;
+            }
+            else
+            {
+                EOT = false;
+                _currentChunk = _memory.First();
+                _currentIndex = 0;
+                _currentOffset = 0;
+
+                Command = ReadAnsi();
+                ClientId = ReadInteger();
+                QueryId = ReadInteger();
+                AnswerSize = ReadInteger();
+                ServerVersion = ReadAnsi();
+                ReadAnsi();
+                ReadAnsi();
+                ReadAnsi();
+                ReadAnsi();
+                ReadAnsi();
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public byte Peek()
+        {
+            if (EOT)
+            {
+                return 0;
+            }
+
+            if (_currentOffset >= _currentChunk.Count)
+            {
+                _currentOffset = 0;
+                _currentIndex++;
+                if (_currentIndex >= _memory.Count)
+                {
+                    EOT = true;
+                    return 0;
+                }
+
+                _currentChunk = _memory[_currentIndex];
+            }
+
+            return _currentChunk.Array![_currentChunk.Offset + _currentOffset];
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public byte ReadByte()
+        {
+            if (EOT)
+            {
+                return 0;
+            }
+
+            if (_currentOffset >= _currentChunk.Count)
+            {
+                _currentOffset = 0;
+                _currentIndex++;
+                if (_currentIndex >= _memory.Count)
+                {
+                    EOT = true;
+                    return 0;
+                }
+
+                _currentChunk = _memory[_currentIndex];
+            }
+
+            var result = _currentChunk.Array![_currentChunk.Offset + _currentOffset];
+            _currentOffset++;
+
+            if (_currentOffset > _currentChunk.Count)
+            {
+                _currentOffset = 0;
+                _currentIndex++;
+                if (_currentIndex >= _memory.Count)
+                {
+                    EOT = true;
+                }
+                else
+                {
+                    _currentChunk = _memory[_currentIndex];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public byte[] ReadLine()
+        {
+            using var result = new MemoryStream();
+            while (true)
+            {
+                var one = ReadByte();
+                if (one == 0)
+                {
+                    break;
+                }
+
+                if (one == 13)
+                {
+                    if (Peek() == 10)
+                    {
+                        ReadByte();
+                    }
+
+                    break;
+                }
+
+                if (one == 10)
+                {
+                    break;
+                }
+
+                result.WriteByte (one);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string ReadLine
+            (
+                Encoding encoding
+            )
+        {
+            var bytes = ReadLine();
+            if (bytes.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return encoding.GetString (bytes);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public byte[] RemainingBytes()
+        {
+            if (EOT)
+            {
+                return Array.Empty<byte>();
+            }
+
+            var length = _currentChunk.Count - _currentOffset;
+
+            for (var i = _currentIndex + 1; i < _memory.Count; i++)
+            {
+                length += _memory[i].Count;
+            }
+
+            if (length == 0)
+            {
+                EOT = true;
+
+                return Array.Empty<byte>();
+            }
+
+            var result = new byte[length];
+            var offset = 0;
+            Array.Copy
+                (
+                    _currentChunk.Array!,
+                    _currentChunk.Offset + _currentOffset,
+                    result,
+                    0,
+                    _currentChunk.Count - _currentOffset
+                );
+            offset += _currentChunk.Count - _currentOffset;
+            for (var i = _currentIndex + 1; i < _memory.Count; i++)
+            {
+                var chunk = _memory[i];
+                Array.Copy (_memory[i].Array!, 0, result, offset, _memory[i].Count);
+                offset += chunk.Count;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string RemainingText
+            (
+                Encoding encoding
+            )
+        {
+            var bytes = RemainingBytes();
+            if (bytes.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return encoding.GetString (bytes);
+        }
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void Debug
+            (
+                TextWriter? writer = null
+            )
+        {
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
+            {
+                foreach (var b in memory)
+                {
+                    writer.Write ($" {b:X2}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void Debug
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
+        }
+
+        /// <summary>
+        /// Debug dump.
+        /// </summary>
+        public void DebugUtf
+            (
+                TextWriter? writer = null
+            )
+        {
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
+            {
+                writer.Write (Encoding.UTF8.GetString (memory.Array!, memory.Offset, memory.Count));
+            }
+        }
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugUtf
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText (fileName);
+            DebugUtf (writer);
+        }
+
+        /// <summary>
+        /// Debug dump.
+        /// </summary>
+        public void DebugAnsi
+            (
+                TextWriter? writer = null
+            )
+        {
+            writer ??= Console.Out;
+
+            foreach (var memory in _memory)
+            {
+                writer.Write (Utility.Ansi.GetString (memory.Array!, memory.Offset, memory.Count));
+            }
+        }
+
+        /// <summary>
+        /// Отладочная печать.
+        /// </summary>
+        public void DebugAnsi
+            (
+                string fileName
+            )
+        {
+            using var writer = File.CreateText (fileName);
+            Debug (writer);
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public int GetReturnCode()
+        {
+            ReturnCode = ReadInteger();
+
+            return ReturnCode;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string ReadAnsi() => ReadLine (Utility.Ansi);
+
+        /// <summary>
+        ///
+        /// </summary>
+        public int ReadInteger() => ReadLine (Utility.Ansi).SafeToInt32();
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string[]? ReadAnsiStrings
+            (
+                int count
+            )
+        {
+            var result = new List<string> (count);
+            for (var i = 0; i < count; i++)
+            {
+                var line = ReadAnsi();
+                if (string.IsNullOrEmpty (line))
+                {
+                    return null;
+                }
+
+                result.Add (line);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Get array of ANSI strings.
+        /// </summary>
+        /// <returns><c>null</c>if there is no lines in
+        /// the server response, otherwise missing lines will
+        /// be added (as empty lines).</returns>
+        public string[]? ReadAnsiStringsPlus
+            (
+                int count
+            )
+        {
+            var result = new List<string> (count);
+            var index = 0;
+            string line;
+            for (; index < 1; index++)
+            {
+                line = ReadAnsi();
+                if (string.IsNullOrEmpty (line))
+                {
+                    return null;
+                }
+
+                result.Add (line);
+            }
+
+            for (; index < count; index++)
+            {
+                line = ReadAnsi();
+                result.Add (line);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Require ANSI-encoded line.
+        /// </summary>
+        public string RequireAnsi()
+        {
+            var result = ReadAnsi();
+            if (string.IsNullOrEmpty (result))
+            {
+                throw new IrbisException();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Require UTF8-encoded line.
+        /// </summary>
+        public string RequireUtf()
+        {
+            var result = ReadUtf();
+            if (string.IsNullOrEmpty (result))
+            {
+                throw new IrbisException();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Require integer value.
+        /// </summary>
+        public int RequireInteger()
+        {
+            var line = ReadAnsi();
+            var result = int.Parse (line);
+            return result;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerable<string> EnumRemainingAnsiLines()
+        {
+            while (!EOT)
+            {
+                string line;
+                try
+                {
+                    line = ReadAnsi();
+                }
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
+                    continue;
+                }
+
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerable<string> EnumRemainingNonNullAnsiLines()
+        {
+            while (!EOT)
+            {
+                string line;
+                try
+                {
+                    line = ReadAnsi();
+                }
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
+                    continue;
+                }
+
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerable<string> EnumRemainingUtfLines()
+        {
+            while (!EOT)
+            {
+                string line;
+                try
+                {
+                    line = ReadUtf();
+                }
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
+                    continue;
+                }
+
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerable<string> EnumRemainingNonNullUtfLines()
+        {
+            while (!EOT)
+            {
+                string line;
+                try
+                {
+                    line = ReadUtf();
+                }
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
+                    continue;
+                }
+
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public IEnumerable<byte[]> EnumRemainingBinaryLines()
+        {
+            while (!EOT)
+            {
+                byte[] line;
+                try
+                {
+                    line = ReadLine();
+                }
+                catch (Exception exception)
+                {
+                    System.Diagnostics.Debug.WriteLine (exception.Message);
+                    continue;
+                }
+
+                yield return line;
+            }
+        }
+
+        /// <summary>
+        /// Чтение нескольких строк в кодировке ANSI.
+        /// </summary>
+        public string[]? GetAnsiStrings
+            (
+                int lineCount
+            )
+        {
+            var result = new List<string>();
+
+            for (var i = 0; i < lineCount; i++)
+            {
+                if (EOT)
+                {
+                    return null;
+                }
+
+                var line = ReadAnsi();
+                result.Add (line);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <returns></returns>
+        public string[] ReadRemainingAnsiLines()
+        {
+            var result = new List<string>();
+
+            while (!EOT)
+            {
+                var line = ReadAnsi();
+                result.Add (line);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string ReadRemainingAnsiText() => RemainingText (Utility.Ansi);
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string[] ReadRemainingUtfLines()
+        {
+            var result = new List<string>();
+
+            while (!EOT)
+            {
+                string line = ReadLine (Encoding.UTF8);
+                result.Add (line);
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        public string ReadRemainingUtfText() => RemainingText (Encoding.UTF8);
+
+        /// <summary>
+        /// Чтение строки в кодировке UTF-8.
+        /// </summary>
+        public string ReadUtf() => ReadLine (Encoding.UTF8);
+
+        /// <summary>
+        /// Чтение целого числа.
+        /// </summary>
+        public int RequireInt32()
+        {
+            if (EOT)
+            {
+                throw new IrbisException ("Unexpected end of response");
+            }
+
+            var line = ReadLine (Utility.Ansi);
+
+            return int.Parse (line, CultureInfo.InvariantCulture);
+        }
+
+        #endregion
+    }
+}
