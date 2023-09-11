@@ -48,6 +48,12 @@ public static class TokenKind
     public const string Directive = "directive";
 
     /// <summary>
+    /// Терм -- последовательность символов,
+    /// воспинимаемая как некое целое.
+    /// </summary>
+    public const string Term = "term";
+
+    /// <summary>
     /// Пунктуация, например, "{" или "++".
     /// </summary>
     public const string Punctuation = "punctuation";
