@@ -356,6 +356,11 @@ public sealed class Token
     }
 
     /// <summary>
+    /// Токен с новым видом.
+    /// </summary>
+    public Token WithNewKind (string kind) => new (kind, Value, Line, Column);
+
+    /// <summary>
     /// Токен с новым значением.
     /// </summary>
     public Token WithNewValue (string? value) => new (Kind, value, Line, Column);
