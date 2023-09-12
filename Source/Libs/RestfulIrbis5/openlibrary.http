@@ -1,0 +1,21 @@
+﻿https://openlibrary.org/books/OL53924W.json
+Accept: application/json
+
+#####
+
+https://openlibrary.org/isbn/978-0-691-15270-7.json
+Accept: application/json
+
+#####
+
+https://openlibrary.org/authors/OL18319A.json
+Accept: application/json
+
+#####
+
+https://openlibrary.org/search.json?q=the+lord+of+the+rings
+Accept: application/json
+
+#####
+
+https://covers.openlibrary.org/b/isbn/0385472579-S.jpg

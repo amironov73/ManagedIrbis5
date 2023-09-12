@@ -122,8 +122,49 @@ public sealed class OpenLibraryClient
 
         return response.Content is { } content
             ? JsonConvert.DeserializeObject<IsbnResponse> (content)
-            : null;
+            : default;
     }
+
+    /// <summary>
+    /// Получение обложки.
+    /// </summary>
+    /// <param name="key">Атрибут для поиска: ISBN, OCLC, LCCN, OLID, ID.</param>
+    /// <param name="value">Значение искомого атрибута.</param>
+    /// <param name="size">Размер: S, M или L.</param>
+    public byte[]? GetCover
+        (
+            string key,
+            string? value,
+            string size
+        )
+    {
+        if (string.IsNullOrEmpty (key)
+            || string.IsNullOrEmpty (value)
+            || string.IsNullOrEmpty (size))
+        {
+            return default;
+        }
+
+        var client = new RestClient ("https://covers.openlibrary.org");
+        var request = new RestRequest ("b/{key}/{value}-{size}")
+            .AddUrlSegment ("key", key)
+            .AddUrlSegment ("value", value)
+            .AddUrlSegment ("size", size);
+
+        return client.DownloadData (request);
+    }
+
+    /// <summary>
+    /// Получение маленькой обложки по укзанному ISBN.
+    /// </summary>
+    public byte[]? SmallCoverForIsbn (string? isbn)
+        => GetCover ("isbn", isbn, "S");
+
+    /// <summary>
+    /// Получение большой обложки по укзанному ISBN.
+    /// </summary>
+    public byte[]? LargeCoverForIsbn (string? isbn)
+        => GetCover ("isbn", isbn, "L");
 
     #endregion
 }

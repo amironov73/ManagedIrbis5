@@ -1,0 +1,11 @@
+﻿GET https://openapi.e.lanbook.com/1.0/resource/book?limit=5&offset=0&fields=name%2Cauthors%2Cisbn%2Cyear%2Cpublisher%2Clang
+X-Auth-Token: 7c0c2193d27108a509abd8ea84a8750c82b3a520
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+Accept: application/json
+
+#####
+
+GET https://openapi.e.lanbook.com/1.0/resource/book/get/233312?limit=5&offset=0&fields=name%2Cauthors%2Cisbn%2Cyear%2Cpublisher%2Clang
+X-Auth-Token: 7c0c2193d27108a509abd8ea84a8750c82b3a520
+Content-Type: application/x-www-form-urlencoded; charset=utf-8
+Accept: application/json
