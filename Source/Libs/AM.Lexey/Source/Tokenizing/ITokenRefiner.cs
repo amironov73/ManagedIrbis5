@@ -29,5 +29,5 @@ public interface ITokenRefiner
     /// Обработка списка токенов, например,
     /// выбрасывание из списка пробельных токенов.
     /// </summary>
-    IList<Token> RefineTokens (IList<Token> tokens) => tokens;
+    List<Token> RefineTokens (List<Token> tokens) => tokens;
 }

@@ -112,65 +112,65 @@ public sealed class Token
     /// <summary>
     /// Это терм вообще?
     /// </summary>
-    public bool IsTerm() => Kind is TokenKind.Punctuation;
+    public bool IsTerm() => Kind is TokenKind.Term;
 
     /// <summary>
-    /// Это указанная пунктуация?
+    /// Это указанный терм?
     /// </summary>
-    public bool IsPunctuation
+    public bool IsTerm
         (
-            string punctuation
+            string term
         )
-        => Kind is TokenKind.Punctuation && string.CompareOrdinal (Value, punctuation) == 0;
+        => Kind is TokenKind.Term && string.CompareOrdinal (Value, term) == 0;
 
     /// <summary>
-    /// Это пунктуация?
+    /// Это один из перечисленных термов?
     /// </summary>
-    public bool IsPunctuation
+    public bool IsTerm
         (
-            string punctuation1,
-            string punctuation2
+            string term1,
+            string term2
         )
-        => Kind is TokenKind.Punctuation
+        => Kind is TokenKind.Term
         &&
             (
-                string.CompareOrdinal (Value, punctuation1) == 0
-                || string.CompareOrdinal (Value, punctuation2) == 0
+                string.CompareOrdinal (Value, term1) == 0
+                || string.CompareOrdinal (Value, term2) == 0
+            );
+
+    /// <summary>
+    /// Это один из перечисленных термов?
+    /// </summary>
+    public bool IsTerm
+        (
+            string term1,
+            string term2,
+            string term3
+        )
+        => Kind is TokenKind.Term
+        &&
+            (
+                string.CompareOrdinal (Value, term1) == 0
+                || string.CompareOrdinal (Value, term2) == 0
+                || string.CompareOrdinal (Value, term3) == 0
             );
 
     /// <summary>
     /// Это пунктуация?
     /// </summary>
-    public bool IsPunctuation
+    public bool IsTerm
         (
-            string punctuation1,
-            string punctuation2,
-            string punctuation3
-        )
-        => Kind is TokenKind.Punctuation
-        &&
-            (
-                string.CompareOrdinal (Value, punctuation1) == 0
-                || string.CompareOrdinal (Value, punctuation2) == 0
-                || string.CompareOrdinal (Value, punctuation3) == 0
-            );
-
-    /// <summary>
-    /// Это пунктуация?
-    /// </summary>
-    public bool IsPunctuation
-        (
-            params string[] punctuation
+            params string[] terms
         )
     {
-        if (Kind is not TokenKind.Punctuation)
+        if (Kind is not TokenKind.Term)
         {
             return false;
         }
 
-        foreach (var one in punctuation)
+        foreach (var term in terms)
         {
-            if (string.CompareOrdinal (Value, one) == 0)
+            if (string.CompareOrdinal (Value, term) == 0)
             {
                 return true;
             }

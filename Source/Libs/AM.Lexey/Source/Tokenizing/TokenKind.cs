@@ -20,7 +20,7 @@ namespace AM.Lexey.Tokenizing;
 /// <summary>
 /// Известные виды токенов. Вы не обязаны использовать
 /// именно эти виды токенов, всегда можно изобрести
-/// собственный тип и использовать его.
+/// собственный вид и использовать его.
 /// </summary>
 [PublicAPI]
 public static class TokenKind
@@ -49,14 +49,11 @@ public static class TokenKind
 
     /// <summary>
     /// Терм -- последовательность символов,
-    /// воспинимаемая как некое целое.
+    /// воспринимаемая как некое целое.
+    /// Например, "++" или "+=".
+    /// Может состоять из единственного символа, например, "{".
     /// </summary>
     public const string Term = "term";
-
-    /// <summary>
-    /// Пунктуация, например, "{" или "++".
-    /// </summary>
-    public const string Punctuation = "punctuation";
 
     /// <summary>
     /// Зарезервированное слово, например, "if".
@@ -87,17 +84,12 @@ public static class TokenKind
     /// <summary>
     /// Форматная строка вида `$"{z} = {x} + {y}"`.
     /// </summary>
-    public const string Format = "format";
+    public const string Interpolation = "interpolation";
 
     /// <summary>
     /// Внешний по отношению к Barsik код.
     /// </summary>
     public const string External = "external";
-
-    /// <summary>
-    /// Альтернативная строка <c>`hello world`</c>.
-    /// </summary>
-    public const string AltString = "alt";
 
     /// <summary>
     /// Целое 32-битное число со знаком без префикса и суффикса.
@@ -130,22 +122,26 @@ public static class TokenKind
     public const string Hex64 = "hex64";
 
     /// <summary>
-    /// Длинное целое число в десятеричной системе без префикса, суффикс 'B'.
+    /// Длинное целое число в десятеричной системе без префикса,
+    /// суффикс 'N'.
     /// </summary>
     public const string BigInteger = "big-integer";
 
     /// <summary>
     /// Число с плавающей точкой с одинарной точностью.
+    /// Суффикс 'F'.
     /// </summary>
     public const string Single = "single";
 
     /// <summary>
     /// Число с плавающей точкой с двойной точностью.
+    /// Без суффикса.
     /// </summary>
     public const string Double = "double";
 
     /// <summary>
     /// Число с фиксированной точкой (денежное).
+    /// Суффикс 'M'.
     /// </summary>
     public const string Decimal = "decimal";
 

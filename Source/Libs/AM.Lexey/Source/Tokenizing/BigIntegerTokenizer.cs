@@ -29,6 +29,7 @@ namespace AM.Lexey.Tokenizing;
 
 /// <summary>
 /// Распознает <see cref="BigInteger"/>.
+/// Суффикс 'N'.
 /// </summary>
 [PublicAPI]
 public sealed class BigIntegerTokenizer

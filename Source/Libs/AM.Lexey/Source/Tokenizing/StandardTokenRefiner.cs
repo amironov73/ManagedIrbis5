@@ -58,9 +58,9 @@ public sealed class StandardTokenRefiner
     #region ITokenRefiner members
 
     /// <inheritdoc cref="ITokenRefiner.RefineTokens"/>
-    public IList<Token> RefineTokens
+    public List<Token> RefineTokens
         (
-            IList<Token> tokens
+            List<Token> tokens
         )
     {
         Sure.NotNull (tokens);
