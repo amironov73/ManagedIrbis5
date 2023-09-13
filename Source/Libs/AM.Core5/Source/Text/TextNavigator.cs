@@ -25,8 +25,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Text;
 
 /// <summary>
@@ -337,6 +335,22 @@ public sealed class TextNavigator
     public char PeekChar() => _position >= _length
         ? EOF
         : _text.Span[_position];
+
+    /// <summary>
+    /// Подглядывание символа.
+    /// </summary>
+    [Pure]
+    public char PeekChar
+        (
+            int delta
+        )
+    {
+        var position = _position + delta;
+
+        return position < 0 || position >= _length
+            ? EOF
+            : _text.Span[position];
+    }
 
     /// <summary>
     /// Подглядывание строки вплоть до указанной длины.
