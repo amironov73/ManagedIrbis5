@@ -32,8 +32,6 @@ using ReactiveUI;
 
 #endregion
 
-#nullable enable
-
 namespace TheNude;
 
 /// <summary>
@@ -154,7 +152,7 @@ public sealed class MainWindow
                             () => new WrapPanel { Orientation = Orientation.Horizontal }
                         ),
                     ItemTemplate = new FuncDataTemplate<ModelInfo> ((_, _) => new ModelControl()),
-                    [!ItemsRepeater.ItemsSourceProperty] = new Binding (nameof (ViewModel.Models))
+                    [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (ViewModel.Models))
                 },
             }
         };

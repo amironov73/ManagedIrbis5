@@ -4,10 +4,10 @@
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <MicrosoftVersion>8.0.0-preview.7.23375.6</MicrosoftVersion>
-    <MicrosoftVersionAlt>8.0.0-preview.7.23375.9</MicrosoftVersionAlt>
+    <MicrosoftVersion>8.0.0-rc.1.23419.4</MicrosoftVersion>
+    <MicrosoftVersionAlt>8.0.0-rc.1.23421.29</MicrosoftVersionAlt>
     <AvaloniaVersion>11.0.4</AvaloniaVersion>
-    <AvaloniaPrevious>11.0.0-rc2.2</AvaloniaPrevious>
+    <AvaloniaPrevious>11.0.0</AvaloniaPrevious>
     <SkiaVersion>2.88.5</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
     <NugetVersion>6.7.0</NugetVersion>
@@ -22,7 +22,7 @@
     <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.0" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.1" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
@@ -39,7 +39,7 @@
     <PackageVersion Include="Avalonia.Xaml.Interactions" Version="11.0.2" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.0.2" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.7" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.8" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
@@ -59,7 +59,7 @@
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.3.1" />
     <PackageVersion Include="MailKit" Version="4.2.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.0.0-avalonia11-preview5.225-nightly" />
+    <PackageVersion Include="Material.Avalonia" Version="3.0.0.35-nightly" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.1.2" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftVersionAlt)" />
