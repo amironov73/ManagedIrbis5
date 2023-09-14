@@ -27,15 +27,6 @@ namespace AM.Lexey.Tokenizing;
 public sealed class RemainderRecognizer
     : ITokenRecognizer
 {
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new RemainderRecognizer();
-
-    #endregion
-
     #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -49,10 +40,17 @@ public sealed class RemainderRecognizer
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
-        var text = navigator.GetRemainingText().ToString();
-        var result = new Token ("remainder", text, line, column, offset)
+        var value = navigator.GetRemainingText().ToString();
+        var result = new Token
+            (
+                TokenKind.Remainder,
+                value,
+                line,
+                column,
+                offset
+            )
         {
-            UserData = text
+            UserData = value
         };
 
         return result;

@@ -77,7 +77,7 @@ public sealed class WhitespaceRecognizer
             }
 
             var text = navigator.Substring (offset, navigator.Position - offset).ToString();
-            var token = new Token
+            var result = new Token
                 (
                     TokenKind.Whitespace,
                     text,
@@ -89,7 +89,7 @@ public sealed class WhitespaceRecognizer
                     UserData = text
                 };
 
-            return token;
+            return result;
         }
 
         return default;

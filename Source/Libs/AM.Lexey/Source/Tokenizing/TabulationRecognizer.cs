@@ -35,15 +35,6 @@ public sealed class TabulationRecognizer
 
     #endregion
 
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new TabulationRecognizer();
-
-    #endregion
-
     #region ITokenRecognizer
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -60,7 +51,7 @@ public sealed class TabulationRecognizer
 
         if (navigator.PeekChar() != Tabulation)
         {
-            return null;
+            return default;
         }
 
         do

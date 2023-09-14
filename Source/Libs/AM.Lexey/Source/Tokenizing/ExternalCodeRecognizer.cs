@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
 /* ExternalCodeRecognizer.cs -- распознает внешний код
  * Ars Magna project, http://arsmagna.ru
@@ -33,22 +32,42 @@ public sealed class ExternalCodeRecognizer
     #region Constants
 
     /// <summary>
-    /// Символ-ограничитель.
+    /// Символ-ограничитель по умолчанию.
     /// Типографский клавиатурный знак обратного апострофа.
     /// </summary>
-    public const char Limiter = '`';
+    public const char DefaultLimiter = '`';
 
     #endregion
 
-    #region Public methods
+    #region Construction
 
     /// <summary>
-    /// Создание экземпляра.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public static ITokenRecognizer Create() => new ExternalCodeRecognizer();
+    public ExternalCodeRecognizer()
+        : this (DefaultLimiter)
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public ExternalCodeRecognizer
+        (
+            char limiter
+        )
+    {
+        _limiter = limiter;
+    }
 
     #endregion
 
+    #region Private members
+
+    private readonly char _limiter;
+
+    #endregion
 
     #region Tokenizer members
 
@@ -64,9 +83,9 @@ public sealed class ExternalCodeRecognizer
         var line = navigator.Line;
         var column = navigator.Column;
 
-        if (navigator.PeekChar() != Limiter)
+        if (navigator.PeekChar() != _limiter)
         {
-            return null;
+            return default;
         }
 
         navigator.ReadChar(); // съедаем открывающую кавычку
@@ -74,15 +93,15 @@ public sealed class ExternalCodeRecognizer
         while (!navigator.IsEOF)
         {
             chr = navigator.ReadChar();
-            if (chr == Limiter)
+            if (chr == _limiter)
             {
                 break;
             }
         }
 
-        if (chr != Limiter)
+        if (chr != _limiter)
         {
-            return null;
+            return default;
         }
 
         var memory = navigator.Substring
@@ -91,7 +110,7 @@ public sealed class ExternalCodeRecognizer
                 navigator.Position - offset - 2
             );
         var value = StringPool.Shared.GetOrAdd (memory.Span);
-        var token = new Token
+        var result = new Token
             (
                 TokenKind.External,
                 value,
@@ -103,7 +122,7 @@ public sealed class ExternalCodeRecognizer
                 UserData = value
             };
 
-        return token;
+        return result;
     }
 
     #endregion

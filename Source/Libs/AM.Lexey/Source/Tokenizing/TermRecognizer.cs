@@ -49,12 +49,26 @@ public sealed class TermRecognizer
 
     #endregion
 
-    #region Public methods
+    #region Construction
 
     /// <summary>
-    /// Создание экземпляра.
+    /// Конструктор.
     /// </summary>
-    public static ITokenRecognizer Create() => new TermRecognizer();
+    public TermRecognizer
+        (
+            string[] knownTerms
+        )
+    {
+        Sure.NotNull (knownTerms);
+
+        _knownTerms = knownTerms;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string[] _knownTerms;
 
     #endregion
 
@@ -108,7 +122,7 @@ public sealed class TermRecognizer
             var text = builder.AsSpan();
             var count = 0;
 
-            foreach (var known in KnownTerms)
+            foreach (var known in _knownTerms)
             {
                 if (known.AsSpan().StartsWith (text))
                 {
@@ -128,7 +142,7 @@ public sealed class TermRecognizer
 
             if (count == 1)
             {
-                foreach (var known in KnownTerms)
+                foreach (var known in _knownTerms)
                 {
                     if (EqualsAsSpans (known, text))
                     {
@@ -137,8 +151,8 @@ public sealed class TermRecognizer
                 }
             }
 
-            previousGood = null;
-            foreach (var known in KnownTerms)
+            previousGood = default;
+            foreach (var known in _knownTerms)
             {
                 if (EqualsAsSpans (known, text))
                 {
@@ -157,7 +171,7 @@ public sealed class TermRecognizer
         {
             if (tokenValue is null)
             {
-                return null;
+                return default;
             }
 
             for (var i = 0; i < length; i++)

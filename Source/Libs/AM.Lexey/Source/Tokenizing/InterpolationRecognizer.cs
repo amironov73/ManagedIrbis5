@@ -11,7 +11,6 @@
 
 #region Using directives
 
-
 using AM.Text;
 
 using JetBrains.Annotations;

@@ -23,8 +23,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
@@ -47,7 +45,7 @@ public sealed class BigIntegerTokenizer
 
         var line = navigator.Line;
         var column = navigator.Column;
-        var position = navigator.Position;
+        var state = navigator.SaveState();
         var chr = navigator.PeekChar();
         if (!chr.IsArabicDigit())
         {
@@ -77,7 +75,7 @@ public sealed class BigIntegerTokenizer
         chr = navigator.PeekChar();
         if (chr is not 'n' and not 'N')
         {
-            navigator.RestorePosition (position);
+            state.Restore();
             return null;
         }
 
@@ -91,7 +89,7 @@ public sealed class BigIntegerTokenizer
                 value,
                 line,
                 column,
-                position
+                state.Position
             );
 
         return result;

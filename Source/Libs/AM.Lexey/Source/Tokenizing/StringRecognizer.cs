@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* StringRecognizer.cs -- распознает обычные строки
  * Ars Magna project, http://arsmagna.ru
@@ -29,6 +28,36 @@ namespace AM.Lexey.Tokenizing;
 public sealed class StringRecognizer
     : ITokenRecognizer
 {
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public StringRecognizer()
+        : this ('"')
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public StringRecognizer
+        (
+            char limiter
+        )
+    {
+        _limiter = limiter;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly char _limiter;
+
+    #endregion
+
     #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -42,9 +71,9 @@ public sealed class StringRecognizer
         var line = navigator.Line;
         var column = navigator.Column;
         var offset = navigator.Position;
-        if (navigator.PeekChar() != '"')
+        if (navigator.PeekChar() != _limiter)
         {
-            return null;
+            return default;
         }
 
         navigator.ReadChar(); // съедаем открывающую кавычку
@@ -60,7 +89,7 @@ public sealed class StringRecognizer
                 continue;
             }
 
-            if (chr == '"')
+            if (chr == _limiter)
             {
                 break;
             }
@@ -68,7 +97,7 @@ public sealed class StringRecognizer
             builder.Append (chr);
         }
 
-        if (chr != '"')
+        if (chr != _limiter)
         {
             StringBuilderPool.Shared.Return (builder);
             throw new SyntaxException (navigator);

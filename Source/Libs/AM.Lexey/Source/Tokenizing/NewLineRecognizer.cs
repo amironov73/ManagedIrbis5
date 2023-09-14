@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
 /* NewLineRecognizer.cs -- распознает перевод строки
  * Ars Magna project, http://arsmagna.ru
@@ -47,15 +46,6 @@ public sealed class NewLineRecognizer
 
     #endregion
 
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new NewLineRecognizer();
-
-    #endregion
-
     #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -73,7 +63,7 @@ public sealed class NewLineRecognizer
         var chr = navigator.PeekChar();
         if (chr is not '\r' and not '\n')
         {
-            return null;
+            return default;
         }
 
         navigator.ReadChar(); // съедаем символ
@@ -94,7 +84,7 @@ public sealed class NewLineRecognizer
                 navigator.Position - offset - 1
             );
         var value = StringPool.Shared.GetOrAdd (memory.Span);
-        var token = new Token
+        var result = new Token
             (
                 TokenKind.NewLine,
                 value,
@@ -106,7 +96,7 @@ public sealed class NewLineRecognizer
                 UserData = value
             };
 
-        return token;
+        return result;
     }
 
     #endregion

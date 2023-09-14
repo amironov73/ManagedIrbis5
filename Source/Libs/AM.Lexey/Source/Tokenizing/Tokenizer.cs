@@ -71,6 +71,7 @@ public sealed class Tokenizer
 
             if (token is null)
             {
+                // не удалось распознать токен в текущей позиции
                 throw new SyntaxException (navigator);
             }
         }

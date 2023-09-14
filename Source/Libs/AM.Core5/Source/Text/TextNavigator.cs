@@ -21,6 +21,8 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Text;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Logging;
 
 #endregion
@@ -30,33 +32,55 @@ namespace AM.Text;
 /// <summary>
 /// Навигатор по тексту (оформленный как класс).
 /// </summary>
+[PublicAPI]
 public sealed class TextNavigator
 {
     #region Nested structures
 
-    readonly struct StateHolder
+    /// <summary>
+    /// Хранит состояние.
+    /// </summary>
+    public readonly struct StateHolder
         : IDisposable
     {
         private readonly TextNavigator _navigator;
         private readonly int _column;
         private readonly int _line;
+
+        /// <summary>
+        /// Текущая позиция.
+        /// </summary>
         public readonly int Position;
 
-        public StateHolder (TextNavigator navigator)
+        /// <summary>
+        /// Конструктор.
+        /// </summary>
+        public StateHolder
+            (
+                TextNavigator navigator
+            )
             : this()
         {
+            Sure.NotNull (navigator);
+
             _navigator = navigator;
             _column = navigator._column;
             _line = navigator._line;
             Position = navigator._position;
         }
 
+        /// <inheritdoc cref="IDisposable.Dispose"/>
         public void Dispose()
         {
             _navigator._column = _column;
             _navigator._line = _line;
             _navigator._position = Position;
         }
+
+        /// <summary>
+        /// Восстановление ранее сохраненного состояния.
+        /// </summary>
+        public void Restore() => Dispose();
     }
 
     #endregion
@@ -1180,29 +1204,10 @@ public sealed class TextNavigator
         return Substring (start, length);
     }
 
-    /*
     /// <summary>
-    /// Restore previously saved position.
+    /// Сохранение состояния.
     /// </summary>
-    public void RestorePosition
-        (
-            TextPosition saved
-        )
-    {
-        _column = saved.Column;
-        _line = saved.Line;
-        _position = saved.Position;
-    }
-
-    /// <summary>
-    /// Save current position.
-    /// </summary>
-    [Pure]
-    public TextPosition SavePosition()
-    {
-        return new TextPosition(this);
-    }
-    */
+    public StateHolder SaveState() => new StateHolder (this);
 
     /// <summary>
     /// Пропускает один символ, если он совпадает с указанным.
@@ -1676,7 +1681,7 @@ public sealed class TextNavigator
     public char ReadCharNoCrLf()
     {
         var result = ReadChar();
-        while (result == '\r' || result == '\n')
+        while (result is '\r' or '\n')
         {
             result = ReadChar();
         }

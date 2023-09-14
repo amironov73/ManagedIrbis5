@@ -30,15 +30,6 @@ namespace AM.Lexey.Tokenizing;
 public sealed class IntegerRecognizer
     : ITokenRecognizer
 {
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new IntegerRecognizer();
-
-    #endregion
-
     #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -49,7 +40,7 @@ public sealed class IntegerRecognizer
     {
         Sure.NotNull (navigator);
 
-        var offset = navigator.Position;
+        var state = navigator.SaveState();
         var line = navigator.Line;
         var column = navigator.Column;
 
@@ -107,7 +98,7 @@ public sealed class IntegerRecognizer
             else if (chr is '.' or 'e' or 'E' or 'f' or 'F' or 'm' or 'M')
             {
                 // это число с плавающей (или фиксированной) точкой
-                navigator.RestorePosition (offset);
+                state.Restore();
                 return default;
             }
             else
@@ -123,8 +114,9 @@ public sealed class IntegerRecognizer
                 ? TokenKind.UInt32 : TokenKind.Int32;
 
         var span = builder.AsSpan();
+        var offset = state.Position;
         var value = StringPool.Shared.GetOrAdd (span);
-        var token = new Token
+        var result = new Token
             (
                 kind,
                 value,
@@ -136,7 +128,7 @@ public sealed class IntegerRecognizer
                 UserData = value
             };
 
-        return token;
+        return result;
     }
 
     #endregion

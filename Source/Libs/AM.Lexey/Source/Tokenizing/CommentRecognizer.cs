@@ -46,15 +46,6 @@ public sealed class CommentRecognizer
 
     #endregion
 
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new CommentRecognizer();
-
-    #endregion
-
     #region ITokenRecognizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -113,7 +104,7 @@ public sealed class CommentRecognizer
             // многострочный комментарий
             if (nextChar == '*')
             {
-                // проматываем всё до конца
+                // проматываем всё до конца комментария
                 var position = navigator.Position;
                 navigator.ReadTo ("*/");
                 if (navigator.Position == position)
@@ -145,7 +136,7 @@ public sealed class CommentRecognizer
             }
         }
 
-        return null;
+        return default;
     }
 
     #endregion

@@ -56,6 +56,11 @@ public static class TokenKind
     public const string Term = "term";
 
     /// <summary>
+    /// Нераспознанный остаток текста.
+    /// </summary>
+    public const string Remainder = "remainder";
+
+    /// <summary>
     /// Зарезервированное слово, например, "if".
     /// </summary>
     public const string ReservedWord = "reserved";

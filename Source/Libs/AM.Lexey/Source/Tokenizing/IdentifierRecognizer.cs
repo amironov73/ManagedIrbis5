@@ -38,7 +38,7 @@ public sealed class IdentifierRecognizer
     #region Common data
 
     /// <summary>
-    /// Первый символ идентификатора.
+    /// Первый символ идентификатора по умолчанию.
     /// </summary>
     public static char[] FirstIdentifierLetter =
         (
@@ -53,7 +53,7 @@ public sealed class IdentifierRecognizer
         .ToCharArray();
 
     /// <summary>
-    /// Последующие символы идентификатора.
+    /// Последующие символы идентификатора по умолчанию.
     /// </summary>
     public static char[] NextIdentifierLetter =
         (
@@ -70,12 +70,36 @@ public sealed class IdentifierRecognizer
 
     #endregion
 
-    #region Public methods
+    #region Construction
 
     /// <summary>
-    /// Создание экземпляра.
+    /// Конструктор по умолчанию.
     /// </summary>
-    public static ITokenRecognizer Create() => new IdentifierRecognizer();
+    public IdentifierRecognizer()
+        : this (FirstIdentifierLetter, NextIdentifierLetter)
+    {
+        // пустое тело конструктора
+    }
+
+    public IdentifierRecognizer
+        (
+            char[] firstIdentifierLetters,
+            char[] nextIdentifierLetters
+        )
+    {
+        Sure.NotNull (firstIdentifierLetters);
+        Sure.NotNull (nextIdentifierLetters);
+
+        _firstIdentifierLetters = firstIdentifierLetters;
+        _nextIdentifierLetters = nextIdentifierLetters;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly char[] _firstIdentifierLetters;
+    private readonly char[] _nextIdentifierLetters;
 
     #endregion
 
@@ -87,11 +111,11 @@ public sealed class IdentifierRecognizer
             TextNavigator navigator
         )
     {
-        var firstIdentifierLetter = FirstIdentifierLetter;
-        var nextIdentifierLetter = NextIdentifierLetter;
-        if (Array.IndexOf (firstIdentifierLetter, navigator.PeekChar()) < 0)
+        Sure.NotNull (navigator);
+
+        if (Array.IndexOf (_firstIdentifierLetters, navigator.PeekChar()) < 0)
         {
-            return null;
+            return default;
         }
 
         var line = navigator.Line;
@@ -100,7 +124,7 @@ public sealed class IdentifierRecognizer
         navigator.ReadChar();
         while (!navigator.IsEOF)
         {
-            if (Array.IndexOf (nextIdentifierLetter, navigator.PeekChar()) < 0)
+            if (Array.IndexOf (_nextIdentifierLetters, navigator.PeekChar()) < 0)
             {
                 break;
             }

@@ -29,15 +29,6 @@ namespace AM.Lexey.Tokenizing;
 public sealed class CharacterRecognizer
     : ITokenRecognizer
 {
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new CharacterRecognizer();
-
-    #endregion
-
     #region ITokenizer members
 
     /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
@@ -50,7 +41,7 @@ public sealed class CharacterRecognizer
 
         var line = navigator.Line;
         var column = navigator.Column;
-        var offset = navigator.Position;
+        var state = navigator.SaveState();
 
         if (navigator.PeekChar() != '\'')
         {
@@ -99,6 +90,7 @@ public sealed class CharacterRecognizer
         }
 
         var value = chr.ToString();
+        var offset = state.Position;
         var result = new Token (TokenKind.Char, value, line, column, offset)
         {
             UserData = value

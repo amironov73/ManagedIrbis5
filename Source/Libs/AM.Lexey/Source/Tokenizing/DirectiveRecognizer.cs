@@ -26,6 +26,11 @@ namespace AM.Lexey.Tokenizing;
 /// <code>
 /// #имя аргументы
 /// </code>
+/// Еще предусмотрена псевдодиректива
+/// <code>
+/// #!/usr/bin/env barsik
+/// </code>
+/// для совместимости с shebang.
 /// </summary>
 [PublicAPI]
 public sealed class DirectiveRecognizer
@@ -37,15 +42,6 @@ public sealed class DirectiveRecognizer
     /// Признак начала директивы.
     /// </summary>
     public const char DirectiveStartSign = '#';
-
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Создание экземпляра.
-    /// </summary>
-    public static ITokenRecognizer Create() => new DirectiveRecognizer();
 
     #endregion
 
@@ -65,7 +61,7 @@ public sealed class DirectiveRecognizer
 
         if (navigator.PeekChar() != DirectiveStartSign)
         {
-            return null;
+            return default;
         }
 
         // директива должна быть первым токеном в строке
@@ -96,7 +92,7 @@ public sealed class DirectiveRecognizer
         if (!atStart)
         {
             // не в начале строки не считается
-            return null;
+            return default;
         }
 
         navigator.ReadChar();
@@ -106,7 +102,7 @@ public sealed class DirectiveRecognizer
             : navigator.ReadWord().ToString();
         if (string.IsNullOrEmpty (command))
         {
-            return null;
+            return default;
         }
 
         navigator.SkipWhile (' ', '\t');
@@ -124,7 +120,6 @@ public sealed class DirectiveRecognizer
             };
 
         return result;
-
     }
 
     #endregion
