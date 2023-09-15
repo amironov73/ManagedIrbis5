@@ -13,6 +13,7 @@
 
 using System;
 
+using AM.Lexey.Parsing;
 using AM.Text;
 
 using JetBrains.Annotations;
@@ -124,17 +125,17 @@ public sealed class SyntaxException
         // пустое тело конструктора
     }
 
-    // /// <summary>
-    // /// Конструктор.
-    // /// </summary>
-    // public SyntaxException
-    //     (
-    //         ParseState state
-    //     )
-    //     : base (state.ToString())
-    // {
-    //     // пустое тело метода
-    // }
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public SyntaxException
+        (
+            ParseState state
+        )
+        : base (state.ToString())
+    {
+        // пустое тело метода
+    }
 
     #endregion
 
