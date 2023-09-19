@@ -1,0 +1,14 @@
+﻿GET http://icorp2.elnit.org/icorp/index.php?task=search_broadcast&isbn=&author=&title=клавиатураyear=
+Cookie: ICORPS=so1togdq03l3baa6l20787m7l1
+
+######
+
+GET http://icorp2.elnit.org/icorp/index.php?_=1695093651327&task=show_results&req_id=-430569153
+Accept-Encoding: gzip, deflate
+Referer: http://icorp2.elnit.org/icorp/
+Cookie: ICORPS=so1togdq03l3baa6l20787m7l1
+
+#####
+
+GET http://icorp2.elnit.org/icorp/index.php?task=download_record&EXP21FMT=TEXT&rec_id=87446022&FICTION_C21COM=4&EXP21MFN=87446022
+Cookie: ICORPS=so1togdq03l3baa6l20787m7l1

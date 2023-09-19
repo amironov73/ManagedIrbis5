@@ -36,6 +36,4 @@
         <ProjectReference Include="..\ManagedIrbis5\ManagedIrbis5.csproj" />
     </ItemGroup>
 
-
-
 </Project>
