@@ -31,7 +31,7 @@ namespace AM.Lexey.Tokenizing;
 public sealed class StandardTokenRefiner
     : ITokenRefiner
 {
-    #region Private members
+    #region Public members
 
     /// <summary>
     /// Зарезервированные слова Barsik.

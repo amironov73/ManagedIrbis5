@@ -28,7 +28,7 @@ namespace AM.Lexey.Tokenizing;
 /// Распознает числа в шестнадцатеричной системе счисления.
 /// </summary>
 [PublicAPI]
-public sealed class HexTokenizer
+public sealed class HexRecognizer
     : ITokenRecognizer
 {
     #region ITokenRecognizer members

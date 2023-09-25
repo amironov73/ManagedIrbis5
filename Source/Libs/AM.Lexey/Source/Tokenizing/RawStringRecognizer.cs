@@ -25,7 +25,7 @@ namespace AM.Lexey.Tokenizing;
 /// Распознает сырые строки.
 /// </summary>
 [PublicAPI]
-public sealed class RawStringTokenizer
+public sealed class RawStringRecognizer
     : ITokenRecognizer
 {
     #region Tokenizer members

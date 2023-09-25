@@ -9,4 +9,8 @@
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Source\Barsik\" />
+  </ItemGroup>
+
 </Project>
