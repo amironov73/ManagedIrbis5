@@ -9,6 +9,31 @@
     <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
   </ItemGroup>
 
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.Themes.Fluent" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" />
+        <PackageReference Include="Avalonia.Xaml.Interactions" />
+        <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <PackageReference Include="DynamicData" />
+        <PackageReference Include="DynamicData.ReactiveUI" />
+        <PackageReference Include="GridExtra.Avalonia" />
+        <PackageReference Include="MessageBox.Avalonia" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="Newtonsoft.Json" />
+        <PackageReference Include="Pidgin" />
+        <PackageReference Include="ReactiveHistory" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="SkiaSharp" />
+    </ItemGroup>
+
   <ItemGroup>
     <Folder Include="Source\Barsik\" />
   </ItemGroup>

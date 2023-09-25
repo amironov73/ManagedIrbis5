@@ -1,0 +1,68 @@
+﻿import SomeLibrary
+import OtherLibrary
+
+Window {
+    Title="Hello, Avalonia"
+    Width=400
+    MinWidth=380
+    Height=300
+    MinHeight=280
+
+    StackPanel {
+        Orientation=Vertical
+        Spacing=5
+
+        Border {
+            BorderBrush=Black
+            BorderThickness="0, 0, 0, 1"
+
+            TextBlock {
+                Margin=5
+                FontSize=24
+                HorizontalAlignment=Center
+                Text="Temperature converter"
+            }
+        }
+
+        Grid {
+            ShowGridLines=True
+            Margin=5
+            ColumnDefinitions="120, 120"
+            RowDefinitions="Auto, Auto, Auto"
+
+            Label {
+                Grid.Row=0
+                Grid.Column=0
+                Content="Celsius"
+                Margin=10
+            }
+
+            TextBox {
+                Grid.Row=0
+                Grid.Column=1
+                Margin="0 5"
+                Text="0"
+            }
+
+            Label {
+                Grid.Row=1
+                Grid.Column=0
+                Content="Fahrenheit"
+                Margin=10
+            }
+
+            TextBox {
+                Grid.Row=1
+                Grid.Column=1
+                Margin="0 5"
+                Text="0"
+            }
+        }
+
+        Button {
+            HorizontalAlignment=Center
+            Content="Calculate"
+            Click=ButtonClicked
+        }
+    }
+}
