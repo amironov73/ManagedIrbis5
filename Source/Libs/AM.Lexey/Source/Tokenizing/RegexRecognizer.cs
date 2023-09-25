@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 
-/* RegexTokenizer.cs -- токенайзер на регулярных выражениях
+/* RegexRecognizer.cs -- распознает токены на регулярных выражениях
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -26,14 +26,14 @@ using JetBrains.Annotations;
 namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер на регулярных выражениях.
+/// Распознает токены на регулярных выражениях.
 /// </summary>
 /// <remarks>
 /// Не может быть добавлен в <c>tokenizer.settings</c>,
 /// т. к. не содержит конструктора по умолчанию.
 /// </remarks>
 [PublicAPI]
-public sealed class RegexTokenizer
+public sealed class RegexRecognizer
     : ITokenRecognizer
 {
     #region Construction
@@ -41,7 +41,7 @@ public sealed class RegexTokenizer
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public RegexTokenizer
+    public RegexRecognizer
         (
             string kind,
             string regex,
@@ -55,7 +55,7 @@ public sealed class RegexTokenizer
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public RegexTokenizer
+    public RegexRecognizer
         (
             string kind,
             Regex regex,

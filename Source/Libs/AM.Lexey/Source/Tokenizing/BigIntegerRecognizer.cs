@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* BigIntegerTokenizer.cs -- токенайзер для BigInteger
+/* BigIntegerRecognizer.cs -- распознает BigInteger
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -23,40 +23,44 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
-namespace AM.Purr.Tokenizing;
+namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер для <see cref="BigInteger"/>.
+/// Распознает <see cref="BigInteger"/>.
+/// Суффикс 'N'.
 /// </summary>
 [PublicAPI]
-public sealed class BigIntegerTokenizer
-    : Tokenizer
+public sealed class BigIntegerRecognizer
+    : ITokenRecognizer
 {
-    #region Tokenizer members
+    #region ITokenRecognier members
 
-    /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override TokenizerResult Parse()
+    /// <inheritdoc cref="ITokenRecognizer.RecognizeToken"/>
+    public Token? RecognizeToken
+        (
+            TextNavigator navigator
+        )
     {
+        Sure.NotNull (navigator);
+
         var line = navigator.Line;
         var column = navigator.Column;
-        var position = navigator.Position;
-        var chr = PeekChar();
+        var state = navigator.SaveState();
+        var chr = navigator.PeekChar();
         if (!chr.IsArabicDigit())
         {
-            return TokenizerResult.Error;
+            return null;
         }
 
         Span<char> buffer = stackalloc char[16];
         var builder = new ValueStringBuilder (buffer);
-        while (!IsEof)
+        while (!navigator.IsEOF)
         {
-            chr = PeekChar();
+            chr = navigator.PeekChar();
 
             if (chr is '_')
             {
-                ReadChar();
+                navigator.ReadChar();
                 continue;
             }
 
@@ -65,17 +69,17 @@ public sealed class BigIntegerTokenizer
                 break;
             }
 
-            builder.Append (ReadChar());
+            builder.Append (navigator.ReadChar());
         }
 
-        chr = PeekChar();
-        if (chr is not 'b' and not 'B') // TODO подобрать подходящий суффикс
+        chr = navigator.PeekChar();
+        if (chr is not 'n' and not 'N')
         {
-            navigator.RestorePosition (position);
-            return TokenizerResult.Error;
+            state.Restore();
+            return null;
         }
 
-        ReadChar();
+        navigator.ReadChar();
         var span = builder.AsSpan();
         var value = StringPool.Shared.GetOrAdd (span);
 
@@ -85,10 +89,10 @@ public sealed class BigIntegerTokenizer
                 value,
                 line,
                 column,
-                position
+                state.Position
             );
 
-        return TokenizerResult.Success (result);
+        return result;
     }
 
     #endregion

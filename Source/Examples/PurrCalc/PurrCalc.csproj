@@ -6,8 +6,9 @@
     <ApplicationIcon>toy.ico</ApplicationIcon>
   </PropertyGroup>
 
+
   <ItemGroup>
-    <ProjectReference Include="..\..\Libs\AM.Purr\AM.Purr.csproj" />
+    <ProjectReference Include="..\..\Libs\AM.Lexey\AM.Lexey.csproj" />
   </ItemGroup>
 
 </Project>

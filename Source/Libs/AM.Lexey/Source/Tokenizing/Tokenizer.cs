@@ -65,6 +65,7 @@ public sealed class Tokenizer
                 token = recognizer.RecognizeToken (navigator);
                 if (token is not null)
                 {
+                    result.Add (token);
                     break;
                 }
             }

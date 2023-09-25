@@ -4,9 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
-/* RawStringTokenizer.cs -- токенайзер для сырых строк
+/* RawStringRecognizer.cs -- распознает сырые строки
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,42 +19,51 @@ using JetBrains.Annotations;
 
 #nullable enable
 
-namespace AM.Purr.Tokenizing;
+namespace AM.Lexey.Tokenizing;
 
 /// <summary>
-/// Токенайзер для сырых строк.
+/// Распознает сырые строки.
 /// </summary>
 [PublicAPI]
 public sealed class RawStringTokenizer
-    : Tokenizer
+    : ITokenRecognizer
 {
     #region Tokenizer members
 
     /// <inheritdoc cref="Tokenizer.Parse"/>
-    public override TokenizerResult Parse()
+    public Token? RecognizeToken
+        (
+            TextNavigator navigator
+        )
     {
+        Sure.NotNull (navigator);
+
         var line = navigator.Line;
         var column = navigator.Column;
 
-        if (PeekChar() != '"' || PeekChar (1) != '"'
-            || PeekChar (2) != '"')
+        if (navigator.PeekChar() != '"'
+            || navigator.PeekChar (1) != '"'
+            || navigator.PeekChar (2) != '"'
+           )
         {
-            return TokenizerResult.Error;
+            return null;
         }
 
-        ReadChar(); // съедаем открывающие кавычки
-        ReadChar();
-        ReadChar();
+        navigator.ReadChar(); // съедаем открывающие кавычки
+        navigator.ReadChar();
+        navigator.ReadChar();
 
         var success = false;
         var builder = StringBuilderPool.Shared.Get();
-        while (!IsEof)
+        while (!navigator.IsEOF)
         {
-            var chr = ReadChar();
-            if (chr == '"' && PeekChar() == '"' && PeekChar (1) == '"')
+            var chr = navigator.ReadChar();
+            if (chr == '"'
+                && navigator.PeekChar() == '"'
+                && navigator.PeekChar (1) == '"')
             {
-                ReadChar();
-                ReadChar();
+                navigator.ReadChar();
+                navigator.ReadChar();
                 success = true;
                 break;
             }
@@ -66,11 +74,11 @@ public sealed class RawStringTokenizer
         if (!success)
         {
             StringBuilderPool.Shared.Return (builder);
-            return TokenizerResult.Error;
+            return null;
         }
 
-        var value = builder.ReturnShared();
-        var token = new Token
+        var value = builder.ReturnShared().DosToUnix();
+        var result = new Token
             (
                 TokenKind.String,
                 value,
@@ -81,7 +89,7 @@ public sealed class RawStringTokenizer
                 UserData = value
             };
 
-        return TokenizerResult.Success (token);
+        return result;
     }
 
     #endregion

@@ -30,7 +30,7 @@ namespace AM.Lexey.Tokenizing;
 /// Распознает дробные числа.
 /// </summary>
 [PublicAPI]
-public sealed class NumberTokenizer
+public sealed class NumberRecognizer
     : ITokenRecognizer
 {
     #region ITokenRecognizer members

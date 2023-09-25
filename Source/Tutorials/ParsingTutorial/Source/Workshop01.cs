@@ -11,11 +11,10 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 
 using AM;
-using AM.Purr.Parsing;
-using AM.Purr.Tokenizing;
+using AM.Lexey.Parsing;
+using AM.Lexey.Tokenizing;
 
 #endregion
 
@@ -41,7 +40,19 @@ internal static class Workshop01
         var number = new LiteralParser().Map (Convert.ToInt32);
         var parser = number.SeparatedBy (Term (","), minCount: 1).End();
 
-        var series = parser.ParseOrThrow (sourceCode, knownTerms);
+        var tokenizer = new Tokenizer
+        {
+            Refiner = new StandardTokenRefiner(),
+            Recognizers =
+            {
+                new IntegerRecognizer(),
+                new WhitespaceRecognizer(),
+                new TermRecognizer (knownTerms)
+            }
+        };
+        var tokens = tokenizer.Parse (sourceCode);
+        var state = new ParseState (tokens);
+        var series = parser.ParseOrThrow (state);
         Console.WriteLine (series.JoinText());
     }
 }

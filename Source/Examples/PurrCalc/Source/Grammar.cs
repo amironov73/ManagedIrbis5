@@ -14,8 +14,9 @@
 
 using System;
 
-using AM.Purr.Expressions;
-using AM.Purr.Parsing;
+using AM.Lexey.Expressions;
+using AM.Lexey.Parsing;
+using AM.Lexey.Tokenizing;
 
 #endregion
 
@@ -100,7 +101,19 @@ internal static class Grammar
         )
     {
         var knownTerms = new[] { "+", "-", "*", "/", "(", ")" };
-        var result = _math.ParseOrThrow (expression, knownTerms);
+        var tokenizer = new Tokenizer
+        {
+            Refiner = new StandardTokenRefiner(),
+            Recognizers =
+            {
+                new IntegerRecognizer(),
+                new WhitespaceRecognizer(),
+                new TermRecognizer (knownTerms)
+            }
+        };
+        var tokens = tokenizer.Parse (expression);
+        var state = new ParseState (tokens);
+        var result = _math.ParseOrThrow (state);
 
         return result;
     }

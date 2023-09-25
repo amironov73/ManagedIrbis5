@@ -11,11 +11,9 @@
 #region Using directives
 
 using System;
-using System.Collections.Generic;
 
-using AM;
-using AM.Purr.Parsing;
-using AM.Purr.Tokenizing;
+using AM.Lexey.Parsing;
+using AM.Lexey.Tokenizing;
 
 #endregion
 
@@ -46,7 +44,19 @@ internal static class Workshop02
         var parser = Parser.Sequence (first, comma, second, comma, third)
             .End();
 
-        parser.ParseOrThrow (sourceCode, knownTerms);
+        var tokenizer = new Tokenizer
+        {
+            Refiner = new StandardTokenRefiner(),
+            Recognizers =
+            {
+                new IntegerRecognizer(),
+                new WhitespaceRecognizer(),
+                new TermRecognizer (knownTerms)
+            }
+        };
+        var tokens = tokenizer.Parse (sourceCode);
+        var state = new ParseState (tokens);
+        parser.ParseOrThrow (state);
         Console.WriteLine ($"{first}, {second}, {third}");
     }
 }

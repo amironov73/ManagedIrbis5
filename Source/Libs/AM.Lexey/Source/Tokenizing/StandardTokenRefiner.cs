@@ -71,6 +71,12 @@ public sealed class StandardTokenRefiner
         {
             var token = tokens[index];
 
+            if (token.Kind is TokenKind.Whitespace or TokenKind.Comment)
+            {
+                // выбрасываем пробелы и комментарии
+                continue;
+            }
+
             if (token.Value is { } tokenValue
                 && ReservedWords.ContainsValue (tokenValue, comparer))
             {
