@@ -111,7 +111,7 @@ internal static class Grammar
                 new TermRecognizer (knownTerms)
             }
         };
-        var tokens = tokenizer.Parse (expression);
+        var tokens = tokenizer.ScanForTokens (expression);
         var state = new ParseState (tokens);
         var result = _math.ParseOrThrow (state);
 

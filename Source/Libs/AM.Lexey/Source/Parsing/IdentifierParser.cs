@@ -43,7 +43,7 @@ public sealed class IdentifierParser
         var current = state.Current;
         if (current.IsIdentifier())
         {
-            result = current.Value!;
+            result = current.Lexeme!;
             var final = DebugSuccess (state, true);
             state.Advance();
             return final;

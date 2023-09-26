@@ -72,7 +72,7 @@ public sealed class TermParser
 
         if (_expected is null)
         {
-            result = current.Value!;
+            result = current.Lexeme!;
             var final = DebugSuccess (state, true);
             state.Advance();
             return final;
@@ -80,7 +80,7 @@ public sealed class TermParser
 
         if (current.IsTerm (_expected))
         {
-            result = current.Value!;
+            result = current.Lexeme!;
             var final = DebugSuccess (state, true);
             state.Advance();
             return final;

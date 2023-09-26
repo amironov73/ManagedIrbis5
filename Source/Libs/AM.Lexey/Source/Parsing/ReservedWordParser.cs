@@ -66,7 +66,7 @@ public sealed class ReservedWordParser
             {
                 if (state.Current.Kind == TokenKind.ReservedWord)
                 {
-                    result = state.Current.Value!;
+                    result = state.Current.Lexeme!;
                     state.Advance();
                     return DebugSuccess (state, true);
                 }

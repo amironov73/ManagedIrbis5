@@ -5,13 +5,11 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ControlNode.cs -- узел, описывающий контрол
+/* ImportNode.cs -- узел, импортирующий пространство имен
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
-
-using System.Collections.Generic;
 
 using AM.Lexey.Ast;
 
@@ -22,44 +20,34 @@ using JetBrains.Annotations;
 namespace AM.Lexey.Eml.Ast;
 
 /// <summary>
-/// Узел, описывающий контрол.
+/// Узел, импортирующий пространство имен.
 /// </summary>
 [PublicAPI]
-public class ControlNode
+public sealed class ImportNode
     : AstNode
 {
     #region Properties
 
     /// <summary>
-    /// Имя типа.
+    /// Пространство имен.
     /// </summary>
-    public string TypeName { get; }
-
-    /// <summary>
-    /// Свойства.
-    /// </summary>
-    public List<PropertyNode> Properties { get; } = new ();
-
-    /// <summary>
-    /// Вложенные контролы.
-    /// </summary>
-    public List<ControlNode> Children { get; } = new ();
+    public string Namespace { get; }
 
     #endregion
 
     #region Construction
 
     /// <summary>
-    /// Имя типа.
+    /// Конструктор.
     /// </summary>
-    public ControlNode
+    public ImportNode
         (
-            string typeName
+            string ns
         )
     {
-        Sure.NotNullNorEmpty (typeName);
+        Sure.NotNullNorEmpty (ns);
 
-        TypeName = typeName;
+        Namespace = ns;
     }
 
     #endregion

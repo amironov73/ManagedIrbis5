@@ -77,14 +77,14 @@ public sealed class StandardTokenRefiner
                 continue;
             }
 
-            if (token.Value is { } tokenValue
+            if (token.Lexeme is { } tokenValue
                 && ReservedWords.ContainsValue (tokenValue, comparer))
             {
                 tokens[index] = token.WithNewKind (TokenKind.ReservedWord);
                 continue;
             }
 
-            if (token is { Kind: TokenKind.Term, Value: "-" })
+            if (token is { Kind: TokenKind.Term, Lexeme: "-" })
             {
                 var next = tokens!.SafeAt (index + 1);
                 if (next is not null && next.IsSignedNumber())
@@ -92,7 +92,7 @@ public sealed class StandardTokenRefiner
                     var prev = tokens!.SafeAt (index - 1)?.Kind;
                     if (prev is null or TokenKind.Term)
                     {
-                        result.Add (next.WithNewValue ("-" + next.Value));
+                        result.Add (next.WithNewValue ("-" + next.Lexeme));
                         index++;
                     }
                     else

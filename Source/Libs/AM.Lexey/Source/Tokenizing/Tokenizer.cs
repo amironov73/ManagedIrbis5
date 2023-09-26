@@ -44,7 +44,7 @@ public sealed class Tokenizer
 
     #region Public methods
 
-    public List<Token> Parse
+    public List<Token> ScanForTokens
         (
             string text
         )

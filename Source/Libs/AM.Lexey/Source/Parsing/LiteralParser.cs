@@ -47,7 +47,7 @@ public sealed class LiteralParser
         }
 
         var current = state.Current;
-        var value = current.Value!;
+        var value = current.Lexeme!;
         var invariant = CultureInfo.InvariantCulture;
         switch (current.Kind)
         {

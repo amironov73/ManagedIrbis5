@@ -912,7 +912,7 @@ public static class Parser
         Sure.NotNull (source);
         Sure.NotNull (tokenizer);
 
-        var tokens = tokenizer.Parse (source);
+        var tokens = tokenizer.ScanForTokens (source);
         var state = new ParseState (tokens);
 
         return parser.Parse (state);
@@ -952,7 +952,7 @@ public static class Parser
         Sure.NotNull (source);
         Sure.NotNull (tokenizer);
 
-        var tokens = tokenizer.Parse (source);
+        var tokens = tokenizer.ScanForTokens (source);
         var state = new ParseState (tokens);
 
         return parser.ParseOrThrow (state);

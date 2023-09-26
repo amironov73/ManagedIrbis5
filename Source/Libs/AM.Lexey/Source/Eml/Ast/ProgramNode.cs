@@ -5,15 +5,13 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ControlNode.cs -- узел, описывающий контрол
+/* ProgramNode.cs -- узел, описывающий программу
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
 using System.Collections.Generic;
-
-using AM.Lexey.Ast;
 
 using JetBrains.Annotations;
 
@@ -22,44 +20,38 @@ using JetBrains.Annotations;
 namespace AM.Lexey.Eml.Ast;
 
 /// <summary>
-/// Узел, описывающий контрол.
+/// Узел, описывающий программу в целом.
 /// </summary>
 [PublicAPI]
-public class ControlNode
-    : AstNode
+public sealed class ProgramNode
 {
     #region Properties
 
     /// <summary>
-    /// Имя типа.
+    /// Импортируемые пространства имен.
     /// </summary>
-    public string TypeName { get; }
+    public List<ImportNode> Imports { get; } = new ();
 
     /// <summary>
-    /// Свойства.
+    /// Корневой контрол, например, окно.
     /// </summary>
-    public List<PropertyNode> Properties { get; } = new ();
-
-    /// <summary>
-    /// Вложенные контролы.
-    /// </summary>
-    public List<ControlNode> Children { get; } = new ();
+    public ControlNode? RootControl { get; set; }
 
     #endregion
 
-    #region Construction
+    #region Public methods
 
     /// <summary>
-    /// Имя типа.
+    /// Запуск интерпретации программы.
     /// </summary>
-    public ControlNode
+    public object? Execute
         (
-            string typeName
+            Context context
         )
     {
-        Sure.NotNullNorEmpty (typeName);
+        Sure.NotNull (context);
 
-        TypeName = typeName;
+        return null;
     }
 
     #endregion

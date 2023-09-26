@@ -54,7 +54,7 @@ internal static class Workshop02
                 new TermRecognizer (knownTerms)
             }
         };
-        var tokens = tokenizer.Parse (sourceCode);
+        var tokens = tokenizer.ScanForTokens (sourceCode);
         var state = new ParseState (tokens);
         parser.ParseOrThrow (state);
         Console.WriteLine ($"{first}, {second}, {third}");

@@ -26,5 +26,36 @@ namespace AM.Lexey.Eml.Ast;
 public class PropertyNode
     : AstNode
 {
-    // пока пустое тело класса
+    #region Properties
+
+    /// <summary>
+    /// Имя свойства.
+    /// </summary>
+    public string Name { get; }
+
+    /// <summary>
+    /// Значение свойства.
+    /// </summary>
+    public object? Value { get; set; }
+
+    #endregion
+
+    #region Construction
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public PropertyNode
+        (
+            string name,
+            object? value
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        Name = name;
+        Value = value;
+    }
+
+    #endregion
 }

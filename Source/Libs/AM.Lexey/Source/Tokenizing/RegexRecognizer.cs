@@ -83,7 +83,7 @@ public sealed class RegexRecognizer
 
     #region Tokeninzer members
 
-    /// <inheritdoc cref="Tokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.ScanForTokens"/>
     public Token? RecognizeToken
         (
             TextNavigator navigator

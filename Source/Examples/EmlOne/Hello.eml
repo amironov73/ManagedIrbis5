@@ -1,0 +1,7 @@
+﻿import Avalonia.Controls
+
+Window {
+    Title="Hello, world"
+    Width=400
+    Height=300
+}

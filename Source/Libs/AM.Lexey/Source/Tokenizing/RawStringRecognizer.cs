@@ -30,7 +30,7 @@ public sealed class RawStringRecognizer
 {
     #region Tokenizer members
 
-    /// <inheritdoc cref="Tokenizer.Parse"/>
+    /// <inheritdoc cref="Tokenizer.ScanForTokens"/>
     public Token? RecognizeToken
         (
             TextNavigator navigator

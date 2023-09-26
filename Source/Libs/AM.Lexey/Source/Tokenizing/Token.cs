@@ -50,9 +50,9 @@ public sealed class Token
     public string Kind { get; }
 
     /// <summary>
-    /// Собственно значение токена.
+    /// Лексема - cобственно значение токена.
     /// </summary>
-    public string? Value { get; }
+    public string? Lexeme { get; }
 
     /// <summary>
     /// Произвольные пользовательские данные.
@@ -69,7 +69,7 @@ public sealed class Token
     public Token
         (
             string kind,
-            string? value,
+            string? lexeme,
             int line = 0,
             int column = 0,
             int offset = 0
@@ -78,7 +78,7 @@ public sealed class Token
         Sure.NotNullNorEmpty (kind);
 
         Kind = kind;
-        Value = value;
+        Lexeme = lexeme;
         Line = line;
         Column = column;
         Offset = offset;
@@ -121,7 +121,7 @@ public sealed class Token
         (
             string term
         )
-        => Kind is TokenKind.Term && string.CompareOrdinal (Value, term) == 0;
+        => Kind is TokenKind.Term && string.CompareOrdinal (Lexeme, term) == 0;
 
     /// <summary>
     /// Это один из перечисленных термов?
@@ -134,8 +134,8 @@ public sealed class Token
         => Kind is TokenKind.Term
         &&
             (
-                string.CompareOrdinal (Value, term1) == 0
-                || string.CompareOrdinal (Value, term2) == 0
+                string.CompareOrdinal (Lexeme, term1) == 0
+                || string.CompareOrdinal (Lexeme, term2) == 0
             );
 
     /// <summary>
@@ -150,9 +150,9 @@ public sealed class Token
         => Kind is TokenKind.Term
         &&
             (
-                string.CompareOrdinal (Value, term1) == 0
-                || string.CompareOrdinal (Value, term2) == 0
-                || string.CompareOrdinal (Value, term3) == 0
+                string.CompareOrdinal (Lexeme, term1) == 0
+                || string.CompareOrdinal (Lexeme, term2) == 0
+                || string.CompareOrdinal (Lexeme, term3) == 0
             );
 
     /// <summary>
@@ -170,7 +170,7 @@ public sealed class Token
 
         foreach (var term in terms)
         {
-            if (string.CompareOrdinal (Value, term) == 0)
+            if (string.CompareOrdinal (Lexeme, term) == 0)
             {
                 return true;
             }
@@ -197,7 +197,7 @@ public sealed class Token
             string reserved
         )
         => Kind is TokenKind.ReservedWord
-           && string.CompareOrdinal (Value, reserved) == 0;
+           && string.CompareOrdinal (Lexeme, reserved) == 0;
 
     /// <summary>
     /// Это одно из перечисленных зарезервированных слов?
@@ -210,8 +210,8 @@ public sealed class Token
         => Kind is TokenKind.ReservedWord
            &&
            (
-               string.CompareOrdinal (Value, reserved1) == 0
-               || string.CompareOrdinal (Value, reserved2) == 0
+               string.CompareOrdinal (Lexeme, reserved1) == 0
+               || string.CompareOrdinal (Lexeme, reserved2) == 0
            );
 
     /// <summary>
@@ -226,9 +226,9 @@ public sealed class Token
         => Kind is TokenKind.ReservedWord
            &&
            (
-               string.CompareOrdinal (Value, reserved1) == 0
-               || string.CompareOrdinal (Value, reserved2) == 0
-               || string.CompareOrdinal (Value, reserved3) == 0
+               string.CompareOrdinal (Lexeme, reserved1) == 0
+               || string.CompareOrdinal (Lexeme, reserved2) == 0
+               || string.CompareOrdinal (Lexeme, reserved3) == 0
            );
 
     /// <summary>
@@ -246,7 +246,7 @@ public sealed class Token
 
         foreach (var word in words)
         {
-            if (string.CompareOrdinal (Value, word) == 0)
+            if (string.CompareOrdinal (Lexeme, word) == 0)
             {
                 return true;
             }
@@ -358,7 +358,7 @@ public sealed class Token
     /// <summary>
     /// Токен с новым видом.
     /// </summary>
-    public Token WithNewKind (string kind) => new (kind, Value, Line, Column);
+    public Token WithNewKind (string kind) => new (kind, Lexeme, Line, Column);
 
     /// <summary>
     /// Токен с новым значением.
@@ -415,7 +415,7 @@ public sealed class Token
     {
         return other is not null
             && string.CompareOrdinal (Kind, other.Kind) == 0
-            && string.CompareOrdinal (Value, other.Value) == 0;
+            && string.CompareOrdinal (Lexeme, other.Lexeme) == 0;
     }
 
     #endregion
@@ -435,12 +435,12 @@ public sealed class Token
     /// <inheritdoc cref="object.GetHashCode"/>
     public override int GetHashCode()
     {
-        return HashCode.Combine (Kind, Value);
+        return HashCode.Combine (Kind, Lexeme);
     }
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString() =>
-        $"[{Line}, {Column}] {Kind.ToVisibleString()}: {Value.ToVisibleString()}";
+        $"[{Line}, {Column}] {Kind.ToVisibleString()}: {Lexeme.ToVisibleString()}";
 
     #endregion
 }
