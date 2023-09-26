@@ -11,7 +11,12 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+
+using AM.Lexey.Ast;
 
 using JetBrains.Annotations;
 
@@ -24,6 +29,7 @@ namespace AM.Lexey.Eml.Ast;
 /// </summary>
 [PublicAPI]
 public sealed class EmlProgramNode
+    : AstNode
 {
     #region Properties
 
@@ -59,6 +65,28 @@ public sealed class EmlProgramNode
 
     #endregion
 
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer);
+
+        foreach (var importNode in Imports)
+        {
+            importNode.DumpHierarchyItem ("Import", level + 1, writer);
+        }
+
+        RootControl.DumpHierarchyItem ("Root", level + 1, writer);
+    }
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -80,6 +108,14 @@ public sealed class EmlProgramNode
         }
 
         return RootControl.CreateControl (context);
+    }
+
+    /// <summary>
+    /// Дамп программы
+    /// </summary>
+    public void Dump()
+    {
+        DumpHierarchyItem ("Program", 0, Console.Out);
     }
 
     #endregion

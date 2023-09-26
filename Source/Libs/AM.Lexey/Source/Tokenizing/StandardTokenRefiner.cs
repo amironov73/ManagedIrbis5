@@ -112,7 +112,7 @@ public sealed class StandardTokenRefiner
             if (token.Lexeme is { } lexeme
                 && _reservedWords.ContainsValue (lexeme, comparer))
             {
-                tokens[index] = token.WithNewKind (TokenKind.ReservedWord);
+                result.Add (token.WithNewKind (TokenKind.ReservedWord));
                 continue;
             }
 

@@ -1,0 +1,40 @@
+﻿import Avalonia.Controls
+
+Window {
+    Title="Calculator"
+    Width=400
+    Height=300
+
+    StackPanel {
+        Orientation=Vertical
+        Spacing=5
+
+        Label {
+            Content="Первое слагаемое"
+        }
+
+        TextBox {
+            Text="123"
+        }
+
+        Label {
+            Content="Второе слагаемое"
+        }
+
+        TextBox {
+            Text="456"
+        }
+
+        Button {
+            Content="Сложить"
+        }
+
+        Label {
+            Content="Сумма"
+        }
+
+        TextBox {
+            Text="?"
+        }
+    }
+}

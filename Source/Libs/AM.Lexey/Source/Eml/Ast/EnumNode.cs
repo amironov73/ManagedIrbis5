@@ -5,35 +5,35 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* ImportNode.cs -- узел, импортирующий пространство имен
+/* EnumNode.cs -- узел со значением из перечисления
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
+using System;
 using System.IO;
 
 using AM.Lexey.Ast;
-
-using JetBrains.Annotations;
+using AM.Lexey.Barsik;
+using AM.Lexey.Barsik.Ast;
 
 #endregion
 
 namespace AM.Lexey.Eml.Ast;
 
 /// <summary>
-/// Узел, импортирующий пространство имен.
+/// Узел, хранящий значение из перечисления
 /// </summary>
-[PublicAPI]
-public sealed class ImportNode
-    : AstNode
+public sealed class EnumNode
+    : AtomNode
 {
     #region Properties
 
     /// <summary>
-    /// Пространство имен.
+    /// Текстовое представление.
     /// </summary>
-    public string Namespace { get; }
+    public string Text{ get; }
 
     #endregion
 
@@ -42,14 +42,14 @@ public sealed class ImportNode
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public ImportNode
+    public EnumNode
         (
-            string ns
+            string text
         )
     {
-        Sure.NotNullNorEmpty (ns);
+        Sure.NotNullNorEmpty (text);
 
-        Namespace = ns;
+        Text = text;
     }
 
     #endregion
@@ -64,8 +64,28 @@ public sealed class ImportNode
             TextWriter writer
         )
     {
-        DumpHierarchyItem (name, level, writer, Namespace);
+        base.DumpHierarchyItem (name, level, writer, Text);
     }
+
+    #endregion
+
+    #region AtomNode members
+
+    /// <inheritdoc cref="AtomNode.Compute"/>
+    public override dynamic Compute
+        (
+            Context context
+        )
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="AstNode.ToString"/>
+    public override string ToString() => $"EnumNode '{Text.ToVisibleString()}'";
 
     #endregion
 }

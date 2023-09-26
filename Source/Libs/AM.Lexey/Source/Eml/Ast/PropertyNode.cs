@@ -11,6 +11,8 @@
 
 #region Using directives
 
+using System.IO;
+
 using AM.Lexey.Ast;
 
 using JetBrains.Annotations;
@@ -55,6 +57,21 @@ public class PropertyNode
 
         Name = name;
         Value = value;
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer, $"{Name} = {Value.ToVisibleString()}");
     }
 
     #endregion

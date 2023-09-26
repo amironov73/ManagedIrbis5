@@ -12,6 +12,7 @@
 #region Using directives
 
 using System.Collections.Generic;
+using System.IO;
 
 using AM.Lexey.Ast;
 
@@ -66,6 +67,31 @@ public class ControlNode
         TypeName = typeName;
         Properties = new (properties);
         Children = new (children);
+    }
+
+    #endregion
+
+    #region AstNode members
+
+    /// <inheritdoc cref="AstNode.DumpHierarchyItem(string?,int,System.IO.TextWriter)"/>
+    internal override void DumpHierarchyItem
+        (
+            string? name,
+            int level,
+            TextWriter writer
+        )
+    {
+        base.DumpHierarchyItem (name, level, writer, TypeName);
+
+        foreach (var property in Properties)
+        {
+            property.DumpHierarchyItem ("Property", level + 1, writer);
+        }
+
+        foreach (var child in Children)
+        {
+            child.DumpHierarchyItem ("Child", level + 1, writer);
+        }
     }
 
     #endregion

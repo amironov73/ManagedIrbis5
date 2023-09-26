@@ -13,6 +13,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -42,12 +43,25 @@ internal static class EmlGrammar
     private static readonly string[] KnownTerms = { "{", "}", "=", "." };
 
     /// <summary>
-    /// Порождение константного узла.
+    /// Константное значение.
     /// </summary>
     private static readonly Parser<AtomNode> Literal = new LiteralParser().Map
         (
             x => (AtomNode) new ConstantNode (x)
         );
+
+    /// <summary>
+    /// Значение из перечисления.
+    /// </summary>
+    private static readonly Parser<AtomNode> Enum = new IdentifierParser().Map
+        (
+            x => (AtomNode) new EnumNode (x)
+        );
+
+    /// <summary>
+    /// Атом.
+    /// </summary>
+    public static readonly Parser<AtomNode> Atom = Literal.Or (Enum);
 
     /// <summary>
     /// Разбор зарезервированного слова.
@@ -60,8 +74,7 @@ internal static class EmlGrammar
     /// Разбор идентификаторов.
     /// </summary>
     private static readonly Parser<string> Identifier =
-        new IdentifierParser().SeparatedBy (Term ("."))
-            .Map (it => string.Join ('.', it));
+        new IdentifierParser();
 
     /// <summary>
     /// Терм.
@@ -74,8 +87,8 @@ internal static class EmlGrammar
     private static readonly Parser<ImportNode> Import = Parser.Chain
         (
             Reserved ("import"),
-            Identifier,
-            (_, name) => new ImportNode (name)
+            Identifier.SeparatedBy (Term (".")),
+            (_, name) => new ImportNode (string.Join ('.', name))
         );
 
     /// <summary>
@@ -88,10 +101,11 @@ internal static class EmlGrammar
     /// </summary>
     private static readonly Parser<PropertyNode> Property = Parser.Chain
         (
-            Identifier,
+            Identifier.SeparatedBy (Term (".")),
             Term ("="),
-            Literal,
-            (name, _, value) => new PropertyNode (name, value)
+            Atom,
+            (name, _, value) =>
+                new PropertyNode (string.Join ('.', name), value)
         );
 
     /// <summary>
@@ -106,7 +120,8 @@ internal static class EmlGrammar
         (
             ImportSection,
             Control,
-            (imports, root) => new EmlProgramNode(imports, root)
+            (imports, root) =>
+                new EmlProgramNode (imports, root)
         );
 
     private static bool _isInitialized;
@@ -152,13 +167,27 @@ internal static class EmlGrammar
                 new WhitespaceRecognizer(),
                 new IdentifierRecognizer(),
                 new IntegerRecognizer(),
+                new StringRecognizer(),
                 new TermRecognizer (KnownTerms)
             }
         };
         var tokens = tokenizer.ScanForTokens (sourceCode);
+
+        Console.WriteLine();
+        foreach (var token in tokens)
+        {
+            Console.WriteLine (token);
+        }
+
+        Console.WriteLine();
+
         var state = new ParseState (tokens);
 
-        return Program.ParseOrThrow (state);
+        var result = Program.ParseOrThrow (state);
+        result.Dump();
+        Console.WriteLine();
+
+        return result;
     }
 
     /// <summary>
