@@ -18,8 +18,6 @@ using AM.Lexey.Tokenizing;
 
 #endregion
 
-#nullable enable
-
 namespace ParsingTutorial;
 
 /// <summary>
@@ -32,7 +30,7 @@ internal static class Workshop01
     public static void Step1()
     {
         // текст, подлежащий разбору
-        var sourceCode = "-1, \"2\", -3";
+        var sourceCode = "-1, 2, -3";
 
         // термы, которые могут встретиться в тексте
         var knownTerms = new[] { ",", "-" };

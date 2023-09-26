@@ -6,11 +6,13 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 
-/* Context.cs -- контекст исполнения скрипта
+/* EmlContext.cs -- контекст исполнения скрипта
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
+
+using System.Collections.Generic;
 
 using JetBrains.Annotations;
 
@@ -22,7 +24,14 @@ namespace AM.Lexey.Eml;
 /// Контекст исполнения скрипта
 /// </summary>
 [PublicAPI]
-public sealed class Context
+public sealed class EmlContext
 {
-    // пока пустое тело класса
+    #region Properties
+
+    /// <summary>
+    /// Перечень пространств имен.
+    /// </summary>
+    public List<string> Namespaces { get; } = new ();
+
+    #endregion
 }

@@ -55,6 +55,38 @@ public sealed class StandardTokenRefiner
 
     #endregion
 
+    #region Construction
+
+    /// <summary>
+    /// Конструктор по умолчанию.
+    /// </summary>
+    public StandardTokenRefiner()
+        : this (Array.Empty<string>())
+    {
+        // пустое тело конструктора
+    }
+
+    /// <summary>
+    /// Конструктор.
+    /// </summary>
+    public StandardTokenRefiner
+        (
+            string[] reservedWords
+        )
+    {
+        Sure.NotNull (reservedWords);
+
+        _reservedWords = reservedWords;
+    }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string[] _reservedWords;
+
+    #endregion
+
     #region ITokenRefiner members
 
     /// <inheritdoc cref="ITokenRefiner.RefineTokens"/>
@@ -77,8 +109,8 @@ public sealed class StandardTokenRefiner
                 continue;
             }
 
-            if (token.Lexeme is { } tokenValue
-                && ReservedWords.ContainsValue (tokenValue, comparer))
+            if (token.Lexeme is { } lexeme
+                && _reservedWords.ContainsValue (lexeme, comparer))
             {
                 tokens[index] = token.WithNewKind (TokenKind.ReservedWord);
                 continue;
@@ -90,7 +122,8 @@ public sealed class StandardTokenRefiner
                 if (next is not null && next.IsSignedNumber())
                 {
                     var prev = tokens!.SafeAt (index - 1)?.Kind;
-                    if (prev is null or TokenKind.Term)
+                    if (prev is null or TokenKind.Whitespace
+                        or TokenKind.Term or TokenKind.Comment)
                     {
                         result.Add (next.WithNewValue ("-" + next.Lexeme));
                         index++;

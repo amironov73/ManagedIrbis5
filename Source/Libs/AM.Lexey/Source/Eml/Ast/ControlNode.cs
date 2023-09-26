@@ -38,12 +38,12 @@ public class ControlNode
     /// <summary>
     /// Свойства.
     /// </summary>
-    public List<PropertyNode> Properties { get; } = new ();
+    public List<PropertyNode> Properties { get; }
 
     /// <summary>
     /// Вложенные контролы.
     /// </summary>
-    public List<ControlNode> Children { get; } = new ();
+    public List<ControlNode> Children { get; }
 
     #endregion
 
@@ -54,12 +54,35 @@ public class ControlNode
     /// </summary>
     public ControlNode
         (
-            string typeName
+            string typeName,
+            IList<PropertyNode> properties,
+            IList<ControlNode> children
         )
     {
         Sure.NotNullNorEmpty (typeName);
+        Sure.NotNull (properties);
+        Sure.NotNull (children);
 
         TypeName = typeName;
+        Properties = new (properties);
+        Children = new (children);
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Построение контрола.
+    /// </summary>
+    public object? CreateControl
+        (
+            EmlContext context
+        )
+    {
+        Sure.NotNull (context);
+
+        return null;
     }
 
     #endregion

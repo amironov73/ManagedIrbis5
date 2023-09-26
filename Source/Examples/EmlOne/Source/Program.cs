@@ -34,9 +34,9 @@ internal static class Program
     {
         if (args.Length != 0)
         {
-            var program = Grammar.Load (args[0]);
-            var context = new AM.Lexey.Eml.Context();
-            var window = program.Execute (context);
+            var program = EmlGrammar.ParseFile (args[0]);
+            var context = new AM.Lexey.Eml.EmlContext();
+            var window = program.CreateControl (context);
             Console.WriteLine ($"Got window: {window}");
         }
     }
