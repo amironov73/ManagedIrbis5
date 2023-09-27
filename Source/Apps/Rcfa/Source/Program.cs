@@ -30,7 +30,7 @@ using ManagedIrbis.Server;
 
 #nullable enable
 
-namespace Barsik;
+namespace Rcfa;
 
 /// <summary>
 /// Вся логика программы в одном классе.
