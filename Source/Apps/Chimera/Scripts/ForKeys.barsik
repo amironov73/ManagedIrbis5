@@ -1,0 +1,28 @@
+﻿//
+// Выгрузка ФИО и номера пропуска для ключницы
+//
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=RDR;")
+if (!is_connected())
+{
+    error ("Not connected")
+    return
+}
+
+//==============================
+
+// отбор по месту работы
+found = batch_search ("MR=ИОГУНБ")
+
+foreach (rdr in found)
+{
+    fio = fm (rdr, 10) // фамилия
+    fio = fio + " " + fm (rdr, 11) // имя
+    fio = fio + " " + fm (rdr, 12) // отчество
+    key = fm (rdr, 22) // номер пропуска
+    println (fio, "\t", key)
+}
+
+//==============================
+
+disconnect()
