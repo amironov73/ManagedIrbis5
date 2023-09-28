@@ -29,7 +29,7 @@ public sealed class RecordHeader
     [XmlAttribute ("longDbName")]
     public string? LongDatabaseName { get; set; }
 
-    [XmlAttribute ("uiTterm")]
+    [XmlAttribute ("uiTerm")]
     public string? Term { get; set; }
 
     [XmlElement ("controlInfo")]

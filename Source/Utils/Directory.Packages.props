@@ -1,8 +1,10 @@
 <Project>
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
@@ -11,6 +13,7 @@
     <CommunityToolkitVersion>8.2.0</CommunityToolkitVersion>
     <NugetVersion>6.6.1</NugetVersion>
   </PropertyGroup>
+
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
     <PackageVersion Include="Autofac" Version="7.0.1" />
@@ -150,4 +153,5 @@
     <PackageVersion Include="Topshelf.NLog" Version="4.3.0" />
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.6.1" />
   </ItemGroup>
+
 </Project>
