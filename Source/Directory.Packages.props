@@ -126,7 +126,7 @@
     <PackageVersion Include="SixLabors.ImageSharp" Version="3.0.2" />
     <PackageVersion Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
     <PackageVersion Include="SixLabors.Fonts" Version="1.0.0" />
-    <PackageVersion Include="SkiaSharp" Version="2.88.6" />
+    <PackageVersion Include="SkiaSharp" Version="2.88.5" />
     <PackageVersion Include="SkiaSharp.Extended" Version="2.0.0-preview.61" />
     <PackageVersion Include="SkiaSharp.HarfBuzz" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="$(SkiaVersion)" />
