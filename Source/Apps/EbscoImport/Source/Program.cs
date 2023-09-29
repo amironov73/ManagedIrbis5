@@ -244,10 +244,23 @@ internal sealed class Program
             result.Add (field);
         }
 
-        var url = kind == "pdf"
-            ? $"http://elib.istu.edu/viewer.php?file=/ebsco/{id}.pdf"
-            : $"http://elib.istu.edu/ebsco/{id}.epub";
-        result.Add (new Field (951, 'i', url));
+        var coverUrl = kind == "pdf"
+            ? $"http://elib.istu.edu/ebsco/pdf/{id}.jpg"
+            : $"http://elib.istu.edu/ebsco/epub/{id}.jpg";
+        result.Add (new Field (951)
+            {
+                new SubField ('h', "02a"),
+                new SubField ('i', coverUrl)
+            });
+
+        var documentUrl = kind == "pdf"
+            ? $"http://elib.istu.edu/viewer.php?file=/ebsco/pdf/{id}.pdf"
+            : $"http://elib.istu.edu/ebsco/epub/{id}.epub";
+        result.Add (new Field (951)
+            {
+                new SubField ('h', "05"),
+                new SubField ('i', documentUrl)
+            });
 
         return result;
     }
@@ -259,11 +272,9 @@ internal sealed class Program
     {
         Sure.FileExists (fileName);
 
-        // Console.WriteLine (fileName);
         using var textReader = File.OpenText (fileName);
         var serializer = new XmlSerializer (typeof (EbscoRecords));
         var records = (EbscoRecords?) serializer.Deserialize (textReader);
-        // Console.WriteLine ($"Records found: {records?.Records?.Length ?? 0}");
 
         if (records?.Records is {} ebscoRecords)
         {
