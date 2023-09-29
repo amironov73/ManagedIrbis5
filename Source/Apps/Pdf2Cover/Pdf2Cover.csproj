@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <ApplicationIcon>pdf-file.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Remove="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Remove="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <CentralPackageVersionOverrideEnabled>false</CentralPackageVersionOverrideEnabled>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="DevExpress.Document.Processor" Version="22.1.6" />
+        <PackageReference Include="DevExpress.Pdf.Core" Version="22.1.6" />
+    </ItemGroup>
+
+</Project>

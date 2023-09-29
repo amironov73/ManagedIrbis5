@@ -30,8 +30,6 @@ using AM;
 using AM.Linq;
 using AM.Text;
 
-using EbscoImport;
-
 using ManagedIrbis;
 using ManagedIrbis.ImportExport;
 
@@ -39,9 +37,8 @@ using ManagedIrbis.ImportExport;
 
 #nullable enable
 
-/// <summary>
-/// Единственный класс, содержащий всю функциональность утилиты.
-/// </summary>
+namespace EbscoImport;
+
 internal sealed class Program
 {
     private static HashSet<string> _epubIdentifiers = null!;
@@ -52,7 +49,6 @@ internal sealed class Program
         "Association", "Institute", "Meeting", "Committee", "Academy",
         "Corporation", "Foundation", "Museum"
     };
-
 
     private static void SetAuthor
         (
