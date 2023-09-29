@@ -17,7 +17,6 @@
 /*
     Утилита для создания обложек для PDF-файлов.
     Фактически отрисовывается первая страница.
-
  */
 
 #region Using directives
@@ -30,6 +29,8 @@ using DevExpress.Pdf;
 
 #endregion
 
+namespace Pdf2Cover;
+
 /// <summary>
 /// Единственный класс, содержащий всю функциональность утилиты.
 /// </summary>
@@ -40,16 +41,6 @@ internal sealed class Program
             string filename
         )
     {
-        var colorDepth = Encoder.ColorDepth;
-
-        var parameters = new EncoderParameters(1);
-        var parameter = new EncoderParameter
-            (
-                colorDepth,
-                4L
-            );
-        parameters.Param[0] = parameter;
-
         using var processor = new PdfDocumentProcessor();
         processor.LoadDocument (filename);
         if (processor.Document.Pages.Count < 1)

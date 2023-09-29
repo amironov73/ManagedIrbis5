@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <ApplicationIcon>epub-file.ico</ApplicationIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Remove="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Remove="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+  
+    <ItemGroup>
+        <PackageReference Include="SharpCompress" />
+    </ItemGroup>
+
+</Project>
