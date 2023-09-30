@@ -24,8 +24,6 @@ using AM.Collections;
 
 #endregion
 
-#nullable enable
-
 namespace AM.IO;
 
 /// <summary>
@@ -73,6 +71,7 @@ public sealed class ArrayPoolWriter
     public ArrayPoolWriter()
         : this (ArrayPool<byte>.Shared, DefaultChunkSize)
     {
+        // пустое тело конструктора.
     }
 
     /// <summary>

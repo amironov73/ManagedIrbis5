@@ -20,34 +20,32 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Buffers.Text;
 
 /// <summary>
-/// 
+///
 /// </summary>
 [PublicAPI]
 public partial struct Utf16ValueStringBuilder
     : IDisposable, IBufferWriter<char>, IResettableBufferWriter<char>
 {
     #region Delegates
-    
+
     /// <summary>
-    /// 
+    ///
     /// </summary>
-    public delegate bool TryFormat<T> 
+    public delegate bool TryFormat<T>
         (
             T value,
-            Span<char> destination, 
+            Span<char> destination,
             out int charsWritten,
             ReadOnlySpan<char> format
         );
-    
+
     #endregion
 
     #region Constants
-    
+
     private const int ThreadStaticBufferSize = 31111;
     private const int DefaultBufferSize = 32768; // use 32K default buffer.
 
@@ -57,7 +55,7 @@ public partial struct Utf16ValueStringBuilder
 
     static class ExceptionUtil
     {
-        public static void ThrowArgumentOutOfRangeException 
+        public static void ThrowArgumentOutOfRangeException
             (
                 string paramName
             )
@@ -67,13 +65,13 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public static class FormatterCache<T>
     {
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public static TryFormat<T> TryFormatDelegate;
 
@@ -99,7 +97,7 @@ public partial struct Utf16ValueStringBuilder
             TryFormatDelegate = formatter;
         }
 
-        static bool TryFormatString 
+        static bool TryFormatString
             (
                 T value,
                 Span<char> dest,
@@ -120,7 +118,7 @@ public partial struct Utf16ValueStringBuilder
             return s.AsSpan().TryCopyTo (dest);
         }
 
-        static bool TryFormatDefault 
+        static bool TryFormatDefault
             (
                 T value,
                 Span<char> dest,
@@ -154,7 +152,7 @@ public partial struct Utf16ValueStringBuilder
     #endregion
 
     #region Construction
-    
+
     static Utf16ValueStringBuilder()
     {
         var newLine = Environment.NewLine.ToCharArray();
@@ -214,7 +212,7 @@ public partial struct Utf16ValueStringBuilder
         _index = 0;
         _disposeImmediately = disposeImmediately;
     }
-    
+
     #endregion
 
 
@@ -237,10 +235,10 @@ public partial struct Utf16ValueStringBuilder
     private int _index;
     private readonly bool _disposeImmediately;
 
-    [ThreadStatic] 
+    [ThreadStatic]
     private static char[]? _scratchBuffer;
 
-    [ThreadStatic] 
+    [ThreadStatic]
     internal static bool scratchBufferUsed;
 
     void IResettableBufferWriter<char>.Reset()
@@ -325,7 +323,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     #endregion
-    
+
     #region Public methods
 
     /// <summary>
@@ -351,7 +349,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void Clear()
     {
@@ -359,7 +357,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="sizeHint"></param>
     public void TryGrow
@@ -374,7 +372,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="sizeHint"></param>
     public void Grow
@@ -442,7 +440,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Append
@@ -493,13 +491,13 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Append
         (
             string? value,
-            int startIndex, 
+            int startIndex,
             int count
         )
     {
@@ -519,7 +517,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
     public void Append
@@ -555,7 +553,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="value"></param>
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
@@ -613,7 +611,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void Insert
         (
@@ -625,7 +623,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void Insert
         (
@@ -747,7 +745,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="oldValue"></param>
     /// <param name="newValue"></param>
@@ -788,7 +786,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     public void Replace
         (
@@ -896,7 +894,7 @@ public partial struct Utf16ValueStringBuilder
     /// <remarks>
     /// This method does not reduce the capacity of this builder.
     /// </remarks>
-    public void Remove 
+    public void Remove
         (
             int startIndex,
             int length
@@ -936,7 +934,7 @@ public partial struct Utf16ValueStringBuilder
     /// <summary>Copy inner buffer to the destination span.</summary>
     public bool TryCopyTo
         (
-            Span<char> destination, 
+            Span<char> destination,
             out int charsWritten
         )
     {
@@ -993,7 +991,7 @@ public partial struct Utf16ValueStringBuilder
     }
 
     /// <summary>IBufferWriter.Advance.</summary>
-    public void Advance 
+    public void Advance
         (
             int count
         )
@@ -1030,7 +1028,7 @@ public partial struct Utf16ValueStringBuilder
     /// <summary>
     /// Supports the Nullable type for a given struct type.
     /// </summary>
-    public static void EnableNullableFormat<T>() 
+    public static void EnableNullableFormat<T>()
         where T: struct
     {
         RegisterTryFormat<T?> (CreateNullableFormatter<T>());

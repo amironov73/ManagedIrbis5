@@ -6118,9 +6118,9 @@ public static class Utility
             int offset,
             T value
         )
-        where T : struct
+        where T: struct
     {
-        MemoryMarshal.Write (span[offset..], ref value);
+        MemoryMarshal.Write (span[offset..], in value);
     }
 
     /// <summary>

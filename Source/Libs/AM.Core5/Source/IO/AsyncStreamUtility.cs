@@ -30,8 +30,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM.IO;
 
 /// <summary>
@@ -601,7 +599,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (short)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -620,7 +618,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (ushort)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -639,7 +637,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (int)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -658,7 +656,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (uint)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -677,7 +675,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (long)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -696,7 +694,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (ulong)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -715,7 +713,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (float)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -734,7 +732,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (double)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -753,7 +751,7 @@ public static class AsyncStreamUtility
 
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (decimal)];
-        MemoryMarshal.Write (memory.Span, ref value);
+        MemoryMarshal.Write (memory.Span, in value);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
@@ -773,7 +771,7 @@ public static class AsyncStreamUtility
         var binary = value.ToBinary();
         using var owner = MemoryPool<byte>.Shared.Rent (16);
         var memory = owner.Memory[..sizeof (long)];
-        MemoryMarshal.Write (memory.Span, ref binary);
+        MemoryMarshal.Write (memory.Span, in binary);
 
         await stream.WriteAsync (memory, cancellationToken);
     }
