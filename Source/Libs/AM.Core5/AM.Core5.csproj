@@ -70,5 +70,9 @@
         </EmbeddedResource>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Source\Hosting\" />
+    </ItemGroup>
+
 
 </Project>

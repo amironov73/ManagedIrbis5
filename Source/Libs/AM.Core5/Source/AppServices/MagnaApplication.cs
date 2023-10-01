@@ -10,8 +10,6 @@
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 // ReSharper disable VirtualMemberCallInConstructor
 
 /* MagnaApplication.cs -- класс-приложение
@@ -32,6 +30,8 @@ using System.Threading.Tasks;
 using AM.Interactivity;
 using AM.Logging;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,13 +42,12 @@ using NLog.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM.AppServices;
 
 /// <summary>
 /// Класс-приложение.
 /// </summary>
+[PublicAPI]
 public class MagnaApplication
     : IMagnaApplication
 {

@@ -20,7 +20,7 @@ using Microsoft.Extensions.Hosting;
 
 #endregion
 
-namespace AM.Hosting;
+namespace AM.AppServices;
 
 /// <summary>
 /// Пустой хост, не выполняющий никаких полезных действий.

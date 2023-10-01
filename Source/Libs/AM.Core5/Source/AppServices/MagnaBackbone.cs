@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
 
 /* MagnaBackbone.cs -- хребет приложения
  * Ars Magna project, http://arsmagna.ru
@@ -19,6 +18,8 @@ using AM.Interactivity;
 using AM.Logging;
 using AM.Plugins;
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -28,13 +29,12 @@ using NLog.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM.AppServices;
 
 /// <summary>
 /// Хребет приложения.
 /// </summary>
+[PublicAPI]
 public class MagnaBackbone
     : IMagnaBackbone
 {

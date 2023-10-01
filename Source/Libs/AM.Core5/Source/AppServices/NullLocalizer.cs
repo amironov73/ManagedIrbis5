@@ -4,12 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
 /* NullLocalizer.cs -- нулевой локализатор
  * Ars Magna project, http://arsmagna.ru
@@ -23,8 +17,6 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Localization;
 
 #endregion
-
-#nullable enable
 
 namespace AM.AppServices;
 

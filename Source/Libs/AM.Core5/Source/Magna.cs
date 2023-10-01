@@ -28,7 +28,6 @@ using System.Reflection;
 
 using AM.AppServices;
 using AM.Configuration;
-using AM.Hosting;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

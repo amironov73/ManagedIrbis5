@@ -2,19 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassWithVirtualMembersNeverInherited.Global
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable VirtualMemberCallInConstructor
 
 /* IMagnaApplication.cs -- интерфейс приложения
  * Ars Magna project, http://arsmagna.ru
@@ -22,19 +12,21 @@
 
 #region Using directives
 
+using JetBrains.Annotations;
+
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
 
 namespace AM.AppServices;
 
 /// <summary>
 /// Интефейс приложения.
 /// </summary>
+[PublicAPI]
 public interface IMagnaApplication
 {
     #region Properties
