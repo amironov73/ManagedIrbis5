@@ -213,6 +213,10 @@ public sealed partial class MainForm
         )
     {
         var format = _configuration["format"];
+        if (string.IsNullOrEmpty (format))
+        {
+            return "(no format configured)";
+        }
 
         var formatted = await Connection.FormatRecordAsync
             (

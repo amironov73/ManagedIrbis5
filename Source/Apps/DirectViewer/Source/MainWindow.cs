@@ -236,7 +236,10 @@ public sealed class MainWindow
         }
     }
 
-    private void AddDescriptionIfNotYet (int mfn)
+    private void AddDescriptionIfNotYet
+        (
+            int mfn
+        )
     {
         if (_mfnList[mfn - 1] is MfnListItem listItem)
         {
@@ -281,7 +284,10 @@ public sealed class MainWindow
         }
     }
 
-    private void GotoMfn (MfnListItem item)
+    private void GotoMfn
+        (
+            MfnListItem item
+        )
     {
         _recordTextBox.Text = null;
         var parameters = new ReadRecordParameters
@@ -302,20 +308,17 @@ public sealed class MainWindow
         if (int.TryParse (_mfnTextBox.Text, out var mfn))
         {
             var mfnList = _mfnListBox.Items;
-            if (mfnList is not null)
+            foreach (var item in mfnList)
             {
-                foreach (var item in mfnList)
+                if (item is int itemMfn && itemMfn == mfn)
                 {
-                    if (item is int itemMfn && itemMfn == mfn)
-                    {
-                        _mfnListBox.SelectedItem = item;
-                        return;
-                    }
-                    if (item is MfnListItem listItem && listItem.Mfn == mfn)
-                    {
-                        _mfnListBox.SelectedItem = listItem;
-                        return;
-                    }
+                    _mfnListBox.SelectedItem = item;
+                    return;
+                }
+                if (item is MfnListItem listItem && listItem.Mfn == mfn)
+                {
+                    _mfnListBox.SelectedItem = listItem;
+                    return;
                 }
             }
         }

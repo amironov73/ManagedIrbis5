@@ -26,7 +26,7 @@ using ManagedIrbis.Providers;
 
 namespace InvList;
 
-class Program
+internal static class Program
 {
     private static string _connectionString = string.Empty;
     private static string _searchExpression = string.Empty;
@@ -52,8 +52,10 @@ class Program
 
         foreach (var exemplar in exemplars)
         {
-            Console.WriteLine (
-                $"{exemplar.Number}\t{exemplar.Place}\t{worklist}\t{exemplar.Status}\t{record.Mfn}\t{description}\t{count}");
+            Console.WriteLine
+                (
+                    $"{exemplar.Number}\t{exemplar.Place}\t{worklist}\t{exemplar.Status}\t{record.Mfn}\t{description}\t{count}"
+                );
         }
     }
 

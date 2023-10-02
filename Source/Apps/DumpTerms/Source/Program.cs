@@ -2,13 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -39,7 +36,7 @@ namespace DumpTerms;
 /// <summary>
 /// Единственный класс, содержащий всю функциональность утилиты.
 /// </summary>
-class Program
+internal static class Program
 {
     /// <summary>
     /// Дамп термина.
@@ -70,11 +67,7 @@ class Program
         {
             Console.WriteLine
                 (
-                    "\tMFN={0} Tag={1} Occ={2} Count={3}",
-                    posting.Mfn,
-                    posting.Tag,
-                    posting.Occurrence,
-                    posting.Count
+                    $"\tMFN={posting.Mfn} Tag={posting.Tag} Occ={posting.Occurrence} Count={posting.Count}"
                 );
 
             try
@@ -87,11 +80,7 @@ class Program
                         .GetOccurrence (posting.Occurrence - 1);
                     if (field is not null)
                     {
-                        Console.WriteLine
-                            (
-                                "\t{0}",
-                                field.ToText()
-                            );
+                        Console.WriteLine ($"\t{field.ToText()}");
                         Console.WriteLine();
                     }
 
@@ -149,15 +138,15 @@ class Program
                 return 1;
             }
 
-            Console.WriteLine ("Found terms: {0}", terms.Length);
+            Console.WriteLine ($"Found terms: {terms.Length}");
             foreach (var term in terms)
             {
                 DumpTerm (connection, term);
             }
         }
-        catch (Exception e)
+        catch (Exception exception)
         {
-            Console.Error.WriteLine (e);
+            Console.Error.WriteLine (exception);
             return 1;
         }
 

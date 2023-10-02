@@ -2,13 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* Program.cs -- точка входа в программу
  * Ars Magna project, http://arsmagna.ru
@@ -39,7 +37,7 @@ using CM = System.Configuration.ConfigurationManager;
 
 namespace ExemplarKiller;
 
-class Program
+internal static class Program
 {
     /// <summary>
     /// Префикс для поиска по инвентарному номеру.
@@ -269,7 +267,7 @@ class Program
             string[] args
         )
     {
-        if (args.Length < 1 || args.Length > 3)
+        if (args.Length is < 1 or > 3)
         {
             Console.WriteLine
                 (

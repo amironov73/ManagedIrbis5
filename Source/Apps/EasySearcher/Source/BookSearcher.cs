@@ -10,7 +10,7 @@
 // ReSharper disable PartialTypeWithSinglePart
 // ReSharper disable StringLiteralTypo
 
-/* Searcher.cs -- искатель по каталогу
+/* BookSearcher.cs -- искатель по каталогу
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -34,7 +34,7 @@ using ManagedIrbis.Searching;
 namespace EasySearcher;
 
 /// <summary>
-/// Искатель по каталогу
+/// Искатель по каталогу.
 /// </summary>
 public sealed class BookSearcher
 {

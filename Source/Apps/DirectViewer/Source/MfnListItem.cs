@@ -21,7 +21,7 @@ using ReactiveUI.Fody.Helpers;
 
 namespace DirectViewer;
 
-public class MfnListItem
+public sealed class MfnListItem
     : ReactiveObject
 {
     #region Properties
