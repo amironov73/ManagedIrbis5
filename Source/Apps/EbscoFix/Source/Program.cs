@@ -24,6 +24,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using AM;
@@ -42,7 +43,7 @@ internal sealed partial class Program
     private static HashSet<string> _pdfIdentifiers = null!;
     private static readonly Regex _regex = RegexForBookId();
 
-    [GeneratedRegex ("\\d{3,}")]
+    [GeneratedRegex ("\\d{4,}")]
     private static partial Regex RegexForBookId();
 
     private static bool ProcessRecord
@@ -50,14 +51,16 @@ internal sealed partial class Program
             Record record
         )
     {
-        var result = false;
-
-        Console.WriteLine ($"{record.Mfn}");
-        foreach (var field in record.EnumerateField (951))
+        Console.WriteLine ($"MFN {record.Mfn}");
+        var fields = record.EnumerateField (951).ToArray();
+        string? bookId = null;
+        foreach (var one in fields)
         {
-            var url = field.FM ('i');
-            if (string.IsNullOrEmpty (url) ||
-                !url.Contains ("ebscohost"))
+            // удаляем старое поле, чтобы не мешалось под ногами
+            record.Fields.Remove (one);
+
+            var url = one.FM ('i');
+            if (string.IsNullOrEmpty (url))
             {
                 continue;
             }
@@ -68,28 +71,51 @@ internal sealed partial class Program
                 continue;
             }
 
-            var bookId = match.Value;
-            var kind = PdfOrEpub (bookId);
-
-            var coverUrl = kind == "pdf"
-                ? $"http://elib.istu.edu/ebsco/pdf/{bookId}.jpg"
-                : $"http://elib.istu.edu/ebsco/epub/{bookId}.jpg";
-            record.Add (new Field (951)
-            {
-                new SubField ('h', "02a"),
-                new SubField ('i', coverUrl)
-            });
-
-            var newUrl = kind == "pdf"
-                ? $"http://elib.istu.edu/viewer.php?file=/ebsco/pdf/{bookId}.pdf"
-                : $"http://elib.istu.edu/ebsco/epub/{bookId}.epub";
-            field.SetSubFieldValue ('i', newUrl);
-            field.Add ('h', "05");
-
-            result = true;
+            bookId = match.Value;
+            break;
         }
 
-        return result;
+        if (string.IsNullOrEmpty (bookId))
+        {
+            // книга без идентификатора
+            Console.WriteLine ("No book id");
+            return false;
+        }
+
+        var kind = PdfOrEpub (bookId);
+        if (string.IsNullOrEmpty (kind))
+        {
+            // если книги не существует, удаляем запись
+            Console.WriteLine ($"Book with id {bookId} doesn't exist");
+            record.Status |= RecordStatus.LogicallyDeleted;
+            return true;
+        }
+
+        var coverUrl = kind == "pdf"
+            ? $"/pdf/{bookId}.jpg"
+            : $"/epub/{bookId}.jpg";
+        var pathToCheck = @"D:\Temp1050" + coverUrl;
+        if (File.Exists (pathToCheck))
+        {
+            // если обложка существует, добавляем ее
+            coverUrl = $"http://elib.istu.edu/ebsco{coverUrl}";
+            record.Add (new Field (951)
+            {
+                new ('h', "02a"),
+                new ('i', coverUrl)
+            });
+        }
+
+        var newUrl = kind == "pdf"
+            ? $"http://elib.istu.edu/viewer/view.php?file=/ebsco/pdf/{bookId}.pdf"
+            : $"http://elib.istu.edu/ebsco/epub/{bookId}.epub";
+        record.Add ( new Field (951)
+        {
+            new ('h', "05"),
+            new ('i', newUrl)
+        });
+
+        return true;
     }
 
     private static HashSet<string> LoadBookIdentifiersFromFile
@@ -145,9 +171,9 @@ internal sealed partial class Program
                 {
                     writer.Append (record);
                 }
-
-                Console.WriteLine ("ALL DONE");
             }
+
+            Console.WriteLine ("ALL DONE");
         }
         catch (Exception exception)
         {
