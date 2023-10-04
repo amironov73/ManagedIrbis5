@@ -1,24 +1,42 @@
-﻿using AM.Avalonia.Controls;
-using AM.Logging;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
+
+#region Using directives
 
 using Avalonia.Controls;
 using Avalonia.Layout;
-using Avalonia.Media;
+
+using AM.Avalonia.Controls;
+
+using Avalonia;
+
+#endregion
 
 namespace AvaloniaTests;
 
-public sealed class GroupBoxDemo
+public class EnumComboBoxDemo
 {
+    public enum DemoEnum
+    {
+        FirstValue,
+        SecondValue,
+        ThirdValue,
+        FourthValue
+    }
+
     public async void Show
         (
             Window owner
         )
     {
-        MagnaTarget.AddToNlogConfiguration();
-
         var window = new Window
         {
-            Title = "GroupBox demo",
+            Title = "EnumComboBox demo",
             Width = 600,
             Height = 400,
 
@@ -26,6 +44,8 @@ public sealed class GroupBoxDemo
             VerticalContentAlignment = VerticalAlignment.Stretch,
             Content = new StackPanel
             {
+                Margin = new Thickness (5),
+
                 Children =
                 {
                     new Label
@@ -35,23 +55,10 @@ public sealed class GroupBoxDemo
                         Content = "Чисто для контроля"
                     },
 
-                    new GroupBox
+                    new EnumComboBox
                     {
-                        Header = "First group",
-                        Width = 600,
-                        Height = 200,
-                        Background = Brushes.Aqua,
-
-                        Content = new StackPanel
-                        {
-                            Background = Brushes.Lavender,
-                            Children =
-                            {
-                                new TextBlock { Text = "Первая строчка" },
-                                new TextBlock { Text = "Вторая строчка" },
-                                new TextBlock { Text = "Третья строчка" },
-                            }
-                        }
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        EnumType = typeof (DemoEnum)
                     }
                 }
             }
@@ -59,4 +66,5 @@ public sealed class GroupBoxDemo
 
         await window.ShowDialog (owner);
     }
+
 }

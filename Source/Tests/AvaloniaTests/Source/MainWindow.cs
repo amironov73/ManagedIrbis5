@@ -587,6 +587,12 @@ public sealed class MainWindow
                     new ProgressStripeDemo().Show (this);
                 }),
 
+                new Button { Content = "EnumComboBox" }
+                .OnClick ((sender, args) =>
+                {
+                    new EnumComboBoxDemo().Show (this);
+                }),
+
             }
         };
     }

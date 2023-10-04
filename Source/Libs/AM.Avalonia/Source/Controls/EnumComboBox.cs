@@ -14,27 +14,28 @@
 
 using System;
 
+using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Styling;
+
+using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
-namespace Avalonia.NETCoreApp5;
+namespace AM.Avalonia.Controls;
 
 /// <summary>
 /// Комбобокс, позволяющий выбрать элемент перечисления.
 /// </summary>
+[PublicAPI]
 public sealed class EnumComboBox
-    : ComboBox, IStyleable
+    : ComboBox
 {
     #region Properties
 
     /// <summary>
     /// Описание свойства "тип перечисления".
     /// </summary>
-    public static StyledProperty<Type?> EnumTypeProperty
+    public static readonly StyledProperty<Type?> EnumTypeProperty
         = AvaloniaProperty.Register<EnumComboBox, Type?> (nameof (EnumType));
 
     /// <summary>
@@ -59,9 +60,14 @@ public sealed class EnumComboBox
 
     #endregion
 
+    #region Private members
+
     private Type? _enumType;
 
-    private void FillItems (Type? enumType)
+    private void FillItems
+        (
+            Type? enumType
+        )
     {
         if (enumType is null)
         {
@@ -72,6 +78,12 @@ public sealed class EnumComboBox
         ItemsSource = Enum.GetValues (enumType);
     }
 
-    /// <inheritdoc cref="IStyleable.StyleKey"/>
-    Type IStyleable.StyleKey => typeof (ComboBox);
+    #endregion
+
+    #region StyledElement members
+
+    /// <inheritdoc cref="StyledElement.StyleKeyOverride"/>
+    protected override Type StyleKeyOverride => typeof (ComboBox);
+
+    #endregion
 }
