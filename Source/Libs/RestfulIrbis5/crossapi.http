@@ -1,0 +1,26 @@
+﻿# How many license types are there?
+https://api.crossref.org/licenses?rows=0
+
+#####
+
+# How many accounts do we have?
+https://api.crossref.org/members?rows=0
+
+#####
+
+# How many records do we have?
+https://api.crossref.org/works?rows=0
+
+#####
+
+# What content types do we have?
+https://api.crossref.org/types
+
+#####
+
+# How many books are in the database?
+https://api.crossref.org/types/book/works?rows=0
+
+#####
+
+http://api.crossref.org/works?query.author="Josiah Carberry"
