@@ -87,7 +87,7 @@ public class BusyWindow
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             IsVisible = false,
-            Height = 17,
+            Height = 22,
             [!BusyStripe.TextProperty] = HeaderProperty
                 .WhenAnyValue (x=>x).ToBinding()
         };

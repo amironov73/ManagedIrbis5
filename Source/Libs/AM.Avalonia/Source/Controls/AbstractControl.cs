@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable StringLiteralTypo
 
 /* AbstractControl.cs -- некий абстрактный контрол, хранящий значение
  * Ars Magna project, http://arsmagna.ru

@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* AnalogClock.cs -- простые аналоговые часы
  * Ars Magna project, http://arsmagna.ru
@@ -108,13 +107,7 @@ public sealed class AnalogClock
         context.DrawText (formatted, new Point (x, y));
     }
 
-    private double FractionToAngle
-        (
-            double fraction
-        )
-    {
-        return fraction * Math.PI * 2.0;
-    }
+    private double FractionToAngle (double fraction) => fraction * Math.PI * 2.0;
 
     #endregion
 

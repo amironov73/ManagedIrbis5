@@ -225,7 +225,7 @@ public sealed class MainWindow
                         Text = "Приложение занято чем-то важным",
                         HorizontalAlignment = HorizontalAlignment.Stretch,
                         IsVisible = false,
-                        Height = 17
+                        Height = 22
                     };
 
                     var button = new Button

@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 
 /* ColorComboBox.cs -- комбобокс, позволяющий выбрать цвет из списка
  * Ars Magna project, http://arsmagna.ru
@@ -17,9 +16,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
 using Avalonia.Media;
-using Avalonia.Styling;
 
 using JetBrains.Annotations;
 
@@ -34,14 +31,14 @@ namespace AM.Avalonia.Controls;
 /// </summary>
 [PublicAPI]
 public sealed class ColorComboBox
-    : ComboBox, IStyleable
+    : ComboBox
 {
     #region Properties
 
     /// <summary>
     /// Регистрация свойства "выбранный цвет".
     /// </summary>
-    public static StyledProperty<Color> SelectedColorProperty
+    public static readonly StyledProperty<Color> SelectedColorProperty
         = AvaloniaProperty.Register<ColorComboBox, Color> (nameof (SelectedColor));
 
     /// <summary>
@@ -76,8 +73,7 @@ public sealed class ColorComboBox
             new TextBlock
             {
                 Background = new SolidColorBrush (value),
-                Foreground = GetContrastBrush (value),
-                [!TextBlock.TextProperty] = new Binding()
+                Foreground = GetContrastBrush (value)
             }
         );
 
@@ -103,14 +99,21 @@ public sealed class ColorComboBox
 
     #region Private members
 
-    private static ISolidColorBrush GetContrastBrush (Color color)
+    private static ISolidColorBrush GetContrastBrush
+        (
+            Color color
+        )
     {
         var summa = color.B + color.G + color.R;
         return summa > 300 ? Brushes.Black : Brushes.White;
     }
 
-    /// <inheritdoc cref="IStyleable.StyleKey"/>
-    Type IStyleable.StyleKey => typeof (ComboBox);
+    #endregion
+
+    #region StyledElement members
+
+    /// <inheritdoc cref="StyledElement.StyleKeyOverride"/>
+    protected override Type StyleKeyOverride => typeof (ComboBox);
 
     #endregion
 }

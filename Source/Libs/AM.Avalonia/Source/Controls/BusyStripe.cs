@@ -4,12 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
 /* BusyStripe.cs -- полоска "приложение занято чем-то важным" с бегающим градиентом
  * Ars Magna project, http://arsmagna.ru
@@ -28,8 +22,6 @@ using Avalonia.Media;
 using Avalonia.Threading;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Avalonia.Controls;
 
@@ -82,7 +74,7 @@ public sealed class BusyStripe
             (
                 nameof (State),
                 x => x.State,
-                (x, v) => { /* Do nothing */ }
+                (_, _) => { /* Do nothing */ }
             );
 
     /// <summary>

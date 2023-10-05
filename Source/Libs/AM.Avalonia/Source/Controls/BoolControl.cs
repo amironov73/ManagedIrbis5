@@ -4,14 +4,8 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable MemberCanBeProtected.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedAutoPropertyAccessor.Global
-// ReSharper disable UnusedParameter.Local
 
-/* BoolControl.cs --
+/* BoolControl.cs -- контрол, умеющий отображать логическое состояние
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -20,7 +14,7 @@
 namespace AM.Avalonia.Controls;
 
 /// <summary>
-///
+/// Контрол, умеющий отображать логическое состояние.
 /// </summary>
 public class BoolControl
     : AbstractControl<bool>

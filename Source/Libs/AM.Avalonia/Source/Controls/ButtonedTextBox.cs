@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* ButtonedTextBox.cs -- текстовый бокс, снабженный кнопкой
  * Ars Magna project, http://arsmagna.ru
@@ -80,7 +79,6 @@ public class ButtonedTextBox
     {
         get => TextBox.Text;
         set => TextBox.SetValue (TextBox.TextProperty, value);
-
     }
 
     /// <summary>
