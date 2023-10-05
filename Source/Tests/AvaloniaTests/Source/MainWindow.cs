@@ -335,13 +335,14 @@ public sealed class MainWindow
 
                     var textBox = new ButtonedTextBox
                     {
-                        Text = "text in a box",
-                        Caption = "..."
+                        Text = "text in a box"
                     };
-                    textBox.ButtonClick += (o, eventArgs) =>
+                    textBox.AddCopyButton()
+                        .AddPasteButton()
+                        .AddClearButton()
+                        .AddButton("...").Click += (_, _) =>
                     {
-                        var box = (ButtonedTextBox) o.ThrowIfNull();
-                        messageLabel.Content = $"Нажато: {++counter}, текст: {box.Text}";
+                        messageLabel.Content = $"Нажато: {++counter}, текст: {textBox.Text}";
                     };
 
                     var window = new Window
