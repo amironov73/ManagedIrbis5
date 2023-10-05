@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* AstVisitor.cs -- посетитель AST-узлов
  * Ars Magna project, http://arsmagna.ru

@@ -42,7 +42,6 @@ public class StatementBase
     /// <summary>
     ///
     /// </summary>
-    /// <param name="line"></param>
     protected StatementBase
         (
             int line

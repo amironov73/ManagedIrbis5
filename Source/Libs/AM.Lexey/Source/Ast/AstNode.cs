@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
 
 /* AstNode.cs -- абстрактный узел AST
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +16,8 @@ using System.IO;
 
 using AM.Runtime.Mere;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -26,6 +27,7 @@ namespace AM.Lexey.Ast;
 /// <summary>
 /// Абстрактный узел AST.
 /// </summary>
+[PublicAPI]
 public abstract class AstNode
     : IMereSerializable
 {
@@ -55,17 +57,6 @@ public abstract class AstNode
     {
         throw new NotImplementedException();
     }
-
-    // /// <summary>
-    // /// Транспиляция узла в C#.
-    // /// </summary>
-    // public virtual void Compile
-    //     (
-    //         ScriptCompiler compiler
-    //     )
-    // {
-    //     throw new NotImplementedException();
-    // }
 
     /// <summary>
     /// Получение информации об AST-узле.

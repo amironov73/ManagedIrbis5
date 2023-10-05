@@ -57,7 +57,7 @@ internal sealed class VariableNode
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute
+    public override object? Compute
         (
             Context context
         )

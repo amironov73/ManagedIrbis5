@@ -196,38 +196,36 @@ public static class BarsikUtility
     /// </summary>
     public static void PrintObject
         (
-            TextWriter output,
+            TextWriter? output,
             object? value
         )
     {
-        if (value is null)
+        if (output is null)
         {
-            output.Write ("(null)");
             return;
         }
 
-        if (value is bool b)
+        switch (value)
         {
-            output.Write (b ? "true" : "false");
-            return;
-        }
+            case null:
+                output.Write ("(null)");
+                return;
 
-        if (value is string)
-        {
-            output.Write (value);
-            return;
-        }
+            case bool b:
+                output.Write (b ? "true" : "false");
+                return;
 
-        if (value is ExpandoObject expando)
-        {
-            PrintExpando (output, expando);
-            return;
-        }
+            case string:
+                output.Write (value);
+                return;
 
-        if (value is Array array)
-        {
-            PrintArray (output, array);
-            return;
+            case ExpandoObject expando:
+                PrintExpando (output, expando);
+                return;
+
+            case Array array:
+                PrintArray (output, array);
+                return;
         }
 
         var type = value.GetType();

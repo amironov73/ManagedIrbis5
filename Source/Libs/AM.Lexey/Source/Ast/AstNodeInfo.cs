@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* PftNodeInfo.cs -- информация об узле синтаксического дерева
  * Ars Magna project, http://arsmagna.ru
@@ -16,6 +14,8 @@
 using AM.Collections;
 using AM.Text.Output;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -25,6 +25,7 @@ namespace AM.Lexey.Ast;
 /// <summary>
 /// Информация об узле синтаксического дерева.
 /// </summary>
+[PublicAPI]
 public sealed class AstNodeInfo
 {
     #region Properties

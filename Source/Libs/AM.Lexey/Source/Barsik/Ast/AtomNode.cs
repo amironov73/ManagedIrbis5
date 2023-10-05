@@ -38,7 +38,7 @@ public abstract class AtomNode
     /// <summary>
     /// Вычисление значения, связанного сданным узлом.
     /// </summary>
-    public abstract dynamic? Compute
+    public abstract object? Compute
         (
             Context context
         );
@@ -50,7 +50,7 @@ public abstract class AtomNode
         (
             Context context,
             string? operation,
-            dynamic? value
+            object? value
         )
     {
         // по умолчанию узлы не поддерживают присваивание

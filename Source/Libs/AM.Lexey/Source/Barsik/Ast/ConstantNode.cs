@@ -15,6 +15,8 @@ using System.IO;
 
 using AM.Lexey.Ast;
 
+using JetBrains.Annotations;
+
 #endregion
 
 namespace AM.Lexey.Barsik.Ast;
@@ -22,6 +24,7 @@ namespace AM.Lexey.Barsik.Ast;
 /// <summary>
 /// Хранимое константное значение.
 /// </summary>
+[PublicAPI]
 public sealed class ConstantNode
     : AtomNode
 {
@@ -69,7 +72,7 @@ public sealed class ConstantNode
     #region AtomNode members
 
     /// <inheritdoc cref="AtomNode.Compute"/>
-    public override dynamic? Compute
+    public override object? Compute
         (
             Context context
         )
@@ -104,10 +107,7 @@ public sealed class ConstantNode
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"ConstantNode '{Value}'";
-    }
+    public override string ToString() => $"ConstantNode '{Value}'";
 
     #endregion
 }
