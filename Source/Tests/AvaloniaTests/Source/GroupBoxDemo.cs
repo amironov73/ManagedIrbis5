@@ -1,13 +1,28 @@
-﻿using AM.Avalonia.Controls;
+﻿// This is an open source non-commercial project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+
+// ReSharper disable CheckNamespace
+// ReSharper disable CommentTypo
+// ReSharper disable UnusedMember.Global
+
+/* GroupBox.cs -- группа контролов
+ * Ars Magna project, http://arsmagna.ru
+ */
+
+#region Using directives
+
+using AM.Avalonia.Controls;
 using AM.Logging;
 
 using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 
+#endregion
+
 namespace AvaloniaTests;
 
-public sealed class GroupBoxDemo
+internal sealed class GroupBoxDemo
 {
     public async void Show
         (
@@ -44,7 +59,7 @@ public sealed class GroupBoxDemo
 
                         Content = new StackPanel
                         {
-                            Background = Brushes.Lavender,
+                            Background = Brushes.Brown,
                             Children =
                             {
                                 new TextBlock { Text = "Первая строчка" },

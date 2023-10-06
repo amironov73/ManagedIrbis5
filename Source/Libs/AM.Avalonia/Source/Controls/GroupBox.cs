@@ -16,11 +16,8 @@ using System;
 using Avalonia;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
-using Avalonia.Styling;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Avalonia.Controls;
 
@@ -28,9 +25,9 @@ namespace AM.Avalonia.Controls;
 /// Группа контролов (аналог WinForms).
 /// </summary>
 public class GroupBox
-    : HeaderedContentControl, IStyleable
+    : HeaderedContentControl
 {
-
+    #region Static construction
 
     /// <summary>
     /// override some metadata:
@@ -49,6 +46,12 @@ public class GroupBox
             );
     }
 
+    #endregion
 
-    Type IStyleable.StyleKey => typeof (HeaderedContentControl);
+    #region StyledElement members
+
+    /// <inheritdoc cref="StyledElement.StyleKeyOverride"/>
+    protected override Type StyleKeyOverride => typeof (HeaderedContentControl);
+
+    #endregion
 }
