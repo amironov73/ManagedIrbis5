@@ -17,8 +17,6 @@ using System.Text;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Buffers;
 
 /// <summary>

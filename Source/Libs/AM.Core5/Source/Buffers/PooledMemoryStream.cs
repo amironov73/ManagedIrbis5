@@ -21,8 +21,6 @@ using System.Threading.Tasks;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Buffers;
 
 /// <summary>

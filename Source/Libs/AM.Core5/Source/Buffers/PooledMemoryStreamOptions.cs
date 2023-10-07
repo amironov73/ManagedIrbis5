@@ -4,28 +4,26 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* PooledMemoryStreamOptions.cs --
+/* PooledMemoryStreamOptions.cs -- опции по умолчанию для PooledMemoryStreamManager
  * Ars Magna project, http://arsmagna.ru
  */
-
-#nullable enable
 
 namespace AM.Buffers;
 
 /// <summary>
-/// The default <see cref="PooledMemoryStreamManager"/> options.
+/// Опции по умолчанию для <see cref="PooledMemoryStreamManager"/>.
 /// </summary>
 public class PooledMemoryStreamOptions
 {
     #region Properties
 
     /// <summary>
-    /// The minimum length of byte array rented from the pool.
+    /// Минимальная длина массива байт, занимаемого из пула.
     /// </summary>
     public int MinimumSegmentSize { get; set; } = 4096;
 
     /// <summary>
-    /// The maximum length of byte array rented from the pool.
+    /// Максимальная длина массива байт, занимаемого из пула.
     /// </summary>
     public int MaximumSegmentSize { get; set; } = 81920;
 

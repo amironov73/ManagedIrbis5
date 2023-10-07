@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
-/* DefaultPooledMemoryStreamManager.cs --
+/* DefaultPooledMemoryStreamManager.cs -- реализация PooledMemoryStreamManager по умолчанию
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -18,14 +18,11 @@ using System.Buffers;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Buffers;
 
 /// <summary>
-/// A default implementation of <see cref="PooledMemoryStreamManager"/>
-/// where byte array will be rented from and returned to
-/// <see cref="ArrayPool{T}"/>.
+/// Реализация <see cref="PooledMemoryStreamManager"/> по умолчанию,
+/// которая берет массивы байт из <see cref="ArrayPool{T}"/>.
 /// </summary>
 public sealed class DefaultPooledMemoryStreamManager
     : PooledMemoryStreamManager

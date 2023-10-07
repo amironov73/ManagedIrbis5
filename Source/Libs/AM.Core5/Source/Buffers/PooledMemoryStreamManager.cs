@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* PooledMemoryStreamManager.cs --
+/* PooledMemoryStreamManager.cs -- менеджер потоков для создания PooledMemoryStream
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -14,40 +14,40 @@ using System;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Buffers;
 
 /// <summary>
-/// A stream manager for constructing <see cref="PooledMemoryStream"/>.
+/// Менеджер потоков для создания <see cref="PooledMemoryStream"/>.
 /// </summary>
 public abstract class PooledMemoryStreamManager
 {
     /// <summary>
-    /// A shared implement of <see cref="PooledMemoryStreamManager"/>.
+    /// Общий экземпляр <see cref="PooledMemoryStreamManager"/>.
     /// </summary>
-    public static PooledMemoryStreamManager Shared { get; } = new DefaultPooledMemoryStreamManager (null);
+    public static PooledMemoryStreamManager Shared { get; } =
+        new DefaultPooledMemoryStreamManager (null);
 
     /// <summary>
-    /// Construct a new <see cref="PooledMemoryStream"/> whose buffer will be managed by this instance.
+    /// Получает экземпляр <see cref="PooledMemoryStream"/>,
+    /// буферы которого управляются данным менеджером.
     /// </summary>
-    /// <returns></returns>
     public PooledMemoryStream GetStream()
     {
         return new PooledMemoryStream (this);
     }
 
     /// <summary>
-    /// Allocate or rent a new <see cref="BufferSegment"/>.
+    /// Создает или занимает из пула экземпляр <see cref="BufferSegment"/>.
     /// </summary>
-    /// <param name="length">The minimum length for the buffer.</param>
-    /// <returns>The allocated <see cref="BufferSegment"/>. </returns>
+    /// <param name="length">Минимальная длина буфера.</param>
+    /// <returns>Полученный экземпляр <see cref="BufferSegment"/>.</returns>
     protected abstract BufferSegment AllocateBufferSegment (int length);
 
     /// <summary>
-    /// Free or return a <see cref="BufferSegment"/>
+    /// Освобождает или возвращает в пул экземпляр <see cref="BufferSegment"/>
     /// </summary>
-    /// <param name="segment">The object to free or return to the pool</param>
+    /// <param name="segment">Объект, подлежащий возврату или освобождению.
+    /// </param>
     protected abstract void FreeBufferSegment (BufferSegment segment);
 
     internal BufferSegment Allocate

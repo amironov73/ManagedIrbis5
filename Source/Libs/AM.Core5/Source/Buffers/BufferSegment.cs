@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* BufferSegment.cs --
+/* BufferSegment.cs -- связанный список массивов байтов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,12 +17,10 @@ using System.Buffers;
 
 #pragma warning disable CA1819 // Properties should not return arrays
 
-#nullable enable
-
 namespace AM.Buffers;
 
 /// <summary>
-/// Represents a linked list of byte array nodes.
+/// Связанный список массивов байтов.
 /// </summary>
 public sealed class BufferSegment
     : ReadOnlySequenceSegment<byte>
