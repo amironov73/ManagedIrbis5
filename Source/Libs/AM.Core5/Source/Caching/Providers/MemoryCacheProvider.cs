@@ -6,7 +6,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* MemoryCacheProvider.cs --
+/* MemoryCacheProvider.cs -- провайдер кэширования в оперативной памяти
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,12 +21,10 @@ using Microsoft.Extensions.Primitives;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Caching.Providers;
 
 /// <summary>
-///
+/// Провайдер кэширования в оперативной памяти.
 /// </summary>
 public class MemoryCacheProvider
     : ICacheProvider
@@ -36,7 +34,6 @@ public class MemoryCacheProvider
     /// <summary>
     /// Конструктор.
     /// </summary>
-    /// <param name="cache"></param>
     public MemoryCacheProvider
         (
             IMemoryCache cache
