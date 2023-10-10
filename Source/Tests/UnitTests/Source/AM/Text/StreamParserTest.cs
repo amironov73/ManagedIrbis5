@@ -23,6 +23,7 @@ public sealed class StreamParserTest
     : Common.CommonUnitTest
 {
     [TestMethod]
+    [Description ("Конструирование")]
     public void StreamParser_Construction_1()
     {
         const string text = "Hello, world!";
@@ -33,7 +34,8 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
-    public void StreamParser_FromFile()
+    [Description ("Считывание из файла")]
+    public void StreamParser_FromFile_1()
     {
         var fileName = Path.Combine
             (
@@ -47,98 +49,103 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Целое 16-битное число со знаком")]
     public void StreamParser_ReadInt16_1()
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var int16 = parser.ReadInt16();
-        Assert.IsTrue (int16.HasValue);
-        Assert.AreEqual (1234, int16.Value);
+        var actual = parser.ReadInt16();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234, actual.Value);
 
         parser = StreamParser.FromString (" -1234 ");
-        int16 = parser.ReadInt16();
-        Assert.IsTrue (int16.HasValue);
-        Assert.AreEqual (-1234, int16.Value);
+        actual = parser.ReadInt16();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (-1234, actual.Value);
 
         parser = StreamParser.FromString ("  ");
-        int16 = parser.ReadInt16();
-        Assert.IsFalse (int16.HasValue);
+        actual = parser.ReadInt16();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
+    [Description ("Целое 16-битное число без знака")]
     public void StreamParser_ReadUInt16_1()
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var uint16 = parser.ReadUInt16();
-        Assert.IsTrue (uint16.HasValue);
-        Assert.AreEqual (1234u, uint16.Value);
-
+        var actual = parser.ReadUInt16();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234u, actual.Value);
 
         parser = StreamParser.FromString ("  ");
-        uint16 = parser.ReadUInt16();
-        Assert.IsFalse (uint16.HasValue);
+        actual = parser.ReadUInt16();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
+    [Description ("Целое 32-битное число со знаком")]
     public void StreamParser_ReadInt32_1()
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var int32 = parser.ReadInt32();
-        Assert.IsTrue (int32.HasValue);
-        Assert.AreEqual (1234, int32.Value);
+        var actual = parser.ReadInt32();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234, actual.Value);
 
         parser = StreamParser.FromString (" -1234 ");
-        int32 = parser.ReadInt32();
-        Assert.IsTrue (int32.HasValue);
-        Assert.AreEqual (-1234, int32.Value);
+        actual = parser.ReadInt32();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (-1234, actual.Value);
 
         parser = StreamParser.FromString ("  ");
-        int32 = parser.ReadInt32();
-        Assert.IsFalse (int32.HasValue);
+        actual = parser.ReadInt32();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
-    [ExpectedException (typeof (FormatException))]
+    [Description ("Целое 32-битное число со знаком: неверный формат")]
     public void StreamParser_ReadInt32_2()
     {
         const string text = "  ogo";
         var parser = StreamParser.FromString (text);
-        parser.ReadInt32();
+        var actual = parser.ReadInt32();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
+    [Description ("Целое 32-битное число без знака")]
     public void StreamParser_ReadUInt32_1()
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var uint32 = parser.ReadUInt32();
-        Assert.IsTrue (uint32.HasValue);
-        Assert.AreEqual (1234u, uint32.Value);
+        var actual = parser.ReadUInt32();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234u, actual.Value);
 
         parser = StreamParser.FromString ("  ");
-        uint32 = parser.ReadUInt32();
-        Assert.IsFalse (uint32.HasValue);
+        actual = parser.ReadUInt32();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
+    [Description ("Целое 64-битное число со знаком")]
     public void StreamParser_ReadInt64_1()
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var int64 = parser.ReadInt64();
-        Assert.IsTrue (int64.HasValue);
-        Assert.AreEqual (1234, int64.Value);
+        var actual = parser.ReadInt64();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234, actual.Value);
 
         parser = StreamParser.FromString (" -1234 ");
-        int64 = parser.ReadInt64();
-        Assert.IsTrue (int64.HasValue);
-        Assert.AreEqual (-1234, int64.Value);
+        actual = parser.ReadInt64();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (-1234, actual.Value);
 
         parser = StreamParser.FromString ("  ");
-        int64 = parser.ReadInt64();
-        Assert.IsFalse (int64.HasValue);
+        actual = parser.ReadInt64();
+        Assert.IsFalse (actual.HasValue);
     }
 
     [TestMethod]
@@ -146,14 +153,53 @@ public sealed class StreamParserTest
     {
         const string text = "  \t1234 ogo";
         var parser = StreamParser.FromString (text);
-        var uint64 = parser.ReadUInt64();
-        Assert.IsTrue (uint64.HasValue);
-        Assert.AreEqual (1234u, uint64.Value);
+        var actual = parser.ReadUInt64();
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (1234u, actual.Value);
 
 
         parser = StreamParser.FromString ("  ");
-        uint64 = parser.ReadUInt64();
-        Assert.IsFalse (uint64.HasValue);
+        actual = parser.ReadUInt64();
+        Assert.IsFalse (actual.HasValue);
+    }
+
+    [TestMethod]
+    [Description ("Целое 128-битное число со знаком")]
+    public void StreamParser_ReadInt128_1()
+    {
+        const string text = "  \t1234 ogo";
+        var parser = StreamParser.FromString (text);
+        var actual = parser.ReadInt128();
+        var expected = Int128.Parse ("1234");
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (expected, actual.Value);
+
+        parser = StreamParser.FromString (" -1234 ");
+        actual = parser.ReadInt128();
+        expected = Int128.Parse ("-1234");
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (expected, actual.Value);
+
+        parser = StreamParser.FromString ("  ");
+        actual = parser.ReadInt128();
+        Assert.IsFalse (actual.HasValue);
+    }
+
+    [TestMethod]
+    [Description ("Целое 128-битное число без знака")]
+    public void StreamParser_ReadUInt128_1()
+    {
+        const string text = "  \t1234 ogo";
+        var parser = StreamParser.FromString (text);
+        var actual = parser.ReadUInt64();
+        var expected = UInt128.Parse ("1234");
+        Assert.IsTrue (actual.HasValue);
+        Assert.AreEqual (expected, actual.Value);
+
+
+        parser = StreamParser.FromString ("  ");
+        actual = parser.ReadUInt64();
+        Assert.IsFalse (actual.HasValue);
     }
 
     private void _TestDouble
@@ -169,6 +215,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Число с плавающей точкой двойной точности")]
     public void StreamParser_ReadDouble_1()
     {
         _TestDouble ("1", 1.0);
@@ -185,12 +232,13 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
-    [ExpectedException (typeof (FormatException))]
+    [Description ("Число с плавающей точкой двойной точности: ошибка формата")]
     public void StreamParser_ReadDouble_2()
     {
         const string text = "  ogo";
         var parser = StreamParser.FromString (text);
-        parser.ReadDouble();
+        var actual = parser.ReadDouble();
+        Assert.IsFalse (actual.HasValue);
     }
 
     private void _TestSingle
@@ -206,6 +254,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Число с плавающей точкой одинарной точности")]
     public void StreamParser_ReadSingle_1()
     {
         _TestSingle ("1", 1.0F);
@@ -233,8 +282,8 @@ public sealed class StreamParserTest
         Assert.AreEqual (expected, number.Value);
     }
 
-
     [TestMethod]
+    [Description ("Число с фиксированной точкой")]
     public void StreamParser_ReadDecimal_1()
     {
         _TestDecimal ("1", 1.0m);
@@ -258,6 +307,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на управляющие символы")]
     public void StreamParser_IsControl_1()
     {
         var parser = StreamParser.FromString ("1\nhello");
@@ -269,6 +319,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на букву")]
     public void StreamParser_IsLetter_1()
     {
         var parser = StreamParser.FromString ("1h!ello");
@@ -280,6 +331,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка: буква или цифра")]
     public void StreamParser_IsLetterOrDigit_1()
     {
         var parser = StreamParser.FromString ("1h!ello");
@@ -291,6 +343,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка: числовой символ")]
     public void StreamParser_IsNumber_1()
     {
         var parser = StreamParser.FromString ("1½hello");
@@ -302,6 +355,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на пунктуацию")]
     public void StreamParser_IsPunctuation_1()
     {
         var parser = StreamParser.FromString ("1!hello");
@@ -313,6 +367,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на символ-разделитель")]
     public void StreamParser_IsSeparator_1()
     {
         var parser = StreamParser.FromString ("1 hello");
@@ -324,6 +379,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на Unicode-суррогат")]
     public void StreamParser_IsSurrogate_1()
     {
         var parser = StreamParser.FromString ("1\xd801hello");
@@ -335,6 +391,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Проверка на спецсимволы")]
     public void StreamParser_IsSymbol_1()
     {
         var parser = StreamParser.FromString ("1№hello");
@@ -361,6 +418,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Пропуск пунктуации: есть данные после пунктуации")]
     public void StreamParser_SkipPunctuation_1()
     {
         var parser = StreamParser.FromString (".,hello");
@@ -369,6 +427,7 @@ public sealed class StreamParserTest
     }
 
     [TestMethod]
+    [Description ("Пропуск пунктуации: конец потока")]
     public void StreamParser_SkipPunctuation_2()
     {
         var parser = StreamParser.FromString (".,");

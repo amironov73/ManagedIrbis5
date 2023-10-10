@@ -2,12 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* StreamParser.cs -- считывание из потока чисел, идентификаторов и прочего
  * Ars Magna project, http://arsmagna.ru
@@ -22,9 +19,9 @@ using System.Text;
 
 using AM.IO;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM.Text;
 
@@ -32,29 +29,28 @@ namespace AM.Text;
 /// Считывание из потока чисел, идентификаторов
 /// и прочего.
 /// </summary>
+[PublicAPI]
 public sealed class StreamParser
     : IDisposable
 {
     #region Constants
 
     /// <summary>
-    /// End of stream reached.
+    /// Символ, означающий, что достигнут конец потока.
     /// </summary>
-
-    // ReSharper disable once InconsistentNaming
-    public const char EOF = unchecked ((char)-1);
+    public const char Eof = unchecked ((char) -1);
 
     #endregion
 
     #region Properties
 
     /// <summary>
-    /// Is end of stream reached.
+    /// Достигнут ли конец потока?
     /// </summary>
-    public bool EndOfStream => PeekChar() == EOF;
+    public bool EndOfStream => PeekChar() == Eof;
 
     /// <summary>
-    /// Underlying <see cref="TextReader"/>
+    /// Используемый <see cref="TextReader"/>.
     /// </summary>
     public TextReader Reader { get; }
 
@@ -63,7 +59,7 @@ public sealed class StreamParser
     #region Construction
 
     /// <summary>
-    /// Constructor.
+    /// Конструктор.
     /// </summary>
     public StreamParser
         (
@@ -71,6 +67,8 @@ public sealed class StreamParser
             bool ownReader = false
         )
     {
+        Sure.NotNull (reader);
+
         Reader = reader;
         _ownReader = ownReader;
     }
@@ -124,12 +122,6 @@ public sealed class StreamParser
             //c = PeekChar();
         }
 
-        //if ((c == 'F') || (c == 'f') || (c == 'D') || (c == 'd')
-        //    || (c == 'M') || (c == 'm'))
-        //{
-        //    result.Append(ReadChar());
-        //}
-
         return builder.ReturnShared();
     }
 
@@ -138,7 +130,7 @@ public sealed class StreamParser
     #region Public methods
 
     /// <summary>
-    /// Конструирование <see cref="StreamParser"/> из указанного файла
+    /// Конструирование <see cref="StreamParser"/> из указанного файла.
     /// </summary>
     public static StreamParser FromFile
         (
@@ -147,6 +139,7 @@ public sealed class StreamParser
         )
     {
         Sure.FileExists (fileName);
+        Sure.NotNull (encoding);
 
         var reader = TextReaderUtility.OpenRead
             (
@@ -168,9 +161,11 @@ public sealed class StreamParser
     /// </summary>
     public static StreamParser FromString
         (
-            string text
+            string? text
         )
     {
+        text ??= string.Empty;
+
         var reader = new StringReader (text);
         var result = new StreamParser
             (
@@ -236,7 +231,7 @@ public sealed class StreamParser
     }
 
     /// <summary>
-    /// Разделитель?
+    /// Символ-разделитель?
     /// </summary>
     public bool IsSeparator()
     {
@@ -272,25 +267,36 @@ public sealed class StreamParser
     }
 
     /// <summary>
-    /// Peek one character from stream.
+    /// Подглядывание одного символа из потока.
+    /// Продвижения вперед по потоку не происходит.
     /// </summary>
+    /// <returns>
+    /// Если достигнут конец потока, возвращает
+    /// <see cref="Eof"/>.
+    /// </returns>
     public char PeekChar()
     {
         return unchecked ((char)Reader.Peek());
     }
 
     /// <summary>
-    /// Read one character from stream.
+    /// Считывание одного символа из потока.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>
+    /// Если достигнут конец потока, возвращает
+    /// <see cref="Eof"/>.
+    /// </returns>
     public char ReadChar()
     {
         return unchecked ((char)Reader.Read());
     }
 
     /// <summary>
-    /// Read fixed point number from stream.
+    /// Считывание из потока числа с фиксированной точкой.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public decimal? ReadDecimal
         (
             IFormatProvider? provider = null
@@ -311,8 +317,11 @@ public sealed class StreamParser
     }
 
     /// <summary>
-    /// Read floating point number from stream.
+    /// Считывание из потока числа с плавающей точкой двойной точности.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public double? ReadDouble
         (
             IFormatProvider? provider = null
@@ -325,16 +334,28 @@ public sealed class StreamParser
 
         var number = _ReadNumber();
 
-        return double.Parse
-            (
-                number,
-                provider ?? CultureInfo.InvariantCulture
-            );
+        try
+        {
+            return double.Parse
+                (
+                    number,
+                    provider ?? CultureInfo.InvariantCulture
+                );
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 16-bit signed integer from stream.
+    /// Считывание из потока челого 16-битного числа со знаком.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public short? ReadInt16()
     {
         if (!SkipWhitespace())
@@ -353,12 +374,24 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseInt16();
+        try
+        {
+            return builder.ReturnShared().ParseInt16();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 32-bit signed integer from stream.
+    /// Считывание из потока целого 32-битного числа со знаком.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public int? ReadInt32()
     {
         if (!SkipWhitespace())
@@ -377,12 +410,24 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseInt32();
+        try
+        {
+            return builder.ReturnShared().ParseInt32();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 64-bit signed integer from stream.
+    /// Считывание из потока целого 64-битного числа со знаком.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public long? ReadInt64()
     {
         if (!SkipWhitespace())
@@ -401,12 +446,64 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseInt64();
+        try
+        {
+            return builder.ReturnShared().ParseInt64();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read floating point number from stream.
+    /// Считывание из потока целого 128-битного числа со знаком.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
+    public Int128? ReadInt128()
+    {
+        if (!SkipWhitespace())
+        {
+            return null;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        if (PeekChar() == '-')
+        {
+            builder.Append (ReadChar());
+        }
+
+        while (IsDigit())
+        {
+            builder.Append (ReadChar());
+        }
+
+        try
+        {
+            return  Int128.Parse
+                (
+                    builder.ReturnShared(),
+                    CultureInfo.InvariantCulture
+                );
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Считывание из потока числа с плавающей точкой одинарной точности.
+    /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public float? ReadSingle
         (
             IFormatProvider? provider = null
@@ -419,16 +516,62 @@ public sealed class StreamParser
 
         var number = _ReadNumber();
 
-        return float.Parse
-            (
-                number,
-                provider ?? CultureInfo.InvariantCulture
-            );
+        try
+        {
+            return float.Parse
+                (
+                    number,
+                    provider ?? CultureInfo.InvariantCulture
+                );
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 16-bit unsigned integer from stream.
+    /// Считывание из потока числа с плавающей точкой половинной точности.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
+    public Half? ReadHalf
+        (
+            IFormatProvider? provider = null
+        )
+    {
+        if (!SkipWhitespace())
+        {
+            return null;
+        }
+
+        var number = _ReadNumber();
+
+        try
+        {
+            return Half.Parse
+                (
+                    number,
+                    provider ?? CultureInfo.InvariantCulture
+                );
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Считывание из потока целого 16-битного числа без знака.
+    /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public ushort? ReadUInt16()
     {
         if (!SkipWhitespace())
@@ -442,12 +585,24 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseUInt16();
+        try
+        {
+            return builder.ReturnShared().ParseUInt16();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 16-bit unsigned integer from stream.
+    /// Считывание из потока целого 32-битного числа без знака.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public uint? ReadUInt32()
     {
         if (!SkipWhitespace())
@@ -461,12 +616,24 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseUInt32();
+        try
+        {
+            return builder.ReturnShared().ParseUInt32();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>
-    /// Read 64-bit unsigned integer from stream.
+    /// Считывание из потока целого 64-битного числа без знака.
     /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
     public ulong? ReadUInt64()
     {
         if (!SkipWhitespace())
@@ -480,7 +647,51 @@ public sealed class StreamParser
             builder.Append (ReadChar());
         }
 
-        return builder.ReturnShared().ParseUInt64();
+        try
+        {
+            return builder.ReturnShared().ParseUInt64();
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Считывание из потока целого 128-битного числа без знака.
+    /// </summary>
+    /// <returns>
+    /// При неудаче возвращает <c>null</c>.
+    /// </returns>
+    public UInt128? ReadUInt128()
+    {
+        if (!SkipWhitespace())
+        {
+            return null;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        while (IsDigit())
+        {
+            builder.Append (ReadChar());
+        }
+
+        try
+        {
+            return UInt128.Parse
+                (
+                    builder.ReturnShared(),
+                    CultureInfo.InvariantCulture
+                );
+        }
+        catch
+        {
+            // пустой блок
+        }
+
+        return null;
     }
 
     /// <summary>

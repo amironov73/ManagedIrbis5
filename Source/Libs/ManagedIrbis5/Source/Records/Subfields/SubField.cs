@@ -25,9 +25,9 @@ using AM;
 using AM.IO;
 using AM.Runtime;
 
-#endregion
+using Microsoft.Extensions.ObjectPool;
 
-#nullable enable
+#endregion
 
 namespace ManagedIrbis;
 
@@ -111,7 +111,8 @@ public sealed class SubField
     : IVerifiable,
     IXmlSerializable,
     IHandmadeSerializable,
-    IReadOnly<SubField>
+    IReadOnly<SubField>,
+    IResettable
 {
     #region Constants
 
@@ -176,6 +177,7 @@ public sealed class SubField
     /// </summary>
     public SubField()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -426,6 +428,19 @@ public sealed class SubField
         {
             throw new ReadOnlyException();
         }
+    }
+
+    #endregion
+
+    #region IResettable members
+
+    /// <inheritdoc cref="IResettable.TryReset"/>
+    public bool TryReset()
+    {
+        Code = NoCode;
+        Value = default;
+
+        return true;
     }
 
     #endregion

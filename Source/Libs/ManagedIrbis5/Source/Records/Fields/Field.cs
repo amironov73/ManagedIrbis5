@@ -38,6 +38,7 @@ using AM.Text;
 using ManagedIrbis.Infrastructure;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 
 #endregion
 
@@ -93,7 +94,8 @@ public class Field
     : IHandmadeSerializable,
     IReadOnly<Field>,
     IEnumerable<SubField>,
-    IVerifiable
+    IVerifiable,
+    IResettable
 {
     #region Constants
 
@@ -1670,6 +1672,20 @@ public class Field
         }
 
         return verifier.Result;
+    }
+
+    #endregion
+
+    #region IResettable members
+
+    /// <inheritdoc cref="IResettable.TryReset"/>
+    public bool TryReset()
+    {
+        Tag = NoTag;
+        Value = default;
+        Subfields.Clear();
+
+        return true;
     }
 
     #endregion

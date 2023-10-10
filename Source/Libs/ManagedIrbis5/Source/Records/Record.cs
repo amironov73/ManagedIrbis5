@@ -35,6 +35,7 @@ using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.ObjectPool;
 
 using static ManagedIrbis.RecordStatus;
 
@@ -50,7 +51,8 @@ namespace ManagedIrbis;
 public sealed class Record
     : IRecord,
     IEnumerable<Field>,
-    IVerifiable
+    IVerifiable,
+    IResettable
 {
     #region Constants
 
@@ -1032,6 +1034,21 @@ public sealed class Record
         // TODO: implement
 
         return verifier.Result;
+    }
+
+    #endregion
+
+    #region IResettable members
+
+    /// <inheritdoc cref="IResettable.TryReset"/>
+    public bool TryReset()
+    {
+        Mfn = default;
+        Status = None;
+        Version = 0;
+        Fields.Clear();
+
+        return true;
     }
 
     #endregion
