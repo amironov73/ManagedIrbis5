@@ -19,7 +19,6 @@ using AM.Memory.Collections.Specialized;
 
 #endregion
 
-#nullable enable
 
 namespace UnitTests.AM.Memory.Collections.Specialized;
 

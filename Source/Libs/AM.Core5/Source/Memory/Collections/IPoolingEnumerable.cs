@@ -8,8 +8,6 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
-#nullable enable
-
 namespace AM.Memory.Collections;
 
 /// <summary>
