@@ -41,8 +41,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis;
 
 /*
@@ -1482,6 +1480,86 @@ public class Field
         StringBuilderPool.Shared.Return (builder);
 
         return result;
+    }
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Добавление подполя к полю.
+    /// </summary>
+    public static Field operator +
+        (
+            Field field,
+            SubField? subField
+        )
+    {
+        Sure.NotNull (field);
+
+        if (subField is not null)
+        {
+            field.Subfields.Add (subField);
+        }
+
+        return field;
+    }
+
+    /// <summary>
+    /// Добавление подполя к полю.
+    /// </summary>
+    public static Field operator +
+        (
+            Field field,
+            string? text
+        )
+    {
+        Sure.NotNull (field);
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            var subField = text[0] == SubField.Delimiter
+                ? new SubField (text[1], text[2..])
+                : new SubField (text[0], text[1..]);
+            field.Subfields.Add (subField);
+        }
+
+        return field;
+    }
+
+    /// <summary>
+    /// Удаление подполя.
+    /// </summary>
+    public static Field operator -
+        (
+            Field field,
+            SubField? subField
+        )
+    {
+        Sure.NotNull (field);
+
+        if (subField is not null)
+        {
+            field.Subfields.Remove (subField);
+        }
+
+        return field;
+    }
+
+    /// <summary>
+    /// Удаление подполя.
+    /// </summary>
+    public static Field operator -
+        (
+            Field field,
+            char code
+        )
+    {
+        Sure.NotNull (field);
+
+        field.RemoveSubField (code);
+
+        return field;
     }
 
     #endregion

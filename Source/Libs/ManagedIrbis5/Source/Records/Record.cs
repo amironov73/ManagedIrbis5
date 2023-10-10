@@ -40,8 +40,6 @@ using static ManagedIrbis.RecordStatus;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis;
 
 /// <summary>
@@ -921,6 +919,87 @@ public sealed class Record
     public string ToPlainText()
     {
         return PlainText.ToPlainText (this);
+    }
+
+    #endregion
+
+    #region MyRegion
+
+    /// <summary>
+    /// Добавление поля к записи.
+    /// </summary>
+    public static Record operator +
+        (
+            Record record,
+            Field? field
+        )
+    {
+        Sure.NotNull (record);
+
+        if (field is not null)
+        {
+            record.Fields.Add (field);
+        }
+
+        return record;
+    }
+
+    /// <summary>
+    /// Добавление поля к записи.
+    /// </summary>
+    public static Record operator +
+        (
+            Record record,
+            string? text
+        )
+    {
+        Sure.NotNull (record);
+
+        if (!string.IsNullOrEmpty (text))
+        {
+            var field = FieldUtility.Parse (text);
+            if (field is not null)
+            {
+                record.Fields.Add (field);
+            }
+        }
+
+        return record;
+    }
+
+    /// <summary>
+    /// Удаление поля из записи.
+    /// </summary>
+    public static Record operator -
+        (
+            Record record,
+            Field? field
+        )
+    {
+        Sure.NotNull (record);
+
+        if (field is not null)
+        {
+            record.Fields.Remove (field);
+        }
+
+        return record;
+    }
+
+    /// <summary>
+    /// Удаление поля из записи.
+    /// </summary>
+    public static Record operator -
+        (
+            Record record,
+            int tag
+        )
+    {
+        Sure.NotNull (record);
+
+        record.RemoveField (tag);
+
+        return record;
     }
 
     #endregion
