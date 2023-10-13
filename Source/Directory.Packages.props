@@ -6,8 +6,9 @@
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
-    <AvaloniaVersion>11.0.4</AvaloniaVersion>
-    <AvaloniaPrevious>11.0.0</AvaloniaPrevious>
+    <AvaloniaVersion>11.0.5-rc1</AvaloniaVersion>
+    <AvaloniaStable>11.0.4</AvaloniaStable>
+    <AvaloniaPrevious>11.0.1</AvaloniaPrevious>
     <SkiaVersion>2.88.5</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
     <NugetVersion>6.7.0</NugetVersion>
@@ -17,10 +18,10 @@
   <ItemGroup>
     <PackageVersion Include="Autofac" Version="7.1.0" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaStable)" />
+    <PackageVersion Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaStable)" />
+    <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaStable)" />
+    <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaStable)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.1" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
