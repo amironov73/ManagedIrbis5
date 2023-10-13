@@ -4,8 +4,8 @@
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <MicrosoftVersion>8.0.0-rc.1.23419.4</MicrosoftVersion>
-    <MicrosoftVersionAlt>8.0.0-rc.1.23421.29</MicrosoftVersionAlt>
+    <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
+    <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
     <AvaloniaVersion>11.0.4</AvaloniaVersion>
     <AvaloniaPrevious>11.0.0</AvaloniaPrevious>
     <SkiaVersion>2.88.5</SkiaVersion>
