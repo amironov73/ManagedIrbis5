@@ -20,8 +20,6 @@ using AM.Runtime.Mere;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Kotik.Ast;
 
 /// <summary>

@@ -18,8 +18,6 @@ using AM.Text.Output;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Kotik.Ast;
 
 /// <summary>

@@ -16,8 +16,6 @@ using System.Collections;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Kotik;
 
 /// <summary>

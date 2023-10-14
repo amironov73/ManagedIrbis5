@@ -23,8 +23,6 @@ using AM.Text;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Kotik;
 
 /// <summary>
