@@ -40,7 +40,7 @@
     <PackageVersion Include="Avalonia.Xaml.Interactions" Version="11.0.2" />
     <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="11.0.2" />
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
-    <PackageVersion Include="BenchmarkDotNet" Version="0.13.8" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
@@ -52,9 +52,9 @@
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="Google.Protobuf" Version="3.24.2" />
-    <PackageVersion Include="Grpc.Tools" Version="2.57.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.58.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.11.53" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.11.54" />
     <PackageVersion Include="KaitaiStruct.Runtime.CSharp" Version="0.10.0" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
