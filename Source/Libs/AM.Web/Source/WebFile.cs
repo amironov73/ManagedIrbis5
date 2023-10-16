@@ -37,6 +37,15 @@ public sealed class WebFile
     /// </summary>
     public HttpClient Client { get; }
 
+    /// <summary>
+    /// Веб-адрес по умолчанию.
+    /// Желательно, чтобы адрес заканчивался '/'
+    /// или чем-то вроде '?file=', потому что актуальный адрес
+    /// для скачивания получается конкатенацией <see cref="WebAddress"/>
+    /// и локального пути к файлу.
+    /// </summary>
+    public string? WebAddress { get; set; }
+
     #endregion
 
     #region Construction
@@ -99,6 +108,24 @@ public sealed class WebFile
     }
 
     /// <summary>
+    /// Скачивание файла, если его еще нет локально.
+    /// Веб-адрес формируется из <see cref="WebAddress"/>
+    /// и <paramref name="localPath"/>.
+    /// </summary>
+    /// <param name="localPath">Локальный путь к файлу.</param>
+    public Task DownloadAsync
+        (
+            string localPath
+        )
+    {
+        Sure.NotNullNorEmpty (localPath);
+
+        var url = WebAddress.ThrowIfNullOrEmpty() + localPath;
+
+        return DownloadAsync (url, localPath);
+    }
+
+    /// <summary>
     /// Открытие файла для чтения.
     /// </summary>
     public async Task <Stream> OpenReadAsync
@@ -116,6 +143,24 @@ public sealed class WebFile
     }
 
     /// <summary>
+    /// Открытие файла для чтения.
+    /// Веб-адрес формируется из &lt;see cref="DefaultAddress"/&gt;
+    /// и <paramref name="localPath"/>.
+    /// </summary>
+    /// <param name="localPath">Локальный путь к файлу.</param>
+    public Task<Stream> OpenReadAsync
+        (
+            string localPath
+        )
+    {
+        Sure.NotNullNorEmpty (localPath);
+
+        var url = WebAddress.ThrowIfNullOrEmpty() + localPath;
+
+        return OpenReadAsync (url, localPath);
+    }
+
+    /// <summary>
     /// Открытие файла для чтения в текстовом режиме.
     /// </summary>
     public async Task <TextReader> OpenTextAsync
@@ -130,6 +175,21 @@ public sealed class WebFile
         await DownloadAsync (url, localPath);
 
         return File.OpenText (localPath);
+    }
+
+    /// <summary>
+    /// Открытие файла для чтения в текстовом режиме.
+    /// </summary>
+    public Task <TextReader> OpenTextAsync
+        (
+            string localPath
+        )
+    {
+        Sure.NotNullNorEmpty (localPath);
+
+        var url = WebAddress.ThrowIfNullOrEmpty() + localPath;
+
+        return OpenTextAsync (url, localPath);
     }
 
     #endregion
