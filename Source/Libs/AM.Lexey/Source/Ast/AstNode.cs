@@ -20,8 +20,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Lexey.Ast;
 
 /// <summary>
