@@ -30,8 +30,6 @@ using NuGet.Versioning;
 
 #endregion
 
-#nullable enable
-
 namespace AM.BuildSystem;
 
 /// <summary>

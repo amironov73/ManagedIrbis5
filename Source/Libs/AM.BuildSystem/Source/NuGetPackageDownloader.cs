@@ -38,8 +38,6 @@ using FileUtility = AM.IO.FileUtility;
 
 #endregion
 
-#nullable enable
-
 namespace AM.BuildSystem;
 
 /// <summary>
