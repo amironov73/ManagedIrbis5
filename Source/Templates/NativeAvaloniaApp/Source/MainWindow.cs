@@ -22,8 +22,6 @@ using Avalonia.Layout;
 
 #endregion
 
-#nullable enable
-
 namespace NativeAvaloniaApp;
 
 /// <summary>

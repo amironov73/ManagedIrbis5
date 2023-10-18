@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.0-preview4</AvaloniaVersion>
+        <AvaloniaVersion>11.0.5</AvaloniaVersion>
     </PropertyGroup>
 
   <ItemGroup>

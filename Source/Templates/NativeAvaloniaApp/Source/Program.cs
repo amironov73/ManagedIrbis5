@@ -22,8 +22,6 @@ using Avalonia.ReactiveUI;
 
 #endregion
 
-#nullable enable
-
 namespace NativeAvaloniaApp;
 
 /// <summary>

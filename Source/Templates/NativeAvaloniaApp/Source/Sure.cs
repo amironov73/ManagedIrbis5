@@ -26,8 +26,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AvaloniaApp;
 
 /// <summary>

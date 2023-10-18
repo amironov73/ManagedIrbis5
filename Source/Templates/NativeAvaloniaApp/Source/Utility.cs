@@ -39,8 +39,6 @@ using System.Threading.Tasks;
 
 #endregion
 
-#nullable enable
-
 namespace AvaloniaApp;
 
 /// <summary>

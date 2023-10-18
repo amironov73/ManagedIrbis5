@@ -28,31 +28,30 @@
         If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
         https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
         <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
-        <TrimmableAssembly Include="Avalonia.Themes.Default" />
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.0-rc1.1</AvaloniaVersion>
-        <MicrosoftVersion>8.0.0-preview.5.23280.8</MicrosoftVersion>
-        <MicrosoftVersionAlt>8.0.0-preview.5.23302.2</MicrosoftVersionAlt>
+        <AvaloniaVersion>11.0.5</AvaloniaVersion>
+        <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
+        <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.AvaloniaEdit" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.1" />
         <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.1"/>
         <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
         <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-        <PackageReference Include="Avalonia.ThemeManager" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.ThemeManager" Version="11.0.0" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)"/>
-        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2"/>
+        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.2"/>
+        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.0.2"/>
         <PackageReference Include="DynamicData" Version="7.12.1"/>
         <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
         <PackageReference Include="Faker.Net" Version="2.0.154" />
@@ -74,7 +73,7 @@
         <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
         <PackageReference Include="ReactiveUI" Version="18.3.1"/>
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.3" />
+        <PackageReference Include="SkiaSharp" Version="2.88.6" />
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1"/>
     </ItemGroup>
 

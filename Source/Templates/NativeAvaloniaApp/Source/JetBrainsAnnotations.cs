@@ -16,8 +16,6 @@ using System;
 
 #endregion
 
-#nullable enable
-
 namespace JetBrains.Annotations;
 
 /// <summary>
