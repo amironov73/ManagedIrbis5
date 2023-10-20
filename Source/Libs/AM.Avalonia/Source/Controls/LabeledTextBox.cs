@@ -14,7 +14,6 @@
 
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Layout;
 
 #endregion
 
@@ -26,77 +25,24 @@ namespace AM.Avalonia.Controls;
 /// Текстовый бокс с меткой.
 /// </summary>
 public sealed class LabeledTextBox
-    : UserControl
+    : TextBox
 {
     #region Properties
 
     /// <summary>
-    /// Описание свойства "Текст".
+    /// Описание свойства "метка".
     /// </summary>
-    public static readonly StyledProperty<string?> TextProperty
-        = AvaloniaProperty.Register<LabeledTextBox, string?> (nameof (Text));
+    public static readonly StyledProperty<object?> LabelProperty
+        = AvaloniaProperty.Register<LabeledTextBox, object?> (nameof (Label));
 
     /// <summary>
-    /// Надпись на встроенной в контрол метке.
+    /// Собственно метка.
     /// </summary>
-    public string? Label
+    public object? Label
     {
-        get => (string?) _innerLabel?.Content;
-        set => _innerLabel?.SetValue (ContentProperty, value);
+        get => GetValue (LabelProperty);
+        set => SetValue (LabelProperty, value);
     }
-
-    /// <summary>
-    /// Содержимое встроенного в контрол поля для текстового ввода.
-    /// </summary>
-    public string? Text
-    {
-        get => _innerTextBox?.Text;
-        set => _innerTextBox?.SetValue (TextBox.TextProperty, value);
-    }
-
-    #endregion
-
-    #region Construction
-
-    /// <summary>
-    /// Конструктор по умолчанию.
-    /// </summary>
-    public LabeledTextBox()
-    {
-        _innerLabel = new Label
-        {
-            HorizontalAlignment = HorizontalAlignment.Stretch
-        };
-
-        _innerTextBox = new TextBox
-        {
-            HorizontalAlignment = HorizontalAlignment.Stretch
-        };
-
-        Content = new StackPanel
-        {
-            Orientation = Orientation.Vertical,
-            Children =
-            {
-                _innerLabel,
-                _innerTextBox
-            }
-        };
-    }
-
-    #endregion
-
-    #region Private members
-
-    /// <summary>
-    /// Встроенная в контрол метка.
-    /// </summary>
-    private readonly Label? _innerLabel;
-
-    /// <summary>
-    /// Встроенное в контрол текстовое поле ввода.
-    /// </summary>
-    private readonly TextBox? _innerTextBox;
 
     #endregion
 }
