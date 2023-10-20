@@ -1,8 +1,10 @@
 <Project>
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
@@ -14,8 +16,10 @@
     <NugetVersion>6.7.0</NugetVersion>
     <NLogVersion>5.2.4</NLogVersion>
   </PropertyGroup>
+
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
+    <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.0" />
     <PackageVersion Include="Autofac" Version="7.1.0" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaStable)" />
@@ -158,4 +162,5 @@
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.6.1" />
     <PackageVersion Include="YamlDotNet" Version="13.3.1" />
   </ItemGroup>
+
 </Project>

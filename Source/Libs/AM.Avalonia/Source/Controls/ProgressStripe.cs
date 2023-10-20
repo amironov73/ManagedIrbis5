@@ -23,8 +23,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Avalonia.Controls;
 
 /// <summary>

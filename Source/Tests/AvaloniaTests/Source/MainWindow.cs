@@ -594,6 +594,12 @@ public sealed class MainWindow
                     new EnumComboBoxDemo().Show (this);
                 }),
 
+                new Button { Content = "LedIndicator" }
+                .OnClick ((sender, args) =>
+                {
+                    new LedIndicatorDemo().Show (this);
+                }),
+
             }
         };
     }

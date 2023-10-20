@@ -7,14 +7,6 @@
         </Border>
     </Design.PreviewWith>
 
-    <Styles.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceInclude Source="Styles/LabeledTextBox.axaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Styles.Resources>
-
     <StyleInclude Source="avares://AM.Avalonia/Styles/Fonts.axaml" />
     <StyleInclude Source="avares://AM.Avalonia/Styles/Themes/Light.Blue.axaml" />
     <StyleInclude Source="avares://AM.Avalonia/Styles/ProgressRing.axaml" />
