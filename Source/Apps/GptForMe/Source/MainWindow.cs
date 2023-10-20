@@ -17,18 +17,22 @@
 #region Using directives
 
 using System;
+using System.Collections.ObjectModel;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
+
+using GptForMe.Source;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 using OpenAI_API;
+using OpenAI_API.Chat;
 
 #endregion
 
@@ -69,8 +73,7 @@ public sealed class MainWindow
         /// <summary>
         /// История общения.
         /// </summary>
-        [Reactive]
-        public string? History { get; set; }
+        public ObservableCollection<IChatMessage> History { get; } = new ();
 
         #endregion
     }
@@ -93,20 +96,18 @@ public sealed class MainWindow
         Width = MinWidth = 600;
         Height = MinHeight = 450;
 
-        DataContext = new Model();
+        var model = new Model();
+        DataContext = model;
 
-        _historyBox = new TextBox
+        _historyBox = new ListBox
         {
             [Grid.RowProperty] = 1,
-            [Grid.ColumnSpanProperty] = 2,
+            [Grid.ColumnSpanProperty] = 3,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
             Margin = new Thickness (5),
             Padding = new Thickness (5),
-            Watermark = "История запросов",
-            IsReadOnly = true,
-            TextWrapping = TextWrapping.Wrap,
-            [!TextBox.TextProperty] = new Binding (nameof (Model.History))
+            ItemsSource = model.History
         };
 
         Content = new Grid
@@ -116,6 +117,7 @@ public sealed class MainWindow
             ColumnDefinitions = new ColumnDefinitions
             {
                 new (1.0, GridUnitType.Star),
+                new (GridLength.Auto),
                 new (GridLength.Auto)
             },
             RowDefinitions = new RowDefinitions
@@ -137,6 +139,15 @@ public sealed class MainWindow
                 new Button
                 {
                     [Grid.ColumnProperty] = 1,
+                    Content = "Новый",
+                    Padding = new Thickness (5),
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    Command = ReactiveCommand.Create (NewConversation),
+                },
+
+                new Button
+                {
+                    [Grid.ColumnProperty] = 2,
                     Content = "Спросить",
                     Padding = new Thickness (5),
                     HorizontalAlignment = HorizontalAlignment.Right,
@@ -153,7 +164,62 @@ public sealed class MainWindow
 
     #region Private members
 
-    private  TextBox _historyBox = null!;
+    private ListBox _historyBox = null!;
+    private OpenAIAPI? _api;
+    private Conversation? _conversation;
+
+    private void ScrollToEnd()
+    {
+        var last = _historyBox.Items.Count - 1;
+        if (last >= 0)
+        {
+            _historyBox.ScrollIntoView (last);
+        }
+    }
+
+    private void AddConversation
+        (
+            string prompt,
+            string answer
+        )
+    {
+        var model = (Model) DataContext.ThrowIfNull();
+
+        model.History.Add (new OutgoingMessage
+        {
+            MessageContent = prompt
+        });
+
+        model.History.Add (new IncomingMessage
+        {
+            MessageContent = answer
+        });
+    }
+
+    private void AddError
+        (
+            string message
+        )
+    {
+        var model = (Model) DataContext.ThrowIfNull();
+
+        model.History.Add (new ErrorMessage
+        {
+            MessageContent = message
+        });
+    }
+
+    private void NewConversation()
+    {
+        var model = (Model) DataContext.ThrowIfNull();
+        model.History.Clear();
+
+        if (_api is not null)
+        {
+            _conversation = _api.Chat.CreateConversation();
+            _conversation.AppendSystemMessage ("You are a helpful assistant.");
+        }
+    }
 
     private async void HandlePrompt()
     {
@@ -164,24 +230,32 @@ public sealed class MainWindow
             return;
         }
 
-        var configuration = Program.Configuration;
-        var apiKey = configuration["api-key"];
-        var api = new OpenAIAPI (apiKey)
+        if (_conversation is null)
         {
-            ApiUrlFormat = configuration["api-url"]
-        };
-        var chat = api.Chat.CreateConversation();
-        chat.AppendSystemMessage ("You are a helpful assistant.");
-        chat.AppendUserInput (prompt);
-        var answer = await chat.GetResponseFromChatbotAsync();
-        model.Answer = answer;
-        model.Prompt = null;
+             var configuration = Program.Configuration;
+             var apiKey = configuration["api-key"];
+             _api = new OpenAIAPI (apiKey)
+             {
+                 ApiUrlFormat = configuration["api-url"]
+             };
+             NewConversation();
+             _conversation!.AppendUserInput (prompt);
+        }
 
-        var newLine = Environment.NewLine;
-        model.History += $"> {prompt}" + newLine + answer + newLine + newLine;
-        var length = model.History.Length;
-        _historyBox.SelectionStart = length;
-        _historyBox.SelectionEnd = length;
+        try
+        {
+            var answer = await _conversation.GetResponseFromChatbotAsync();
+            model.Answer = answer;
+            model.Prompt = null;
+
+            AddConversation (prompt, answer);
+        }
+        catch (Exception exception)
+        {
+            AddError (exception.Message);
+        }
+
+        DispatcherTimer.RunOnce (ScrollToEnd, TimeSpan.FromMilliseconds (100));
     }
 
     #endregion
