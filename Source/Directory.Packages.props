@@ -27,6 +27,7 @@
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <PackageVersion Include="Avalonia.HtmlRenderer" Version="11.0.0" />
     <PackageVersion Include="Avalonia.Labs.Controls" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Labs.Lottie" Version="$(AvaloniaPrevious)" />
     <PackageVersion Include="Avalonia.Labs.Qr" Version="$(AvaloniaPrevious)" />
