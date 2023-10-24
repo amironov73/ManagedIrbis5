@@ -54,6 +54,11 @@ public sealed class StreamParser
     /// </summary>
     public TextReader Reader { get; }
 
+    /// <summary>
+    /// Парсер для системной консоли.
+    /// </summary>
+    public static StreamParser Console => _consoleParser ??= new (System.Console.In);
+
     #endregion
 
     #region Construction
@@ -78,6 +83,8 @@ public sealed class StreamParser
     #region Private members
 
     private readonly bool _ownReader;
+
+    private static StreamParser? _consoleParser;
 
     private string _ReadNumber()
     {

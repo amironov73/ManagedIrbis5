@@ -3,11 +3,14 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable InconsistentNaming
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
 // ReSharper disable UnusedAutoPropertyAccessor.Global
 // ReSharper disable UnusedMember.Global
+// ReSharper disable UnusedParameter.Local
 
 /* AvaloniaUtility.cs -- полезные расширения для Avalonia UI
  * Ars Magna project, http://arsmagna.ru
@@ -23,8 +26,6 @@ using System.Runtime.CompilerServices;
 
 using ActiproSoftware.UI.Avalonia.Themes;
 
-using AM.Text.Output;
-
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -38,27 +39,16 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Styling;
-using Avalonia.Themes.Fluent;
-using Avalonia.Themes.Simple;
-
-using JetBrains.Annotations;
-
-using Material.Colors;
-using Material.Styles.Themes;
-using Material.Styles.Themes.Base;
-
-using Microsoft.Extensions.Logging;
 
 using SkiaSharp;
 
 #endregion
 
-namespace AM.Avalonia;
+namespace AvaloniaApp;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.
 /// </summary>
-[PublicAPI]
 public static class AvaloniaUtility
 {
     #region Public methods
@@ -125,7 +115,7 @@ public static class AvaloniaUtility
         }
         catch (Exception exception)
         {
-            Magna.Logger.LogDebug (exception, "URI as resource");
+            Debug.WriteLine (exception.Message);
         }
 
         return default;
@@ -251,90 +241,6 @@ public static class AvaloniaUtility
         var result = new ControlTheme (actualControlType)
         {
             BasedOn = basedOn
-        };
-
-        return result;
-    }
-
-    /// <summary>
-    /// Создание Fluent-темы.
-    /// </summary>
-    public static IStyle CreateFluentTheme
-        (
-            bool light = true
-        )
-    {
-        // TODO разобраться с light
-        return new FluentTheme();
-
-        // return new FluentTheme (new Uri
-        //     (
-        //         light
-        //         ? "avares://Avalonia.Themes.Fluent/FluentLight.xaml"
-        //         : "avares://Avalonia.Themes.Fluent/FluentDark.xaml"
-        //     ));
-    }
-
-    /// <summary>
-    /// Создание Material-темы.
-    /// </summary>
-    public static IStyle CreateMaterialTheme
-        (
-            bool light = true
-        )
-    {
-        var baseMode = light ? BaseThemeMode.Light : BaseThemeMode.Dark;
-        // var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
-        var result = new MaterialTheme (Magna.Host.Services)
-        {
-            BaseTheme = baseMode,
-            PrimaryColor = PrimaryColor.Blue,
-            SecondaryColor = SecondaryColor.Teal
-        };
-
-        return result;
-    }
-
-    /// <summary>
-    /// Создание Simple-темы.
-    /// </summary>
-    public static IStyle CreateSimpleTheme
-        (
-            bool light = true
-        )
-    {
-        // TODO разобраться с light
-        return new SimpleTheme();
-
-        // var mode = light ? SimpleThemeMode.Light : SimpleThemeMode.Dark;
-        // var uri = new Uri ("avares://Avalonia.Themes.Simple/SimpleTheme.xaml");
-        // var result = new SimpleTheme (uri)
-        // {
-        //     Mode = mode
-        // };
-
-        // return result;
-    }
-
-    /// <summary>
-    /// Создание Citrus-темы.
-    /// </summary>
-    public static IStyle CreateCitrusTheme
-        (
-            string variant = "Citrus.axaml"
-        )
-    {
-        var simple = CreateSimpleTheme();
-        var uri = new Uri ($"avares://AM.Avalonia/Styles/Citrus/{variant}");
-        var citrus = new StyleInclude (uri)
-        {
-            Source = uri
-        };
-
-        var result = new Styles
-        {
-            simple,
-            citrus
         };
 
         return result;
@@ -806,32 +712,6 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Получение доступа к ресурсам темы.
-    /// </summary>
-    public static IThemeResources GetThemeResources
-        (
-            IResourceHost resourceHost
-        )
-    {
-        Sure.NotNull (resourceHost);
-
-        foreach (var style in Application.Current!.Styles)
-        {
-            if (style is FluentTheme)
-            {
-                return new FluentThemeResources (resourceHost);
-            }
-
-            if (style is SimpleTheme)
-            {
-                return new SimpleThemeResources (resourceHost);
-            }
-        }
-
-        return new FallbackThemeResources();
-    }
-
-    /// <summary>
     /// Получение окна, которому принадлежит указанный контрол.
     /// </summary>
     public static Window GetWindow
@@ -852,7 +732,7 @@ public static class AvaloniaUtility
             parent = parent.Parent;
         }
 
-        throw new ArsMagnaException ($"Can't find window for {control}");
+        throw new Exception ($"Can't find window for {control}");
     }
 
     /// <summary>
@@ -887,20 +767,6 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
-    /// Включение ссылки на стили ColorPicker.
-    /// </summary>
-    public static IStyle IncludeColorPickerStyles()
-    {
-        var uri = new Uri ("avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml");
-        var result = new StyleInclude (uri)
-        {
-            Source = uri
-        };
-
-        return result;
-    }
-
-    /// <summary>
     /// Включение ссылки на стили DataGrid.
     /// </summary>
     public static IStyle IncludeDataGridStyles
@@ -912,34 +778,6 @@ public static class AvaloniaUtility
         var result = new StyleInclude (gridUri)
         {
             Source = gridUri
-        };
-
-        return result;
-    }
-
-    /// <summary>
-    /// Включение ссылки на стили DataGrid.
-    /// </summary>
-    public static IStyle IncludeLabsStyles()
-    {
-        var labsUri = new Uri ($"avares://Avalonia.Labs.Controls/Themes/ControlThemes.xaml");
-        var result = new StyleInclude (labsUri)
-        {
-            Source = labsUri
-        };
-
-        return result;
-    }
-
-    /// <summary>
-    /// Включение ссылки на стили TreeDataGrid.
-    /// </summary>
-    public static IStyle IncludeTreeDataGridStyles()
-    {
-        var treeDataGridUri = new Uri ("avares://Avalonia.Controls.TreeDataGrid/Themes/Fluent.axaml");
-        var result = new StyleInclude (treeDataGridUri)
-        {
-            Source = treeDataGridUri
         };
 
         return result;
@@ -1040,7 +878,7 @@ public static class AvaloniaUtility
         }
         catch (Exception exception)
         {
-            Magna.Logger.LogDebug (exception, nameof (MeasureString));
+            Debug.WriteLine (exception.Message);
         }
 
         return default;
@@ -1085,52 +923,6 @@ public static class AvaloniaUtility
         }
 
         return null;
-    }
-
-    /// <summary>
-    /// Print system information in abstract output.
-    /// </summary>
-    public static void PrintSystemInformation
-        (
-            this AbstractOutput? output
-        )
-    {
-        if (output is not null)
-        {
-            output.WriteLine
-                (
-                    "OS version: {0}",
-                    Environment.OSVersion
-                );
-            output.WriteLine
-                (
-                    "Framework version: {0}",
-                    Environment.Version
-                );
-            var assembly = Assembly.GetEntryAssembly();
-            var vi = assembly?.GetName().Version;
-            if (assembly?.Location is null)
-            {
-                // TODO: в single-exe-application .Location возвращает string.Empty
-                // consider using the AppContext.BaseDirectory
-                return;
-            }
-
-            // TODO: в single-exe-application .Location возвращает string.Empty
-            // consider using the AppContext.BaseDirectory
-            var fi = new FileInfo (assembly.Location);
-            output.WriteLine
-                (
-                    "Application version: {0} ({1})",
-                    vi.ToVisibleString(),
-                    fi.LastWriteTime.ToShortDateString()
-                );
-            output.WriteLine
-                (
-                    "Memory: {0} Mb",
-                    GC.GetTotalMemory (false) / 1024
-                );
-        }
     }
 
     /// <summary>

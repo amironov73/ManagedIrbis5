@@ -1,0 +1,85 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <!-- Отключаем централизованное управление пакетами -->
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <Nullable>enable</Nullable>
+        <TargetFramework>net8.0</TargetFramework>
+        <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
+        <TrimMode>copyused</TrimMode>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Remove=".gitignore" />
+        <None Update="NLog.config">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+        <!--This helps with theme dll-s trimming.
+        If you will publish your application in self-contained mode with p:PublishTrimmed=true and it will use Fluent theme Default theme will be trimmed from the output and vice versa.
+        https://github.com/AvaloniaUI/Avalonia/issues/5593 -->
+        <TrimmableAssembly Include="Avalonia.Themes.Fluent" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <ActiproVersion>23.1.0</ActiproVersion>
+        <AvaloniaVersion>11.0.5</AvaloniaVersion>
+        <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
+        <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Remove="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Remove="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia.Pro" Version="$(ActiproVersion)" />
+        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.0.1" />
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Controls.TreeDataGrid" Version="11.0.1"/>
+        <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)"/>
+        <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Xaml.Behaviors" Version="11.0.2"/>
+        <PackageReference Include="Avalonia.Xaml.Interactions" Version="11.0.2"/>
+        <PackageReference Include="Avalonia.Xaml.Interactivity" Version="11.0.2"/>
+        <PackageReference Include="DynamicData" Version="7.12.1"/>
+        <PackageReference Include="DynamicData.ReactiveUI" Version="6.11.0.2613"/>
+        <PackageReference Include="Faker.Net" Version="2.0.154" />
+        <PackageReference Include="GridExtra.Avalonia" Version="0.9.1"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersionAlt)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersionAlt)"/>
+        <PackageReference Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)"/>
+        <PackageReference Include="NLog" Version="5.1.3"/>
+        <PackageReference Include="NLog.Extensions.Logging" Version="5.2.3"/>
+        <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
+        <PackageReference Include="ReactiveUI" Version="18.3.1"/>
+        <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
+        <PackageReference Include="SkiaSharp" Version="2.88.6" />
+        <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1"/>
+    </ItemGroup>
+
+</Project>

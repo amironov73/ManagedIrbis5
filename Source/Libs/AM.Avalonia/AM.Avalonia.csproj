@@ -40,6 +40,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="ActiproSoftware.Controls.Avalonia" />
         <PackageReference Include="Avalonia" />
         <PackageReference Include="Avalonia.Controls.DataGrid" />
         <PackageReference Include="Avalonia.Controls.TreeDataGrid" />
