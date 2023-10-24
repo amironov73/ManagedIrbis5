@@ -997,7 +997,8 @@ public static class AvaloniaUtility
     public static T SetColumn<T>
         (
             this T obj,
-            int column
+            int column,
+            int span = 0
         )
         where T : AvaloniaObject
     {
@@ -1005,6 +1006,10 @@ public static class AvaloniaUtility
         Sure.Positive (column);
 
         obj.SetValue (Grid.ColumnProperty, column);
+        if (span > 0)
+        {
+            obj.SetValue (Grid.ColumnSpanProperty, span);
+        }
 
         return obj;
     }

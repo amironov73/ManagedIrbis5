@@ -20,8 +20,6 @@ using Avalonia.Controls.ApplicationLifetimes;
 
 #endregion
 
-#nullable enable
-
 namespace AvaloniaApp;
 
 /// <summary>

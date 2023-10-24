@@ -25,10 +25,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.ReactiveUI;
 
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+
+using static AvaloniaApp.ActiproUtility;
 
 #endregion
 
@@ -101,11 +104,15 @@ public sealed class MainWindow
     /// </summary>
     protected override void OnInitialized()
     {
+        this.AttachDevTools();
+
         base.OnInitialized();
 
-        Title = "Калькулятор Avalonia";
-        Width = MinWidth = 450;
-        Height = MinHeight = 250;
+        Styles.Add (CreateStandardStyles());
+
+        Title = "Форма ввода с Modern-темой Actipro";
+        Width = MinWidth = 650;
+        Height = MinHeight = 450;
 
         DataContext = new Model
         {
@@ -119,7 +126,7 @@ public sealed class MainWindow
             Spacing = 5,
             Children =
             {
-                ActiproUtility.ButtonWithGlyph (GlyphTemplateKind.Menu16)
+                ButtonWithGlyph (GlyphTemplateKind.Menu16)
             }
         };
 
@@ -137,7 +144,7 @@ public sealed class MainWindow
         {
             LeftContent = leftContent,
             RightContent = rightContent,
-            Content = "Калькулятор с Modern-темой"
+            Content = "Форма ввода с Modern-темой Actipro"
         };
 
         var scroller = new ScrollViewer
@@ -151,6 +158,163 @@ public sealed class MainWindow
                 Spacing = 5,
                 Children =
                 {
+                    Header1 ("Profile Form"),
+                    BodyText ("This sample demonstrates how Actipro's control themes can create professional-looking forms, such as for collecting user profile data."),
+
+                    Header2 ("Public Profile"),
+                    BodyText ("This profile information is shared publicly with all users."),
+
+                    FormInputGroup
+                        (
+                            FormInput (LabeledControl
+                                (
+                                    "Bio",
+                                    new TextBox
+                                    {
+                                        TextWrapping = TextWrapping.Wrap,
+                                        MaxLines = 5,
+                                        AcceptsReturn = true
+                                    }
+                                    .Accent(),
+                                    "Any details such as age, occupation, interests."
+                                ))
+                        ),
+
+                    FormInputGroup
+                        (
+                            new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinitions.Parse ("*,30,*"),
+                                Children =
+                                {
+                                    FormInput (LabeledControl
+                                        (
+                                            "First name",
+                                            new TextBox().Success()
+                                        )),
+
+                                    FormInput (LabeledControl
+                                        (
+                                            "Last name",
+                                            new TextBox().Warning()
+                                        ))
+                                        .SetColumn (2)
+                                }
+                            },
+
+                            new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinitions.Parse ("*,30,*,30,*"),
+                                Children =
+                                {
+                                    FormInput (LabeledControl
+                                        (
+                                            "Phone number",
+                                            new TextBox().Danger()
+                                        ),
+                                        new CheckBox
+                                        {
+                                            Margin = new Thickness (0, 10, 0, 0),
+                                            Content = "Allow text messages"
+                                        }
+                                        .Danger()
+                                        ),
+
+                                    FormInput ( LabeledControl
+                                        (
+                                            "E-mail address",
+                                            new TextBox()
+                                        ))
+                                        .SetColumn (2, 4)
+
+                                }
+                            },
+
+                            FormInput ( LabeledControl
+                                (
+                                    "Preferred contact method",
+                                    new StackPanel
+                                    {
+                                        Orientation = Orientation.Horizontal,
+                                        Children =
+                                        {
+                                            new RadioButton
+                                            {
+                                                Content = "E-mail",
+                                                IsChecked = true
+                                            },
+                                            new RadioButton
+                                            {
+                                                Content = "Voice"
+                                            },
+                                            new RadioButton
+                                            {
+                                                Content = "Text"
+                                            }
+                                        }
+                                    }
+                                )),
+
+                            new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinitions.Parse ("*,30,*"),
+                                Children =
+                                {
+                                    FormInput ( LabeledControl
+                                        (
+                                            "Country",
+                                            new ComboBox
+                                            {
+                                                Items =
+                                                {
+                                                    "Canada",
+                                                    "Mexico",
+                                                    "United States"
+                                                },
+                                                SelectedIndex = 2,
+                                            }
+                                        )),
+
+                                    FormInput (LabeledControl
+                                        (
+                                            "Street address",
+                                            new TextBox()
+                                        ))
+                                        .SetColumn (2)
+                                }
+                            },
+
+                            new Grid
+                            {
+                                ColumnDefinitions = ColumnDefinitions.Parse ("*,30,*,30,*"),
+                                Children =
+                                {
+                                    FormInput ( LabeledControl
+                                        (
+                                            "City",
+                                            new TextBox()
+                                        )),
+                                    FormInput ( LabeledControl
+                                        (
+                                            "State / Province",
+                                            new TextBox()
+                                        ))
+                                        .SetColumn (2),
+                                    FormInput ( LabeledControl
+                                        (
+                                            "ZIP / Postal code",
+                                            new TextBox()
+                                        ))
+                                        .SetColumn (4)
+                                }
+                            }
+                        ),
+
+                    new StackPanel
+                    {
+                        Height = 30,
+                    },
+
                     CreateTextBox (nameof (Model.FirstTerm)),
                     CreateTextBox (nameof (Model.SecondTerm)),
                     CreateTextBox (nameof (Model.Sum), isReadOnly: true)
