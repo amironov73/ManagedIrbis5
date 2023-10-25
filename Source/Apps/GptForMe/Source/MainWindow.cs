@@ -114,17 +114,8 @@ public sealed class MainWindow
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
-            ColumnDefinitions = new ColumnDefinitions
-            {
-                new (1.0, GridUnitType.Star),
-                new (GridLength.Auto),
-                new (GridLength.Auto)
-            },
-            RowDefinitions = new RowDefinitions
-            {
-                new (GridLength.Auto),
-                new (1.0, GridUnitType.Star)
-            },
+            ColumnDefinitions = ColumnDefinitions.Parse ("*,Auto,Auto"),
+            RowDefinitions = RowDefinitions.Parse ("Auto,*"),
             Margin = new Thickness (5),
             Children =
             {
@@ -239,16 +230,20 @@ public sealed class MainWindow
                  ApiUrlFormat = configuration["api-url"]
              };
              NewConversation();
-             _conversation!.AppendUserInput (prompt);
         }
+
+        _conversation!.AppendUserInput (prompt);
 
         try
         {
             var answer = await _conversation.GetResponseFromChatbotAsync();
-            model.Answer = answer;
-            model.Prompt = null;
-
-            AddConversation (prompt, answer);
+            if (!string.IsNullOrEmpty (answer))
+            {
+                model.Answer = answer;
+                model.Prompt = null;
+                _conversation.AppendExampleChatbotOutput (answer);
+                AddConversation (prompt, answer);
+            }
         }
         catch (Exception exception)
         {

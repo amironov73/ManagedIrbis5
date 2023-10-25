@@ -51,9 +51,11 @@
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
     <PackageVersion Include="DevExpress.Win.Spreadsheet" Version="22.1.11" />
+    <PackageVersion Include="DocX" Version="3.0.23523.1209" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
+    <PackageVersion Include="FastExcel" Version="3.0.13" />
     <PackageVersion Include="Google.Protobuf" Version="3.24.2" />
     <PackageVersion Include="Grpc.Tools" Version="2.58.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
@@ -108,6 +110,7 @@
     <PackageVersion Include="NLog" Version="$(NLogVersion)" />
     <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.4" />
     <PackageVersion Include="NLog.Schema" Version="$(NLogVersion)" />
+    <PackageVersion Include="NPOI" Version="2.6.2" />
     <PackageVersion Include="NuGet.Common" Version="$(NugetVersion)" />
     <PackageVersion Include="NuGet.Configuration" Version="$(NugetVersion)" />
     <PackageVersion Include="NuGet.DependencyResolver.Core" Version="$(NugetVersion)" />

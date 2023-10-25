@@ -1211,7 +1211,6 @@ public static class AvaloniaUtility
         where T : AvaloniaObject
     {
         Sure.NotNull (obj);
-        Sure.Positive (column);
 
         obj.SetValue (Grid.ColumnProperty, column);
         if (span > 0)
@@ -1424,14 +1423,22 @@ public static class AvaloniaUtility
     public static T SetRow<T>
         (
             this T obj,
-            int row
+            int row,
+            int span = 0
         )
         where T : AvaloniaObject
     {
         Sure.NotNull (obj);
-        Sure.Positive (row);
 
-        obj.SetValue (Grid.RowProperty, row);
+        if (row >= 0)
+        {
+            obj.SetValue (Grid.RowProperty, row);
+        }
+
+        if (span > 0)
+        {
+            obj.SetValue (Grid.RowSpanProperty, span);
+        }
 
         return obj;
     }
