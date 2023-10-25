@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OldReaders", "OldReaders.csproj", "{0C1D856C-0ED5-46D7-9872-F26647D3AF37}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Core5", "..\..\Libs\AM.Core5\AM.Core5.csproj", "{5B1FD6DA-374C-4AA6-B3DA-D5857B0CDAB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedIrbis5", "..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj", "{02523731-9303-4B91-98FD-BA66EE047069}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0C1D856C-0ED5-46D7-9872-F26647D3AF37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C1D856C-0ED5-46D7-9872-F26647D3AF37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C1D856C-0ED5-46D7-9872-F26647D3AF37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C1D856C-0ED5-46D7-9872-F26647D3AF37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B1FD6DA-374C-4AA6-B3DA-D5857B0CDAB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B1FD6DA-374C-4AA6-B3DA-D5857B0CDAB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B1FD6DA-374C-4AA6-B3DA-D5857B0CDAB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B1FD6DA-374C-4AA6-B3DA-D5857B0CDAB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02523731-9303-4B91-98FD-BA66EE047069}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02523731-9303-4B91-98FD-BA66EE047069}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02523731-9303-4B91-98FD-BA66EE047069}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02523731-9303-4B91-98FD-BA66EE047069}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

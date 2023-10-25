@@ -1,10 +1,8 @@
 <Project>
-
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
-
   <PropertyGroup>
     <MicrosoftVersion>8.0.0-rc.2.23479.6</MicrosoftVersion>
     <MicrosoftVersionAlt>8.0.0-rc.2.23480.2</MicrosoftVersionAlt>
@@ -16,7 +14,6 @@
     <NugetVersion>6.7.0</NugetVersion>
     <NLogVersion>5.2.4</NLogVersion>
   </PropertyGroup>
-
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
     <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.0" />
@@ -53,6 +50,7 @@
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
+    <PackageVersion Include="DevExpress.Win.Spreadsheet" Version="22.1.11" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
@@ -162,5 +160,4 @@
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.6.1" />
     <PackageVersion Include="YamlDotNet" Version="13.3.1" />
   </ItemGroup>
-
 </Project>
