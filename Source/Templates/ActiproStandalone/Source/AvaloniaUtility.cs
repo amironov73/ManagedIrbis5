@@ -926,6 +926,32 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Установка выравнивания по горизонтали.
+    /// </summary>
+    public static Setter SetAlignment
+        (
+            HorizontalAlignment alignment
+        )
+        => new ()
+        {
+            Property = Layoutable.HorizontalAlignmentProperty,
+            Value = alignment
+        };
+
+    /// <summary>
+    /// Установка выравнивания по вертикали.
+    /// </summary>
+    public static Setter SetAlignment
+        (
+            VerticalAlignment alignment
+        )
+        => new ()
+        {
+            Property = Layoutable.VerticalAlignmentProperty,
+            Value = alignment
+        };
+
+    /// <summary>
     /// Заполнение ячейки грида.
     /// </summary>
     public static Control SetCellObject
@@ -1005,7 +1031,11 @@ public static class AvaloniaUtility
         Sure.NotNull (obj);
         Sure.Positive (column);
 
-        obj.SetValue (Grid.ColumnProperty, column);
+        if (column >= 0)
+        {
+            obj.SetValue (Grid.ColumnProperty, column);
+        }
+
         if (span > 0)
         {
             obj.SetValue (Grid.ColumnSpanProperty, span);
@@ -1051,6 +1081,19 @@ public static class AvaloniaUtility
     /// <summary>
     /// Установка полей снаружи контрола.
     /// </summary>
+    public static Setter SetMargin
+        (
+            double thickness
+        )
+        => new ()
+    {
+        Property = Layoutable.MarginProperty,
+        Value = new Thickness (thickness)
+    };
+
+    /// <summary>
+    /// Установка полей снаружи контрола.
+    /// </summary>
     public static T SetMargin<T>
         (
             this T control,
@@ -1065,6 +1108,20 @@ public static class AvaloniaUtility
 
         return control;
     }
+
+    /// <summary>
+    /// Установка полей снаружи контрола.
+    /// </summary>
+    public static Setter SetMargin
+        (
+            double horizontal,
+            double vertical
+        )
+        => new ()
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (horizontal, vertical)
+        };
 
     /// <summary>
     /// Установка полей снаружи контрола.
@@ -1085,6 +1142,22 @@ public static class AvaloniaUtility
 
         return control;
     }
+
+    /// <summary>
+    /// Установка полей снаружи контрола.
+    /// </summary>
+    public static Setter SetMargin
+        (
+            double left,
+            double top,
+            double right,
+            double bottom
+        )
+        => new ()
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (left, top, right, bottom)
+        };
 
     /// <summary>
     /// Установка полей внутри текстового блока.
@@ -1121,6 +1194,19 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Установка полей внутри контрола.
+    /// </summary>
+    public static Setter SetPadding
+        (
+            double thickness
+        )
+        => new ()
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (thickness)
+        };
+
+    /// <summary>
     /// Установка полей внутри текстового блока.
     /// </summary>
     public static T SetPadding<T>
@@ -1137,6 +1223,20 @@ public static class AvaloniaUtility
 
         return block;
     }
+
+    /// <summary>
+    /// Установка полей внутри контрола.
+    /// </summary>
+    public static Setter SetPadding
+        (
+            double horizontal,
+            double vertical
+        )
+        => new ()
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (horizontal, vertical)
+        };
 
     /// <summary>
     /// Установка полей внутри текстового блока.
@@ -1157,6 +1257,22 @@ public static class AvaloniaUtility
 
         return block;
     }
+
+    /// <summary>
+    /// Установка полей внутри контрола.
+    /// </summary>
+    public static Setter SetPadding
+        (
+            double left,
+            double top,
+            double right,
+            double bottom
+        )
+        => new ()
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (left, top, right, bottom)
+        };
 
     /// <summary>
     /// Установка полей снаружи панели.
@@ -1216,14 +1332,23 @@ public static class AvaloniaUtility
     public static T SetRow<T>
         (
             this T obj,
-            int row
+            int row,
+            int span = 0
         )
         where T : AvaloniaObject
     {
         Sure.NotNull (obj);
         Sure.Positive (row);
 
-        obj.SetValue (Grid.RowProperty, row);
+        if (row >= 0)
+        {
+            obj.SetValue (Grid.RowProperty, row);
+        }
+
+        if (span > 0)
+        {
+            obj.SetValue (Grid.RowSpanProperty, span);
+        }
 
         return obj;
     }
@@ -1235,7 +1360,9 @@ public static class AvaloniaUtility
         (
             this T obj,
             int row,
-            int column
+            int column,
+            int rowSpan = 0,
+            int colSpan = 0
         )
         where T : AvaloniaObject
     {
@@ -1243,11 +1370,41 @@ public static class AvaloniaUtility
         Sure.Positive (row);
         Sure.Positive (column);
 
-        obj.SetValue (Grid.RowProperty, row);
-        obj.SetValue (Grid.ColumnProperty, column);
+        if (row >= 0)
+        {
+            obj.SetValue (Grid.RowProperty, row);
+        }
+
+        if (column >= 0)
+        {
+            obj.SetValue (Grid.ColumnProperty, column);
+        }
+
+        if (rowSpan > 0)
+        {
+            obj.SetValue (Grid.RowSpanProperty, rowSpan);
+        }
+
+        if (colSpan > 0)
+        {
+            obj.SetValue (Grid.ColumnSpanProperty, colSpan);
+        }
 
         return obj;
     }
+
+    /// <summary>
+    /// Установка промежутка между вложенными контролами.
+    /// </summary>
+    public static Setter SetSpacing
+        (
+            double spacing
+        )
+        => new ()
+    {
+        Property = StackPanel.SpacingProperty,
+        Value = spacing
+    };
 
     /// <summary>
     /// Установка иконки для окна.

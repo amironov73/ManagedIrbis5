@@ -27,6 +27,8 @@ using Avalonia.Styling;
 
 using JetBrains.Annotations;
 
+using static AvaloniaApp.AvaloniaUtility;
+
 #endregion
 
 namespace AvaloniaApp;
@@ -172,11 +174,7 @@ public static class ActiproUtility
                         .Class ("h1"),
                     Setters =
                     {
-                        new Setter
-                        {
-                            Property = Layoutable.MarginProperty,
-                            Value = new Thickness (0.0, 0.0, 0.0, 10.0)
-                        },
+                        SetMargin (0, 0, 0, 10),
                         new Setter
                         {
                             Property = StyledElement.ThemeProperty,
@@ -208,11 +206,7 @@ public static class ActiproUtility
                         .Class ("h2"),
                     Setters =
                     {
-                        new Setter
-                        {
-                            Property = Layoutable.MarginProperty,
-                            Value = new Thickness (0.0, 30.0, 0.0, 10.0)
-                        },
+                        SetMargin (0, 30, 0, 10),
                         new Setter
                         {
                             Property = StyledElement.ThemeProperty,
@@ -244,16 +238,8 @@ public static class ActiproUtility
                         .Class ("form-input-group"),
                     Setters =
                     {
-                        new Setter
-                        {
-                            Property = Layoutable.MarginProperty,
-                            Value = new Thickness (0.0, 20.0, 0.0, 0.0)
-                        },
-                        new Setter
-                        {
-                            Property = StackPanel.SpacingProperty,
-                            Value = 20.0
-                        }
+                        SetMargin (0, 20, 0, 0),
+                        SetSpacing (20)
                     }
                 },
 
@@ -270,11 +256,7 @@ public static class ActiproUtility
                                 .Descendant().OfType (typeof (CheckBox)),
                             Setters =
                             {
-                                new Setter
-                                {
-                                    Property = Layoutable.MarginProperty,
-                                    Value = new Thickness (0.0, 5.0, 0.0, 0.0)
-                                }
+                                SetMargin (0, 5, 0, 0)
                             }
                         },
 
@@ -284,11 +266,7 @@ public static class ActiproUtility
                                 .Descendant().OfType (typeof (RadioButton)),
                             Setters =
                             {
-                                new Setter
-                                {
-                                    Property = Layoutable.MarginProperty,
-                                    Value = new Thickness (0.0, 5.0, 20.0, 0.0)
-                                }
+                                SetMargin (0, 5, 20, 0)
                             }
                         }
                     }
@@ -301,16 +279,8 @@ public static class ActiproUtility
                         .Class ("switch-input-group"),
                     Setters =
                     {
-                        new Setter
-                        {
-                            Property = Layoutable.MarginProperty,
-                            Value = new Thickness (0.0, 20.0, 0.0, 0.0)
-                        },
-                        new Setter
-                        {
-                            Property = StackPanel.SpacingProperty,
-                            Value = 10.0
-                        }
+                        SetMargin (0, 20, 0, 0),
+                        SetSpacing (10)
                     },
                     Children =
                     {
@@ -357,11 +327,7 @@ public static class ActiproUtility
                                 .Descendant().OfType (typeof (Button)),
                             Setters =
                             {
-                                new Setter
-                                {
-                                    Property = Layoutable.MarginProperty,
-                                    Value = new Thickness (0.0, 50.0, 10.0, 0.0)
-                                }
+                                SetMargin (0, 50, 10, 0)
                             }
                         }
                     }
