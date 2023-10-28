@@ -1008,6 +1008,33 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Создание рамки.
+    /// </summary>
+    public static Border MakeBorder (Control control)
+        => new () { Child = control };
+
+    /// <summary>
+    /// Создание рамки с контролами, ориентированных вертикально.
+    /// </summary>
+    public static Border MakeBorder (params Control[] children) => new ()
+        {
+            Child = new StackPanel
+            {
+                Orientation = Orientation.Vertical
+            }.WithChildren (children)
+        };
+
+    /// <summary>
+    /// Создание кнопки с указанным текстом.
+    /// </summary>
+    public static Button MakeButton (object text) => new () { Content = text };
+
+    /// <summary>
+    /// Создание метки с указанным текстом.
+    /// </summary>
+    public static Label MakeLabel (object text) => new () { Content = text };
+
+    /// <summary>
     /// Измерение строки.
     /// </summary>
     public static Size MeasureString
