@@ -29,10 +29,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data;
+using Avalonia.Data.Core;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
+using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
@@ -1023,6 +1025,40 @@ public static class AvaloniaUtility
                 Orientation = Orientation.Vertical
             }.WithChildren (children)
         };
+
+    /// <summary>
+    /// Создание <c>CompiledBinding</c> из кода.
+    /// </summary>
+    /// <param name="propertyName">Имя свойства.</param>
+    /// <param name="getter">Геттер.</param>
+    /// <param name="setter">Сеттер.</param>
+    /// <typeparam name="TProperty">Тип свойства.</typeparam>
+    /// <returns>Созданная <c>CompiledBinding</c></returns>
+    public static CompiledBindingExtension MakeBinding<TProperty>
+        (
+            string propertyName,
+            Func<object, object?> getter,
+            Action<object, object?> setter
+        )
+    {
+        var propertyInfo = new ClrPropertyInfo
+            (
+                propertyName,
+                getter,
+                setter,
+                typeof (TProperty)
+            );
+
+        var path = new CompiledBindingPathBuilder()
+            .Property
+                (
+                    propertyInfo,
+                    PropertyInfoAccessorFactory.CreateInpcPropertyAccessor
+                )
+            .Build();
+
+        return new CompiledBindingExtension (path);
+    }
 
     /// <summary>
     /// Создание кнопки с указанным текстом.
