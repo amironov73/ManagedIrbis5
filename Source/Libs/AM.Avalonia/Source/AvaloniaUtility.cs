@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 using ActiproSoftware.UI.Avalonia.Themes;
 
@@ -39,6 +40,7 @@ using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Avalonia.Skia;
 using Avalonia.Styling;
 using Avalonia.Themes.Fluent;
 using Avalonia.Themes.Simple;
@@ -1041,6 +1043,10 @@ public static class AvaloniaUtility
             Action<object, object?> setter
         )
     {
+        Sure.NotNullNorEmpty (propertyName);
+        Sure.NotNull (getter);
+        // setter может быть null, если очень нужно
+
         var propertyInfo = new ClrPropertyInfo
             (
                 propertyName,
@@ -1867,6 +1873,86 @@ public static class AvaloniaUtility
         panel.Children.AddRange (children);
 
         return panel;
+    }
+
+    // До новой Авалонии, в 11.1 должен появиться нормальный метод
+    //==================
+
+    private static MethodInfo? _renderMethod;
+    private static Type? _platformDrawingContext;
+
+    /// <summary>
+    /// Отрисовка визуального элемента.
+    /// </summary>
+    public static void Render
+        (
+            DrawingContext context,
+            Visual visual,
+            Rect clipRect
+        )
+    {
+        Sure.NotNull (context);
+        Sure.NotNull (visual);
+
+        if (_renderMethod is null)
+        {
+            var assembly = typeof (AvaloniaObject).Assembly;
+            var type = assembly.GetType
+                    (
+                        "Avalonia.Rendering.ImmediateRenderer",
+                        true
+                    )
+                .ThrowIfNull();
+            const BindingFlags bindingFlags = BindingFlags.Static | BindingFlags.Public;
+            var types = new[]
+            {
+                typeof (DrawingContext),
+                typeof (Visual),
+                typeof (Rect)
+            };
+            _renderMethod = type.GetMethod ("Render", bindingFlags, types)
+                .ThrowIfNull();
+        }
+
+        _renderMethod.Invoke (null, new object[] { context, visual, clipRect });
+    }
+
+    /// <summary>
+    /// Отрисовка контрола на картинке.
+    /// </summary>
+    public static Task Render
+        (
+            SKCanvas canvas,
+            Visual visual
+        )
+    {
+        if (_platformDrawingContext is null)
+        {
+            var assembly = typeof (AvaloniaObject).Assembly;
+            _platformDrawingContext = assembly.GetType
+                (
+                    "Avalonia.Media.PlatformDrawingContext",
+                    true
+                )
+                .ThrowIfNull();
+        }
+
+        using var drawingContextImpl = global::Avalonia.Skia.Helpers.DrawingContextHelper.WrapSkiaCanvas
+            (
+                canvas,
+                SkiaPlatform.DefaultDpi
+            );
+        using var drawingContext = (DrawingContext) Activator.CreateInstance
+            (
+                _platformDrawingContext,
+                drawingContextImpl,
+                false
+            )
+            .ThrowIfNull();
+
+        Render (drawingContext, visual, visual.Bounds);
+
+        return Task.CompletedTask;
     }
 
     #endregion

@@ -16,8 +16,6 @@ using Avalonia.Media;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Avalonia;
 
 /// <summary>

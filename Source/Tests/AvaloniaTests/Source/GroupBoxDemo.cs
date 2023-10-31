@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable UnusedMember.Global
 
-/* GroupBox.cs -- группа контролов
+/* GroupBoxDemo.cs -- демонстрация группы контролов
  * Ars Magna project, http://arsmagna.ru
  */
 

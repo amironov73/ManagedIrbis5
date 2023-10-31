@@ -33,9 +33,9 @@ using ManagedIrbis.Workspace;
 
 using ReactiveUI;
 
-#endregion
+using static AM.Avalonia.AvaloniaUtility;
 
-#nullable enable
+#endregion
 
 namespace AvaloniaTests;
 
@@ -599,6 +599,9 @@ public sealed class MainWindow
                 {
                     new LedIndicatorDemo().Show (this);
                 }),
+
+                MakeButton ("Render")
+                    .OnClick ((_, _) => new RenderDemo().DoRender())
 
             }
         };

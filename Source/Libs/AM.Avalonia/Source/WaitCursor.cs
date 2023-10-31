@@ -79,6 +79,9 @@ public sealed class WaitCursor
             Func<Task> action
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         await action();
     }
@@ -93,6 +96,9 @@ public sealed class WaitCursor
             T1 argument1
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         await action (argument1);
     }
@@ -108,6 +114,9 @@ public sealed class WaitCursor
             T2 argument2
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         await action (argument1, argument2);
     }
@@ -124,6 +133,9 @@ public sealed class WaitCursor
             T3 argument3
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         await action (argument1, argument2, argument3);
     }
@@ -137,6 +149,9 @@ public sealed class WaitCursor
             Func<Task<TResult>> action
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         return await action();
     }
@@ -151,6 +166,9 @@ public sealed class WaitCursor
             T1 argument1
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         return await action (argument1);
     }
@@ -166,6 +184,9 @@ public sealed class WaitCursor
             T2 argument2
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         return await action (argument1, argument2);
     }
@@ -182,6 +203,9 @@ public sealed class WaitCursor
             T3 argument3
         )
     {
+        Sure.NotNull (element);
+        Sure.NotNull (action);
+
         using var cursor = new WaitCursor (element);
         return await action (argument1, argument2, argument3);
     }

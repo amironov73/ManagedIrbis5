@@ -17,8 +17,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Avalonia;
 
 /// <summary>
@@ -36,7 +34,7 @@ public sealed class FallbackThemeResources
     private static readonly Brush _highlightBrush = new SolidColorBrush (Colors.Aqua);
 
     #endregion
-    
+
     #region IThemeResources members
 
     /// <inheritdoc cref="IThemeResources.CurrentThemeName"/>
