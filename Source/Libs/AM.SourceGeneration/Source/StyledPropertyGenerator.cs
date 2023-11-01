@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* DirectPropertyGenerator.cs -- генерирует Direct-поля Авалонии
+/* StyledPropertyGenerator.cs -- генерирует Styled-поля Авалонии
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,15 +22,15 @@ using Microsoft.CodeAnalysis.Text;
 namespace AM.SourceGeneration
 {
     /// <summary>
-    /// Генерирует Direct-поля Авалонии.
+    /// Генерирует Styled-поля Авалонии.
     /// </summary>
     [Generator]
-    public sealed class DirectPropertyGenerator
+    public class StyledPropertyGenerator
         : ISourceGenerator
     {
         #region Constants
 
-        private const string AttributeName = "AM.Avalonia.SourceGeneration.DirectPropertyAttribute";
+        private const string AttributeName = "AM.Avalonia.SourceGeneration.StyledPropertyAttribute";
 
         #endregion
 
@@ -95,18 +95,13 @@ namespace {namespaceName}
                 (
                     $@"
 
-        public static readonly DirectProperty<{className}, {fieldType}> {propertyName}Property =
-            AvaloniaProperty.RegisterDirect<{className}, {fieldType}>
-            (
-                nameof ({propertyName}),
-                o => o.{propertyName},
-                (o, v) => o.{propertyName} = v
-            );
+        public static readonly StyledProperty<{fieldType}> {propertyName}Property =
+            AvaloniaProperty.Register<{className}, {fieldType}> (nameof ({propertyName}));
 
         public {fieldType} {propertyName}
         {{
-            get => this.{fieldName};
-            set => SetAndRaise ({propertyName}Property, ref this.{fieldName}, value);
+            get => GetValue ({propertyName}Property);
+            set => SetValue ({propertyName}Property, value);
         }}
 "
                 );
@@ -147,7 +142,7 @@ namespace {namespaceName}
                 {
                     context.AddSource
                         (
-                            $"{group.Key.Name}_direct_properties.g.cs",
+                            $"{group.Key.Name}_styled_properties.g.cs",
                             SourceText.From (classSource!, Encoding.UTF8)
                         );
                 }

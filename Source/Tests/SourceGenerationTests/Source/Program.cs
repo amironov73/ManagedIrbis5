@@ -7,3 +7,11 @@ var person = new Person
 };
 
 Console.WriteLine (person);
+
+var department = new Department
+{
+    Title = "Cataloguing",
+    Room = 14
+};
+
+Console.WriteLine (department);
