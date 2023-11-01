@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* RegisterDirectPropertyAttribute.cs -- атрибут для регистрации Direct-свойств
+/* DirectPropertyAttribute.cs -- генерирует Direct-поля Авалонии
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -12,18 +12,15 @@
 
 using System;
 
-using JetBrains.Annotations;
-
 #endregion
 
-namespace AM.Avalonia.CodeGenerators.Attributes;
+namespace AM.Avalonia.SourceGeneration;
 
 /// <summary>
-/// Атрибут для регистрации Direct-свойств.
+/// Атрибут, заставляющий генерировать Direct-свойства Avalonia.
 /// </summary>
-[PublicAPI]
-[AttributeUsage (AttributeTargets.Property)]
-public sealed class RegisterDirectPropertyAttribute
+[AttributeUsage (AttributeTargets.Field)]
+public sealed class DirectPropertyAttribute
     : Attribute
 {
     // пустое тело класса
