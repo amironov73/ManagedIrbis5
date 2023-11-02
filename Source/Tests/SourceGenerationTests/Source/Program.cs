@@ -15,3 +15,6 @@ var department = new Department
 };
 
 Console.WriteLine (department);
+
+var calculator = new Calculator();
+calculator.Run();

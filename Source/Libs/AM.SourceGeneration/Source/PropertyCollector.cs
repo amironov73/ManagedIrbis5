@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* FieldCollector.cs -- собирает упоминания поля с указанным атрибутом
+/* PropertyCollector.cs -- собирает упоминания свойств класса, помеченных указанным атрибутом
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,19 +21,18 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace AM.SourceGeneration
 {
-
     /// <summary>
-    /// Собирает упоминания поля класса с указанным атрибутом.
+    /// Собирает упоминания свойств класса, помеченных указанным атрибутом.
     /// </summary>
-    internal sealed class FieldCollector
+    internal sealed class PropertyCollector
         : ISyntaxContextReceiver
     {
         #region Properties
 
         /// <summary>
-        /// Собранные упоминания поля класса.
+        /// Собранные упоминания свойства класса.
         /// </summary>
-        public List<IFieldSymbol> Collected { get; } = new List<IFieldSymbol>();
+        public List<IPropertySymbol> Collected { get; } = new List<IPropertySymbol>();
 
         #endregion
 
@@ -43,7 +42,7 @@ namespace AM.SourceGeneration
         /// Конструктор.
         /// </summary>
         /// <param name="attributeName">Имя искомого атрибута.</param>
-        public FieldCollector (string attributeName)
+        public PropertyCollector (string attributeName)
             => _attributeName = attributeName;
 
         #endregion
@@ -77,16 +76,13 @@ namespace AM.SourceGeneration
                 GeneratorSyntaxContext context
             )
         {
-            if (context.Node is FieldDeclarationSyntax node
+            if (context.Node is PropertyDeclarationSyntax node
                 && node.AttributeLists.Count > 0)
             {
-                foreach (var variable in node.Declaration.Variables)
+                if (context.SemanticModel.GetDeclaredSymbol (node) is IPropertySymbol property
+                    && property.GetAttributes().Any (ContainsAttribute))
                 {
-                    if (context.SemanticModel.GetDeclaredSymbol (variable) is IFieldSymbol field
-                        && field.GetAttributes().Any (ContainsAttribute))
-                    {
-                        Collected.Add (field);
-                    }
+                    Collected.Add (property);
                 }
             }
         }
