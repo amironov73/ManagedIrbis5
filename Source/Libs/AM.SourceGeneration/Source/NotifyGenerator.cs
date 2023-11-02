@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* StyledPropertyGenerator.cs -- генерирует Styled-поля Авалонии
+/* NotifyGenerator.cs -- генерирует свойство с поддержкой INotifyPropertyChanged
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,15 +22,26 @@ using Microsoft.CodeAnalysis.Text;
 namespace AM.SourceGeneration
 {
     /// <summary>
-    /// Генерирует Styled-поля Авалонии.
+    /// Генерирует свойство с поддержкой INotifyPropertyChanged.
     /// </summary>
     [Generator]
-    public class StyledPropertyGenerator
+    public sealed class NotifyGenerator
         : ISourceGenerator
     {
         #region Constants
 
-        private const string AttributeName = "AM.Avalonia.SourceGeneration.StyledPropertyAttribute";
+        private const string AttributeName = "AM.SourceGeneration.NotifyAttribute";
+
+        private const string AttributeText = @"using System;
+
+namespace AM.SourceGeneration
+{
+    [AttributeUsage (AttributeTargets.Field)]
+    internal sealed class NotifyAttribute: Attribute
+    {
+    }
+}
+";
 
         #endregion
 
@@ -39,6 +50,7 @@ namespace AM.SourceGeneration
         private string? ProcessClass
             (
                 INamedTypeSymbol classSymbol,
+                INamedTypeSymbol notifySymbol,
                 IList<IFieldSymbol> fields
             )
         {
@@ -53,19 +65,29 @@ namespace AM.SourceGeneration
             }
 
             var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
+            var needDeclare = !classSymbol.Interfaces.Contains (notifySymbol, SymbolEqualityComparer.Default);
+            var interfaceDeclaration = needDeclare
+                ? $" : {notifySymbol.ToDisplayString()}"
+                : string.Empty;
 
             var source = new StringBuilder (
-$@"using Avalonia;
-
-namespace {namespaceName}
+$@"namespace {namespaceName}
 {{
-    partial class {classSymbol.Name}
+    partial class {classSymbol.Name}{interfaceDeclaration}
     {{
 ");
 
+            if (needDeclare)
+            {
+                source.Append
+                    (
+"        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;"
+                    );
+            }
+
             foreach (var fieldSymbol in fields)
             {
-                ProcessField (classSymbol, source, fieldSymbol);
+                ProcessField (source, fieldSymbol);
             }
 
             source.Append ("} }");
@@ -74,12 +96,10 @@ namespace {namespaceName}
 
         private void ProcessField
             (
-                INamedTypeSymbol classSymbol,
                 StringBuilder source,
                 IFieldSymbol fieldSymbol
             )
         {
-            var className = classSymbol.Name;
             var fieldName = fieldSymbol.Name;
             var fieldType = fieldSymbol.Type;
 
@@ -94,13 +114,18 @@ namespace {namespaceName}
                 (
                     $@"
 
-        public static readonly StyledProperty<{fieldType}> {propertyName}Property =
-            AvaloniaProperty.Register<{className}, {fieldType}> (nameof ({propertyName}));
-
         public {fieldType} {propertyName}
         {{
-            get => GetValue ({propertyName}Property);
-            set => SetValue ({propertyName}Property, value);
+            get
+            {{
+                return this.{fieldName};
+            }}
+
+            set
+            {{
+                this.{fieldName} = value;
+                this.PropertyChanged?.Invoke (this, new System.ComponentModel.PropertyChangedEventArgs (nameof ({propertyName})));
+            }}
         }}
 "
                 );
@@ -116,6 +141,11 @@ namespace {namespaceName}
                 GeneratorInitializationContext context
             )
         {
+            context.RegisterForPostInitialization
+                (
+                    i => i.AddSource ("NotifyAttribute.g.cs", AttributeText)
+                );
+
             context.RegisterForSyntaxNotifications (() => new FieldCollector (AttributeName));
         }
 
@@ -130,18 +160,19 @@ namespace {namespaceName}
                 return;
             }
 
+            var notifySymbol = context.Compilation.GetTypeByMetadataName ("System.ComponentModel.INotifyPropertyChanged")!;
             var types = collector.Collected.GroupBy<IFieldSymbol, INamedTypeSymbol>
                 (
                     it => it.ContainingType, SymbolEqualityComparer.Default
                 );
             foreach (var group in types)
             {
-                var classSource = ProcessClass (group.Key, group.ToList());
+                var classSource = ProcessClass (group.Key, notifySymbol, group.ToList());
                 if (!string.IsNullOrEmpty (classSource))
                 {
                     context.AddSource
                         (
-                            $"{group.Key.Name}_styled_properties.g.cs",
+                            $"{group.Key.Name}_notify.g.cs",
                             SourceText.From (classSource!, Encoding.UTF8)
                         );
                 }

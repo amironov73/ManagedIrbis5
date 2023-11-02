@@ -1,4 +1,5 @@
-﻿using SourceGenerationTests;
+﻿using System.ComponentModel;
+using SourceGenerationTests;
 
 var person = new Person
 {
@@ -18,3 +19,11 @@ Console.WriteLine (department);
 
 var calculator = new Calculator();
 calculator.Run();
+
+
+var notifier = new ObjectWithNotifications();
+notifier.PropertyChanged += (object? sender, PropertyChangedEventArgs e) =>
+    Console.WriteLine ($"Property '{e.PropertyName}' has been changed");
+
+notifier.Name = "Alexey";
+notifier.Age = 50;

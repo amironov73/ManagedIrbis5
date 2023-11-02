@@ -10,8 +10,6 @@
 
 #region Using directives
 
-using Avalonia;
-
 using AM.SourceGeneration;
 
 #endregion

@@ -55,8 +55,7 @@ namespace AM.SourceGeneration
             var namespaceName = classSymbol.ContainingNamespace.ToDisplayString();
 
             var source = new StringBuilder (
-                $@"
-using Avalonia;
+$@"using Avalonia;
 
 namespace {namespaceName}
 {{
