@@ -19,7 +19,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 #endregion
 
-namespace AM.SourceGeneration
+namespace SourceGenerators
 {
     /// <summary>
     /// Полезные методы.

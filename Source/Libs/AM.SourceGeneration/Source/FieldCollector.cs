@@ -10,9 +10,7 @@
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,21 +50,6 @@ namespace AM.SourceGeneration
 
         private readonly string _attributeName;
 
-        private bool ContainsAttribute
-            (
-                AttributeData attributeData
-            )
-        {
-            var attributeClass = attributeData.AttributeClass;
-            if (attributeClass is null)
-            {
-                return false;
-            }
-
-            var attributeName = attributeClass.ToDisplayString();
-            return StringComparer.Ordinal.Equals (attributeName, _attributeName);
-        }
-
         #endregion
 
         #region ISyntaxContextReceiver
@@ -83,7 +66,7 @@ namespace AM.SourceGeneration
                 foreach (var variable in node.Declaration.Variables)
                 {
                     if (context.SemanticModel.GetDeclaredSymbol (variable) is IFieldSymbol field
-                        && field.GetAttributes().Any (ContainsAttribute))
+                        && field.HaveAttribute (_attributeName))
                     {
                         Collected.Add (field);
                     }

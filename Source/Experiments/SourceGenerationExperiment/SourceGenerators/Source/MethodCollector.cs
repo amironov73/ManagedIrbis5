@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* PropertyCollector.cs -- собирает упоминания свойств класса, помеченных указанным атрибутом
+/* MethodCollector.cs -- собирает упоминания методов класса, помеченных указанным атрибутом
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,20 +17,20 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 #endregion
 
-namespace AM.SourceGeneration
+namespace SourceGenerators
 {
     /// <summary>
-    /// Собирает упоминания свойств класса, помеченных указанным атрибутом.
+    /// Собирает упоминания методов класса, помеченных указанным атрибутом.
     /// </summary>
-    internal sealed class PropertyCollector
+    internal sealed class MethodCollector
         : ISyntaxContextReceiver
     {
         #region Properties
 
         /// <summary>
-        /// Собранные упоминания свойства класса.
+        /// Собранные упоминания методов класса.
         /// </summary>
-        public List<IPropertySymbol> Collected { get; } = new List<IPropertySymbol>();
+        public List<IMethodSymbol> Collected { get; } = new List<IMethodSymbol>();
 
         #endregion
 
@@ -40,7 +40,7 @@ namespace AM.SourceGeneration
         /// Конструктор.
         /// </summary>
         /// <param name="attributeName">Имя искомого атрибута.</param>
-        public PropertyCollector (string attributeName)
+        public MethodCollector (string attributeName)
             => _attributeName = attributeName;
 
         #endregion
@@ -59,13 +59,13 @@ namespace AM.SourceGeneration
                 GeneratorSyntaxContext context
             )
         {
-            if (context.Node is PropertyDeclarationSyntax node
+            if (context.Node is MethodDeclarationSyntax node
                 && node.AttributeLists.Count > 0)
             {
-                if (context.SemanticModel.GetDeclaredSymbol (node) is IPropertySymbol property
-                    && property.HaveAttribute (_attributeName))
+                if (context.SemanticModel.GetDeclaredSymbol (node) is IMethodSymbol method
+                    && method.HaveAttribute (_attributeName))
                 {
-                    Collected.Add (property);
+                    Collected.Add (method);
                 }
             }
         }
