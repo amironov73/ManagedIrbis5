@@ -10,19 +10,19 @@ namespace Demo;
 // атрибут CLSCompliant здесь только лишь для создания информационного шума
 // проверить, что генератор не покупается на посторонние атрибуты
 [CLSCompliant (false)]
-internal partial class Canary
+internal partial class Raven
 {
-    [SubField ('a')]
+    [Field (100, 'a')]
     public string? First { get; set; }
 
     // поле с посторонним атрибутом
     [CLSCompliant (false)]
     public string? NotMapped { get; set; }
 
-    [SubField ('b')]
+    [Field (200, 'b')]
     public string? Second { get; set; }
 
-    [SubField ('c')]
+    [Field (300, 'c')]
     public string? Third { get; set; }
 
     // свойство вообще без атрибутов

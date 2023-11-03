@@ -17,14 +17,14 @@ using Microsoft.CodeAnalysis.Text;
 namespace SourceGenerators
 {
     [Generator]
-    public sealed class FieldMapperGenerator
+    public class RecordMapperGenerator
         : ISourceGenerator
     {
         #region Constants
 
-        private const string FieldTypeName = "ManagedIrbis.Field";
-        private const string MapperAttributeName = "ManagedIrbis.Mapping.FieldMapperAttribute";
-        private const string SubFieldAttributeName = "ManagedIrbis.Mapping.SubFieldAttribute";
+        private const string RecordTypeName = "ManagedIrbis.Record";
+        private const string MapperAttributeName = "ManagedIrbis.Mapping.RecordMapperAttribute";
+        private const string FieldAttributeName = "ManagedIrbis.Mapping.FieldAttribute";
 
         #endregion
 
@@ -43,7 +43,7 @@ namespace SourceGenerators
 
             public INamedTypeSymbol Class { get; set; }
 
-            public ITypeSymbol FieldType { get; set; }
+            public ITypeSymbol RecordType { get; set; }
 
             public ITypeSymbol MarkerType { get; set; }
 
@@ -70,7 +70,7 @@ namespace SourceGenerators
             var namespaceName = bunch.Class.ContainingNamespace.ToDisplayString();
             bunch.Source = new StringBuilder
                 (
-$@"namespace {namespaceName}
+                    $@"namespace {namespaceName}
 {{
     partial class {bunch.Class.Name}
     {{"
@@ -84,7 +84,7 @@ $@"namespace {namespaceName}
 
             bunch.Source.Append
                 (
-@"    }
+                    @"    }
 }"
                 );
             return bunch.Source.ToString();
@@ -113,7 +113,7 @@ $@"namespace {namespaceName}
             var indent = NewUtility.MakeIndent (2);
             source.Append
                 (
-$@"
+                    $@"
 {indent}{modifiers} partial {returnType.ToDisplayString()} {methodName} ("
                 );
 
@@ -121,7 +121,7 @@ $@"
 
             source.AppendLine
                 (
-@")
+                    @")
         {"
                 );
             bunch.From = from;
@@ -141,18 +141,18 @@ $@"
                 Bunch bunch
             )
         {
-            if (bunch.From.Type.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
+            if (bunch.From.Type.Equals (bunch.RecordType, SymbolEqualityComparer.Default))
             {
                 GenerateForwardMapping (bunch);
             }
-            else if (bunch.To.Type.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
+            else if (bunch.To.Type.Equals (bunch.RecordType, SymbolEqualityComparer.Default))
             {
                 GenerateBackwardMapping (bunch);
             }
         }
 
         /// <summary>
-        /// Преобразование из поля с подполями в структуру данных -- прямое.
+        /// Преобразование из записи с полями в структуру данных -- прямое.
         /// </summary>
         private void GenerateForwardMapping
             (
@@ -167,26 +167,29 @@ $@"
             foreach (var property in properties)
             {
                 var attribute = property.GetAttribute (bunch.MarkerType);
-                if (attribute is null || attribute.ConstructorArguments.Length != 1)
+                if (attribute is null || attribute.ConstructorArguments.Length != 2)
                 {
                     continue;
                 }
 
-                var argument = attribute.ConstructorArguments[0];
-                if (argument.Type!.ToDisplayString() != "char")
+                var tagArgument = attribute.ConstructorArguments[0];
+                var codeArgument = attribute.ConstructorArguments[1];
+                if (tagArgument.Type!.ToDisplayString() != "int"
+                    || codeArgument.Type!.ToDisplayString() != "char")
                 {
                     continue;
                 }
 
-                var code = (char) argument.Value!;
+                var tag = (int) tagArgument.Value!;
+                var code = (char) codeArgument.Value!;
                 var propertyType = property.Type.ToDisplayString().TrimEnd ('?');
                 var indent = NewUtility.MakeIndent (3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'));");
+                bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.FM ({tag}, '{code}'));");
             }
         }
 
         /// <summary>
-        /// Преобразование из структуры данных в поле с подполями -- обратное.
+        /// Преобразование из структуры данных в запись с полями -- обратное.
         /// </summary>
         private void GenerateBackwardMapping
             (
@@ -201,21 +204,24 @@ $@"
             foreach (var property in properties)
             {
                 var attribute = property.GetAttribute (bunch.MarkerType);
-                if (attribute is null || attribute.ConstructorArguments.Length != 1)
+                if (attribute is null || attribute.ConstructorArguments.Length != 2)
                 {
                     continue;
                 }
 
-                var argument = attribute.ConstructorArguments[0];
-                if (argument.Type!.ToDisplayString() != "char")
+                var tagArgument = attribute.ConstructorArguments[0];
+                var codeArgument = attribute.ConstructorArguments[1];
+                if (tagArgument.Type!.ToDisplayString() != "int"
+                    || codeArgument.Type!.ToDisplayString() != "char")
                 {
                     continue;
                 }
 
-                var code = (char)argument.Value!;
+                var tag = (int) tagArgument.Value!;
+                var code = (char) codeArgument.Value!;
                 var propertyName = property.Name;
                 var indent = NewUtility.MakeIndent(3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ('{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
+                bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ({tag}, '{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
             }
         }
 
@@ -243,8 +249,8 @@ $@"
 
             var bunch = new Bunch
             {
-                FieldType = context.Compilation.GetTypeByMetadataName (FieldTypeName)!,
-                MarkerType = context.Compilation.GetTypeByMetadataName (SubFieldAttributeName)!,
+                RecordType = context.Compilation.GetTypeByMetadataName (RecordTypeName)!,
+                MarkerType = context.Compilation.GetTypeByMetadataName (FieldAttributeName)!,
             };
             var types = collector.Collected.GroupBy<IMethodSymbol, INamedTypeSymbol>
                 (
@@ -259,7 +265,7 @@ $@"
                 {
                     context.AddSource
                         (
-                            $"{group.Key.Name}_map_field.g.cs",
+                            $"{group.Key.Name}_map_record.g.cs",
                             SourceText.From (classSource, Encoding.UTF8)
                         );
                 }

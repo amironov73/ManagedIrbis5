@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 #endregion
 
@@ -90,5 +91,9 @@ namespace SourceGenerators
 
             return result.Trim();
         }
+
+        public static string MakeIndent(int level) => level > 0
+            ? new string(' ', 4 * level)
+            : string.Empty;
     }
 }

@@ -47,6 +47,32 @@ public class Field
         return default;
     }
 
+    public void SetSubFieldValue
+        (
+            char code,
+            string? value
+        )
+    {
+        SubField? target = null;
+
+        foreach (var subField in Subfields)
+        {
+            if (char.ToUpperInvariant (subField.Code) == char.ToUpperInvariant (code))
+            {
+                target = subField;
+                break;
+            }
+        }
+
+        if (target is null)
+        {
+            target = new SubField { Code = code };
+            Subfields.Add (target);
+        }
+
+        target.Value = value;
+    }
+
     public override string ToString()
     {
         var result = new StringBuilder();
