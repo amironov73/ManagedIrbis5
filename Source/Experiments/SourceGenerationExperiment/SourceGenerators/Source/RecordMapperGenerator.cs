@@ -5,6 +5,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -45,7 +46,7 @@ namespace SourceGenerators
 
             public ITypeSymbol RecordType { get; set; }
 
-            public ITypeSymbol MarkerType { get; set; }
+            public ITypeSymbol MarkerAttribute { get; set; }
 
             public IList<IMethodSymbol> Methods { get; set; }
 
@@ -166,7 +167,7 @@ namespace SourceGenerators
 
             foreach (var property in properties)
             {
-                var attribute = property.GetAttribute (bunch.MarkerType);
+                var attribute = property.GetAttribute (bunch.MarkerAttribute);
                 if (attribute is null || attribute.ConstructorArguments.Length != 2)
                 {
                     continue;
@@ -182,9 +183,30 @@ namespace SourceGenerators
 
                 var tag = (int) tagArgument.Value!;
                 var code = (char) codeArgument.Value!;
-                var propertyType = property.Type.ToDisplayString().TrimEnd ('?');
-                var indent = NewUtility.MakeIndent (3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.FM ({tag}, '{code}'));");
+
+                var propertyType = property.Type;
+                var typeName = propertyType.GetTypeName();
+                var indent = NewUtility.MakeIndent(3);
+                if (propertyType.IsUserClass())
+                {
+                    Console.WriteLine ("Это пользовательский класс");
+                }
+                else if (propertyType.IsArray())
+                {
+                    Console.WriteLine ("Это массив");
+                }
+                else if (propertyType.IsList())
+                {
+                    Console.WriteLine ("Это список");
+                }
+                else if (propertyType.IsCollection())
+                {
+                    Console.WriteLine ("Это коллекция");
+                }
+                else
+                {
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{typeName}> ({sourceName}.FM ({tag}, '{code}'));");
+                }
             }
         }
 
@@ -203,7 +225,7 @@ namespace SourceGenerators
 
             foreach (var property in properties)
             {
-                var attribute = property.GetAttribute (bunch.MarkerType);
+                var attribute = property.GetAttribute (bunch.MarkerAttribute);
                 if (attribute is null || attribute.ConstructorArguments.Length != 2)
                 {
                     continue;
@@ -250,7 +272,7 @@ namespace SourceGenerators
             var bunch = new Bunch
             {
                 RecordType = context.Compilation.GetTypeByMetadataName (RecordTypeName)!,
-                MarkerType = context.Compilation.GetTypeByMetadataName (FieldAttributeName)!,
+                MarkerAttribute = context.Compilation.GetTypeByMetadataName (FieldAttributeName)!,
             };
             var types = collector.Collected.GroupBy<IMethodSymbol, INamedTypeSymbol>
                 (

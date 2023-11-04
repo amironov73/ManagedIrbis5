@@ -36,6 +36,24 @@ public class Record
         return null;
     }
 
+    public string[] FMA (int tag, char code)
+    {
+        var result = new List<string>();
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                var value = field.GetFirstSubFieldValue (code);
+                if (!string.IsNullOrEmpty (value))
+                {
+                    result.Add (value);
+                }
+            }
+        }
+
+        return result.ToArray();
+    }
+
     public Record SetSubFieldValue (int tag, char code, string? value)
     {
         Field? target = null;

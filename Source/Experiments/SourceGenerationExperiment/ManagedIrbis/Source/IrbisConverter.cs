@@ -5,6 +5,7 @@
 
 #region Using directives
 
+using System.Collections;
 using System.Globalization;
 
 #endregion
@@ -30,6 +31,21 @@ public static class IrbisConverter
         };
     }
 
+    public static IList<TTarget> FromStrings<TTarget>
+        (
+            IList<string> values
+        )
+    {
+        var result = new List<TTarget>();
+        foreach (var value in values)
+        {
+            var item = FromString<TTarget> (value);
+            result.Add (item);
+        }
+
+        return result;
+    }
+
     public static string? ToString
         (
             object? value
@@ -42,6 +58,24 @@ public static class IrbisConverter
             IConvertible convertible => convertible.ToString (CultureInfo.InvariantCulture),
             _ => value.ToString()
         };
+    }
+
+    public static IList<string> ToStrings
+        (
+            IList values
+        )
+    {
+        var result = new List<string>();
+        foreach (var value in values)
+        {
+            var line = ToString (value);
+            if (!string.IsNullOrEmpty (line))
+            {
+                result.Add (line);
+            }
+        }
+
+        return result;
     }
 
     #endregion

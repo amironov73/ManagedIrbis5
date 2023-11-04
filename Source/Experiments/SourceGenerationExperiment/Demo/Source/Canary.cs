@@ -20,10 +20,10 @@ internal partial class Canary
     public string? NotMapped { get; set; }
 
     [SubField ('b')]
-    public string? Second { get; set; }
+    public int Second { get; set; }
 
     [SubField ('c')]
-    public string? Third { get; set; }
+    public bool Third { get; set; }
 
     // свойство вообще без атрибутов
     public string? Fourth { get; set; }

@@ -12,6 +12,19 @@ namespace Demo;
 [CLSCompliant (false)]
 internal partial class Raven
 {
+    // пользовательский класс
+    [Field (97, '7')]
+    public Canary? MinusTwo { get; set; }
+
+    // массив
+    [Field (98, '8')]
+    public string[]? MinusOne { get; set; }
+
+    // список
+    [Field (99, '9')]
+    public IList<string>? Zero { get; set; }
+
+    // встроенный класс - строка
     [Field (100, 'a')]
     public string? First { get; set; }
 

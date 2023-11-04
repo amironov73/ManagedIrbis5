@@ -26,8 +26,8 @@ internal partial class Work
             Subfields =
             {
                 new SubField { Code = 'a', Value = "SubA" },
-                new SubField { Code = 'b', Value = "SubB" },
-                new SubField { Code = 'c', Value = "SubC" },
+                new SubField { Code = 'b', Value = "321" },
+                new SubField { Code = 'c', Value = "True" },
                 new SubField { Code = 'd', Value = "SubD" },
                 new SubField { Code = 'z', Value = "SubZ" },
             }
@@ -39,9 +39,9 @@ internal partial class Work
         var result1 = ConvertForward (field, canary);
         Console.WriteLine (result1);
 
-        canary.First = "ASub";
-        canary.Second = null;
-        canary.Third = "CSub";
+        canary.First = null!;
+        canary.Second = 123;
+        canary.Third = false;
         canary.Fourth = "DSub";
         var result2 = ConvertBackward (canary,
             new Field { Tag = 100, Subfields =

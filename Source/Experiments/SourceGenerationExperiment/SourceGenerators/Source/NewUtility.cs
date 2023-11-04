@@ -10,6 +10,7 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,6 +27,73 @@ namespace SourceGenerators
     /// </summary>
     internal static class NewUtility
     {
+        /// <summary>
+        /// Получение имени типа.
+        /// Удаляет признак nullable.
+        /// </summary>
+        public static string GetTypeName (this ITypeSymbol symbol)
+            => symbol.ToDisplayString().TrimEnd ('?');
+
+        /// <summary>
+        /// Проверка, не массив ли это.
+        /// </summary>
+        public static bool IsArray (this ITypeSymbol symbol)
+            => symbol.TypeKind == TypeKind.Array;
+            // => symbol.BaseType?.GetTypeName() == "System.Array";
+
+        /// <summary>
+        /// Проверка, не коллекция ли это?
+        /// </summary>
+        public static bool IsCollection (this ITypeSymbol symbol)
+            => symbol.ImplementsInterface ("System.Collections.Generic.ICollection");
+
+        /// <summary>
+        /// Проверка, не список ли это?
+        /// </summary>
+        public static bool IsList (this ITypeSymbol symbol)
+            => symbol.ImplementsInterface ("System.Collections.Generic.IList");
+
+        public static bool IsUserClass (this ITypeSymbol symbol)
+            => symbol.TypeKind == TypeKind.Class && symbol.SpecialType == SpecialType.None;
+
+        /// <summary>
+        /// Проверка, не реализует ли тип указанный интерфейс.
+        /// </summary>
+        /// <param name="symbol"></param>
+        /// <param name="interfaceName"></param>
+        /// <returns></returns>
+        public static bool ImplementsInterface
+            (
+                this ITypeSymbol symbol,
+                string interfaceName
+            )
+        {
+            var invariantCulture = StringComparison.InvariantCulture;
+
+            if (symbol.TypeKind == TypeKind.Interface
+                && symbol.GetTypeName().StartsWith (interfaceName, invariantCulture))
+            {
+                return true;
+            }
+
+            foreach (var item in symbol.Interfaces)
+            {
+                var name = item.ToDisplayString();
+                if (item.IsGenericType
+                    && name.StartsWith (interfaceName, invariantCulture))
+                {
+                    return true;
+                }
+
+                if (name.Equals (interfaceName, invariantCulture))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void EnumerateParameters
             (
                 this StringBuilder source,
