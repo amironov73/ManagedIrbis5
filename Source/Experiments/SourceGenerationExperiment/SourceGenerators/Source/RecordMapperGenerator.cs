@@ -11,6 +11,8 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 #endregion
@@ -24,6 +26,7 @@ namespace SourceGenerators
         #region Constants
 
         private const string RecordTypeName = "ManagedIrbis.Record";
+        private const string FieldTypeName = "ManagedIrbis.Field";
         private const string MapperAttributeName = "ManagedIrbis.Mapping.RecordMapperAttribute";
         private const string FieldAttributeName = "ManagedIrbis.Mapping.FieldAttribute";
 
@@ -31,12 +34,25 @@ namespace SourceGenerators
 
         #region Nested classes
 
+        sealed class PostponedItem
+        {
+#nullable disable
+
+            public bool IsForward { get; set; }
+
+            public ITypeSymbol Property { get; set; }
+
+            public string MethodName { get; set; }
+
+#nullable restore
+        }
+
         /// <summary>
         /// Параметры, протаскиваемые через иерархию вызовов.
         /// </summary>
         sealed class Bunch
         {
-            #nullable disable
+#nullable disable
 
             public GeneratorExecutionContext Context { get; set; }
 
@@ -45,6 +61,8 @@ namespace SourceGenerators
             public INamedTypeSymbol Class { get; set; }
 
             public ITypeSymbol RecordType { get; set; }
+
+            public ITypeSymbol FieldType { get; set; }
 
             public ITypeSymbol MarkerAttribute { get; set; }
 
@@ -56,7 +74,9 @@ namespace SourceGenerators
 
             public IParameterSymbol To { get; set; }
 
-            #nullable restore
+            public IList<PostponedItem> Postponed { get; set; }
+
+#nullable restore
         }
 
         #endregion
@@ -82,6 +102,8 @@ namespace SourceGenerators
                 bunch.Method = method;
                 ProcessMethod (bunch);
             }
+
+            HandlePostponed (bunch);
 
             bunch.Source.Append
                 (
@@ -137,6 +159,63 @@ namespace SourceGenerators
                 );
         }
 
+        private void HandlePostponed
+            (
+                Bunch bunch
+            )
+        {
+            var postponed = bunch.Postponed;
+            if (postponed is null)
+            {
+                return;
+            }
+
+            foreach (var item in postponed)
+            {
+                var typeName = item.Property.GetTypeName();
+                bunch.Source.AppendLine ($@"
+        private static {typeName} {item.MethodName} ({bunch.FieldType} from, {typeName} to)
+        {{
+            if  (object.ReferenceEquals (from, null))
+            {{
+                 return null;
+            }}
+");
+
+                var marker = FieldMapperGenerator.SubFieldAttributeName;
+                var sourceName = "from";
+                var targetName = "to";
+                var targetType = item.Property;
+                var properties = targetType.GetProperties();
+
+                foreach (var property in properties)
+                {
+                    var attribute = property.GetAttribute (marker);
+                    if (attribute is null || attribute.ConstructorArguments.Length != 1)
+                    {
+                        continue;
+                    }
+
+                    var argument = attribute.ConstructorArguments[0];
+                    if (argument.Type!.ToDisplayString() != "char")
+                    {
+                        continue;
+                    }
+
+                    var code = (char)argument.Value!;
+                    var propertyType = property.Type.GetTypeName();
+                    var indent = NewUtility.MakeIndent (3);
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'));");
+                }
+
+                bunch.Source.AppendLine
+                    (
+                        @"
+            return to;
+        }");
+            }
+        }
+
         private void GenerateMapping
             (
                 Bunch bunch
@@ -165,6 +244,7 @@ namespace SourceGenerators
             var targetType = bunch.To.Type;
             var properties = targetType.GetProperties();
 
+            bunch.Postponed = new List<PostponedItem>();
             foreach (var property in properties)
             {
                 var attribute = property.GetAttribute (bunch.MarkerAttribute);
@@ -181,27 +261,44 @@ namespace SourceGenerators
                     continue;
                 }
 
-                var tag = (int) tagArgument.Value!;
-                var code = (char) codeArgument.Value!;
+                var tag = (int)tagArgument.Value!;
+                var code = (char)codeArgument.Value!;
 
                 var propertyType = property.Type;
                 var typeName = propertyType.GetTypeName();
-                var indent = NewUtility.MakeIndent(3);
+                var indent = NewUtility.MakeIndent (3);
                 if (propertyType.IsUserClass())
                 {
-                    Console.WriteLine ("Это пользовательский класс");
+                    var postpone = new PostponedItem
+                    {
+                        IsForward = true,
+                        Property = propertyType,
+                        MethodName = $"_Convert_{bunch.Postponed.Count}"
+                    };
+                    bunch.Postponed.Add (postpone);
+
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = {postpone.MethodName} ({sourceName}.GetField ({tag}), new {typeName}());");
                 }
                 else if (propertyType.IsArray())
                 {
-                    Console.WriteLine ("Это массив");
+                    var array = (IArrayTypeSymbol)propertyType;
+                    var elementType = array.ElementType!;
+                    var elementName = elementType.GetTypeName();
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ArrayFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
                 }
                 else if (propertyType.IsList())
                 {
-                    Console.WriteLine ("Это список");
+                    var named = (INamedTypeSymbol) propertyType;
+                    var elementType = named.TypeArguments[0];
+                    var elementName = elementType.GetTypeName();
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ListFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
                 }
                 else if (propertyType.IsCollection())
                 {
-                    Console.WriteLine ("Это коллекция");
+                    var named = (INamedTypeSymbol) propertyType;
+                    var elementType = named.TypeArguments[0];
+                    var elementName = elementType.GetTypeName();
+                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.CollectionFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
                 }
                 else
                 {
@@ -239,10 +336,10 @@ namespace SourceGenerators
                     continue;
                 }
 
-                var tag = (int) tagArgument.Value!;
-                var code = (char) codeArgument.Value!;
+                var tag = (int)tagArgument.Value!;
+                var code = (char)codeArgument.Value!;
                 var propertyName = property.Name;
-                var indent = NewUtility.MakeIndent(3);
+                var indent = NewUtility.MakeIndent (3);
                 bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ({tag}, '{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
             }
         }
@@ -272,6 +369,7 @@ namespace SourceGenerators
             var bunch = new Bunch
             {
                 RecordType = context.Compilation.GetTypeByMetadataName (RecordTypeName)!,
+                FieldType = context.Compilation.GetTypeByMetadataName (FieldTypeName)!,
                 MarkerAttribute = context.Compilation.GetTypeByMetadataName (FieldAttributeName)!,
             };
             var types = collector.Collected.GroupBy<IMethodSymbol, INamedTypeSymbol>

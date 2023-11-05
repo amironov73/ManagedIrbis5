@@ -22,9 +22,9 @@ namespace SourceGenerators
     {
         #region Constants
 
-        private const string FieldTypeName = "ManagedIrbis.Field";
-        private const string MapperAttributeName = "ManagedIrbis.Mapping.FieldMapperAttribute";
-        private const string SubFieldAttributeName = "ManagedIrbis.Mapping.SubFieldAttribute";
+        internal const string FieldTypeName = "ManagedIrbis.Field";
+        internal const string MapperAttributeName = "ManagedIrbis.Mapping.FieldMapperAttribute";
+        internal const string SubFieldAttributeName = "ManagedIrbis.Mapping.SubFieldAttribute";
 
         #endregion
 
@@ -33,7 +33,7 @@ namespace SourceGenerators
         /// <summary>
         /// Параметры, протаскиваемые через иерархию вызовов.
         /// </summary>
-        sealed class Bunch
+        internal sealed class Bunch
         {
             #nullable disable
 
@@ -179,7 +179,7 @@ $@"
                 }
 
                 var code = (char) argument.Value!;
-                var propertyType = property.Type.ToDisplayString().TrimEnd ('?');
+                var propertyType = property.Type.GetTypeName();
                 var indent = NewUtility.MakeIndent (3);
                 bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'));");
             }

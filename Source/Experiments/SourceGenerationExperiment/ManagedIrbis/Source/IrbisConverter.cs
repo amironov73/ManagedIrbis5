@@ -6,6 +6,7 @@
 #region Using directives
 
 using System.Collections;
+using System.Collections.ObjectModel;
 using System.Globalization;
 
 #endregion
@@ -31,7 +32,16 @@ public static class IrbisConverter
         };
     }
 
-    public static IList<TTarget> FromStrings<TTarget>
+    /// <summary>
+    /// Формирование массива.
+    /// </summary>
+    public static TTarget[] ArrayFromStrings<TTarget>
+        (
+            IList<string> values
+        )
+        => ListFromStrings<TTarget> (values).ToArray();
+
+    public static IList<TTarget> ListFromStrings<TTarget>
         (
             IList<string> values
         )
@@ -39,8 +49,29 @@ public static class IrbisConverter
         var result = new List<TTarget>();
         foreach (var value in values)
         {
-            var item = FromString<TTarget> (value);
-            result.Add (item);
+            if (!string.IsNullOrEmpty (value))
+            {
+                var item = FromString<TTarget> (value);
+                result.Add (item);
+            }
+        }
+
+        return result;
+    }
+
+    public static ICollection<TTarget> CollectionFromStrings<TTarget>
+        (
+            IList<string> values
+        )
+    {
+        var result = new Collection<TTarget>();
+        foreach (var value in values)
+        {
+            if (!string.IsNullOrEmpty (value))
+            {
+                var item = FromString<TTarget> (value);
+                result.Add (item);
+            }
         }
 
         return result;
@@ -60,7 +91,7 @@ public static class IrbisConverter
         };
     }
 
-    public static IList<string> ToStrings
+    public static IList<string> StringsToList
         (
             IList values
         )

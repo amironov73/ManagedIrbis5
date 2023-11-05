@@ -77,6 +77,31 @@ public class Record
         return this;
     }
 
+    /// <summary>
+    /// Получение заданного повторения поля с указанной меткой.
+    /// </summary>
+    public Field? GetField
+        (
+            int tag,
+            int occurrence = 0
+        )
+    {
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                if (occurrence == 0)
+                {
+                    return field;
+                }
+
+                --occurrence;
+            }
+        }
+
+        return null;
+    }
+
     public override string ToString()
     {
         var result = new StringBuilder();

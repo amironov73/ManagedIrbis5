@@ -122,8 +122,11 @@ namespace SourceGenerators
                 .Cast<IPropertySymbol>()
                 .ToList();
 
+        public static AttributeData? GetAttribute(this ISymbol symbol, string attributeType)
+            => symbol.GetAttributes().FirstOrDefault (it => it.AttributeClass!.GetTypeName() == attributeType);
+
         public static AttributeData? GetAttribute (this ISymbol symbol, ITypeSymbol marker)
-            => symbol.GetAttributes().FirstOrDefault(it => it.AttributeClass!.Equals(marker, SymbolEqualityComparer.Default));
+            => symbol.GetAttributes().FirstOrDefault (it => it.AttributeClass!.Equals (marker, SymbolEqualityComparer.Default));
 
         public static string GetModifiers
             (
