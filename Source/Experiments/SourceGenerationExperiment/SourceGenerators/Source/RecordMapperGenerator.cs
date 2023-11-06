@@ -1,18 +1,16 @@
 ﻿// ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable StringLiteralTypo
+// ReSharper disable UnusedAutoPropertyAccessor.Local
 // ReSharper disable UnusedMember.Local
 
 #region Using directives
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
 #endregion
@@ -34,17 +32,15 @@ namespace SourceGenerators
 
         #region Nested classes
 
+        #nullable disable
+
         sealed class PostponedItem
         {
-#nullable disable
-
             public bool IsForward { get; set; }
 
             public ITypeSymbol Property { get; set; }
 
             public string MethodName { get; set; }
-
-#nullable restore
         }
 
         /// <summary>
@@ -52,8 +48,6 @@ namespace SourceGenerators
         /// </summary>
         sealed class Bunch
         {
-#nullable disable
-
             public GeneratorExecutionContext Context { get; set; }
 
             public StringBuilder Source { get; set; }
@@ -75,9 +69,9 @@ namespace SourceGenerators
             public IParameterSymbol To { get; set; }
 
             public IList<PostponedItem> Postponed { get; set; }
-
-#nullable restore
         }
+
+        #nullable restore
 
         #endregion
 
@@ -173,41 +167,57 @@ namespace SourceGenerators
             foreach (var item in postponed)
             {
                 var typeName = item.Property.GetTypeName();
-                bunch.Source.AppendLine ($@"
+                if (item.IsForward)
+                {
+                    bunch.Source.AppendLine ($@"
         private static {typeName} {item.MethodName} ({bunch.FieldType} from, {typeName} to)
-        {{
-            if  (object.ReferenceEquals (from, null))
+        {{");
+                }
+                else
+                {
+                    bunch.Source.AppendLine ($@"
+        private static {bunch.FieldType} {item.MethodName} ({typeName} from, {bunch.FieldType} to)
+        {{");
+                }
+
+                bunch.Source.AppendLine (
+$@"           if  (object.ReferenceEquals (from, null))
             {{
                  return null;
             }}
 ");
 
-                var marker = FieldMapperGenerator.SubFieldAttributeName;
-                var sourceName = "from";
-                var targetName = "to";
-                var targetType = item.Property;
-                var properties = targetType.GetProperties();
-
-                foreach (var property in properties)
+                var subBunch = new FieldMapperGenerator.Bunch
                 {
-                    var attribute = property.GetAttribute (marker);
-                    if (attribute is null || attribute.ConstructorArguments.Length != 1)
-                    {
-                        continue;
-                    }
+                    Context = bunch.Context,
+                    Source = bunch.Source,
+                    Class = bunch.Class,
+                    FieldType = bunch.FieldType,
+                    MarkerAttributeType = FieldMapperGenerator.SubFieldAttributeName,
+                    FromName = "from",
+                    FromType = bunch.FieldType,
+                    ToName = "to",
+                    ToType = item.Property,
 
-                    var argument = attribute.ConstructorArguments[0];
-                    if (argument.Type!.ToDisplayString() != "char")
-                    {
-                        continue;
-                    }
-
-                    var code = (char)argument.Value!;
-                    var propertyType = property.Type.GetTypeName();
-                    var indent = NewUtility.MakeIndent (3);
-                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'));");
+                };
+                if (!item.IsForward)
+                {
+                    subBunch.FromType = item.Property;
+                    subBunch.ToType = bunch.FieldType;
                 }
 
+                var subMapper = new FieldMapperGenerator();
+                var indent = NewUtility.MakeIndent (3);
+                bunch.Source.AppendLine ($"{indent}// code from FieldMapperGenerator");
+                if (item.IsForward)
+                {
+                    subMapper.GenerateForwardMapping (subBunch);
+
+                }
+                else
+                {
+                    subMapper.GenerateBackwardMapping (subBunch);
+                }
                 bunch.Source.AppendLine
                     (
                         @"
@@ -282,7 +292,7 @@ namespace SourceGenerators
                 else if (propertyType.IsArray())
                 {
                     var array = (IArrayTypeSymbol)propertyType;
-                    var elementType = array.ElementType!;
+                    var elementType = array.ElementType;
                     var elementName = elementType.GetTypeName();
                     bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ArrayFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
                 }
@@ -292,13 +302,6 @@ namespace SourceGenerators
                     var elementType = named.TypeArguments[0];
                     var elementName = elementType.GetTypeName();
                     bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ListFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
-                }
-                else if (propertyType.IsCollection())
-                {
-                    var named = (INamedTypeSymbol) propertyType;
-                    var elementType = named.TypeArguments[0];
-                    var elementName = elementType.GetTypeName();
-                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.CollectionFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
                 }
                 else
                 {
@@ -338,9 +341,25 @@ namespace SourceGenerators
 
                 var tag = (int)tagArgument.Value!;
                 var code = (char)codeArgument.Value!;
+                var propertyType = property.Type;
                 var propertyName = property.Name;
                 var indent = NewUtility.MakeIndent (3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ({tag}, '{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
+                if (propertyType.IsUserClass())
+                {
+                    var postpone = new PostponedItem
+                    {
+                        IsForward = false,
+                        Property = propertyType,
+                        MethodName = $"_Convert_{bunch.Postponed.Count}"
+                    };
+                    bunch.Postponed.Add (postpone);
+
+                    bunch.Source.AppendLine ($"{indent}{targetName}.SetField ({tag}, {postpone.MethodName} ({sourceName}.{propertyName}, new {bunch.FieldType}() {{ Tag = {tag} }}));");
+                }
+                else
+                {
+                    bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ({tag}, '{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
+                }
             }
         }
 

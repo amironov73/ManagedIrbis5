@@ -102,6 +102,28 @@ public class Record
         return null;
     }
 
+    public Record SetField
+        (
+            int tag,
+            string? newValue
+        )
+    {
+        // TODO implement
+
+        return this;
+    }
+
+    public Record SetField
+        (
+            int tag,
+            Field? newValue
+        )
+    {
+        // TODO implement
+
+        return this;
+    }
+
     public override string ToString()
     {
         var result = new StringBuilder();

@@ -45,15 +45,19 @@ namespace SourceGenerators
 
             public ITypeSymbol FieldType { get; set; }
 
-            public ITypeSymbol MarkerType { get; set; }
+            public string MarkerAttributeType { get; set; }
 
             public IList<IMethodSymbol> Methods { get; set; }
 
             public IMethodSymbol Method { get; set; }
 
-            public IParameterSymbol From { get; set; }
+            public ITypeSymbol FromType { get; set; }
 
-            public IParameterSymbol To { get; set; }
+            public string FromName { get; set; }
+
+            public ITypeSymbol ToType { get; set; }
+
+            public string ToName { get; set; }
 
             #nullable restore
         }
@@ -124,8 +128,10 @@ $@"
 @")
         {"
                 );
-            bunch.From = from;
-            bunch.To = to;
+            bunch.FromType = from.Type;
+            bunch.FromName = from.Name;
+            bunch.ToType = to.Type;
+            bunch.ToName = to.Name;
             GenerateMapping (bunch);
 
             source.AppendLine
@@ -141,11 +147,11 @@ $@"
                 Bunch bunch
             )
         {
-            if (bunch.From.Type.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
+            if (bunch.FromType.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
             {
                 GenerateForwardMapping (bunch);
             }
-            else if (bunch.To.Type.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
+            else if (bunch.ToType.Equals (bunch.FieldType, SymbolEqualityComparer.Default))
             {
                 GenerateBackwardMapping (bunch);
             }
@@ -154,19 +160,19 @@ $@"
         /// <summary>
         /// Преобразование из поля с подполями в структуру данных -- прямое.
         /// </summary>
-        private void GenerateForwardMapping
+        internal void GenerateForwardMapping
             (
                 Bunch bunch
             )
         {
-            var sourceName = bunch.From.Name;
-            var targetName = bunch.To.Name;
-            var targetType = bunch.To.Type;
+            var sourceName = bunch.FromName;
+            var targetName = bunch.ToName;
+            var targetType = bunch.ToType;
             var properties = targetType.GetProperties();
 
             foreach (var property in properties)
             {
-                var attribute = property.GetAttribute (bunch.MarkerType);
+                var attribute = property.GetAttribute (bunch.MarkerAttributeType);
                 if (attribute is null || attribute.ConstructorArguments.Length != 1)
                 {
                     continue;
@@ -188,19 +194,19 @@ $@"
         /// <summary>
         /// Преобразование из структуры данных в поле с подполями -- обратное.
         /// </summary>
-        private void GenerateBackwardMapping
+        internal void GenerateBackwardMapping
             (
                 Bunch bunch
             )
         {
-            var sourceName = bunch.From.Name;
-            var sourceType = bunch.From.Type;
-            var targetName = bunch.To.Name;
+            var sourceName = bunch.FromName;
+            var sourceType = bunch.FromType;
+            var targetName = bunch.ToName;
             var properties = sourceType.GetProperties();
 
             foreach (var property in properties)
             {
-                var attribute = property.GetAttribute (bunch.MarkerType);
+                var attribute = property.GetAttribute (bunch.MarkerAttributeType);
                 if (attribute is null || attribute.ConstructorArguments.Length != 1)
                 {
                     continue;
@@ -244,7 +250,7 @@ $@"
             var bunch = new Bunch
             {
                 FieldType = context.Compilation.GetTypeByMetadataName (FieldTypeName)!,
-                MarkerType = context.Compilation.GetTypeByMetadataName (SubFieldAttributeName)!,
+                MarkerAttributeType = SubFieldAttributeName,
             };
             var types = collector.Collected.GroupBy<IMethodSymbol, INamedTypeSymbol>
                 (
