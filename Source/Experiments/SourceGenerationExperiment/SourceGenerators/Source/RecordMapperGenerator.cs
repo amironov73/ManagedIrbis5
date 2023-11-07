@@ -291,7 +291,7 @@ $@"           if  (object.ReferenceEquals (from, null))
                 }
                 else if (propertyType.IsArray())
                 {
-                    var array = (IArrayTypeSymbol)propertyType;
+                    var array = (IArrayTypeSymbol) propertyType;
                     var elementType = array.ElementType;
                     var elementName = elementType.GetTypeName();
                     bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ArrayFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
@@ -301,7 +301,22 @@ $@"           if  (object.ReferenceEquals (from, null))
                     var named = (INamedTypeSymbol) propertyType;
                     var elementType = named.TypeArguments[0];
                     var elementName = elementType.GetTypeName();
-                    bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ListFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
+                    if (elementType.IsUserClass())
+                    {
+                        var postpone = new PostponedItem
+                        {
+                            IsForward = true,
+                            Property = elementType,
+                            MethodName = $"_Convert_{bunch.Postponed.Count}"
+                        };
+                        bunch.Postponed.Add (postpone);
+
+                        bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ListFromFields<{elementName}> ({sourceName}.GetFields ({tag}), {postpone.MethodName});");
+                    }
+                    else
+                    {
+                        bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.ListFromStrings<{elementName}> ({sourceName}.FMA ({tag}, '{code}'));");
+                    }
                 }
                 else
                 {
@@ -355,6 +370,35 @@ $@"           if  (object.ReferenceEquals (from, null))
                     bunch.Postponed.Add (postpone);
 
                     bunch.Source.AppendLine ($"{indent}{targetName}.SetField ({tag}, {postpone.MethodName} ({sourceName}.{propertyName}, new {bunch.FieldType}() {{ Tag = {tag} }}));");
+                }
+                else if (propertyType.IsArray())
+                {
+                    var array = (IArrayTypeSymbol) propertyType;
+                    var elementType = array.ElementType;
+                    var elementName = elementType.GetTypeName();
+                    bunch.Source.AppendLine ($"{indent}{targetName}.SetField ({tag}, ManagedIrbis.IrbisConverter.ToStrings<{elementName}> ({sourceName}.{propertyName}));");
+                }
+                else if (propertyType.IsList())
+                {
+                    var named = (INamedTypeSymbol) propertyType;
+                    var elementType = named.TypeArguments[0];
+                    var elementName = elementType.GetTypeName();
+                    if (elementType.IsUserClass())
+                    {
+                        var postpone = new PostponedItem
+                        {
+                            IsForward = false,
+                            Property = elementType,
+                            MethodName = $"_Convert_{bunch.Postponed.Count}"
+                        };
+                        bunch.Postponed.Add (postpone);
+
+                        bunch.Source.AppendLine ($"{indent}{targetName}.SetField ({tag}, ManagedIrbis.IrbisConverter.FieldsFromList<{elementName}> ({sourceName}.{propertyName}, {postpone.MethodName}));");
+                    }
+                    else
+                    {
+                        bunch.Source.AppendLine ($"{indent}{targetName}.SetField ({tag}, ManagedIrbis.IrbisConverter.ToStrings<{elementName}> ({sourceName}.{propertyName}));");
+                    }
                 }
                 else
                 {

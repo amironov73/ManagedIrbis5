@@ -102,6 +102,26 @@ public class Record
         return null;
     }
 
+    /// <summary>
+    /// Получение заданного повторения поля с указанной меткой.
+    /// </summary>
+    public List<Field> GetFields
+        (
+            int tag
+        )
+    {
+        var result = new List<Field>();
+        foreach (var field in Fields)
+        {
+            if (field.Tag == tag)
+            {
+                result.Add (field);
+            }
+        }
+
+        return result;
+    }
+
     public Record SetField
         (
             int tag,
@@ -117,6 +137,28 @@ public class Record
         (
             int tag,
             Field? newValue
+        )
+    {
+        // TODO implement
+
+        return this;
+    }
+
+    public Record SetField
+        (
+            int tag,
+            IList<Field> newValues
+        )
+    {
+        // TODO implement
+
+        return this;
+    }
+
+    public Record SetField
+        (
+            int tag,
+            IList<string> newValues
         )
     {
         // TODO implement
