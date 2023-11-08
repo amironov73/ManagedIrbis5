@@ -2994,6 +2994,48 @@ public static class Utility
     }
 
     /// <summary>
+    /// Безопасное преобразование строки в целое без знака.
+    /// </summary>
+    public static uint SafeToUInt32
+        (
+            this string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return 0;
+        }
+
+        if (!uint.TryParse (text, out var result))
+        {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Безопасное преобразование строки в длинное целое без знака.
+    /// </summary>
+    public static ulong SafeToUInt64
+        (
+            this string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return 0;
+        }
+
+        if (!ulong.TryParse (text, out var result))
+        {
+            result = 0;
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Безопасное преобразование строки в целое.
     /// </summary>
     public static int SafeToInt32

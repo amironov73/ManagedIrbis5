@@ -25,20 +25,19 @@ namespace ManagedIrbis.Mapping;
 /// Задаёт отображение поля записи на свойство класса.
 /// </summary>
 [DebuggerDisplay ("{" + nameof (Tag) + "}, " + nameof (Code) + "}")]
-[AttributeUsage (AttributeTargets.Field
-                 | AttributeTargets.Property | AttributeTargets.Class)]
+[AttributeUsage (AttributeTargets.Property)]
 public sealed class FieldAttribute
     : Attribute
 {
     #region Properties
 
     /// <summary>
-    /// Тег.
+    /// Метка поля.
     /// </summary>
     public int Tag { get; }
 
     /// <summary>
-    /// Код подполя (опциональный).
+    /// Код подполя (опционально).
     /// </summary>
     public char Code { get; }
 
