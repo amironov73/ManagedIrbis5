@@ -43,10 +43,16 @@ public static class IrbisConverter
     {
         return Type.GetTypeCode (typeof (TTarget)) switch
         {
+            TypeCode.Boolean => (TTarget)(object) Utility.ToBoolean (value!),
+            TypeCode.Int16 => (TTarget)(object) value!.ParseInt16(),
+            TypeCode.UInt16 => (TTarget)(object) value!.ParseUInt16(),
             TypeCode.Int32 => (TTarget)(object) value.SafeToInt32(),
             TypeCode.UInt32 => (TTarget)(object) value.SafeToUInt32(),
             TypeCode.Int64 => (TTarget)(object) value.SafeToInt64(),
             TypeCode.UInt64 => (TTarget)(object) value.SafeToUInt64(),
+            TypeCode.Decimal => (TTarget)(object) value!.ParseDecimal(),
+            TypeCode.Double => (TTarget)(object) value!.ParseDouble(),
+            TypeCode.Single => (TTarget)(object) value!.ParseSingle(),
             TypeCode.DateTime =>
                 (TTarget)(object) DateTime.ParseExact (value!, "YYYYMMDd", CultureInfo.InvariantCulture),
             _ => (TTarget) Convert.ChangeType (value, typeof (TTarget))!
@@ -133,10 +139,15 @@ public static class IrbisConverter
         return value switch
         {
             null => null,
+            short shortValue => shortValue.ToInvariantString(),
+            ushort ushortValue => ushortValue.ToInvariantString(),
             int intValue => intValue.ToInvariantString(),
             uint uintValue => uintValue.ToInvariantString(),
             long longValue => longValue.ToInvariantString(),
             ulong ulongValue => ulongValue.ToInvariantString(),
+            decimal decimalValue => decimalValue.ToInvariantString(),
+            double doubleValue => doubleValue.ToInvariantString(),
+            float floatValue => floatValue.ToInvariantString(),
             DateTime date => date.ToString ("YYYYMMdd", CultureInfo.InvariantCulture),
             IConvertible convertible => convertible.ToString (CultureInfo.InvariantCulture),
             _ => value.ToString()

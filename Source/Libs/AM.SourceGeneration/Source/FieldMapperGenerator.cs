@@ -97,10 +97,11 @@ $@"namespace {namespaceName}
                 ProcessMethod (bunch);
             }
 
+            var indent = Utility.MakeIndent (1);
+            var newLine = Environment.NewLine;
             bunch.Source.Append
                 (
-@"    }
-}"
+                    $"{indent}}}{newLine}}}"
                 );
             return bunch.Source.ToString();
         }
@@ -125,19 +126,18 @@ $@"namespace {namespaceName}
             var to = parameters[1];
 
             var source = bunch.Source;
-            var indent = Utility.MakeIndent (2);
+            var indent2 = Utility.MakeIndent (2);
+            var newLine = Environment.NewLine;
             source.Append
                 (
-$@"
-{indent}{modifiers} partial {returnType.ToDisplayString()} {methodName} ("
+                    $"{newLine}{indent2}{modifiers} partial {returnType.ToDisplayString()} {methodName} ("
                 );
 
             source.EnumerateParameters (method);
 
             source.AppendLine
                 (
-@")
-        {"
+                    $"){newLine}        {{"
                 );
             bunch.FromType = from.Type;
             bunch.FromName = from.Name;
@@ -147,9 +147,7 @@ $@"
 
             source.AppendLine
                 (
-                    $@"
-            return {parameters[1].Name};
-        }}"
+                    $"{newLine}{indent2}return {parameters[1].Name};{newLine}        }}"
                 );
         }
 
@@ -207,7 +205,9 @@ $@"
                 var code = (char) argument.Value!;
                 var propertyType = property.Type.GetTypeName();
                 var indent = Utility.MakeIndent (3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.{property.Name} = ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'));");
+                var left = $"{indent}{targetName}.{property.Name}";
+                var right = $"ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'))";
+                bunch.Source.AppendLine ($"{left} = {right};");
             }
         }
 
@@ -241,7 +241,9 @@ $@"
                 var code = (char)argument.Value!;
                 var propertyName = property.Name;
                 var indent = Utility.MakeIndent(3);
-                bunch.Source.AppendLine ($"{indent}{targetName}.SetSubFieldValue ('{code}', ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}));");
+                var left = $"{indent}{targetName}.SetSubFieldValue ('{code}'";
+                var right = $"ManagedIrbis.IrbisConverter.ToString ({sourceName}.{propertyName}))";
+                bunch.Source.AppendLine ($"{left}, {right};");
             }
         }
 
