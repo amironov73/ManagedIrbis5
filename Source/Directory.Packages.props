@@ -12,7 +12,7 @@
     <SkiaVersion>2.88.6</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
     <NugetVersion>6.7.0</NugetVersion>
-    <NLogVersion>5.2.4</NLogVersion>
+    <NLogVersion>5.2.5</NLogVersion>
   </PropertyGroup>
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
@@ -110,7 +110,7 @@
     <PackageVersion Include="Nito.StructuredConcurrency" Version="1.0.0-alpha.9" />
     <PackageVersion Include="Nito.Try" Version="1.1.1" />
     <PackageVersion Include="NLog" Version="$(NLogVersion)" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.4" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.5" />
     <PackageVersion Include="NLog.Schema" Version="$(NLogVersion)" />
     <PackageVersion Include="NPOI" Version="2.6.2" />
     <PackageVersion Include="NuGet.Common" Version="$(NugetVersion)" />
