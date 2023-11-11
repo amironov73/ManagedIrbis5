@@ -15,8 +15,6 @@ using ManagedIrbis.Mapping;
 
 #endregion
 
-#nullable enable
-
 namespace IrbisExamples;
 
 public class Order
@@ -53,8 +51,14 @@ public class Person
     }
 }
 
-public static class MappingExample
+public static partial class MappingExample
 {
+    [FieldMapper]
+    private static partial Person ForwardMapper (Field from, Person to);
+
+    [FieldMapper]
+    private static partial Field BackwardMapper (Person from, Field to);
+
     public static void FieldMapping()
     {
         Console.WriteLine (new string ('-', 70));
@@ -63,20 +67,22 @@ public static class MappingExample
             .Add ('b', "48")
             .Add ('c', "123.45")
             .Add ('d', "20201224");
-        var person = new Person();
-        var mapper = MapperCache.GetFieldMapper<Person>();
-        mapper.FromField (field, person);
+        var person = ForwardMapper (field, new Person());
+        // var mapper = MapperCache.GetFieldMapper<Person>();
+        // mapper.FromField (field, person);
         Console.WriteLine (person);
 
         person.Name = "Хоттабыч";
         person.Age = 12345;
         person.Fund = 321.45m;
         person.Date = DateTime.Today.AddDays (1.0);
-        mapper.ToField (field, person);
+        _ = BackwardMapper (person, field);
+        // mapper.ToField (field, person);
         Console.WriteLine (field);
 
         field = new Field { Tag = 100 };
-        mapper.ToField (field, person);
+        // mapper.ToField (field, person);
+        _ = BackwardMapper (person, field);
         Console.WriteLine (field);
     }
 

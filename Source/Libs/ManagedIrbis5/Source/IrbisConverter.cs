@@ -54,7 +54,7 @@ public static class IrbisConverter
             TypeCode.Double => (TTarget)(object) value!.ParseDouble(),
             TypeCode.Single => (TTarget)(object) value!.ParseSingle(),
             TypeCode.DateTime =>
-                (TTarget)(object) DateTime.ParseExact (value!, "YYYYMMDd", CultureInfo.InvariantCulture),
+                (TTarget)(object) DateTime.ParseExact (value!, "yyyyMMdd", CultureInfo.InvariantCulture),
             _ => (TTarget) Convert.ChangeType (value, typeof (TTarget))!
         };
     }
@@ -148,7 +148,7 @@ public static class IrbisConverter
             decimal decimalValue => decimalValue.ToInvariantString(),
             double doubleValue => doubleValue.ToInvariantString(),
             float floatValue => floatValue.ToInvariantString(),
-            DateTime date => date.ToString ("YYYYMMdd", CultureInfo.InvariantCulture),
+            DateTime date => date.ToString ("yyyyMMdd", CultureInfo.InvariantCulture),
             IConvertible convertible => convertible.ToString (CultureInfo.InvariantCulture),
             _ => value.ToString()
         };

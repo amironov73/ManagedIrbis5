@@ -4,8 +4,10 @@ Client framework for IRBIS64 system ported to .NET 8
 
 Currently supports:
 
-* Windows 7/10/11 x64
-* MacOS 10.14
+* Windows 10/11 x64/x86/arm64
+* Windows Server 2012 and newer
+* Various Linuxes: Debian 11+, Fedora 37+, openSUSE 15+, RHEL 8+, Ubuntu 20.04+
+* MacOS 10.15 x64/arm64 and newer
 * .NET runtime 8.0.0 and higher
 * .NET SDK 8.0.0 and higher
 
@@ -13,6 +15,7 @@ Currently supports:
 using System;
 using ManagedIrbis;
 using static System.Console;
+using static AM.Utility;
 using static ManagedIrbis.IrbisUtility;
 
 try
@@ -20,9 +23,8 @@ try
     await using var connection = ConnectionFactory.Shared.CreateAsyncConnection();
 
     connection.Host = args.Length == 0 ? "127.0.0.1" : args[0];
-    connection.Username = "librarian";
-    connection.Password = Unprotect ("AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA7Y"
-        + "/2B/9VkTGC7i2ocUAKorH6fhaZgrNzc=");
+    connection.Username = RequireEnvironment ("IRBIS_LOGIN");
+    connection.Password = RequireEnvironment ("IRBIS_PASSWORD");
 
     var success = await connection.ConnectAsync();
     if (!success)
@@ -44,7 +46,7 @@ try
 
     await Out.WriteLineAsync ($"Records found: {found.Length}");
 
-    // In order not to print all found records, 
+    // In order not to print all found records,
     // we will select only the first 10
     foreach (var mfn in found[..10])
     {

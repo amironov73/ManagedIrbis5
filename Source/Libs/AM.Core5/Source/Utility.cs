@@ -6821,5 +6821,25 @@ public static class Utility
             return fallbackValue;
         }
     }
+
+    /// <summary>
+    /// Требование переменной окружения.
+    /// </summary>
+    public static string RequireEnvironment
+        (
+            string variable
+        )
+    {
+        Sure.NotNullNorEmpty (variable);
+
+        var result = Environment.GetEnvironmentVariable (variable);
+        if (string.IsNullOrEmpty (result))
+        {
+            throw new ArsMagnaException ($"Environment variable '{variable}' not set");
+        }
+
+        return result;
+    }
+
     #endregion
 }

@@ -15,8 +15,6 @@ using ManagedIrbis;
 
 #endregion
 
-#nullable enable
-
 namespace IrbisExamples;
 
 public class FullTextSearch

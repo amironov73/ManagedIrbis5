@@ -127,6 +127,7 @@ $@"namespace {namespaceName}
 
             var source = bunch.Source;
             var indent2 = Utility.MakeIndent (2);
+            var indent3 = Utility.MakeIndent (3);
             var newLine = Environment.NewLine;
             source.Append
                 (
@@ -137,7 +138,7 @@ $@"namespace {namespaceName}
 
             source.AppendLine
                 (
-                    $"){newLine}        {{"
+                    $"){newLine}{indent2}{{"
                 );
             bunch.FromType = from.Type;
             bunch.FromName = from.Name;
@@ -147,7 +148,7 @@ $@"namespace {namespaceName}
 
             source.AppendLine
                 (
-                    $"{newLine}{indent2}return {parameters[1].Name};{newLine}        }}"
+                    $"{newLine}{indent3}return {parameters[1].Name};{newLine}{indent2}}}"
                 );
         }
 
@@ -206,7 +207,7 @@ $@"namespace {namespaceName}
                 var propertyType = property.Type.GetTypeName();
                 var indent = Utility.MakeIndent (3);
                 var left = $"{indent}{targetName}.{property.Name}";
-                var right = $"ManagedIrbis.IrbisConverter.FromString<{propertyType}> ({sourceName}.GetFirstSubFieldValue ('{code}'))";
+                var right = $"ManagedIrbis.IrbisConverter.FromString<{propertyType}> (ManagedIrbis.FieldUtility.GetFirstSubFieldValue ({sourceName}, '{code}'))";
                 bunch.Source.AppendLine ($"{left} = {right};");
             }
         }
