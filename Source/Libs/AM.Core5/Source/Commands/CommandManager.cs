@@ -2,16 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* CommandManager.cs -- менеджер команд
  * Ars Magna project, http://arsmagna.ru
@@ -22,22 +16,23 @@
 using System;
 using System.Threading.Tasks;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM.Commands;
 
 /// <summary>
 /// Менеджер команд.
 /// </summary>
+[PublicAPI]
 public class CommandManager
     : IDisposable
 {
     #region Properties
 
     /// <summary>
-    /// Команды.
+    /// Словарь команд.
     /// </summary>
     public CommandDictionary Commands { get; } = new ();
 
@@ -50,7 +45,7 @@ public class CommandManager
     /// </summary>
     /// <param name="name">Искомое название команды
     /// (регистр символов учитывается).</param>
-    /// <returns></returns>
+    /// <returns>Найденная команда либо <c>null</c></returns>
     public ICommand? FindCommand
         (
             string? name
@@ -75,6 +70,8 @@ public class CommandManager
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         FindCommand (name)?.PerformExecute();
     }
 
@@ -87,6 +84,8 @@ public class CommandManager
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         var command = FindCommand (name);
 
         return command is null ? Task.CompletedTask : command.PerformExecuteAsync();
@@ -95,8 +94,13 @@ public class CommandManager
     /// <summary>
     /// Команда должна обновить свое состояние в синхронном режиме.
     /// </summary>
-    public void PerformUpdate (string name)
+    public void PerformUpdate
+        (
+            string name
+        )
     {
+        Sure.NotNullNorEmpty (name);
+
         FindCommand (name)?.PerformUpdate();
     }
 
@@ -108,6 +112,8 @@ public class CommandManager
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         var command = FindCommand (name);
 
         return command is null ? Task.CompletedTask : command.PerformUpdateAsync();
@@ -121,6 +127,8 @@ public class CommandManager
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         FindCommand (name)?.PerformChange();
     }
 
@@ -132,6 +140,8 @@ public class CommandManager
             string name
         )
     {
+        Sure.NotNullNorEmpty (name);
+
         var command = FindCommand (name);
 
         return command is null ? Task.CompletedTask : command.PerformChangeAsync();
@@ -142,10 +152,7 @@ public class CommandManager
     #region IDisposable members
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
-    public void Dispose()
-    {
-        Commands.Dispose();
-    }
+    public void Dispose() => Commands.Dispose();
 
     #endregion
 }

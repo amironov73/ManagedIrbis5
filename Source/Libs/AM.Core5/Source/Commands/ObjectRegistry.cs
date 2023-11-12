@@ -2,13 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* ObjectRegistry.cs -- реестр объектов для сопоставления с командами
  * Ars Magna project, http://arsmagna.ru
@@ -18,17 +13,18 @@
 
 using System.Collections.Generic;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM.Commands;
 
 /// <summary>
 /// Реестр объектов для сопоставления с командами.
 /// </summary>
+[PublicAPI]
 public sealed class ObjectRegistry
     : Dictionary<string, object>
 {
-
+    // пустое тело класса
 }

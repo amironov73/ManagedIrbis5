@@ -2,17 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedMemberInSuper.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 /* ICommand.cs -- интерфейс команды
  * Ars Magna project, http://arsmagna.ru
@@ -23,15 +15,16 @@
 using System;
 using System.Threading.Tasks;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM.Commands;
 
 /// <summary>
 /// Интерфейс команды.
 /// </summary>
+[PublicAPI]
 public interface ICommand
     : IDisposable
 {

@@ -25,8 +25,6 @@ using System.Xml.Serialization;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Commands;
 
 /// <summary>

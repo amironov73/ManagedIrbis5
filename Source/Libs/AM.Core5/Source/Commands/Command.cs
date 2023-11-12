@@ -2,16 +2,10 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
-// ReSharper disable EventNeverSubscribedTo.Global
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable UnusedType.Global
 
 #pragma warning disable 67
 
@@ -27,15 +21,16 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM.Commands;
 
 /// <summary>
 /// Некая команда (действие) приложения.
 /// </summary>
+[PublicAPI]
 public class Command
     : ICommand
 {
@@ -137,6 +132,7 @@ public class Command
     /// </summary>
     public Command()
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -186,6 +182,8 @@ public class Command
             EventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         if (Enabled)
         {
             Execute?.Invoke (this, eventArgs);
@@ -193,15 +191,9 @@ public class Command
     }
 
     /// <inheritdoc cref="ICommand.PerformExecuteAsync()"/>
-    public virtual Task PerformExecuteAsync()
-    {
-        if (Enabled)
-        {
-            return Execute.RaiseAsync (this);
-        }
-
-        return Task.CompletedTask;
-    }
+    public virtual Task PerformExecuteAsync() => Enabled
+            ? Execute.RaiseAsync (this)
+            : Task.CompletedTask;
 
     /// <inheritdoc cref="ICommand.PerformExecuteAsync(System.EventArgs)"/>
     public virtual Task PerformExecuteAsync
@@ -209,12 +201,11 @@ public class Command
             EventArgs eventArgs
         )
     {
-        if (Enabled)
-        {
-            return Execute.RaiseAsync (this, eventArgs);
-        }
+        Sure.NotNull (eventArgs);
 
-        return Task.CompletedTask;
+        return Enabled
+            ? Execute.RaiseAsync (this, eventArgs)
+            : Task.CompletedTask;
     }
 
     /// <inheritdoc cref="ICommand.PerformUpdate()"/>
@@ -229,14 +220,14 @@ public class Command
             EventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         Update?.Invoke (this, eventArgs);
     }
 
     /// <inheritdoc cref="ICommand.PerformUpdateAsync()"/>
-    public virtual Task PerformUpdateAsync()
-    {
-        return Update.RaiseAsync (this);
-    }
+    public virtual Task PerformUpdateAsync() =>
+        Update.RaiseAsync (this);
 
     /// <inheritdoc cref="ICommand.PerformUpdateAsync(System.EventArgs)"/>
     public virtual Task PerformUpdateAsync
@@ -244,14 +235,14 @@ public class Command
             EventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         return Update.RaiseAsync (this, eventArgs);
     }
 
     /// <inheritdoc cref="ICommand.PerformChange()"/>
-    public virtual void PerformChange()
-    {
+    public virtual void PerformChange() =>
         Changed?.Invoke (this, EventArgs.Empty);
-    }
 
     /// <inheritdoc cref="ICommand.PerformChange(System.EventArgs)"/>
     public virtual void PerformChange
@@ -259,14 +250,13 @@ public class Command
             EventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         Changed?.Invoke (this, eventArgs);
     }
 
     /// <inheritdoc cref="ICommand.PerformChangeAsync()"/>
-    public virtual Task PerformChangeAsync()
-    {
-        return Changed.RaiseAsync (this);
-    }
+    public virtual Task PerformChangeAsync() => Changed.RaiseAsync (this);
 
     /// <inheritdoc cref="ICommand.PerformChangeAsync(System.EventArgs)"/>
     public virtual Task PerformChangeAsync
@@ -274,6 +264,8 @@ public class Command
             EventArgs eventArgs
         )
     {
+        Sure.NotNull (eventArgs);
+
         return Changed.RaiseAsync (this, eventArgs);
     }
 
@@ -282,20 +274,15 @@ public class Command
     #region IDisposable members
 
     /// <inheritdoc cref="IDisposable.Dispose"/>
-    public virtual void Dispose()
-    {
+    public virtual void Dispose() =>
         Disposed?.Invoke (this, EventArgs.Empty);
-    }
 
     #endregion
 
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString()
-    {
-        return $"{Title}: {Description} [{Enabled}]";
-    }
+    public override string ToString() => $"{Title}: {Description} [{Enabled}]";
 
     #endregion
 }
