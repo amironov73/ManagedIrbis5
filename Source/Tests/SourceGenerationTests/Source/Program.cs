@@ -27,3 +27,5 @@ notifier.PropertyChanged += (object? sender, PropertyChangedEventArgs e) =>
 
 notifier.Name = "Alexey";
 notifier.Age = 50;
+
+new FieldMappingDemo().DoMapping();
