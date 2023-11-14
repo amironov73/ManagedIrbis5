@@ -29,5 +29,3 @@ notifier.Name = "Alexey";
 notifier.Age = 50;
 
 new FieldMappingDemo().DoMapping();
-
-new BinaryInclusionDemo().DoInclusion();
