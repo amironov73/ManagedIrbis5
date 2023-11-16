@@ -9,7 +9,7 @@ Currently supports:
 * Various Linuxes: Debian 11+, Fedora 37+, openSUSE 15+, RHEL 8+, Ubuntu 20.04+
 * MacOS 10.15 x64/arm64 and newer
 * .NET runtime 8.0.0 and higher
-* .NET SDK 8.0.0 and higher
+* .NET SDK 8.0.100 and higher
 
 ```c#
 using System;
