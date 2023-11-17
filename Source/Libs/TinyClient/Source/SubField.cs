@@ -28,6 +28,7 @@ namespace ManagedIrbis
 {
     /// <summary>
     /// Подполе библиографической записи.
+    /// Состоит из односимвольного кода и значения произвольной длины.
     /// </summary>
     public sealed class SubField
     {
@@ -51,12 +52,14 @@ namespace ManagedIrbis
         #region Properties
 
         /// <summary>
-        /// Код подполя.
+        /// Односимвольный код подполя.
         /// </summary>
         public char Code { get; set; } = NoCode;
 
         /// <summary>
         /// Значение подполя.
+        /// Вообще говоря, значение подполя не должно быть пустым,
+        /// но в некоторых сценариях это все же встречается.
         /// </summary>
         public string? Value
         {
@@ -65,7 +68,7 @@ namespace ManagedIrbis
         }
 
         /// <summary>
-        /// Подполе хранит значение поля до первого разделителя.
+        /// Подполе хранит значение поля до первого разделителя?
         /// </summary>
         public bool RepresentsValue => Code == NoCode;
 
@@ -128,7 +131,7 @@ namespace ManagedIrbis
         /// <summary>
         /// Клонирование подполя.
         /// </summary>
-        public SubField Clone() => (SubField)MemberwiseClone();
+        public SubField Clone() => (SubField) MemberwiseClone();
 
         /// <summary>
         /// Сравнение двух подполей.
