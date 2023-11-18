@@ -25,8 +25,6 @@ using ManagedIrbis.Magazines;
 
 #endregion
 
-#nullable enable
-
 namespace CountKpio;
 
 /// <summary>
@@ -57,15 +55,15 @@ class Program
         var manager = new MagazineManager (Magna.Host, connection);
         var newspapers = manager.GetAllMagazines ("V=01");
         Console.WriteLine ($"Всего названий газет: {newspapers.Length}");
-        newspapers = newspapers.OrderBy (n => n.Title!.Trim ('"')).ToArray();
+        newspapers = newspapers.OrderBy (static n => n.Title!.Trim ('"')).ToArray();
 
         var counter = new DictionaryCounter<int, int>();
         foreach (var newspaper in newspapers)
         {
             var issues = manager.GetIssues (newspaper);
-            issues = issues.Where (i => HavePlace (i, "Ф403")).ToArray();
-            var years = issues.Select (i => i.Year.SafeToInt32()).Distinct()
-                .OrderBy (y => y).ToArray();
+            issues = issues.Where (static i => HavePlace (i, "Ф403")).ToArray();
+            var years = issues.Select (static i => i.Year.SafeToInt32()).Distinct()
+                .OrderBy (static y => y).ToArray();
             Console.Write ($"{newspaper.Title}: выпусков {issues.Length}, годы [{string.Join (',', years)}]");
             foreach (var year in years)
             {
@@ -79,7 +77,7 @@ class Program
         Console.WriteLine (new string ('=', 80));
         Console.WriteLine();
 
-        var sortedYears = counter.Keys.OrderBy (y => y).ToArray();
+        var sortedYears = counter.Keys.OrderBy (static y => y).ToArray();
         foreach (var year in sortedYears)
         {
             Console.WriteLine ($"{year}\t{counter[year]}");

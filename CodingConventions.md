@@ -58,8 +58,6 @@ using System;
 
 #endregion
 
-#nullable enable
-
 namespace SomeNamespace;
 ```
 
@@ -79,9 +77,7 @@ namespace SomeNamespace;
 
 Регион с подключением пространств имен (если таковые имеются), должен оформляться с помощью соответствующей пары директив.
 
-Указание на использование `nullable`-нотации должно быть явным?
-
-Пространство имен должно объявляться file-scoped.
+Пространство имен должно объявляться file-scoped. Это экономит отступы и делает текст более читаемым.
 
 ## Форматирование исходных текстов
 
@@ -167,6 +163,8 @@ newColor.Red∙∙∙=∙brightColor.Red∙∙∙-∙10;
 newColor.Green∙=∙brightColor.Green∙–∙10;
 newColor.Blue∙∙=∙brightColor.Blue∙∙-∙10;
 ```
+
+Однако "табличное" форматирование не должно становиться самоцелью, и может быть опущено, если его поддержание требует слишком много усилий либо уродует код.
 
 ## Оформление и именование отдельных элементов языка C#
 
@@ -474,14 +472,14 @@ public class SampleClass
 
 В качестве имен для констант используются существительные или именные группы. Исключение - случаи, когда соответствующие понятия предметной области не являются существительными, и с этим ничего поделать нельзя.
 
-Примеры:
+Пример (обратите внимание на "табличное" выравнивание):
 
 ```c#
 class Color
 {
-    const string Red = "#FF0000";
+    const string Red   = "#FF0000";
     const string Green = "#00FF00";
-    const string Blue = "#0000FF";
+    const string Blue  = "#0000FF";
 }
 ```
 
@@ -498,7 +496,7 @@ class Color
 ```c#
 void RemoveAll ();
 
-char[] ReadChars ( int howMany );
+char[] ReadChars (int howMany);
 
 void Invoke ();
 ```
@@ -622,6 +620,18 @@ int Method()
     return Add (x, y);
 
     static int Add (int left, int right) => left + right;
+}
+```
+
+### Лямбда-функции
+
+По возможности лямбда-функции, не захватывающие контекст, следует снабжать модификатором `static`:
+
+```c#
+int Method (IEnumerable<TItem> items)
+{
+    ...
+    return items.Sum (static it => it * 2);
 }
 ```
 
@@ -836,17 +846,21 @@ foreach (var author in allAuthors)
 ```c#
 switch (condition)
 {
-case 1:
-    // some code
-    break;
-case 2:
-    // some code
-    break;
-default:
-    // some code
-    break;
+    case 1:
+        // some code
+        break;
+
+    case 2:
+        // some code
+        break;
+
+    default:
+        // some code
+        break;
 }
 ```
+
+Многострочные `case` следует отделять друг от друга пустой строкой.
 
 Везде, где это имеет смысл, следует использовать вместо оператора выражение `switch`:
 
@@ -912,7 +926,7 @@ using (var reader = new MarcIsoRecordReader (file))
 }
 ```
 
-Везде, где это имеет смысл, следует использовать `var`-декларацию переменной. Кроме того, имеет смысл применять `using`-декларацию переменной, экономящую логический отступ:
+Везде, где это имеет смысл, следует использовать `var`-декларацию переменной. Кроме того, имеет смысл применять `using`-декларацию переменной, экономящую логический отступ и повышающую читаемость кода:
 
 ```c#
 using var reader = new MarcIsoRecordReader (file);

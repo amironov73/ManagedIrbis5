@@ -29,8 +29,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace CountMagazines;
 
 /// <summary>
@@ -80,9 +78,9 @@ internal sealed class Program
             }
 
             var issues = manager.GetIssues (magazine)
-                .Where (issue => issue.Year.SafeToInt32() >= 2017)
+                .Where (static issue => issue.Year.SafeToInt32() >= 2017)
                 .ToArray();
-            var loanCount = issues.Sum (issue => issue.LoanCount);
+            var loanCount = issues.Sum (static issue => issue.LoanCount);
             var message = $"{title}\t{issues.Length}\t{loanCount}";
             Logger.LogInformation ("Magazine: {Message}", magazine);
             Console.WriteLine (message);

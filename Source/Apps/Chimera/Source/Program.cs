@@ -25,8 +25,6 @@ using ManagedIrbis.Scripting.Barsik;
 
 #endregion
 
-#nullable enable
-
 namespace Chimera;
 
 /// <summary>
@@ -49,17 +47,17 @@ internal static class Program
         var result = BarsikUtility.CreateAndRunInterpreter
             (
                 args,
-                interpreter =>
+                static interpreter =>
                 {
                     interpreter.WithStdLib();
                     interpreter.Context.AttachModule (new IrbisLib());
                     interpreter.Context.AttachModule (new IstuLib());
                 },
-                (_, exception) =>
+                static (_, exception) =>
                 {
                     Console.WriteLine (exception);
                 },
-                interpreter =>
+                static interpreter =>
                 {
                     interpreter.Context.DumpVariables();
                 }

@@ -21,8 +21,6 @@ using AM.Scripting.Barsik;
 
 #endregion
 
-#nullable enable
-
 namespace Barsik;
 
 /// <summary>
@@ -43,15 +41,15 @@ internal static class Program
         var result = BarsikUtility.CreateAndRunInterpreter
             (
                 args,
-                interpreter =>
+                static interpreter =>
                 {
                     interpreter.WithStdLib();
                 },
-                (_, exception) =>
+                static (_, exception) =>
                 {
                     Console.WriteLine (exception);
                 },
-                interpreter =>
+                static interpreter =>
                 {
                     interpreter.Context.DumpVariables();
                 }

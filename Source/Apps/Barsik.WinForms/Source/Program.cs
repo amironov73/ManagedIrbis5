@@ -25,8 +25,6 @@ using AM.Scripting.WinForms;
 
 #endregion
 
-#nullable enable
-
 namespace Barsik.WinForms;
 
 internal static class Program
@@ -56,7 +54,7 @@ internal static class Program
         var result = BarsikUtility.CreateAndRunInterpreter
             (
                 args,
-                interpreter =>
+                static interpreter =>
                 {
                     var debugWriter = new DebugTextWriter();
                     interpreter.WithStdLib().WithWinForms();
@@ -64,11 +62,11 @@ internal static class Program
                     interpreter.Context.Output = debugWriter;
                     interpreter.Context.Error = debugWriter;
                 },
-                (_, exception) =>
+                static (_, exception) =>
                 {
                     MessageBox.Show (exception.ToString());
                 },
-                interpreter =>
+                static interpreter =>
                 {
                     var output = new StringWriter();
                     var context = new Context

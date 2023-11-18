@@ -22,8 +22,6 @@ using ManagedIrbis.Fields;
 
 #endregion
 
-#nullable enable
-
 namespace ClearInventarization;
 
 class Program
@@ -31,7 +29,7 @@ class Program
     private static string _connectionString = string.Empty;
     private static string _searchExpression = string.Empty;
     private static Regex _placeRegex = new ("^$");
-    private static Regex? _realPlaceRegex = null;
+    private static Regex? _realPlaceRegex;
 
     private static readonly SyncConnection _connection
         = ConnectionFactory.Shared.CreateSyncConnection();
@@ -129,7 +127,7 @@ class Program
             var database = _connection.EnsureDatabase();
             using var writer = new BatchRecordWriter (_connection, database, 60);
 
-            writer.BatchWrite += (sender, _) =>
+            writer.BatchWrite += static (sender, _) =>
                 Console.Write ($"\n{((BatchRecordWriter)sender!).RecordsWritten}\n");
 
             foreach (var record in batch)
