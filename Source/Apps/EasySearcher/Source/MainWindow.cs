@@ -29,8 +29,6 @@ using ManagedIrbis;
 
 #endregion
 
-#nullable enable
-
 namespace EasySearcher;
 
 /// <summary>
@@ -90,7 +88,7 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (SearcherModel.Found)),
-            ItemTemplate = new FuncDataTemplate<FoundItem> ((_, _) =>
+            ItemTemplate = new FuncDataTemplate<FoundItem> (static (_, _) =>
             {
                 var firstBlock = new TextBlock
                     {

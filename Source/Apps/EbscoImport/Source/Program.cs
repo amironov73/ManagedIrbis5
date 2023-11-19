@@ -28,14 +28,11 @@ using System.Xml.Serialization;
 
 using AM;
 using AM.Linq;
-using AM.Text;
 
 using ManagedIrbis;
 using ManagedIrbis.ImportExport;
 
 #endregion
-
-#nullable enable
 
 namespace EbscoImport;
 

@@ -47,8 +47,6 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 #endregion
 
-#nullable enable
-
 namespace DirtyKesha;
 
 /// <summary>
@@ -111,8 +109,8 @@ internal sealed class Client
         }
 
         return found
-            .Where (line => !string.IsNullOrEmpty (line))
-            .Select (line => line.ThrowIfNull())
+            .Where (static line => !string.IsNullOrEmpty (line))
+            .Select (static line => line.ThrowIfNull())
             .ToArray();
     }
 
@@ -126,8 +124,8 @@ internal sealed class Client
         return found
             .Take (20)
             .Select (_CleanText)
-            .Where (line => !string.IsNullOrEmpty (line))
-            .OrderBy (line => line)
+            .Where (static line => !string.IsNullOrEmpty (line))
+            .OrderBy (static line => line)
             .ToArray();
     }
 

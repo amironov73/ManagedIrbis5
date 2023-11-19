@@ -20,8 +20,6 @@ using System.Runtime.InteropServices;
 
 #endregion
 
-#nullable enable
-
 namespace DirtyKesha;
 
 /// <summary>

@@ -29,8 +29,6 @@ using NLog.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace DirtyKesha;
 
 /// <summary>
@@ -129,12 +127,12 @@ internal sealed class Program
         Configuration = configurationBuilder
             .Build();
 
-        hostBuilder.ConfigureLogging (logging =>
+        hostBuilder.ConfigureLogging (static logging =>
         {
             logging.ClearProviders();
             logging.AddNLog (Configuration);
         });
-        hostBuilder.ConfigureServices (services =>
+        hostBuilder.ConfigureServices (static services =>
         {
             services.AddOptions();
             services.AddLocalization();
@@ -205,7 +203,7 @@ internal sealed class Program
             IHostBuilder hostBuilder
         )
     {
-        hostBuilder.ConfigureServices (services =>
+        hostBuilder.ConfigureServices (static services =>
         {
             services.AddHostedService<Worker>();
         });

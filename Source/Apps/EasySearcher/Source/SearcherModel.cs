@@ -32,8 +32,6 @@ using ReactiveUI.Fody.Helpers;
 
 #endregion
 
-#nullable enable
-
 namespace EasySearcher;
 
 /// <summary>
@@ -89,7 +87,7 @@ public sealed class SearcherModel
         Found = await WaitCursor.RunFuncAsync
             (
                 window,
-                async (theSearcher, theQuery) => await theSearcher.SearchForBooksAsync (theQuery),
+                static async (theSearcher, theQuery) => await theSearcher.SearchForBooksAsync (theQuery),
                 searcher,
                 query
             );

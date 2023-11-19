@@ -25,15 +25,12 @@ using AM;
 using ManagedIrbis;
 using ManagedIrbis.Batch;
 using ManagedIrbis.Fields;
-using ManagedIrbis.Records;
 
 using Spectre.Console;
 
 using CM = System.Configuration.ConfigurationManager;
 
 #endregion
-
-#nullable enable
 
 namespace ExemplarCounter;
 
@@ -78,12 +75,12 @@ internal sealed class Program
                         new PercentageColumn(),
                         new RemainingTimeColumn { Style = new Style (Color.Yellow) }
                     )
-                .Start (context =>
+                .Start (/* capturing */ context =>
                 {
                     var task = context.AddTask ($"Reading {maxMfn} records");
-                    task.MaxValue = maxMfn;
+                    task.MaxValue = /* captured */ maxMfn;
 
-                    foreach (var record in batch)
+                    foreach (var record in /* captured */ batch)
                     {
                         task.Value = record.Mfn;
 
@@ -112,7 +109,7 @@ internal sealed class Program
                             {
                                 if (inventory[0].SameChar ('И'))
                                 {
-                                    foreign++;
+                                    /* captured */ foreign++;
                                 }
                                 else
                                 {
@@ -123,19 +120,19 @@ internal sealed class Program
                             {
                                 if (number < 1_000_000)
                                 {
-                                    lessMillion++;
+                                    /* captured */ lessMillion++;
                                 }
                                 else if (number < 1_600_000)
                                 {
-                                    millionAndHalf++;
+                                    /* captured */ millionAndHalf++;
                                 }
                                 else
                                 {
-                                    bigger++;
+                                    /* captured */ bigger++;
                                 }
                             }
 
-                            totalExemplars++;
+                            /* captured */ totalExemplars++;
                         }
                     }
                 });
@@ -151,7 +148,7 @@ internal sealed class Program
             table.AddRow ("Прочих", $"[yellow]{other}[/]");
             table.AddEmptyRow();
             table.AddRow ("[bold]Итого[/]", $"[bold yellow]{totalExemplars}[/]");
-            
+
             AnsiConsole.WriteLine();
             AnsiConsole.Write (table);
             AnsiConsole.WriteLine();

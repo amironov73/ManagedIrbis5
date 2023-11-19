@@ -33,8 +33,6 @@ using Spectre.Console;
 
 #endregion
 
-#nullable enable
-
 namespace CountSciFond;
 
 internal sealed class Program
@@ -64,7 +62,7 @@ internal sealed class Program
         Configuration = configurationBuilder
             .Build();
 
-        hostBuilder.ConfigureLogging (logging =>
+        hostBuilder.ConfigureLogging (static logging =>
         {
             logging.ClearProviders();
         });
@@ -112,7 +110,7 @@ internal sealed class Program
                         new PercentageColumn(),
                         new RemainingTimeColumn { Style = new Style (Color.Yellow) }
                     )
-                .Start (context =>
+                .Start (/* capturing */ context =>
                 {
                     var batch = BatchRecordReader.WholeDatabase
                         (
@@ -147,10 +145,10 @@ internal sealed class Program
 
             var translatorCount = 0;
             AnsiConsole.Status()
-                .Start ("Загрузка транслятора", _ =>
+                .Start ("Загрузка транслятора", /* capturing */ _ =>
                 {
                     var found = storehouse.GetKladovka().GetTranslator()
-                        .Select (it => it.Inventory.ToInvariantString()).ToArray();
+                        .Select (static it => it.Inventory.ToInvariantString()).ToArray();
                     foreach (var one in found)
                     {
                         if (!irbisExepmlars.Contains (one))
@@ -164,13 +162,13 @@ internal sealed class Program
                 });
 
             AnsiConsole.Status()
-                .Start ("Загрузка читателей", _ =>
+                .Start ("Загрузка читателей", /* capturing */ _ =>
                 {
                     var found = storehouse.GetKladovka().GetReaders()
-                        .Where (it => it.Category == "служебная запись")
-                        .Select (it => it.Ticket)
+                        .Where (static it => it.Category == "служебная запись")
+                        .Select (static it => it.Ticket)
                         .ToArray()
-                        .Where (it => !string.IsNullOrEmpty (it))
+                        .Where (static it => !string.IsNullOrEmpty (it))
                         .ToArray();
                     foreach (var one in found)
                     {
@@ -182,13 +180,13 @@ internal sealed class Program
                 });
 
             AnsiConsole.Status()
-                .Start ("Загрузка выдач", _ =>
+                .Start ("Загрузка выдач", /* capturing */ _ =>
                 {
                     var found = storehouse.GetKladovka().GetPodsob()
                         .ToArray()
-                        .Where (it => !string.IsNullOrEmpty (it.Ticket)
+                        .Where (/* capturing */ it => !string.IsNullOrEmpty (it.Ticket)
                                       && specialReaders.Contains (it.Ticket))
-                        .Select (it => it.Inventory.ToInvariantString())
+                        .Select (static it => it.Inventory.ToInvariantString())
                         .ToArray();
                     foreach (var one in found)
                     {
@@ -209,7 +207,7 @@ internal sealed class Program
                         new PercentageColumn(),
                         new RemainingTimeColumn { Style = new Style (Color.Yellow) }
                     )
-                .Start (context =>
+                .Start (/* capturing */ context =>
                 {
                     var task = context.AddTask ("Отсев");
                     task.MaxValue = irbisExepmlars.Count;

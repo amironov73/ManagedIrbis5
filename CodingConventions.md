@@ -635,6 +635,21 @@ int Method (IEnumerable<TItem> items)
 }
 ```
 
+Лямбда-функции, захватывающие контекст, желательно помечать комментарием:
+
+```c#
+Start (/* capturing */ context =>
+{
+    var batch = BatchRecordReader.WholeDatabase
+        (
+            connection, // захваченная переменная
+            database: connection.EnsureDatabase(),
+            batchSize: 1_000
+        );
+    context.AddBatch (batch);
+});
+```
+
 ### Асинхронные методы
 
 Имя асинхронного метода должно иметь суффикс `Async`, возвращаемое значение должно быть одного из трех типов:
