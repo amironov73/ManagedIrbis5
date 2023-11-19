@@ -62,7 +62,7 @@ internal sealed class MainWindow
 
         Styles.Add
             (
-                new Style (x => x.Class ("error"))
+                new Style (static x => x.Class ("error"))
                 {
                     Setters =
                     {
@@ -72,7 +72,7 @@ internal sealed class MainWindow
             );
         Styles.Add
             (
-                new Style (x => x.Class ("info"))
+                new Style (static x => x.Class ("info"))
                 {
                     Setters =
                     {
@@ -187,7 +187,7 @@ internal sealed class MainWindow
                     [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (_model.Events)),
                     Styles =
                     {
-                        new Style (x => x.OfType<ListBoxItem>())
+                        new Style (static x => x.OfType<ListBoxItem>())
                         {
                             Setters =
                             {
@@ -201,7 +201,7 @@ internal sealed class MainWindow
         };
 
         DispatcherTimer.Run
-            (() =>
+            (/* capturing */ () =>
                 {
                     _model.AutoUpdate().FireAndForget();
                     return true;
@@ -218,7 +218,7 @@ internal sealed class MainWindow
     {
         base.OnInitialized();
 
-        DispatcherTimer.RunOnce (() =>
+        DispatcherTimer.RunOnce (/* capturing */ () =>
         {
             _barcodeBox.Focus();
             _model.AutoUpdate().FireAndForget();

@@ -30,8 +30,6 @@ using ReactiveUI.Fody.Helpers;
 
 #endregion
 
-#nullable enable
-
 namespace Gatekeeper;
 
 /// <summary>
@@ -136,7 +134,6 @@ internal sealed class GateModel
 
         return result;
     }
-
 
     public static GateModel GetTestModel()
     {

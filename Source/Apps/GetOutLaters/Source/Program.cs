@@ -29,8 +29,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace GetOutLaters;
 
 /// <summary>
@@ -81,9 +79,9 @@ internal sealed class Program
         // отбираем посещения со временем входа в библиотеку,
         // но без времени выхода из нее
         visits = visits
-            .Where (visit => visit.IsVisit
-                             && !string.IsNullOrEmpty (visit.TimeIn)
-                             && string.IsNullOrEmpty (visit.TimeOut))
+            .Where (static visit => visit.IsVisit
+                    && !string.IsNullOrEmpty (visit.TimeIn)
+                    && string.IsNullOrEmpty (visit.TimeOut))
             .ToArray();
 
 
@@ -163,7 +161,7 @@ internal sealed class Program
         if (found.Length != 0)
         {
             using var writer = new BatchRecordWriter (Connection, database, 500);
-            writer.BatchWrite += (_, _) => Logger.LogInformation ("Сохранение записей");
+            writer.BatchWrite += /* capturing */ (_, _) => Logger.LogInformation ("Сохранение записей");
 
             var reader = new BatchRecordReader (Connection, found);
 

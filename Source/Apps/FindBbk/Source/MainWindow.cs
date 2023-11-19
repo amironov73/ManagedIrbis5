@@ -31,8 +31,6 @@ using RestfulIrbis.RslServices;
 
 #endregion
 
-#nullable enable
-
 namespace FindBbk;
 
 /// <summary>
@@ -56,7 +54,7 @@ public sealed class MainWindow
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
             [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (BbkModel.Found)),
-            ItemTemplate = new FuncDataTemplate<BbkEntry> ((_, _) =>
+            ItemTemplate = new FuncDataTemplate<BbkEntry> (/* capturing */ (_, _) =>
             {
                 var firstBlock = new TextBlock
                 {

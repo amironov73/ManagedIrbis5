@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable StringLiteralTypo
 
 /* EventModel.cs -- модель данных для события посещения библиотеки
  * Ars Magna project, http://arsmagna.ru
@@ -14,8 +15,6 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 #endregion
-
-#nullable enable
 
 namespace Gatekeeper;
 
@@ -82,7 +81,6 @@ internal sealed class EventModel
     };
 
     #endregion
-
 
     #region Object members
 

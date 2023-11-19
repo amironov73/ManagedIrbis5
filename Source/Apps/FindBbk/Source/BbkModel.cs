@@ -28,8 +28,6 @@ using RestfulIrbis.RslServices;
 
 #endregion
 
-#nullable enable
-
 namespace FindBbk;
 
 /// <summary>
@@ -85,7 +83,7 @@ public sealed class BbkModel
         var html = await WaitCursor.RunFuncAsync
             (
                 window,
-                async (theClient, theQuery) => await theClient.GetRawHtmlAsync (theQuery),
+                static async (theClient, theQuery) => await theClient.GetRawHtmlAsync (theQuery),
                 client,
                 query
             );
