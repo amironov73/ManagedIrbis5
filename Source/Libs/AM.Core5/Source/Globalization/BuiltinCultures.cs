@@ -14,8 +14,6 @@ using System.Globalization;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Globalization;
 
 /// <summary>
