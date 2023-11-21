@@ -1,0 +1,67 @@
+﻿//
+// Пометка всех авторов ИРНИТУ в электронной библиотеке
+//
+
+/// <summary>
+/// Обработка одного автора
+/// </summary>
+func handle_author (author)
+{
+    // подполе Y = "Автор работает в данной организации"
+    if (have_subfield (author, 'y'))
+    {
+        return false
+    }
+
+    author.SetSubFieldValue ('y', "ДА")
+    return true
+}
+
+/// <summary>
+/// Обработка повторений поля с указанной меткой
+/// </summary>
+func handle_tag (book, tag)
+{
+    result = false
+    foreach (author in get_field (book, tag))
+    {
+        result = handle_author (author) or result
+    }
+
+    return result
+}
+
+//=================================
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "BASE=Труды$ * G=2009"
+found = batch_search (xpression)
+modified = []
+
+foreach (book in found)
+{
+    flag = handle_tag (book, 700)
+        or handle_tag (book, 701)
+        or handle_tag (book, 702)
+
+    if (flag)
+    {
+        modified.Add (book)
+    }
+}
+
+println ("Modified=", len (modified))
+batch_write (modified)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

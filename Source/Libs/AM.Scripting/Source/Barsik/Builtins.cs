@@ -27,8 +27,6 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Scripting.Barsik;
 
 /// <summary>
@@ -133,6 +131,8 @@ public static class Builtins
         { "expando", new FunctionDescriptor ("expando", Expando) },
         { "filter", new FunctionDescriptor ("filter", Filter, false) },
         { "format", new FunctionDescriptor ("format", Format) },
+        { "getenv", new FunctionDescriptor ("getenv", GetEnvironment) },
+        { "get_env", new FunctionDescriptor ("get_env", GetEnvironment) },
         { "have_var", new FunctionDescriptor ("havevar", HaveVariable, false) },
         { "iif", new FunctionDescriptor ("iif", Iif) },
         { "len", new FunctionDescriptor ("len", Length) },
@@ -628,6 +628,29 @@ public static class Builtins
         name = (string?) Compute (context, args, 0);
 
         return !string.IsNullOrEmpty (name) && context.TryGetVariable (name, out _);
+    }
+
+    /// <summary>
+    /// Получение переменной окружения.
+    /// </summary>
+    public static dynamic? GetEnvironment
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (args.Length == 0)
+        {
+            return null;
+        }
+
+        var name = (string?) Compute (context, args, 0);
+        if (string.IsNullOrEmpty (name))
+        {
+            return null;
+        }
+
+        return Environment.GetEnvironmentVariable (name);
     }
 
     /// <summary>

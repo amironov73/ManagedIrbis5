@@ -37,8 +37,6 @@ using static AM.Scripting.Barsik.Builtins;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Scripting.Barsik;
 
 /// <summary>
