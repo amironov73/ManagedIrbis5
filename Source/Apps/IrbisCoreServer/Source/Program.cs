@@ -24,14 +24,12 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace IrbisCoreServer;
 
 /// <summary>
 /// Стартовый класс сервиса.
 /// </summary>
-static class Program
+internal static class Program
 {
     public static ServerEngine Engine { get; private set; } = null!;
 
@@ -93,7 +91,7 @@ static class Program
             string[] args
         )
     {
-        Magna.Initialize (args, _ => { Console.Out.WriteLine ("Initialized"); });
+        Magna.Initialize (args, static _ => { Console.Out.WriteLine ("Initialized"); });
 
         await RunServer (args);
 

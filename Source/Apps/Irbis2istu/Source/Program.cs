@@ -35,14 +35,12 @@ using ManagedIrbis.Pft.Infrastructure;
 
 #endregion
 
-#nullable enable
-
 namespace Irbis2istu;
 
 /// <summary>
 /// Основная логика утилиты.
 /// </summary>
-static class Program
+internal static class Program
 {
     private static DataConnection? _database; // подключение к базе ИРНИТУ
     private static Stopwatch? _stopwatch; // для подсчета, сколько времени заняла операция
@@ -74,7 +72,7 @@ static class Program
         {
             Program = program
         };
-        var provider = (DirectProvider)result.Context.Provider;
+        var provider = (DirectProvider) result.Context.Provider;
         provider.FallForwardPath = ".";
 
         return result;
@@ -86,7 +84,7 @@ static class Program
         )
     {
         var places = record.FMA (2003)
-            .Where (s => s.SameString ("ГРТ")
+            .Where (static s => s.SameString ("ГРТ")
                          || s.SameString ("МСК")
                          || s.SameString ("УСО")
                          || s.SameString ("УХТТ"))
@@ -440,8 +438,7 @@ static class Program
                 Console.WriteLine ("table truncated");
 
                 var mfn = 1;
-                Record? record;
-                while ((record = ReadRecord (mfn)) != null)
+                while (ReadRecord (mfn) is { } record)
                 {
                     try
                     {
