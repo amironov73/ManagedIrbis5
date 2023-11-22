@@ -17,6 +17,8 @@
 
 using System;
 
+using ActiproSoftware.UI.Avalonia.Themes;
+
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Themes.Fluent;
@@ -36,7 +38,9 @@ public sealed class App
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        // Current!.Styles.Add (new FluentTheme (new Uri ("avares://Avalonia.Themes.Fluent/FluentLight.xaml")));
+        // var theme = new FluentTheme();
+        var theme = new ModernTheme();
+        Styles.Add (theme);
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

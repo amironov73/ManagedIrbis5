@@ -19,6 +19,8 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
+using ActiproSoftware.UI.Avalonia.Controls;
+
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -30,6 +32,8 @@ using Avalonia.Threading;
 using AM;
 using AM.Avalonia;
 using AM.Avalonia.Controls;
+
+using Avalonia.Media.Imaging;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
@@ -70,8 +74,10 @@ public sealed class MainWindow
         MinWidth = 600;
         Height = 350;
         MinHeight = 350;
-        Padding = new Thickness (10);
+        Padding = new Thickness (10, 0, 10, 10);
         Title = "Статус партии";
+
+        this.SetWindowIcon ("Assets/party.ico");
 
         InitializeControls();
         InitializeConnectionAsync()
@@ -83,6 +89,20 @@ public sealed class MainWindow
                     );
             })
             .FireAndForget();
+    }
+
+    private Bitmap? GetIcon
+        (
+            string iconName
+        )
+    {
+        using var stream = AvaloniaUtility.OpenAssetStream (GetType(), iconName);
+        if (stream is not null)
+        {
+            return new Bitmap (stream);
+        }
+
+        return null;
     }
 
     private void InitializeControls()
@@ -126,18 +146,40 @@ public sealed class MainWindow
         _logBox.SetValue (Grid.ColumnSpanProperty, 5);
 
         Content = new Grid
-        {
-            ColumnDefinitions = new ColumnDefinitions ("*, 5, *, 5, Auto"),
-            RowDefinitions = new RowDefinitions ("Auto, 5, 20, 5, *"),
-            Children =
             {
-                _numberBox,
-                _statusBox,
-                _button,
-                _busyStripe,
-                _logBox
+                ColumnDefinitions = new ColumnDefinitions ("*"),
+                RowDefinitions = new RowDefinitions ("Auto, *"),
+                Children =
+                {
+                    new ChromedTitleBar
+                    {
+                        LeftContent = new Image
+                        {
+                            Height = 32,
+                            Width = 32,
+                            Source = GetIcon ("Assets/party.ico")
+                        },
+                        RightContent = new ToggleThemeButton(),
+                        Content = Title
+                    },
+                    new Grid
+                    {
+                        [Grid.RowProperty] = 1,
+                        Margin = new Thickness (0, 10, 0, 0),
+                        ColumnDefinitions = new ColumnDefinitions ("*, 5, *, 5, Auto"),
+                        RowDefinitions = new RowDefinitions ("Auto, 5, 20, 5, *"),
+                        Children =
+                        {
+                            _numberBox,
+                            _statusBox,
+                            _button,
+                            _busyStripe,
+                            _logBox
+                        }
+                    }
+                }
             }
-        };
+            ;
     }
 
     private void WriteLine
@@ -146,12 +188,12 @@ public sealed class MainWindow
         )
     {
         Dispatcher.UIThread.InvokeAsync
-            (
-                () =>
-                {
-                    _logBox.Text += format + _logBox.NewLine;
-                    _logBox.CaretIndex = int.MaxValue;
-            })
+                (
+                    () =>
+                    {
+                        _logBox.Text += format + _logBox.NewLine;
+                        _logBox.CaretIndex = int.MaxValue;
+                    })
             .GetTask()
             .FireAndForget();
     }
@@ -388,7 +430,7 @@ public sealed class MainWindow
             return;
         }
 
-        var entry = (MenuEntry?) _statusBox.SelectedItem;
+        var entry = (MenuEntry?)_statusBox.SelectedItem;
         if (entry is null)
         {
             return;

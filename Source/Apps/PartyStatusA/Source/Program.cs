@@ -17,6 +17,8 @@
 
 using System;
 
+using AM;
+
 using Avalonia;
 
 #endregion
@@ -39,6 +41,8 @@ internal sealed class Program
             string[] args
         )
     {
+        Magna.Initialize (args);
+
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime (args);
     }

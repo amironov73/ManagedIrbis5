@@ -10,7 +10,11 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
-      <ProjectReference Include="..\..\Libs\RestfulIrbis5\RestfulIrbis5.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**" />
+        <TrimmerRootDescriptor Include="Roots.xml" />
     </ItemGroup>
 
     <ItemGroup>
