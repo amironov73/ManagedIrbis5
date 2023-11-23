@@ -1031,6 +1031,36 @@ public static class AvaloniaUtility
     /// <summary>
     /// Создание <c>CompiledBinding</c> из кода.
     /// </summary>
+    /// <param name="source">Объект, к которому осуществляется привязка.</param>
+    /// <param name="format">Формат.</param>
+    /// <param name="propertyName">Имя свойства.</param>
+    /// <param name="getter">Геттер.</param>
+    /// <param name="setter">Сеттер.</param>
+    /// <typeparam name="TProperty">Тип свойства.</typeparam>
+    /// <returns>Созданная <c>CompiledBinding</c></returns>
+    public static CompiledBindingExtension MakeBinding<TProperty>
+        (
+            object source,
+            string? format,
+            string propertyName,
+            Func<object, object?> getter,
+            Action<object, object?> setter
+        )
+    {
+        Sure.NotNull (source);
+        Sure.NotNullNorEmpty (propertyName);
+        Sure.NotNull (getter);
+
+        var result = MakeBinding<TProperty> (propertyName, getter, setter);
+        result.Source = source;
+        result.StringFormat = format;
+
+        return result;
+    }
+
+    /// <summary>
+    /// Создание <c>CompiledBinding</c> из кода.
+    /// </summary>
     /// <param name="propertyName">Имя свойства.</param>
     /// <param name="getter">Геттер.</param>
     /// <param name="setter">Сеттер.</param>

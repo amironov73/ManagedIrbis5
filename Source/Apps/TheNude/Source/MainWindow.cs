@@ -122,18 +122,29 @@ public sealed class MainWindow
                                     new TextBox
                                     {
                                         Width = 200,
-                                        [!TextBox.TextProperty] = new Binding (nameof (ViewModel.Name))
+                                        [!TextBox.TextProperty] = AvaloniaUtility.MakeBinding<string>
+                                            (
+                                                nameof (ViewModel.Name),
+                                                it => ((GalleryInfo) it).Name,
+                                                (it, value) => ((GalleryInfo) it).Name = (string?) value
+                                            )
                                     },
 
                                     new CheckBox
                                     {
                                         Content = "точно",
-                                        [!ToggleButton.IsCheckedProperty] = new Binding (nameof (ViewModel.Exact))
+                                        [!ToggleButton.IsCheckedProperty] = AvaloniaUtility.MakeBinding<bool>
+                                            (
+                                                nameof (ViewModel.Exact),
+                                                it => ((GalleryInfo) it).Exact,
+                                                (it, value) => ((GalleryInfo) it).Exact = (bool) value!
+                                            )
                                     },
 
                                     new Button
                                     {
                                         Content = "Найти",
+                                        IsDefault = true,
                                         Command = ReactiveCommand.Create (ViewModel!.Search)
                                     }
                                 }

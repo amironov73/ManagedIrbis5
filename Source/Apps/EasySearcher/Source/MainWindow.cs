@@ -16,12 +16,14 @@
 
 #region Using directives
 
+using System;
+using System.Threading.Tasks;
+
 using AM.Avalonia;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Avalonia.Data;
 using Avalonia.Layout;
 using Avalonia.Media;
 
@@ -66,7 +68,12 @@ public sealed class MainWindow
                         HorizontalAlignment = HorizontalAlignment.Center,
                         FontWeight = FontWeight.Bold,
                         Foreground = Brushes.Red,
-                        [!ContentProperty] = new Binding (nameof (SearcherModel.ErrorMessage))
+                        [!ContentProperty] = AvaloniaUtility.MakeBinding<string>
+                            (
+                                nameof (SearcherModel.ErrorMessage),
+                                static it => ((SearcherModel) it).ErrorMessage,
+                                static (it, value) => ((SearcherModel) it).ErrorMessage = (string?) value
+                            )
                     }
                     .DockTop(),
 
@@ -87,7 +94,12 @@ public sealed class MainWindow
         {
             VerticalAlignment = VerticalAlignment.Stretch,
             HorizontalAlignment = HorizontalAlignment.Stretch,
-            [!ItemsControl.ItemsSourceProperty] = new Binding (nameof (SearcherModel.Found)),
+            [!ItemsControl.ItemsSourceProperty] = AvaloniaUtility.MakeBinding<FoundItem[]>
+                (
+                    nameof (SearcherModel.Found),
+                    static it => ((SearcherModel) it).Found,
+                    static (it, value) => ((SearcherModel) it).Found = (FoundItem[]?) value
+                ),
             ItemTemplate = new FuncDataTemplate<FoundItem> (static (_, _) =>
             {
                 var firstBlock = new TextBlock
@@ -95,14 +107,24 @@ public sealed class MainWindow
                         MinWidth = 90,
                         FontWeight = FontWeight.Bold,
                         Margin = new Thickness (0, 0, 10, 0),
-                        [!TextBlock.TextProperty] = new Binding (nameof (FoundItem.Mfn))
+                        [!TextBlock.TextProperty] = AvaloniaUtility.MakeBinding<int>
+                            (
+                                nameof (FoundItem.Mfn),
+                                static it => ((FoundItem) it).Mfn,
+                                static (it, value) => ((FoundItem) it).Mfn = (int) value!
+                            )
                     }
                     .DockLeft();
 
                 var secondBlock = new TextBlock
                 {
                     TextWrapping = TextWrapping.WrapWithOverflow,
-                    [!TextBlock.TextProperty] = new Binding (nameof (FoundItem.Text))
+                    [!TextBlock.TextProperty] = AvaloniaUtility.MakeBinding<string>
+                        (
+                            nameof (FoundItem.Text),
+                            static it => ((FoundItem) it).Text,
+                            static (it, value) => ((FoundItem) it).Text = (string?) value
+                        )
                 };
 
                 var result = new DockPanel
@@ -137,7 +159,12 @@ public sealed class MainWindow
                     {
                         IsDefault = true,
                         Content = "Найти",
-                        [!Button.CommandProperty] = new Binding (nameof (SearcherModel.PerformSearch))
+                        [!Button.CommandProperty] = AvaloniaUtility.MakeBinding<Func<Task>>
+                            (
+                                nameof (SearcherModel.PerformSearch),
+                                static it => (Func<Task>)(((SearcherModel) it).PerformSearch),
+                                static (_, _) => { /* do nothing */ }
+                            )
                     }
                     .DockRight(),
 
@@ -145,7 +172,12 @@ public sealed class MainWindow
                 {
                     Margin = new Thickness (10, 0),
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-                    [!TextBox.TextProperty] = new Binding (nameof (SearcherModel.LookingFor))
+                    [!TextBox.TextProperty] = AvaloniaUtility.MakeBinding<string>
+                        (
+                            nameof (SearcherModel.LookingFor),
+                            static it => ((SearcherModel) it).LookingFor,
+                            static (it, value) => ((SearcherModel) it).LookingFor = (string?) value
+                        )
                 }
             }
         };

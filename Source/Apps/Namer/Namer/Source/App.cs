@@ -37,6 +37,7 @@ internal class App
 
         var currentApp = Current.ThrowIfNull();
         currentApp.Styles.Add (AvaloniaUtility.CreateFluentTheme());
+        currentApp.Styles.Add (AvaloniaUtility.CreateModernTheme());
         currentApp.Styles.Add (AvaloniaUtility.IncludeDataGridStyles());
     }
 

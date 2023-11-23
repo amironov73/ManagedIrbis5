@@ -21,20 +21,22 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
+using ActiproSoftware.UI.Avalonia.Controls;
+
 using AM;
 using AM.Avalonia;
 using AM.Avalonia.Controls;
+using AM.Collections;
 using AM.IO;
 
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform.Storage;
-// using Avalonia.Styling;
 using Avalonia.Threading;
 
 using ReactiveUI;
@@ -109,22 +111,28 @@ public sealed class MainWindow
         _currentSpecBox = new TextBox
         {
             Width = 250,
-            [!TextBox.TextProperty] = new Binding
-            {
-                Source = _processor,
-                Path = nameof (NameProcessor.Specification)
-            }
+            [!TextBox.TextProperty] = AvaloniaUtility.MakeBinding<string>
+                (
+                    _processor,
+                    null,
+                    nameof (NameProcessor.Specification),
+                    static it => ((NameProcessor) it).Specification,
+                    static (it, value) => ((NameProcessor) it).Specification = (string?) value
+                )
         };
         _currentSpecBox.TextChanged += (_, _) => _ApplySpecification();
 
         _specListBox = new ComboBox
         {
             Width = 250,
-            [!ItemsControl.ItemsSourceProperty] = new Binding
-            {
-                Source = _specifications,
-                Path = "."
-            }
+            [!ItemsControl.ItemsSourceProperty] = AvaloniaUtility.MakeBinding<ObservableCollection<string>>
+                (
+                    _specifications,
+                    null,
+                    ".",
+                    static it => (ObservableCollection<string>) it,
+                    static (_, _) => { /* пустое тело метода */ }
+                )
         };
         _specListBox.SelectionChanged += _SpecificationSelected;
 
@@ -186,35 +194,42 @@ public sealed class MainWindow
                     {
                         Foreground = Brushes.Green,
                         Padding = new Thickness (5),
-                        [!TextBlock.TextProperty] = new Binding
-                        {
-                            Source = _folder,
-                            Path = nameof (Folder.CheckedCount),
-                            StringFormat = "Отмечено: {0}"
-                        }
+                        [!TextBlock.TextProperty] = AvaloniaUtility.MakeBinding<int>
+                            (
+                                _folder,
+                                "Отмечено: {0}",
+                                nameof (Folder.CheckedCount),
+                                static it => ((Folder) it).CheckedCount,
+                                static (it, value) => ((Folder) it).CheckedCount = (int) value!
+                            )
                     },
 
                     new TextBlock
                     {
                         Foreground = Brushes.Red,
                         Padding = new Thickness (5),
-                        [!TextBlock.TextProperty] = new Binding
-                        {
-                            Source = _folder,
-                            Path = nameof (Folder.ErrorCount),
-                            StringFormat = "Ошибки: {0}"
-                        }
+                        [!TextBlock.TextProperty] = AvaloniaUtility.MakeBinding<int>
+                            (
+                                _folder,
+                                "Ошибки: {0}",
+                                nameof (Folder.ErrorCount),
+                                static it => ((Folder) it).ErrorCount,
+                                static (it, value) => ((Folder) it).ErrorCount = (int) value!
+                            )
                     },
 
                     new TextBlock
                     {
                         // Foreground = foreground,
                         Padding = new Thickness (5),
-                        [!TextBlock.TextProperty] = new Binding
-                        {
-                            Source = _folder,
-                            Path = nameof (Folder.DirectoryName)
-                        }
+                        [!TextBlock.TextProperty] = AvaloniaUtility.MakeBinding<string>
+                            (
+                                _folder,
+                                null,
+                                nameof (Folder.DirectoryName),
+                                static it => ((Folder) it).DirectoryName,
+                                static (it, value) => ((Folder) it).DirectoryName = (string?) value
+                            )
                     }
                 }
             }
@@ -231,14 +246,24 @@ public sealed class MainWindow
             HorizontalGridLinesBrush = Brushes.Gray,
             VerticalGridLinesBrush = Brushes.Gray,
             GridLinesVisibility = DataGridGridLinesVisibility.All,
-            [!DataGrid.ItemsSourceProperty] = new Binding (nameof (_folder.Files)),
+            [!DataGrid.ItemsSourceProperty] = AvaloniaUtility.MakeBinding<ItemPropertyTrackingCollection<NamePair>>
+                (
+                    nameof(_folder.Files),
+                    static it => ((Folder) it).Files,
+                    static (_, _) => { /* пустое тело метода */ }
+                ),
             Columns =
             {
                 new DataGridCheckBoxColumn
                 {
                     MinWidth = 40,
                     Width = new DataGridLength (40, DataGridLengthUnitType.Pixel),
-                    Binding = new Binding (nameof (NamePair.IsChecked))
+                    Binding = AvaloniaUtility.MakeBinding<bool>
+                        (
+                            nameof (NamePair.IsChecked),
+                            static it => ((NamePair) it).IsChecked,
+                            static (it, value) => ((NamePair) it).IsChecked = (bool) value!
+                        )
                 },
 
                 new DataGridTextColumn
@@ -246,14 +271,24 @@ public sealed class MainWindow
                     IsReadOnly = true,
                     Header = "Старое имя",
                     Width = new DataGridLength (1, DataGridLengthUnitType.Star),
-                    Binding = new Binding (nameof (NamePair.Old))
+                    Binding = AvaloniaUtility.MakeBinding<string>
+                        (
+                            nameof (NamePair.Old),
+                            static it => ((NamePair) it).Old,
+                            static (_, _) => { /* пустое тело метода */}
+                        )
                 },
 
                 new DataGridTextColumn
                 {
                     Header = "Новое имя",
                     Width = new DataGridLength (1, DataGridLengthUnitType.Star),
-                    Binding = new Binding (nameof (NamePair.New))
+                    Binding = AvaloniaUtility.MakeBinding<string>
+                        (
+                            nameof (NamePair.New),
+                            static it => ((NamePair) it).New,
+                            static (_, _) => { /* пустое тело метода */}
+                        )
                 },
 
                 new DataGridTextColumn
@@ -262,7 +297,12 @@ public sealed class MainWindow
                     Foreground = Brushes.Red,
                     Header = "Сообщение об ошибке",
                     Width = new DataGridLength (1, DataGridLengthUnitType.Star),
-                    Binding = new Binding (nameof (NamePair.ErrorMessage))
+                    Binding = AvaloniaUtility.MakeBinding<string>
+                        (
+                            nameof (NamePair.ErrorMessage),
+                            static it => ((NamePair) it).ErrorMessage,
+                            static (it, value) => ((NamePair) it).ErrorMessage = (string?) value
+                        )
                 }
             }
         };
@@ -295,12 +335,26 @@ public sealed class MainWindow
         //     }
         // };
 
+        var titleBar = new ChromedTitleBar
+        {
+            LeftContent = new Image
+            {
+                Height = 32,
+                Width = 32,
+                Source = GetIcon ("Assets/number.ico")
+            },
+            RightContent = new ToggleThemeButton(),
+            Content = Title
+        }
+        .DockTop();
+
         Content = new DockPanel
         {
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch,
             Children =
             {
+                titleBar,
                 toolbar,
                 _progressStripe,
                 statusBar,
@@ -375,6 +429,20 @@ public sealed class MainWindow
     private readonly NameProcessor _processor;
     private readonly Folder _folder;
     private DataGrid _dataGrid = null!;
+
+    private Bitmap? GetIcon
+        (
+            string iconName
+        )
+    {
+        using var stream = AvaloniaUtility.OpenAssetStream (GetType(), iconName);
+        if (stream is not null)
+        {
+            return new Bitmap (stream);
+        }
+
+        return null;
+    }
 
     private async Task<bool> RenameImplAsync
         (

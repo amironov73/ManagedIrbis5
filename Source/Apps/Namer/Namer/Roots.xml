@@ -1,5 +1,8 @@
 ﻿<linker>
   <!-- Can be removed if CompiledBinding and no reflection are used -->
+  <assembly fullname="AM.Core5" preserve="All" />
   <assembly fullname="Namer" preserve="All" />
   <assembly fullname="Avalonia.Themes.Fluent" preserve="All" />
+  <assembly fullname="ActiproSoftware.Avalonia.Core" preserve="All" />
+  <assembly fullname="ActiproSoftware.Avalonia.Shared" preserve="All" />
 </linker>

@@ -21,6 +21,8 @@ using AM;
 
 using Avalonia;
 
+using Microsoft.Extensions.Configuration;
+
 #endregion
 
 #nullable enable
@@ -41,7 +43,10 @@ internal sealed class Program
             string[] args
         )
     {
-        Magna.Initialize (args);
+        Magna.Configuration = new ConfigurationBuilder()
+            .SetBasePath (AppContext.BaseDirectory)
+            .AddJsonFile ("appsettings.json", false, false)
+            .Build();
 
         BuildAvaloniaApp()
             .StartWithClassicDesktopLifetime (args);

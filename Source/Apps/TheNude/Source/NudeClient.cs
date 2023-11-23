@@ -21,6 +21,8 @@ using AM.Collections;
 
 using HtmlAgilityPack;
 
+using Microsoft.Extensions.Logging;
+
 using RestSharp;
 
 #endregion
@@ -105,9 +107,21 @@ public sealed class NudeClient
         request.AddParameter ("m_exact", exact ? "on" : "off");
 
 
-        var response = client.Get (request);
+        RestResponse response;
+
+        try
+        {
+            response = client.Get (request);
+        }
+        catch (Exception exception)
+        {
+            Magna.Logger.LogError (exception, "Can't get info for {ModelName}", modelName);
+            return null;
+        }
+
         if (!response.IsSuccessful)
         {
+            Magna.Logger.LogError ("Can't get info for {ModelName}", modelName);
             return null;
         }
 
