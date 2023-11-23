@@ -156,6 +156,7 @@
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="System.Security.Permissions" Version="7.0.0" />
     <PackageVersion Include="System.Text.Encoding.CodePages" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="TaskScheduler" Version="2.10.1" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0" />
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
     <PackageVersion Include="Tomlyn" Version="0.16.2" />

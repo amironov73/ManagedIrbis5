@@ -34,6 +34,7 @@
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
         <PackageReference Include="Microsoft.Windows.Compatibility"/>
+        <PackageReference Include="TaskScheduler"/>
     </ItemGroup>
 
 </Project>
