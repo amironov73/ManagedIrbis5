@@ -15,9 +15,12 @@
 
 #region Using directives
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+
+using AM.Collections;
 
 using Avalonia.Media.Imaging;
 
@@ -31,7 +34,7 @@ namespace EasyCaption;
 /// <summary>
 /// Папка с подписываемыми картинками.
 /// </summary>
-public sealed class Folder
+internal sealed class Folder
     : ReactiveObject
 {
     #region Properties
@@ -47,6 +50,12 @@ public sealed class Folder
     /// </summary>
     [Reactive]
     public Caption? Current { get; set; }
+
+    /// <summary>
+    /// Статистика использования меток.
+    /// </summary>
+    [Reactive]
+    public TokenStat[]? Stat { get; set; }
 
     #endregion
 
@@ -96,6 +105,49 @@ public sealed class Folder
 
     #region Public methods
 
+    /// <summary>
+    /// Подсчет статистики использования меток.
+    /// </summary>
+    /// <returns></returns>
+    public TokenStat[] GetTagStat()
+    {
+        var captions = Captions;
+        if (captions is null)
+        {
+            return Array.Empty<TokenStat>();
+        }
+
+        var dictionary = new DictionaryCounter<string, int>();
+        foreach (var caption in captions)
+        {
+            var text = caption.Text;
+            if (!string.IsNullOrEmpty (text))
+            {
+                var counter = new TokenCounter (text, dictionary);
+                counter.CountLorasAndTokens();
+            }
+        }
+
+        var result = new List<TokenStat>();
+        foreach (var pair in dictionary)
+        {
+            var stat = new TokenStat
+            {
+                Tag = pair.Key,
+                Count = pair.Value
+            };
+            result.Add (stat);
+        }
+
+        // сортировка по убыванию
+        result.Sort ((left, right) => right.Count - left.Count);
+
+        return result.ToArray();
+    }
+
+    /// <summary>
+    /// Поиск картинок по указанному пути.
+    /// </summary>
     public void ScanForImages
         (
             string path
@@ -110,10 +162,24 @@ public sealed class Folder
         files.AddRange (EnumerateFiles (path, "*.png"));
 
         var captions = files
-            .Select (file => LoadCaption (file))
+            .Select (LoadCaption)
             .ToArray();
 
         Captions = captions;
+    }
+
+    /// <summary>
+    /// Синхронизация текстов с файловой системой.
+    /// </summary>
+    public void Synchronize()
+    {
+        if (Captions is not null)
+        {
+            foreach (var caption in Captions)
+            {
+                caption.Synchcronize();
+            }
+        }
     }
 
     #endregion

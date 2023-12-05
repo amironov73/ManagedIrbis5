@@ -20,8 +20,6 @@ using System.Collections.Generic;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Collections;
 
 /// <summary>
@@ -38,6 +36,7 @@ public class CaseInsensitiveDictionary<T>
     public CaseInsensitiveDictionary()
         : base (_GetComparer())
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -49,6 +48,7 @@ public class CaseInsensitiveDictionary<T>
         )
         : base (capacity, _GetComparer())
     {
+        // пустое тело конструктора
     }
 
     /// <summary>
@@ -60,6 +60,7 @@ public class CaseInsensitiveDictionary<T>
         )
         : base (dictionary, _GetComparer())
     {
+        // пустое тело конструктора
     }
 
     #endregion

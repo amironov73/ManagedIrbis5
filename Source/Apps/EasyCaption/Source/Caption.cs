@@ -69,6 +69,24 @@ public sealed class Caption
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Синхронизация текста с файловой системой.
+    /// </summary>
+    public void Synchcronize()
+    {
+        if (string.IsNullOrEmpty (CaptionFile))
+        {
+            return;
+        }
+
+        var text = (Text ?? string.Empty).Trim();
+        File.WriteAllText (CaptionFile, text);
+    }
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>

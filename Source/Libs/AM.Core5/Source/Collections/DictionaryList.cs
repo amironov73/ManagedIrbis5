@@ -18,8 +18,6 @@ using System.Diagnostics.CodeAnalysis;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Collections;
 
 /// <summary>
@@ -32,7 +30,7 @@ public class DictionaryList<TKey, TValue>
     #region Properties
 
     /// <summary>
-    /// Number of keys.
+    /// Количество ключей, помещенных в словарь.
     /// </summary>
     public int Count
     {
@@ -54,8 +52,7 @@ public class DictionaryList<TKey, TValue>
         {
             lock (_syncRoot)
             {
-                var result
-                    = new List<TKey> (_dictionary.Keys);
+                var result = new List<TKey> (_dictionary.Keys);
 
                 return result.ToArray();
             }
@@ -104,7 +101,7 @@ public class DictionaryList<TKey, TValue>
     #region Public methods
 
     /// <summary>
-    /// Add an item.
+    /// Добавление элемента.
     /// </summary>
     public DictionaryList<TKey, TValue> Add
         (

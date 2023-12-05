@@ -29,6 +29,7 @@ using AM.Text.Output;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Data.Core;
 using Avalonia.Interactivity;
@@ -424,6 +425,15 @@ public static class AvaloniaUtility
     public static IStyle CreateModernTheme()
     {
         return new ModernTheme();
+    }
+
+    /// <summary>
+    /// Создание стиля для контрола.
+    /// </summary>
+    public static Style CreateStyle<TControl>()
+        where TControl : Control
+    {
+        return new Style (x => x.OfType<TControl>());
     }
 
     /// <summary>
@@ -1446,6 +1456,26 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Установка полей для стиля.
+    /// </summary>
+    public static Style SetMargin
+        (
+            this Style style,
+            double value
+        )
+    {
+        Sure.NotNull (style);
+
+        style.Setters.Add (new Setter
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (value)
+        });
+
+        return style;
+    }
+
+    /// <summary>
     /// Установка полей снаружи контрола.
     /// </summary>
     public static Setter SetMargin
@@ -1504,7 +1534,7 @@ public static class AvaloniaUtility
         )
         => new ()
         {
-            Property = Layoutable.MarginProperty,
+            Property = TemplatedControl.PaddingProperty,
             Value = new Thickness (thickness)
         };
 
@@ -1536,7 +1566,7 @@ public static class AvaloniaUtility
         )
         => new ()
         {
-            Property = Layoutable.MarginProperty,
+            Property = TemplatedControl.PaddingProperty,
             Value = new Thickness (horizontal, vertical)
         };
 
@@ -1572,9 +1602,30 @@ public static class AvaloniaUtility
         )
         => new ()
         {
-            Property = Layoutable.MarginProperty,
+            Property = TemplatedControl.PaddingProperty,
             Value = new Thickness (left, top, right, bottom)
         };
+
+    /// <summary>
+    /// Установка полей для стиля.
+    /// </summary>
+    /// <returns></returns>
+    public static Style SetPadding
+        (
+            this Style style,
+            double value
+        )
+    {
+        Sure.NotNull (style);
+
+        style.Setters.Add (new Setter
+        {
+            Property = TemplatedControl.PaddingProperty,
+            Value = value
+        });
+
+        return style;
+    }
 
     /// <summary>
     /// Установка полей снаружи панели.
