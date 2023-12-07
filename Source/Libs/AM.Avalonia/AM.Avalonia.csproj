@@ -55,9 +55,6 @@
         <PackageReference Include="Avalonia.ThemeManager" />
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="Avalonia.Themes.Simple" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" />
-        <PackageReference Include="Avalonia.Xaml.Interactions" />
-        <PackageReference Include="Avalonia.Xaml.Interactivity" />
         <PackageReference Include="CommunityToolkit.Mvvm" />
         <PackageReference Include="Citrus.Avalonia" />
         <PackageReference Include="DynamicData" />
