@@ -5,7 +5,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <MicrosoftVersion>8.0.0</MicrosoftVersion>
-    <AvaloniaVersion>11.0.5</AvaloniaVersion>
+    <AvaloniaVersion>11.0.6</AvaloniaVersion>
     <AvaloniaStable>11.0.4</AvaloniaStable>
     <AvaloniaPrevious>11.0.1</AvaloniaPrevious>
     <SkiaVersion>2.88.6</SkiaVersion>
@@ -15,7 +15,7 @@
   </PropertyGroup>
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
-    <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.1" />
+    <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.2" />
     <PackageVersion Include="Autofac" Version="7.1.0" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaStable)" />
@@ -64,7 +64,7 @@
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.4.1" />
     <PackageVersion Include="MailKit" Version="4.2.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.0.2" />
+    <PackageVersion Include="Material.Avalonia" Version="3.1.1" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.1.4" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftVersion)" />
