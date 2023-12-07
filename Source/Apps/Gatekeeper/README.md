@@ -1,9 +1,3 @@
-### Peeper
+### Gatekeeper
 
-Простой просмотрщик JPEG-файлов.
-
-![Интерфейс программы](Assets/peeper.png)
-
----
-
-Peeper - a person who peeps at someone or something, especially in a voyeuristic way.
+Регистрация прохода читателей в библиотеку в виде десктопного приложения.

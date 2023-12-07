@@ -1,0 +1,13 @@
+@Gatekeeper2024_HostAddress = http://localhost:5290
+
+POST {{Gatekeeper2024_HostAddress}}/auth/
+Accept: application/json
+
+{
+    "type": "NORMAL",
+    "keyHex": "5AB860",
+    "direction": 2,
+    "accessPoint": 1
+}
+
+###
