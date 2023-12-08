@@ -11,3 +11,15 @@ Accept: application/json
 }
 
 ###
+
+POST http://192.168.7.57:5290/auth/
+Accept: application/json
+
+{
+    "type": "NORMAL",
+    "keyHex": "5AB860",
+    "direction": 2,
+    "accessPoint": 1
+}
+
+###

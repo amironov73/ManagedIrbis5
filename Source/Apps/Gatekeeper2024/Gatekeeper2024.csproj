@@ -27,4 +27,10 @@
     <ProjectReference Include="..\..\Libs\AM.Web\AM.Web.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="ui.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -43,6 +43,7 @@ internal sealed class UserInterface
 
     private readonly WebApplication _application;
     private readonly ILogger _logger;
+    private string? _pageBody;
 
     #endregion
 
@@ -58,7 +59,9 @@ internal sealed class UserInterface
     {
         _logger.LogInformation ("Got UI request from {Host}", context.Request.Host);
 
-        var body = "Привратник";
+        _pageBody ??= await File.ReadAllTextAsync ("ui.html");
+        var body = _pageBody.Replace ("{message}", GlobalState.Instance.Message);
+
         await WriteHtml (context, body);
     }
 

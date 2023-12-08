@@ -26,38 +26,6 @@ var builder = WebApplication.CreateBuilder (args);
 // builder.Services.AddSwaggerGen();
 
 // *******************************************************************
-// демонизация
-
-// под отладчиком запускаемся как обычное консольное приложение
-var needDemonize = !Debugger.IsAttached;
-
-// при явном указании на запуск в консоли тоже запускаемся как обычно
-if (args.Length != 0)
-{
-    var command = args[0].ToLowerInvariant();
-    if (command == "console")
-    {
-        needDemonize = false;
-    }
-
-    if (needDemonize)
-    {
-        if (RuntimeInformation.IsOSPlatform (OSPlatform.Linux))
-        {
-            Utility.UseSystemd (builder);
-        }
-        else if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            Utility.UseWindowsService (builder);
-        }
-        else
-        {
-            throw new Exception ("Operating system not supported");
-        }
-    }
-}
-
-// *******************************************************************
 
 var app = builder.Build();
 

@@ -70,6 +70,12 @@ public sealed class SigurResponse
     [JsonPropertyName ("message")]
     public string? Message { get; set; }
 
+    /// <summary>
+    /// Необязательное пояснение.
+    /// </summary>
+    [JsonPropertyName ("clarification")]
+    public string? Clarification { get; set; }
+
     #endregion
 
     #region Object members
