@@ -57,7 +57,7 @@ internal sealed class UserInterface
             HttpContext context
         )
     {
-        _logger.LogInformation ("Got UI request from {Host}", context.Request.Host);
+        // _logger.LogInformation ("Got UI request from {Host}", context.Request.Host);
 
         _pageBody ??= await File.ReadAllTextAsync ("ui.html");
         var body = _pageBody.Replace ("{message}", GlobalState.Instance.Message);

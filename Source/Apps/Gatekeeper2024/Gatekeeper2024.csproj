@@ -11,16 +11,17 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup -->
-    
+
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" />
         <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
-        
+
         <PackageReference Include="NLog" />
         <PackageReference Include="NLog.Schema" />
         <PackageReference Include="NLog.Extensions.Logging" />
+        <PackageReference Include="NLog.Web.AspNetCore" />
     </ItemGroup>
 
   <ItemGroup>
