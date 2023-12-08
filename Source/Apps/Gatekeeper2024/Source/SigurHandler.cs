@@ -236,7 +236,7 @@ internal class SigurHandler
             bool allow = true
         )
     {
-        if (isDeparture)
+        if (isDeparture || allow)
         {
             message = null;
         }

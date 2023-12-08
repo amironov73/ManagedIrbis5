@@ -11,9 +11,6 @@
 
 #region Using directives
 
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 using Gatekeeper2024;
 
 using NLog.Web;
@@ -47,11 +44,18 @@ var app = builder.Build();
 
 // app.UseHttpsRedirection();
 
+// создаем папку, в которую будут складываться задания на отправку
+var queue = Utility.GetQueueDirectory (app);
+Directory.CreateDirectory (queue);
+
 var ui = new UserInterface (app);
 app.MapGet ("/", context => ui.HandleRequest (context));
 
 var handler = new SigurHandler (app);
 app.MapPost ("/auth", context => handler.HandleRequest (context));
+
+var sender = new IrbisSender (app);
+sender.StartWorkingLoop();
 
 app.Logger.LogInformation ("Application startup");
 
