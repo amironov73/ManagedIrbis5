@@ -37,9 +37,9 @@
     <PackageVersion Include="Avalonia.ThemeManager" Version="11.0.0" />
     <PackageVersion Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Themes.Simple" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" />
+    <!-- PackageVersion Include="Avalonia.Xaml.Behaviors" Version="$(AvaloniaVersion)" / -->
+    <!-- PackageVersion Include="Avalonia.Xaml.Interactions" Version="$(AvaloniaVersion)" / -->
+    <!-- PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" / -->
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />

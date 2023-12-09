@@ -37,9 +37,9 @@
         <PackageReference Include="Avalonia.ReactiveUI" />
         <!-- PackageReference Include="Avalonia.ThemeManager" / -->
         <PackageReference Include="Avalonia.Themes.Fluent" />
-        <PackageReference Include="Avalonia.Xaml.Behaviors" />
-        <PackageReference Include="Avalonia.Xaml.Interactions" />
-        <PackageReference Include="Avalonia.Xaml.Interactivity" />
+        <!-- PackageReference Include="Avalonia.Xaml.Behaviors" / -->
+        <!-- PackageReference Include="Avalonia.Xaml.Interactions" / -->
+        <!-- PackageReference Include="Avalonia.Xaml.Interactivity" / -->
         <PackageReference Include="DynamicData" />
         <PackageReference Include="DynamicData.ReactiveUI" />
         <PackageReference Include="GridExtra.Avalonia" />
