@@ -28,7 +28,18 @@ internal sealed class IrbisSender
         )
     {
         _application = application;
+        _queueDirectory = Path.Combine
+            (
+                AppContext.BaseDirectory,
+                "Queue"
+            );
     }
+
+    #endregion
+
+    #region Private members
+
+    private readonly string _queueDirectory;
 
     #endregion
 
@@ -39,6 +50,8 @@ internal sealed class IrbisSender
     /// </summary>
     public void StartWorkingLoop()
     {
+        Directory.CreateDirectory (_queueDirectory);
+
         var thread = new Thread (WorkingLoop)
         {
             IsBackground = true
@@ -56,7 +69,7 @@ internal sealed class IrbisSender
     /// Получение одного (любого) файла, готового к отправке.
     /// </summary>
     private string? GetOneFile() =>
-        Directory.EnumerateFiles ("Pool", "*.json")
+        Directory.EnumerateFiles (_queueDirectory, "*.json")
             .FirstOrDefault();
 
     private void ProcessFile

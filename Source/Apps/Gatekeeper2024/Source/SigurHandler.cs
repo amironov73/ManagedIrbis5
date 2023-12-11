@@ -36,7 +36,6 @@ internal class SigurHandler
         )
     {
         _application = application;
-        _logger = _application.Logger;
     }
 
     #endregion
@@ -44,7 +43,6 @@ internal class SigurHandler
     #region Private members
 
     private readonly WebApplication _application;
-    private readonly ILogger _logger;
 
     #endregion
 
@@ -61,7 +59,7 @@ internal class SigurHandler
         var request = await JsonSerializer.DeserializeAsync<SigurRequest> (context.Request.Body);
         if (request is null)
         {
-            _logger.LogError ("Can't parse the request");
+            GlobalState.Logger.LogError ("Can't parse the request");
             return;
         }
 
@@ -165,7 +163,7 @@ internal class SigurHandler
             return HandleDeparture (request, reader);
         }
 
-        _logger.LogError ("Unknown access point {Request}", request);
+        GlobalState.Logger.LogError ("Unknown access point {Request}", request);
         return FallbackResolution
             (
                 $"Неизвестная точка доступа: {request.AccessPoint}",
@@ -267,7 +265,7 @@ internal class SigurHandler
             SigurResponse response
         )
     {
-        _logger.LogInformation
+        GlobalState.Logger.LogInformation
             (
                 "Got auth request: {Request}, send {Response}",
                 request,

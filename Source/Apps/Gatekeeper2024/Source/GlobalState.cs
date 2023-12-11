@@ -28,6 +28,11 @@ internal sealed class GlobalState
     #region Properties
 
     /// <summary>
+    /// Логгер чисто для нас.
+    /// </summary>
+    public static ILogger Logger { get; set; } = null!;
+
+    /// <summary>
     /// Общий экземпляр.
     /// </summary>
     public static readonly GlobalState Instance = new ();

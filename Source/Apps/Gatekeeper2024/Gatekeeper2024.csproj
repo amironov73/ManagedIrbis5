@@ -29,9 +29,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="ui.html">
+    <None Update="wwwroot">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

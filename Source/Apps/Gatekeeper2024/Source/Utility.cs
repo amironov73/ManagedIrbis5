@@ -12,17 +12,13 @@
 
 #region Using directives
 
-using System.Text.Json.Serialization;
-
-using JetBrains.Annotations;
-
-#endregion
-
 using AM.Collections;
 
 using ManagedIrbis;
 using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
+
+#endregion
 
 namespace Gatekeeper2024;
 
@@ -201,7 +197,7 @@ internal static class Utility
         var expression = GetSearchExpression (application);
         if (string.IsNullOrEmpty (expression))
         {
-            application.Logger.LogError ("Search expression not specified");
+            GlobalState.Logger.LogError ("Search expression not specified");
             return null;
         }
 
@@ -211,7 +207,7 @@ internal static class Utility
         using var connection = ConnectToIrbis (application);
         if (connection is null)
         {
-            application.Logger.LogError ("Can't connect to the IRBIS");
+            GlobalState.Logger.LogError ("Can't connect to the IRBIS");
             return null;
         }
 
