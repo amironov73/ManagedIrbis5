@@ -50,11 +50,5 @@ internal sealed class PassEvent
     [JsonPropertyName ("data")]
     public string? Data { get; set; }
 
-    /// <summary>
-    /// Дополнительные данные.
-    /// </summary>
-    [JsonPropertyName ("auxiliary")]
-    public string? Auxiliary { get; set; }
-
     #endregion
 }

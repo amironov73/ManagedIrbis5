@@ -10,6 +10,9 @@
  * Ars Magna project, http://arsmagna.ru
  */
 
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+
 namespace Gatekeeper2024;
 
 /// <summary>
@@ -44,17 +47,91 @@ internal sealed class IrbisSender
         Directory.EnumerateFiles (_queueDirectory, "*.json")
             .FirstOrDefault();
 
+    private void DeleteFile
+        (
+            string path
+        )
+    {
+        try
+        {
+            File.Delete (path);
+        }
+        catch (Exception exception)
+        {
+            GlobalState.Logger.LogError (exception, "Can't delete file {Path}", path);
+        }
+
+    }
+
+    /// <summary>
+    /// Обработка входа читателя.
+    /// </summary>
+    private void ProcessArrival
+        (
+            string path,
+            PassEvent passEvent
+        )
+    {
+        // TODO реализовать
+
+        // при успешном окончании удаляем файл
+        DeleteFile (path);
+    }
+
+    // TODO реализовать
+    private bool VerifyEvent (PassEvent passEvent) => true;
+
+    /// <summary>
+    /// Обработка выхода читателя.
+    /// </summary>
+    private void ProcessDeparture
+        (
+            string path,
+            PassEvent passEvent
+        )
+    {
+        // TODO реализовать
+
+        // при успешном окончании удаляем файл
+        DeleteFile (path);
+    }
+
     private void ProcessFile
         (
             string path
         )
     {
-        // TODO реализовать
+        var content = File.ReadAllText (path);
+        var passEvent = JsonSerializer.Deserialize<PassEvent> (content);
+        if (passEvent is null || !VerifyEvent (passEvent))
+        {
+            GlobalState.Logger.LogError ("Bad event file {Path}", path);
+            DeleteFile (path);
+            return;
+        }
+
+        switch (passEvent.Type)
+        {
+            case 1:
+                ProcessArrival (path, passEvent);
+                break;
+
+            case 2:
+                ProcessDeparture (path, passEvent);
+                break;
+
+            default:
+                GlobalState.Logger.LogError ("Bad event file {Path}", path);
+                break;
+
+        }
+
     }
 
     /// <summary>
     /// Рабочий цикл.
     /// </summary>
+    [DoesNotReturn]
     private void WorkingLoop()
     {
         while (true)
@@ -62,7 +139,19 @@ internal sealed class IrbisSender
             var file = GetOneFile();
             if (!string.IsNullOrEmpty (file))
             {
-                ProcessFile (file);
+                try
+                {
+                    ProcessFile (file);
+                }
+                catch (Exception exception)
+                {
+                    GlobalState.Logger.LogError
+                        (
+                            exception,
+                            "Error during processing file {File}",
+                            file
+                        );
+                }
             }
 
             // засыпаем на одну секунду

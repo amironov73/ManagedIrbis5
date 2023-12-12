@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
 /* SigurResponse.cs -- данные, ожидаемые Sigur в ответе на запроо
@@ -68,12 +69,13 @@ public sealed class SigurResponse
     /// запрещен. По решению внешней системы".
     /// </summary>
     [JsonPropertyName ("message")]
+    [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
     public string? Message { get; set; }
 
     /// <summary>
     /// Необязательное пояснение.
     /// </summary>
-    [JsonPropertyName ("clarification")]
+    [JsonIgnore]
     public string? Clarification { get; set; }
 
     #endregion

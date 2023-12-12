@@ -14,6 +14,8 @@
 
 using System.Text.Json;
 
+using AM;
+
 using ManagedIrbis.Readers;
 
 #endregion
@@ -45,8 +47,6 @@ internal class SigurHandler
         request.Arrived = TimeProvider.System.GetLocalNow();
 
         var response = ProcessRequest (request);
-
-        GlobalState.Instance.HasError = !response.Allow;
         LogRequestAndResponse (request, response);
 
         await context.Response.WriteAsJsonAsync (response);
@@ -67,9 +67,9 @@ internal class SigurHandler
     {
         var queue = Utility.GetQueueDirectory();
         Directory.CreateDirectory (queue);
-        var moment = pass.Moment.ToString ("yy-MM-dd-hh-mm-ss-ff");
+        var moment = pass.Moment.ToString ("yyyy-MM-dd-hh-mm-ss-ff");
         var fileName = $"{moment}.{pass.Type}.json";
-        var path = Path.Combine ("Pool", fileName);
+        var path = Path.Combine (queue, fileName);
         var json = JsonSerializer.Serialize (pass);
         File.WriteAllText (path, json);
     }
@@ -82,9 +82,9 @@ internal class SigurHandler
             SigurRequest request
         )
     {
-        var arrival = Utility.GetArrival();
-        var departure = Utility.GetDeparture();
-        var isDepature = request.AccessPoint == departure;
+        var arrivalPoint = Utility.GetArrivalPoint();
+        var departurePoint = Utility.GetDeparturePoint();
+        var isDepature = request.AccessPoint == departurePoint;
         var letPeopleGo = Utility.GetPeopleGo();
 
         var readerId = request.KeyHex;
@@ -101,54 +101,90 @@ internal class SigurHandler
         var readers = Utility.SearchForReader (readerId);
         if (readers is null)
         {
+            // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+            SaveEventForFurtherSending (new PassEvent
+            {
+                Type = request.AccessPoint,
+                Moment = request.Arrived,
+                Id = readerId
+            });
+
             var message = Utility.GetIrbisFailure (readerId);
-            return LetMyPeopleGo
+            var result = LetMyPeopleGo
                 (
                     isDepature,
                     GlobalState.Instance.Message = message,
                     allow: letPeopleGo
                 );
+            GlobalState.Instance.HasError = true;
+
+            return result;
         }
 
         if (readers.Length == 0)
         {
+            // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+            SaveEventForFurtherSending (new PassEvent
+            {
+                Type = request.AccessPoint,
+                Moment = request.Arrived,
+                Id = readerId
+            });
+
             var message = string.Format (Utility.GetReaderFailure (readerId));
-            return LetMyPeopleGo
+            var result = LetMyPeopleGo
                 (
                     isDepature,
                     GlobalState.Instance.Message = message,
                     allow: letPeopleGo
                 );
+            GlobalState.Instance.HasError = true;
+
+            return result;
         }
 
         if (readers.Length != 1)
         {
             var message = string.Format (Utility.GetManyReaders (readerId));
-            return LetMyPeopleGo
+            var result = LetMyPeopleGo
                 (
                     isDepature,
                     GlobalState.Instance.Message = message,
                     allow: letPeopleGo
                 );
+            GlobalState.Instance.HasError = true;
+
+            return result;
         }
 
         var reader = readers[0];
-        if (request.AccessPoint == arrival)
+        if (request.AccessPoint == arrivalPoint)
         {
             return HandleArrival (request, reader);
         }
 
-        if (request.AccessPoint == departure)
+        if (request.AccessPoint == departurePoint)
         {
             return HandleDeparture (request, reader);
         }
 
+        // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+        SaveEventForFurtherSending (new PassEvent
+        {
+            Type = request.AccessPoint,
+            Moment = request.Arrived,
+            Id = readerId
+        });
+
         GlobalState.Logger.LogError ("Unknown access point {Request}", request);
-        return FallbackResolution
+        var finalResult = FallbackResolution
             (
                 $"Неизвестная точка доступа: {request.AccessPoint}",
                 allow: letPeopleGo
             );
+        GlobalState.Instance.HasError = true;
+
+        return finalResult;
     }
 
     /// <summary>
@@ -160,23 +196,17 @@ internal class SigurHandler
             ReaderInfo reader
         )
     {
-        var data = new PassEvent
-        {
-            Type = request.AccessPoint,
-            Moment = request.Arrived,
-            Id = reader.Ticket,
-            Data = "Сформировать" // TODO
-        };
+        request.NotUsed();
+        var message = Utility.GetArrivalMessage (reader.Ticket!);
 
-        SaveEventForFurtherSending (data);
-
-        var message = $"Вход читателя {reader.FullName}: {reader.Ticket}";
-
-        return FallbackResolution
+        var result = FallbackResolution
             (
                 message: GlobalState.Instance.Message = message,
                 allow: true
             );
+        GlobalState.Instance.HasError = false;
+
+        return result;
     }
 
     /// <summary>
@@ -188,19 +218,14 @@ internal class SigurHandler
             ReaderInfo reader
         )
     {
-        var data = new PassEvent
-        {
-            Type = request.AccessPoint,
-            Moment = request.Arrived,
-            Id = reader.Ticket,
-            Data = "Сформировать", // TODO
-            Auxiliary = "Сформировать" // TODO
-        };
+        request.NotUsed();
+        reader.NotUsed();
 
-        SaveEventForFurtherSending (data);
+        // выходящие всегда выходят беспрепятственно
+        var result = FallbackResolution (message: null, allow: true);
+        GlobalState.Instance.HasError = false;
 
-        // выходящие все выходят беспрепятственно
-        return FallbackResolution (message: null, allow: true);
+        return result;
     }
 
     /// <summary>
@@ -233,7 +258,7 @@ internal class SigurHandler
         => new()
     {
         Allow = allow,
-        Message = message ?? (allow ? "Проход разрешен" : "Проход запрещен")
+        Message = message
     };
 
     /// <summary>

@@ -130,14 +130,69 @@ internal static class Utility
     /// <summary>
     /// Получение номера входного турникета.
     /// </summary>
-    public static int GetArrival()
+    public static int GetArrivalPoint()
         => GetRequiredInt32 ("arrival");
+
+    /// <summary>
+    /// Получение сообщения о входе читателя в библиотеку.
+    /// </summary>
+    public static string? GetArrivalMessage
+        (
+            string keyHex
+        )
+    {
+        const string defaultValue = "Зафиксирован вход читателя с пропуском {0}";
+        var result = GetString ("arrival-message", defaultValue);
+        return string.Format (result!, keyHex);
+    }
+
+    /// <summary>
+    /// Получение поля 40, формируемого при входе читателя в библиотеку.
+    /// </summary>
+    public static string GetArrivalField
+        (
+            TimeProvider? timeProvider = null
+        )
+    {
+        const string defaultValue = "^d{date}^1{time}^c(Посещение)^isigur^v*";
+        var result = GetString ("arrival-field", defaultValue);
+        return FormatDateTime (result!, timeProvider);
+    }
+
+    /// <summary>
+    /// Форматирование даты и времени для поля 40.
+    /// </summary>
+    public static string FormatDateTime
+        (
+            string format,
+            TimeProvider? timeProvider = null
+        )
+    {
+        timeProvider ??= TimeProvider.System;
+        var now = timeProvider.GetLocalNow();
+        var result = format.Replace ("{date}", now.ToString ("yyyyMMdd"));
+        result = result.Replace ("{time}", now.ToString ("hh:mm:ss"));
+        return result;
+    }
 
     /// <summary>
     /// Получение номера выходного турникета.
     /// </summary>
-    public static int GetDeparture()
+    public static int GetDeparturePoint()
         => GetRequiredInt32 ("departure");
+
+    /// <summary>
+    /// Получение поля 40, формируемого при выходе читателя из библиотеки.
+    /// </summary>
+    public static string GetDepartureField
+        (
+            TimeProvider? timeProvider = null
+        )
+    {
+        const string defaultValue = "^f{date}^2{time}";
+        var result = GetString ("departure-field", defaultValue);
+        return FormatDateTime (result!, timeProvider);
+    }
 
     /// <summary>
     /// Получение сообщения об ошибке связи с ИРБИС64.
@@ -148,7 +203,8 @@ internal static class Utility
         )
     {
         const string defaultMessage = "ВНИМАНИЕ! Сервер ИРБИС64 недоступен. Примите решение о пропуске посетителя с картой {0} в ручном режиме";
-        return GetString ("irbis-failure", defaultMessage)!;
+        var result = GetString ("irbis-failure", defaultMessage)!;
+        return string.Format (result, readerId);
     }
 
     /// <summary>
@@ -160,7 +216,8 @@ internal static class Utility
         )
     {
         const string defaultMessage = "ВНИМАНИЕ! Посетитель с картой {0} не найден в базе данных читателей, либо лишен права обслуживания. Попросите посетителя пройти на ресепшн";
-        return GetString ("reader-failure", defaultMessage)!;
+        var result = GetString ("reader-failure", defaultMessage)!;
+        return string.Format (result, readerId);
     }
 
     /// <summary>

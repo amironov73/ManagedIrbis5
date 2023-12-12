@@ -43,6 +43,15 @@ internal sealed /* нельзя static */ class Program
         var builder = WebApplication.CreateBuilder (args);
 
         // *******************************************************************
+        // настройка конфигурации
+
+        // используем json5, чтобы невозбранно использовать комментарии
+        var configuration = builder.Configuration;
+        configuration.Sources.Clear();
+        configuration.AddCommandLine (args);
+        configuration.AddJsonFile ("appsettings.json5");
+
+        // *******************************************************************
         // настройка логирования
 
         var logging = builder.Logging;
