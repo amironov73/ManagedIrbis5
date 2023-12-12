@@ -12,6 +12,8 @@
 
 #region Using directives
 
+using System.Globalization;
+
 using AM.Collections;
 
 using ManagedIrbis;
@@ -27,22 +29,88 @@ namespace Gatekeeper2024;
 /// </summary>
 internal static class Utility
 {
+    public static string? GetString
+        (
+            string keyName,
+            string? defaultValue = null
+        )
+    {
+        var configuration = GlobalState.Application.Configuration;
+        var result = configuration[keyName];
+        if (string.IsNullOrEmpty (result))
+        {
+            result = defaultValue;
+        }
+
+        return result;
+    }
+
+    public static string GetRequiredString
+        (
+            string keyName
+        )
+    {
+        var result = GetString (keyName);
+        if (string.IsNullOrEmpty (result))
+        {
+            throw new ApplicationException ($"{keyName} not configured");
+        }
+
+        return result;
+    }
+
+    public static bool GetBoolean
+        (
+            string keyName,
+            bool defaultValue = false
+        )
+    {
+        var result = GetString (keyName);
+        return string.IsNullOrEmpty (result)
+            ? defaultValue
+            : bool.Parse (result);
+    }
+
+    public static int GetInt32
+        (
+            string keyName,
+            int defaultValue = -1
+        )
+    {
+        var result = GetString (keyName);
+        return string.IsNullOrEmpty (result)
+            ? defaultValue
+            : int.Parse (result, NumberStyles.Any, CultureInfo.InvariantCulture);
+    }
+
+    public static int GetRequiredInt32
+        (
+            string keyName,
+            int defaultValue = -1
+        )
+    {
+        var result = GetInt32 (keyName);
+        if (result == defaultValue)
+        {
+            throw new ApplicationException ($"{keyName} not configured");
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Подключение к серверу ИРБИС64.
     /// </summary>
-    public static ISyncProvider? ConnectToIrbis
-        (
-            WebApplication application
-        )
+    public static ISyncProvider? ConnectToIrbis()
     {
-        var configuration = application.Configuration;
-        var connectionString = configuration["irbis-connection"];
-        if (string.IsNullOrEmpty (connectionString))
+        var connectionString = GetRequiredString ("irbis-connection");
+        var timeout = GetInt32 ("timeout", 100);
+        var socket = new GracefulSocket
         {
-            return null;
-        }
-
-        var result = ConnectionFactory.Shared.CreateSyncConnection();
+            Timeout = timeout
+        };
+        var serviceProvider = GlobalState.Application.Services;
+        var result = new SyncConnection (socket, serviceProvider);
         result.ParseConnectionString (connectionString);
         if (!result.Connect() || !result.IsConnected)
         {
@@ -56,62 +124,31 @@ internal static class Utility
     /// <summary>
     /// Получение поискового запроса для поиска читателей в базе RDR.
     /// </summary>
-    public static string? GetSearchExpression
-        (
-            WebApplication application
-        )
-    {
-        var configuration = application.Configuration;
-        var result = configuration["search-expression"];
-
-        return string.IsNullOrEmpty (result) ? null : result;
-    }
+    public static string GetSearchExpression()
+        => GetRequiredString ("search-expression");
 
     /// <summary>
     /// Получение номера входного турникета.
     /// </summary>
-    public static int GetArrival
-        (
-            WebApplication application
-        )
-    {
-        var configuration = application.Configuration;
-        var result = configuration["arrival"];
-
-        return string.IsNullOrEmpty (result) ? -1 : int.Parse (result);
-    }
+    public static int GetArrival()
+        => GetRequiredInt32 ("arrival");
 
     /// <summary>
     /// Получение номера выходного турникета.
     /// </summary>
-    public static int GetDeparture
-        (
-            WebApplication application
-        )
-    {
-        var configuration = application.Configuration;
-        var result = configuration["departure"];
-
-        return string.IsNullOrEmpty (result) ? -1 : int.Parse (result);
-    }
+    public static int GetDeparture()
+        => GetRequiredInt32 ("departure");
 
     /// <summary>
     /// Получение сообщения об ошибке связи с ИРБИС64.
     /// </summary>
     public static string GetIrbisFailure
         (
-            WebApplication application,
             string readerId
         )
     {
-        var configuration = application.Configuration;
-        var result = configuration["irbis-failure"];
-        result =  string.IsNullOrEmpty (result)
-            ? "ВНИМАНИЕ! Сервер ИРБИС64 недоступен. Примите решение о пропуске посетителя с картой {0} в ручном режиме"
-            : result;
-        result = string.Format (result, readerId);
-
-        return result;
+        const string defaultMessage = "ВНИМАНИЕ! Сервер ИРБИС64 недоступен. Примите решение о пропуске посетителя с картой {0} в ручном режиме";
+        return GetString ("irbis-failure", defaultMessage)!;
     }
 
     /// <summary>
@@ -119,18 +156,11 @@ internal static class Utility
     /// </summary>
     public static string GetReaderFailure
         (
-            WebApplication application,
             string readerId
         )
     {
-        var configuration = application.Configuration;
-        var result = configuration["reader-failure"];
-        result = string.IsNullOrEmpty (result)
-            ? "ВНИМАНИЕ! Посетитель с картой {0} не найден в базе данных читателей, либо лишен права обслуживания. Попросите посетителя пройти на ресепшн"
-            : result;
-        result = string.Format (result, readerId);
-
-        return result;
+        const string defaultMessage = "ВНИМАНИЕ! Посетитель с картой {0} не найден в базе данных читателей, либо лишен права обслуживания. Попросите посетителя пройти на ресепшн";
+        return GetString ("reader-failure", defaultMessage)!;
     }
 
     /// <summary>
@@ -138,63 +168,35 @@ internal static class Utility
     /// </summary>
     public static string GetManyReaders
         (
-            WebApplication application,
             string readerId
         )
     {
-        var configuration = application.Configuration;
-        var result = configuration["many-readers"];
-        result = string.IsNullOrEmpty (result)
-            ? "ВНИМАНИЕ! В базе данных читателей обнаружена множественность идентификатора {0}. Попросите посетителя подойти на ресепшн"
-            : result;
-        result = string.Format (result, readerId);
-
-        return result;
+        const string defaultMessage = "ВНИМАНИЕ! В базе данных читателей обнаружена множественность идентификатора {0}. Попросите посетителя подойти на ресепшн";
+        return GetString ("many-readers", defaultMessage)!;
     }
 
     /// <summary>
     /// Получение имени подпапки, в которой хранятся
     /// запросы для отправки на сервер ИРБИС64.
     /// </summary>
-    public static string GetQueueDirectory
-        (
-            WebApplication application
-        )
-    {
-        var configuration = application.Configuration;
-        var result = configuration["queue-directory"];
-        result = string.IsNullOrEmpty (result)
-            ? "Queue"
-            : result;
-
-        return result;
-    }
+    public static string GetQueueDirectory()
+        => GetRequiredString ("queue-directory");
 
     /// <summary>
     /// Пропускать или нет при любых недоразумениях.
     /// </summary>
-    public static bool GetPeopleGo
-        (
-            WebApplication application
-        )
-    {
-        var configuration = application.Configuration;
-        var value = configuration["let-my-people-go"] ?? "true";
-        var result = bool.Parse (value);
-
-        return result;
-    }
+    public static bool GetPeopleGo()
+        => GetBoolean ("let-my-people-go");
 
     /// <summary>
     /// Поиск читателя с указанным идентификатором.
     /// </summary>
     public static ReaderInfo[]? SearchForReader
         (
-            WebApplication application,
             string id
         )
     {
-        var expression = GetSearchExpression (application);
+        var expression = GetSearchExpression();
         if (string.IsNullOrEmpty (expression))
         {
             GlobalState.Logger.LogError ("Search expression not specified");
@@ -204,7 +206,7 @@ internal static class Utility
         // подставляем номер читательского в поисковое выражение
         expression = string.Format (expression, id);
 
-        using var connection = ConnectToIrbis (application);
+        using var connection = ConnectToIrbis();
         if (connection is null)
         {
             GlobalState.Logger.LogError ("Can't connect to the IRBIS");

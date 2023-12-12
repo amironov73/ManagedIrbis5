@@ -25,27 +25,6 @@ namespace Gatekeeper2024;
 /// </summary>
 internal class SigurHandler
 {
-    #region Construction
-
-    /// <summary>
-    /// Конструктор.
-    /// </summary>
-    public SigurHandler
-        (
-            WebApplication application
-        )
-    {
-        _application = application;
-    }
-
-    #endregion
-
-    #region Private members
-
-    private readonly WebApplication _application;
-
-    #endregion
-
     #region Public methods
 
     /// <summary>
@@ -67,6 +46,7 @@ internal class SigurHandler
 
         var response = ProcessRequest (request);
 
+        GlobalState.Instance.HasError = !response.Allow;
         LogRequestAndResponse (request, response);
 
         await context.Response.WriteAsJsonAsync (response);
@@ -85,7 +65,7 @@ internal class SigurHandler
             PassEvent pass
         )
     {
-        var queue = Utility.GetQueueDirectory (_application);
+        var queue = Utility.GetQueueDirectory();
         Directory.CreateDirectory (queue);
         var moment = pass.Moment.ToString ("yy-MM-dd-hh-mm-ss-ff");
         var fileName = $"{moment}.{pass.Type}.json";
@@ -102,10 +82,10 @@ internal class SigurHandler
             SigurRequest request
         )
     {
-        var arrival = Utility.GetArrival (_application);
-        var departure = Utility.GetDeparture (_application);
+        var arrival = Utility.GetArrival();
+        var departure = Utility.GetDeparture();
         var isDepature = request.AccessPoint == departure;
-        var letPeopleGo = Utility.GetPeopleGo (_application);
+        var letPeopleGo = Utility.GetPeopleGo();
 
         var readerId = request.KeyHex;
         if (string.IsNullOrEmpty (readerId))
@@ -118,10 +98,10 @@ internal class SigurHandler
                 );
         }
 
-        var readers = Utility.SearchForReader (_application, readerId);
+        var readers = Utility.SearchForReader (readerId);
         if (readers is null)
         {
-            var message = Utility.GetIrbisFailure (_application, readerId);
+            var message = Utility.GetIrbisFailure (readerId);
             return LetMyPeopleGo
                 (
                     isDepature,
@@ -132,7 +112,7 @@ internal class SigurHandler
 
         if (readers.Length == 0)
         {
-            var message = string.Format (Utility.GetReaderFailure (_application, readerId));
+            var message = string.Format (Utility.GetReaderFailure (readerId));
             return LetMyPeopleGo
                 (
                     isDepature,
@@ -143,7 +123,7 @@ internal class SigurHandler
 
         if (readers.Length != 1)
         {
-            var message = string.Format (Utility.GetManyReaders (_application, readerId));
+            var message = string.Format (Utility.GetManyReaders (readerId));
             return LetMyPeopleGo
                 (
                     isDepature,

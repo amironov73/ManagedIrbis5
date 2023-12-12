@@ -51,46 +51,44 @@ internal sealed /* нельзя static */ class Program
         builder.Host.UseNLog();
 
         // *******************************************************************
-        // дополнительные сервисы
-
-        // // Add services to the container.
-        // // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        // builder.Services.AddEndpointsApiExplorer();
-        // builder.Services.AddSwaggerGen();
-
-        // *******************************************************************
 
         var app = builder.Build();
 
+        GlobalState.Application = app;
         GlobalState.Logger = app.Services.GetRequiredService <ILogger<Program>>();
 
-        // // Configure the HTTP request pipeline.
-        // if (app.Environment.IsDevelopment())
-        // {
-        //     app.UseSwagger();
-        //     app.UseSwaggerUI();
-        // }
+        // *******************************************************************
+        // отдача статических файлов
+
+        // При использовании UseDefaultFiles запросы к папке в wwwroot будут искать следующие файлы:
+        // default.htm
+        // default.html
+        // index.htm
+        // index.html
+        app.UseDefaultFiles();
 
         app.UseStaticFiles();
 
+        // UseFileServer объединяет функции UseStaticFiles, UseDefaultFiles
+        // и при необходимости UseDirectoryBrowser.
+
+        // *******************************************************************
+
         // создаем папку, в которую будут складываться задания на отправку
-        var queue = Utility.GetQueueDirectory (app);
+        var queue = Utility.GetQueueDirectory();
         Directory.CreateDirectory (queue);
 
-        app.MapGet ("/", context =>
-        {
-            context.Response.Redirect ("/index.html");
-            return Task.CompletedTask;
-        });
-
         app.MapGet ("/api/fish", GetNextFish);
+        app.MapGet ("/api/state", GetState);
 
-        var handler = new SigurHandler (app);
+        var handler = new SigurHandler();
         app.MapPost ("/auth", context => handler.HandleRequest (context));
 
-        var sender = new IrbisSender (app);
+        var sender = new IrbisSender();
+        sender.CheckIrbisConnection();
         sender.StartWorkingLoop();
 
+        GlobalState.SetMessageWithTimestamp ("Пока никаких событий не зафиксировано");
         GlobalState.Logger.LogInformation ("Application startup");
 
         app.Run();
@@ -105,5 +103,10 @@ internal sealed /* нельзя static */ class Program
         }
 
         return result;
+    }
+
+    private static IResult GetState()
+    {
+        return Results.Json (GlobalState.Instance);
     }
 }

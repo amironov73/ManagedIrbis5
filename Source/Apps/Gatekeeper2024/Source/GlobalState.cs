@@ -28,9 +28,14 @@ internal sealed class GlobalState
     #region Properties
 
     /// <summary>
-    /// Логгер чисто для нас.
+    /// Логгер чисто для классов <c>GateKeeper2024.*</c>.
     /// </summary>
     public static ILogger Logger { get; set; } = null!;
+
+    /// <summary>
+    /// Веб-приложение.
+    /// </summary>
+    public static WebApplication Application { get; set; } = null!;
 
     /// <summary>
     /// Общий экземпляр.
@@ -41,7 +46,13 @@ internal sealed class GlobalState
     /// Сообщение.
     /// </summary>
     [JsonPropertyName ("message")]
-    public string? Message { get; set; } = "Пока никаких событий не происходило";
+    public string? Message { get; set; }
+
+    /// <summary>
+    /// Признак ошибки.
+    /// </summary>
+    [JsonPropertyName ("error")]
+    public bool HasError { get; set; }
 
     #endregion
 
@@ -53,15 +64,15 @@ internal sealed class GlobalState
 
     #region Public methods
 
-    public static void Update
+    public static string? SetMessageWithTimestamp
         (
-            GlobalState newState
+            string? message
         )
     {
-        lock (_syncObject)
-        {
-            // TODO реализовать
-        }
+        var timestamp = DateTime.Now.ToString ("hh:mm:ss");
+        Instance.Message = $"{timestamp} => {message}";
+
+        return message;
     }
 
     #endregion

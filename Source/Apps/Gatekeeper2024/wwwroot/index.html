@@ -32,9 +32,9 @@
         <div class="col-6 offset-3">
 
             <div class="mt-3">
-                <div id="the-message" class="alert alert-info">
+                <div id="alert-box" class="alert alert-info">
                     <div>
-                        <span class="text-success">Текущее время:</span> <span id="current-time"></span>
+                        <span id="message-text" class="text-success"></span>
                     </div>
                 </div>
             </div>
@@ -50,16 +50,15 @@
 
 
 <script>
-    var flag = true;
-
     setInterval(() => {
-                axios.get("/api/fish")
+                axios.get("/api/state")
                         .then(function (response) {
-                            let div = document.getElementById("the-message")
-                            let span = document.getElementById("current-time")
-                            span.innerText = response.data
-                            flag = !flag;
-                            div.className = flag ? "alert alert-danger" : "alert alert-info";
+                            let alertBox = document.getElementById ("alert-box")
+                            let messageText = document.getElementById ("message-text")
+                            alertBox.className = response.data.error
+                                    ? "alert alert-danger"
+                                    : "alert alert-info"
+                            messageText.innerText = response.data.message
                         })
             },
             1000)

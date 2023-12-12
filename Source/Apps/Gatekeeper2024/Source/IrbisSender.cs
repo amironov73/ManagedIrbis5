@@ -22,12 +22,8 @@ internal sealed class IrbisSender
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public IrbisSender
-        (
-            WebApplication application
-        )
+    public IrbisSender()
     {
-        _application = application;
         _queueDirectory = Path.Combine
             (
                 AppContext.BaseDirectory,
@@ -40,30 +36,6 @@ internal sealed class IrbisSender
     #region Private members
 
     private readonly string _queueDirectory;
-
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Запуск рабочего цикла.
-    /// </summary>
-    public void StartWorkingLoop()
-    {
-        Directory.CreateDirectory (_queueDirectory);
-
-        var thread = new Thread (WorkingLoop)
-        {
-            IsBackground = true
-        };
-        thread.Start();
-    }
-
-    #endregion
-
-    #region Private members
-
-    private readonly WebApplication _application;
 
     /// <summary>
     /// Получение одного (любого) файла, готового к отправке.
@@ -96,6 +68,60 @@ internal sealed class IrbisSender
             // засыпаем на одну секунду
             Thread.Sleep (TimeSpan.FromSeconds (1));
         }
+    }
+
+    private void _CheckIrbisConnection()
+    {
+        try
+        {
+            var connection = Utility.ConnectToIrbis();
+
+            if (connection is null)
+            {
+                GlobalState.Instance.HasError = true;
+                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64: ОШИБКА");
+            }
+            else
+            {
+                GlobalState.Instance.HasError = false;
+                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64 выполнено успешно");
+                connection.Dispose();
+            }
+        }
+        catch (Exception exception)
+        {
+            GlobalState.Logger.LogError (exception, "Error during CheckIrbisConnection");
+        }
+    }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Проверка подключения к серверу ИРБИС64.
+    /// </summary>
+    public void CheckIrbisConnection()
+    {
+        new Thread(_CheckIrbisConnection)
+        {
+            IsBackground = true
+        }
+        .Start();
+    }
+
+    /// <summary>
+    /// Запуск рабочего цикла.
+    /// </summary>
+    public void StartWorkingLoop()
+    {
+        Directory.CreateDirectory (_queueDirectory);
+
+        var thread = new Thread (WorkingLoop)
+        {
+            IsBackground = true
+        };
+        thread.Start();
     }
 
     #endregion

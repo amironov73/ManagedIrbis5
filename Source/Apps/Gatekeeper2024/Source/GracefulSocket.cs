@@ -2,44 +2,50 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable ReplaceSliceWithRangeIndexer
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
-/* SyncTcp4Socket.cs -- клиентский сокет на основе TCP/IP 4
+/* GracefulSocket.cs -- сокет, умеющий отваливаться быстро и безболезненно
  * Ars Magna project, http://arsmagna.ru
  */
 
 #region Using directives
 
-using System;
 using System.Net.Sockets;
 
 using AM;
 
-using Microsoft.Extensions.Logging;
+using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Infrastructure.Sockets;
 
 #endregion
 
-namespace ManagedIrbis.Infrastructure.Sockets;
+namespace Gatekeeper2024;
 
 /// <summary>
-/// Сокет, реализующий синхронный режим для TCPv4-подключения.
+/// Сокет, умеющий отваливаться быстро и безболезненно.
 /// </summary>
-public sealed class SyncTcp4Socket
+public sealed class GracefulSocket
     : ISyncClientSocket
 {
     #region Properties
 
-    /// <inheritdoc cref="ISyncClientSocket.RetryCount"/>
+    /// <summary>
+    /// Игнорируем.
+    /// </summary>
     public int RetryCount { get; set; }
 
-    /// <inheritdoc cref="ISyncClientSocket.RetryDelay"/>
+    /// <summary>
+    /// Игнорируем.
+    /// </summary>
     public int RetryDelay { get; set; }
+
+    /// <summary>
+    /// Тайм-аут подключения и сетевого обмена, миллисекунды.
+    /// </summary>
+    public int Timeout { get; set; } = 100;
 
     /// <summary>
     /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
@@ -51,7 +57,7 @@ public sealed class SyncTcp4Socket
     #region ISyncClientSocket members
 
     /// <inheritdoc cref="ISyncClientSocket.TransactSync"/>
-    public unsafe Response? TransactSync
+    public Response? TransactSync
         (
             SyncQuery query
         )
@@ -65,9 +71,27 @@ public sealed class SyncTcp4Socket
         using var client = new TcpClient (AddressFamily.InterNetwork);
         try
         {
+            // устанавливаем краткие тайм-ауты
+            client.SendTimeout = Timeout;
+            client.ReceiveTimeout = Timeout;
+
             var host = connection.Host.ThrowIfNull();
             logger?.LogTrace ("Connecting to {Host}", host);
-            client.Connect (host, connection.Port);
+
+            // вместо синхронной версии вызова
+            // client.Connect (host, connection.Port);
+
+            // используем асинхронную версию, хоть это и неправильно
+            // зато дает возможность установить тайм-аут на подключение
+            client.ConnectAsync (host, connection.Port).Wait (Timeout);
+            if (!client.Connected)
+            {
+                logger?.LogError ("Error while connecting");
+                connection.SetLastError (-100_002);
+
+                return default;
+            }
+
             logger?.LogTrace ("Connected to {Host}", host);
         }
         catch (Exception exception)
