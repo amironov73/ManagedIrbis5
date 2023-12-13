@@ -3,6 +3,8 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
+// ReSharper disable LocalizableElement
 // ReSharper disable StringLiteralTypo
 
 /* Program.cs -- настройка и запуск Web-приложения
@@ -11,7 +13,11 @@
 
 #region Using directives
 
+using Microsoft.Extensions.Logging.Abstractions;
+
 using NLog.Web;
+
+using RestSharp;
 
 using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
@@ -21,35 +27,39 @@ namespace Gatekeeper2024;
 
 internal sealed /* нельзя static */ class Program
 {
-    private static int _currentFish;
-
-    private static readonly string[] fishLines =
+    internal static void Main
+        (
+            string[] args
+        )
     {
-        "Задача организации, в особенности же постоянное информационно-пропагандистское обеспечение нашей деятельности.",
-        "Повседневная практика показывает, что рамки и место обучения кадров влечет за собой процесс внедрения.",
-        "Значимость этих проблем настолько очевидна, что сложившаяся структура организации представляет собой интересный эксперимент.",
-        "Повседневная практика показывает, что начало повседневной работы по формированию позиции играет важную роль.",
-        "Разнообразный и богатый опыт дальнейшее развитие различных форм деятельности представляет собой интересный эксперимент.",
-        "Разнообразный и богатый опыт консультация с широким активом в значительной степени обуславливает создание.",
-        "Идейные соображения высшего порядка, а также постоянное информационно-пропагандистское обеспечение нашей деятельности.",
-        "Значимость этих проблем настолько очевидна, что дальнейшее развитие различных форм деятельности позволяет выполнять.",
-        "Товарищи! новая модель организационной деятельности в значительной степени обуславливает создание новых предложений.",
-        "С другой стороны постоянный количественный рост и сфера нашей активности позволяет выполнять важные задания по разработке."
-    };
+        // *******************************************************************
+        // начальная настройка
 
+        // временный логгер, будет заменен постоянным
+        GlobalState.Logger = new NullLoggerFactory().CreateLogger ("null");
 
-    internal static void Main (string[] args)
-    {
+        // *******************************************************************
+
         var builder = WebApplication.CreateBuilder (args);
 
         // *******************************************************************
         // настройка конфигурации
 
         // используем json5, чтобы невозбранно использовать комментарии
+        // хотя, говорят, можно было оставаться и на простом json
         var configuration = builder.Configuration;
         configuration.Sources.Clear();
         configuration.AddCommandLine (args);
         configuration.AddJsonFile ("appsettings.json5");
+
+        // *******************************************************************
+        // остановка приложения по требованию
+
+        if (args is ["stop"] or ["/stop"])
+        {
+            RequestStop();
+            return;
+        }
 
         // *******************************************************************
         // настройка логирования
@@ -60,6 +70,14 @@ internal sealed /* нельзя static */ class Program
         builder.Host.UseNLog();
 
         // *******************************************************************
+        // регистрация сервисов
+
+        var services = builder.Services;
+        services.AddHostedService<IrbisSender>();
+        services.AddSingleton<SigurHandler>();
+
+        // *******************************************************************
+        // предварительная настройка завершена, создаем объект приложения
 
         var app = builder.Build();
 
@@ -84,18 +102,26 @@ internal sealed /* нельзя static */ class Program
         // *******************************************************************
 
         // создаем папку, в которую будут складываться задания на отправку
-        var queue = Utility.GetQueueDirectory();
-        Directory.CreateDirectory (queue);
+        var queueDirectory = Utility.GetQueueDirectory();
+        try
+        {
+            Directory.CreateDirectory (queueDirectory);
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine ($"Ошибка при создании папки {queueDirectory}");
+            GlobalState.Logger.LogError (exception, $"Failed to create directory {queueDirectory}");
+            return;
+        }
 
-        app.MapGet ("/api/fish", GetNextFish);
-        app.MapGet ("/api/state", GetState);
+        // *******************************************************************
+        // создаем endpoint'ы
 
-        var handler = new SigurHandler();
-        app.MapPost ("/auth", context => handler.HandleRequest (context));
+        var api = app.MapGroup("/api");
+        api.MapGet ("state", GetState);
+        api.MapGet ("stop", StopTheApplication);
 
-        var sender = new IrbisSender();
-        sender.CheckIrbisConnection();
-        sender.StartWorkingLoop();
+        app.MapPost ("/auth", HandleAuth);
 
         GlobalState.SetMessageWithTimestamp ("Пока никаких событий не зафиксировано");
         GlobalState.Logger.LogInformation ("Application startup");
@@ -103,19 +129,42 @@ internal sealed /* нельзя static */ class Program
         app.Run();
     }
 
-    private static string GetNextFish()
+    private static IResult HandleAuth
+        (
+            HttpContext context
+        )
     {
-        var result = fishLines[_currentFish++];
-        if (_currentFish >= fishLines.Length)
-        {
-            _currentFish = 0;
-        }
+        var sigurHandler = GlobalState.Application.Services.GetRequiredService<SigurHandler>();
 
-        return result;
+        return sigurHandler.HandleRequest (context);
     }
 
     private static IResult GetState()
     {
         return Results.Json (GlobalState.Instance);
     }
+
+    private static void RequestStop()
+    {
+        Console.WriteLine ("Requesting stop the application");
+        try
+        {
+            var client = new RestClient ("http://127.0.0.1");
+            var request = new RestRequest ("/api/stop");
+            var response = client.Execute (request);
+            Console.WriteLine ($"Response is {response.StatusCode}");
+        }
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine (exception.Message);
+        }
+    }
+
+    private static void StopTheApplication()
+    {
+        GlobalState.Logger.LogInformation ("Stop the application requested");
+        var lifetime = GlobalState.Application.Services.GetRequiredService<IHostApplicationLifetime>();
+        lifetime.StopApplication();
+    }
+
 }

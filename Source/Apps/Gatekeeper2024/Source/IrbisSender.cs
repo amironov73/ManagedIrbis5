@@ -19,6 +19,7 @@ namespace Gatekeeper2024;
 /// Отправляет данные на сервер ИРБИС64.
 /// </summary>
 internal sealed class IrbisSender
+    : BackgroundService
 {
     #region Construction
 
@@ -27,11 +28,7 @@ internal sealed class IrbisSender
     /// </summary>
     public IrbisSender()
     {
-        _queueDirectory = Path.Combine
-            (
-                AppContext.BaseDirectory,
-                "Queue"
-            );
+        _queueDirectory = Utility.GetQueueDirectory();
     }
 
     #endregion
@@ -47,6 +44,9 @@ internal sealed class IrbisSender
         Directory.EnumerateFiles (_queueDirectory, "*.json")
             .FirstOrDefault();
 
+    /// <summary>
+    /// Удаление отработанного либо битого файла.
+    /// </summary>
     private void DeleteFile
         (
             string path
@@ -55,6 +55,7 @@ internal sealed class IrbisSender
         try
         {
             File.Delete (path);
+            GlobalState.Logger.LogInformation ("Delete file {Path}", path);
         }
         catch (Exception exception)
         {
@@ -125,41 +126,12 @@ internal sealed class IrbisSender
                 break;
 
         }
-
     }
 
     /// <summary>
-    /// Рабочий цикл.
+    /// Проверка подключения к серверу ИРБИС64.
     /// </summary>
-    [DoesNotReturn]
-    private void WorkingLoop()
-    {
-        while (true)
-        {
-            var file = GetOneFile();
-            if (!string.IsNullOrEmpty (file))
-            {
-                try
-                {
-                    ProcessFile (file);
-                }
-                catch (Exception exception)
-                {
-                    GlobalState.Logger.LogError
-                        (
-                            exception,
-                            "Error during processing file {File}",
-                            file
-                        );
-                }
-            }
-
-            // засыпаем на одну секунду
-            Thread.Sleep (TimeSpan.FromSeconds (1));
-        }
-    }
-
-    private void _CheckIrbisConnection()
+    private void CheckIrbisConnection()
     {
         try
         {
@@ -183,34 +155,68 @@ internal sealed class IrbisSender
         }
     }
 
-    #endregion
-
-    #region Public methods
-
-    /// <summary>
-    /// Проверка подключения к серверу ИРБИС64.
-    /// </summary>
-    public void CheckIrbisConnection()
+    private bool CreateQueueDirectory()
     {
-        new Thread(_CheckIrbisConnection)
+        try
         {
-            IsBackground = true
+            Directory.CreateDirectory (_queueDirectory);
         }
-        .Start();
+        catch (Exception exception)
+        {
+            Console.Error.WriteLine($"Ошибка при создании директории {_queueDirectory}");
+            GlobalState.Logger.LogError
+                (
+                    exception,
+                    "Can't create queue directory {Directory}", _queueDirectory
+                );
+            return false;
+        }
+
+        return true;
     }
 
-    /// <summary>
-    /// Запуск рабочего цикла.
-    /// </summary>
-    public void StartWorkingLoop()
-    {
-        Directory.CreateDirectory (_queueDirectory);
+    #endregion
 
-        var thread = new Thread (WorkingLoop)
+    #region BackgroundService members
+
+    /// <inheritdoc cref="BackgroundService.ExecuteAsync"/>
+    protected override Task ExecuteAsync
+        (
+            CancellationToken stoppingToken
+        )
+    {
+        if (!CreateQueueDirectory())
         {
-            IsBackground = true
-        };
-        thread.Start();
+            return Task.CompletedTask;
+        }
+
+        CheckIrbisConnection();
+
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            var file = GetOneFile();
+            if (!string.IsNullOrEmpty (file))
+            {
+                try
+                {
+                    ProcessFile (file);
+                }
+                catch (Exception exception)
+                {
+                    GlobalState.Logger.LogError
+                        (
+                            exception,
+                            "Error during processing file {File}",
+                            file
+                        );
+                }
+            }
+
+            // засыпаем на секунду
+            Thread.Sleep (1000);
+        }
+
+        return Task.CompletedTask;
     }
 
     #endregion

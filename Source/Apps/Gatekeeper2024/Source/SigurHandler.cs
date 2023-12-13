@@ -32,16 +32,16 @@ internal class SigurHandler
     /// <summary>
     /// Обработчик POST-запроса.
     /// </summary>
-    public async Task HandleRequest
+    public IResult HandleRequest
         (
             HttpContext context
         )
     {
-        var request = await JsonSerializer.DeserializeAsync<SigurRequest> (context.Request.Body);
+        var request = JsonSerializer.Deserialize<SigurRequest> (context.Request.Body);
         if (request is null)
         {
             GlobalState.Logger.LogError ("Can't parse the request");
-            return;
+            return Results.BadRequest();
         }
 
         request.Arrived = TimeProvider.System.GetLocalNow();
@@ -49,7 +49,7 @@ internal class SigurHandler
         var response = ProcessRequest (request);
         LogRequestAndResponse (request, response);
 
-        await context.Response.WriteAsJsonAsync (response);
+        return Results.Json (response);
     }
 
     #endregion
