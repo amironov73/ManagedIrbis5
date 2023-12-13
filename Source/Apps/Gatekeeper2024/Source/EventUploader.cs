@@ -6,27 +6,34 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* IrbisSender.cs -- отправляет данные на сервер ИРБИС64
+/* EventUploader.cs -- отправляет данные о проходах читателей на сервер ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
-using System.Diagnostics.CodeAnalysis;
+#region Using directives
+
 using System.Text.Json;
+
+using ManagedIrbis;
+using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Readers;
+
+#endregion
 
 namespace Gatekeeper2024;
 
 /// <summary>
-/// Отправляет данные на сервер ИРБИС64.
+/// Отправляет данные о событиях прохода читателей на сервер ИРБИС64.
 /// </summary>
-internal sealed class IrbisSender
-    : BackgroundService
+internal sealed class EventUploader
+    : IHostedService
 {
     #region Construction
 
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public IrbisSender()
+    public EventUploader()
     {
         _queueDirectory = Utility.GetQueueDirectory();
     }
@@ -61,7 +68,38 @@ internal sealed class IrbisSender
         {
             GlobalState.Logger.LogError (exception, "Can't delete file {Path}", path);
         }
+    }
 
+    private ReaderInfo? GetReader
+        (
+            ISyncProvider connection,
+            string readerId,
+            string path
+        )
+    {
+        var readers = Utility.SearchForReader (readerId);
+        if (readers is null)
+        {
+            // не удалось связаться с сервером
+            // не удаляем файл, вдруг удастся связаться в будущем
+            return null;
+        }
+
+        if (readers.Length == 0)
+        {
+            GlobalState.Logger.LogError ("No reader with ticket {Ticket}", readerId);
+            DeleteFile (path);
+            return null;
+        }
+
+        if (readers.Length != 1)
+        {
+            GlobalState.Logger.LogError ("Many readers with ticket {Ticket}", readerId);
+            DeleteFile (path);
+            return null;
+        }
+
+        return readers[0];
     }
 
     /// <summary>
@@ -75,12 +113,79 @@ internal sealed class IrbisSender
     {
         // TODO реализовать
 
-        // при успешном окончании удаляем файл
-        DeleteFile (path);
+        var readerId = passEvent.Id;
+        if (string.IsNullOrEmpty (readerId))
+        {
+            GlobalState.Logger.LogError ("Empty reader ID in file {Path}", path);
+            DeleteFile (path);
+            return;
+        }
+
+        using var connection = Utility.ConnectToIrbis();
+        if (connection is null)
+        {
+            return;
+        }
+
+        var reader = GetReader (connection, readerId, path);
+        if (reader is null)
+        {
+            // файл не удаляем, это делает GetReader при необходимости
+            return;
+        }
+
+        var record = reader.Record;
+        if (record is null)
+        {
+            GlobalState.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            DeleteFile (path);
+            return;
+        }
+
+        var eventData = Utility.GetArrivalField (passEvent.Moment);
+        record.Add (40, eventData);
+
+        // отправляем модифицированную запись на сервер
+        var parameters = new WriteRecordParameters
+        {
+            Record = record,
+            Lock = false,
+            Actualize = true,
+            DontParse = true
+        };
+
+        if (connection.WriteRecord (parameters))
+        {
+            GlobalState.Logger.LogInformation
+                (
+                    "Arrival to Irbis success: {Ticket}, {EventData}",
+                    readerId,
+                    eventData
+                );
+
+            // при успешном окончании удаляем файл
+            DeleteFile (path);
+        }
     }
 
-    // TODO реализовать
-    private bool VerifyEvent (PassEvent passEvent) => true;
+    /// <summary>
+    /// Проверка, что с данным событием можно иметь дело.
+    /// </summary>
+    private bool VerifyEvent
+        (
+            PassEvent passEvent
+        )
+    {
+        var result = passEvent.Type is 1 or 2
+               && !string.IsNullOrEmpty (passEvent.Id);
+
+        if (!result)
+        {
+            GlobalState.Logger.LogError ("Bad PassEvent: {Event}", passEvent);
+        }
+
+        return result;
+    }
 
     /// <summary>
     /// Обработка выхода читателя.
@@ -102,8 +207,14 @@ internal sealed class IrbisSender
             string path
         )
     {
-        var content = File.ReadAllText (path);
-        var passEvent = JsonSerializer.Deserialize<PassEvent> (content);
+        var content = File.ReadAllBytes (path);
+        var stream = new MemoryStream (content);
+
+        // синхронно нельзя - лается и бросается исключениями
+        // TODO разобраться с предупреждением
+        var passEvent = JsonSerializer.DeserializeAsync<PassEvent> (stream)
+            .GetAwaiter().GetResult();
+
         if (passEvent is null || !VerifyEvent (passEvent))
         {
             GlobalState.Logger.LogError ("Bad event file {Path}", path);
@@ -124,7 +235,6 @@ internal sealed class IrbisSender
             default:
                 GlobalState.Logger.LogError ("Bad event file {Path}", path);
                 break;
-
         }
     }
 
@@ -175,24 +285,16 @@ internal sealed class IrbisSender
         return true;
     }
 
-    #endregion
-
-    #region BackgroundService members
-
-    /// <inheritdoc cref="BackgroundService.ExecuteAsync"/>
-    protected override Task ExecuteAsync
-        (
-            CancellationToken stoppingToken
-        )
+    private void MainLoop ()
     {
         if (!CreateQueueDirectory())
         {
-            return Task.CompletedTask;
+            return;
         }
 
         CheckIrbisConnection();
 
-        while (!stoppingToken.IsCancellationRequested)
+        while (true)
         {
             var file = GetOneFile();
             if (!string.IsNullOrEmpty (file))
@@ -215,6 +317,33 @@ internal sealed class IrbisSender
             // засыпаем на секунду
             Thread.Sleep (1000);
         }
+    }
+
+    #endregion
+
+    #region IHostedService members
+
+    public Task StartAsync
+        (
+            CancellationToken cancellationToken
+        )
+    {
+        var thread = new Thread (MainLoop)
+        {
+            IsBackground = true,
+            Priority = ThreadPriority.BelowNormal
+        };
+        thread.Start();
+
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync
+        (
+            CancellationToken cancellationToken
+        )
+    {
+        // TODO implement
 
         return Task.CompletedTask;
     }

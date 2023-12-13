@@ -34,4 +34,10 @@
         />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="appsettings.json5">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

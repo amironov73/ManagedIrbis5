@@ -136,7 +136,7 @@ internal static class Utility
     /// <summary>
     /// Получение сообщения о входе читателя в библиотеку.
     /// </summary>
-    public static string? GetArrivalMessage
+    public static string GetArrivalMessage
         (
             string keyHex
         )
@@ -147,16 +147,25 @@ internal static class Utility
     }
 
     /// <summary>
+    /// Текущий момент времени.
+    /// </summary>
+    public static DateTimeOffset GetNow
+        (
+            TimeProvider? timeProvider = null
+        )
+        => (timeProvider ?? TimeProvider.System).GetLocalNow();
+
+    /// <summary>
     /// Получение поля 40, формируемого при входе читателя в библиотеку.
     /// </summary>
     public static string GetArrivalField
         (
-            TimeProvider? timeProvider = null
+            DateTimeOffset moment
         )
     {
         const string defaultValue = "^d{date}^1{time}^c(Посещение)^isigur^v*";
         var result = GetString ("arrival-field", defaultValue);
-        return FormatDateTime (result!, timeProvider);
+        return FormatDateTime (result!, moment);
     }
 
     /// <summary>
@@ -165,13 +174,11 @@ internal static class Utility
     public static string FormatDateTime
         (
             string format,
-            TimeProvider? timeProvider = null
+            DateTimeOffset moment
         )
     {
-        timeProvider ??= TimeProvider.System;
-        var now = timeProvider.GetLocalNow();
-        var result = format.Replace ("{date}", now.ToString ("yyyyMMdd"));
-        result = result.Replace ("{time}", now.ToString ("hh:mm:ss"));
+        var result = format.Replace ("{date}", moment.ToString ("yyyyMMdd"));
+        result = result.Replace ("{time}", moment.ToString ("hh:mm:ss"));
         return result;
     }
 
@@ -186,12 +193,12 @@ internal static class Utility
     /// </summary>
     public static string GetDepartureField
         (
-            TimeProvider? timeProvider = null
+            DateTimeOffset moment
         )
     {
         const string defaultValue = "^f{date}^2{time}";
         var result = GetString ("departure-field", defaultValue);
-        return FormatDateTime (result!, timeProvider);
+        return FormatDateTime (result!, moment);
     }
 
     /// <summary>
@@ -229,7 +236,8 @@ internal static class Utility
         )
     {
         const string defaultMessage = "ВНИМАНИЕ! В базе данных читателей обнаружена множественность идентификатора {0}. Попросите посетителя подойти на ресепшн";
-        return GetString ("many-readers", defaultMessage)!;
+        var result = GetString ("many-readers", defaultMessage)!;
+        return string.Format (result, readerId);
     }
 
     /// <summary>
@@ -247,6 +255,7 @@ internal static class Utility
 
     /// <summary>
     /// Поиск читателя с указанным идентификатором.
+    /// Может найтись несколько, если в базе есть дублеты.
     /// </summary>
     public static ReaderInfo[]? SearchForReader
         (

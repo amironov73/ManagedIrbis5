@@ -73,7 +73,7 @@ internal sealed /* нельзя static */ class Program
         // регистрация сервисов
 
         var services = builder.Services;
-        services.AddHostedService<IrbisSender>();
+        services.AddHostedService<EventUploader>();
         services.AddSingleton<SigurHandler>();
 
         // *******************************************************************
@@ -92,34 +92,20 @@ internal sealed /* нельзя static */ class Program
         // default.html
         // index.htm
         // index.html
-        app.UseDefaultFiles();
+        // app.UseDefaultFiles();
 
         app.UseStaticFiles();
+        app.MapGet ("/", () => Results.Redirect ("/index.html"));
 
         // UseFileServer объединяет функции UseStaticFiles, UseDefaultFiles
         // и при необходимости UseDirectoryBrowser.
 
         // *******************************************************************
-
-        // создаем папку, в которую будут складываться задания на отправку
-        var queueDirectory = Utility.GetQueueDirectory();
-        try
-        {
-            Directory.CreateDirectory (queueDirectory);
-        }
-        catch (Exception exception)
-        {
-            Console.Error.WriteLine ($"Ошибка при создании папки {queueDirectory}");
-            GlobalState.Logger.LogError (exception, $"Failed to create directory {queueDirectory}");
-            return;
-        }
-
-        // *******************************************************************
         // создаем endpoint'ы
 
         var api = app.MapGroup("/api");
-        api.MapGet ("state", GetState);
-        api.MapGet ("stop", StopTheApplication);
+        api.MapGet ("/state", GetState);
+        api.MapGet ("/stop", StopTheApplication);
 
         app.MapPost ("/auth", HandleAuth);
 
@@ -149,8 +135,8 @@ internal sealed /* нельзя static */ class Program
         Console.WriteLine ("Requesting stop the application");
         try
         {
-            var client = new RestClient ("http://127.0.0.1");
-            var request = new RestRequest ("/api/stop");
+            var client = new RestClient ();
+            var request = new RestRequest ("http://127.0.0.1/api/stop");
             var response = client.Execute (request);
             Console.WriteLine ($"Response is {response.StatusCode}");
         }

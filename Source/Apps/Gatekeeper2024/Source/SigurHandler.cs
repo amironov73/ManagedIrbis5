@@ -37,14 +37,20 @@ internal class SigurHandler
             HttpContext context
         )
     {
-        var request = JsonSerializer.Deserialize<SigurRequest> (context.Request.Body);
+        var body = context.Request.Body;
+
+        // синхронно нельзя - лается и бросается исключениями
+        var request = JsonSerializer.DeserializeAsync<SigurRequest> (body)
+            .GetAwaiter().GetResult();
         if (request is null)
         {
-            GlobalState.Logger.LogError ("Can't parse the request");
-            return Results.BadRequest();
+            // нам прислали непонятную штуку, отказываемся обрабатывать
+            GlobalState.Logger.LogError ("Can't parse the request body: {Body}", body);
+            var letPeopleGo = Utility.GetPeopleGo();
+            return Results.Json (Resolution ("Запрос в неверном формате", letPeopleGo));
         }
 
-        request.Arrived = TimeProvider.System.GetLocalNow();
+        request.Arrived = Utility.GetNow();
 
         var response = ProcessRequest (request);
         LogRequestAndResponse (request, response);
@@ -62,16 +68,43 @@ internal class SigurHandler
     /// </summary>
     private void SaveEventForFurtherSending
         (
-            PassEvent pass
+            PassEvent passEvent
         )
     {
-        var queue = Utility.GetQueueDirectory();
-        Directory.CreateDirectory (queue);
-        var moment = pass.Moment.ToString ("yyyy-MM-dd-hh-mm-ss-ff");
-        var fileName = $"{moment}.{pass.Type}.json";
-        var path = Path.Combine (queue, fileName);
-        var json = JsonSerializer.Serialize (pass);
-        File.WriteAllText (path, json);
+        var queueDirectory = Utility.GetQueueDirectory();
+        try
+        {
+            Directory.CreateDirectory (queueDirectory);
+        }
+        catch (Exception exception)
+        {
+            GlobalState.Logger.LogError
+                (
+                    exception,
+                    "Can't create queue directory {Directory}",
+                    queueDirectory
+                );
+            return;
+        }
+
+        var moment = passEvent.Moment.ToString ("yyyy-MM-dd-hh-mm-ss-ff");
+        var fileName = $"{moment}.{passEvent.Type}.json";
+        var path = Path.Combine (queueDirectory, fileName);
+        var json = JsonSerializer.Serialize (passEvent);
+
+        try
+        {
+            File.WriteAllText (path, json);
+        }
+        catch (Exception exception)
+        {
+            GlobalState.Logger.LogError
+                (
+                    exception,
+                    "Can't save pass event file {Path}",
+                    path
+                );
+        }
     }
 
     /// <summary>
@@ -123,13 +156,7 @@ internal class SigurHandler
 
         if (readers.Length == 0)
         {
-            // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
-            SaveEventForFurtherSending (new PassEvent
-            {
-                Type = request.AccessPoint,
-                Moment = request.Arrived,
-                Id = readerId
-            });
+            // не сохраняем событие для дальнейшей отправки на сервер ИРБИС64!
 
             var message = string.Format (Utility.GetReaderFailure (readerId));
             var result = LetMyPeopleGo
@@ -145,6 +172,8 @@ internal class SigurHandler
 
         if (readers.Length != 1)
         {
+            // не сохраняем событие для дальнейшей отправки на сервер ИРБИС64!
+
             var message = string.Format (Utility.GetManyReaders (readerId));
             var result = LetMyPeopleGo
                 (
@@ -168,16 +197,8 @@ internal class SigurHandler
             return HandleDeparture (request, reader);
         }
 
-        // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
-        SaveEventForFurtherSending (new PassEvent
-        {
-            Type = request.AccessPoint,
-            Moment = request.Arrived,
-            Id = readerId
-        });
-
         GlobalState.Logger.LogError ("Unknown access point {Request}", request);
-        var finalResult = FallbackResolution
+        var finalResult = Resolution
             (
                 $"Неизвестная точка доступа: {request.AccessPoint}",
                 allow: letPeopleGo
@@ -196,15 +217,23 @@ internal class SigurHandler
             ReaderInfo reader
         )
     {
-        request.NotUsed();
-        var message = Utility.GetArrivalMessage (reader.Ticket!);
+        var message = Utility.GetArrivalMessage (request.KeyHex!);
+        message += $" ({reader.FullName})";
 
-        var result = FallbackResolution
+        var result = Resolution
             (
                 message: GlobalState.Instance.Message = message,
                 allow: true
             );
         GlobalState.Instance.HasError = false;
+
+        // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+        SaveEventForFurtherSending (new PassEvent
+        {
+            Type = request.AccessPoint,
+            Moment = request.Arrived,
+            Id = request.KeyHex
+        });
 
         return result;
     }
@@ -222,8 +251,16 @@ internal class SigurHandler
         reader.NotUsed();
 
         // выходящие всегда выходят беспрепятственно
-        var result = FallbackResolution (message: null, allow: true);
+        var result = Resolution (message: null, allow: true);
         GlobalState.Instance.HasError = false;
+
+        // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+        SaveEventForFurtherSending (new PassEvent
+        {
+            Type = request.AccessPoint,
+            Moment = request.Arrived,
+            Id = request.KeyHex
+        });
 
         return result;
     }
@@ -244,13 +281,13 @@ internal class SigurHandler
             message = null;
         }
 
-        return FallbackResolution (message, allow);
+        return Resolution (message, allow);
     }
 
     /// <summary>
     /// Стандартное разрешение проходить, применяемое при любых проблемах.
     /// </summary>
-    private SigurResponse FallbackResolution
+    private SigurResponse Resolution
         (
             string? message = null,
             bool allow = true

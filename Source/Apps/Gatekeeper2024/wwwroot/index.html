@@ -60,6 +60,12 @@
                                     : "alert alert-info"
                             messageText.innerText = response.data.message
                         })
+                        .catch(function () {
+                            let alertBox = document.getElementById ("alert-box")
+                            let messageText = document.getElementById ("message-text")
+                            alertBox.className = "alert alert-danger"
+                            messageText.innerText = "Ошибка связи с веб-приложением"
+                        })
             },
             1000)
 

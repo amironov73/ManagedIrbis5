@@ -115,9 +115,18 @@ public sealed class GracefulSocket
         try
         {
             logger?.LogTrace ("Sending");
-            socket.Send (prefix, SocketFlags.None);
-            socket.Send (body.Span, SocketFlags.None);
-            socket.Shutdown (SocketShutdown.Send);
+            try
+            {
+                socket.Send (prefix, SocketFlags.None);
+                socket.Send (body.Span, SocketFlags.None);
+                socket.Shutdown (SocketShutdown.Send);
+            }
+            catch (Exception exception)
+            {
+                // TODO обрабатывать
+                GlobalState.Logger.LogError (exception, "Error during IRBIS negotiation");
+            }
+
             logger?.LogTrace ("Send OK");
         }
         catch (Exception exception)
@@ -132,16 +141,26 @@ public sealed class GracefulSocket
         var result = new Response (Connection.ThrowIfNull());
         try
         {
+            int read;
             while (true)
             {
                 connection.ThrowIfCancelled();
 
                 var buffer = new byte[2048];
                 var chunk = new ArraySegment<byte> (buffer, 0, buffer.Length);
-                var read = socket.Receive (chunk, SocketFlags.None);
-                if (read <= 0)
+                try
                 {
-                    break;
+                    read = socket.Receive (chunk, SocketFlags.None);
+                    if (read <= 0)
+                    {
+                        break;
+                    }
+                }
+                catch (Exception exception)
+                {
+                    // TODO обрабатывать
+                    GlobalState.Logger.LogError (exception, "Error during IRBIS negotiation");
+                    return default;
                 }
 
                 chunk = new ArraySegment<byte> (buffer, 0, read);

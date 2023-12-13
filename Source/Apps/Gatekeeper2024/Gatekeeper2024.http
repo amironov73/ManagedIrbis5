@@ -5,7 +5,7 @@ Accept: application/json
 
 {
     "type": "NORMAL",
-    "keyHex": "5AB860",
+    "keyHex": "6404656F",
     "direction": 2,
     "accessPoint": 1
 }
