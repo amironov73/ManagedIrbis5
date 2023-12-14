@@ -14,8 +14,6 @@
 
 using System.Text.Json;
 
-using AM;
-
 using ManagedIrbis.Readers;
 
 #endregion
@@ -51,9 +49,11 @@ internal class SigurHandler
         }
 
         request.Arrived = Utility.GetNow();
+        DumpRequest (request);
 
         var response = ProcessRequest (request);
         LogRequestAndResponse (request, response);
+        DumpResponse (request, response);
 
         return Results.Json (response);
     }
@@ -61,6 +61,62 @@ internal class SigurHandler
     #endregion
 
     #region Private members
+
+    private string GetDumpDirectory()
+    {
+        var result = Path.Combine
+            (
+                AppContext.BaseDirectory,
+                "Dump"
+            );
+
+        Directory.CreateDirectory (result);
+
+        return result;
+    }
+
+    private void DumpRequest
+        (
+            SigurRequest request
+        )
+    {
+        var dump = Utility.GetBoolean ("dump");
+        if (!dump)
+        {
+            return;
+        }
+
+        var directory = GetDumpDirectory();
+        var fileName = request.Arrived.ToString (Utility.GetDateTimeFormatForFileName());
+        var path = Path.Combine
+            (
+                directory,
+                $"{fileName}.in.json"
+            );
+        File.WriteAllText (path, JsonSerializer.Serialize (request));
+    }
+
+    private void DumpResponse
+        (
+            SigurRequest request,
+            SigurResponse response
+        )
+    {
+        var dump = Utility.GetBoolean ("dump");
+        if (!dump)
+        {
+            return;
+        }
+
+        var directory = GetDumpDirectory();
+        var fileName = request.Arrived.ToString (Utility.GetDateTimeFormatForFileName());
+        var path = Path.Combine
+            (
+                directory,
+                $"{fileName}.out.json"
+            );
+        File.WriteAllText (path, JsonSerializer.Serialize (response));
+    }
 
     /// <summary>
     /// Сохранение запроса в файловой системе для последующей отправки
@@ -87,8 +143,8 @@ internal class SigurHandler
             return;
         }
 
-        var moment = passEvent.Moment.ToString ("yyyy-MM-dd-hh-mm-ss-ff");
-        var fileName = $"{moment}.{passEvent.Type}.json";
+        var moment = passEvent.Moment.ToString (Utility.GetDateTimeFormatForFileName());
+        var fileName = $"{moment}.{passEvent.Point}.json";
         var path = Path.Combine (queueDirectory, fileName);
         var json = JsonSerializer.Serialize (passEvent);
 
@@ -123,12 +179,17 @@ internal class SigurHandler
         var readerId = request.KeyHex;
         if (string.IsNullOrEmpty (readerId))
         {
-            return LetMyPeopleGo
+            var message = "Sigur не прислал идентификатор читателя";
+            var result = LetMyPeopleGo
                 (
                     isDepature,
-                    GlobalState.Instance.Message = "Нет идентификатора читателя",
+                    message,
                     allow: letPeopleGo
                 );
+            GlobalState.SetMessageWithTimestamp (message);
+            GlobalState.Instance.HasError = true;
+
+            return result;
         }
 
         var readers = Utility.SearchForReader (readerId);
@@ -137,7 +198,7 @@ internal class SigurHandler
             // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
             SaveEventForFurtherSending (new PassEvent
             {
-                Type = request.AccessPoint,
+                Point = request.AccessPoint,
                 Moment = request.Arrived,
                 Id = readerId
             });
@@ -146,9 +207,10 @@ internal class SigurHandler
             var result = LetMyPeopleGo
                 (
                     isDepature,
-                    GlobalState.Instance.Message = message,
+                    message,
                     allow: letPeopleGo
                 );
+            GlobalState.SetMessageWithTimestamp (message);
             GlobalState.Instance.HasError = true;
 
             return result;
@@ -162,9 +224,10 @@ internal class SigurHandler
             var result = LetMyPeopleGo
                 (
                     isDepature,
-                    GlobalState.Instance.Message = message,
+                    message,
                     allow: letPeopleGo
                 );
+            GlobalState.SetMessageWithTimestamp (message);
             GlobalState.Instance.HasError = true;
 
             return result;
@@ -178,9 +241,10 @@ internal class SigurHandler
             var result = LetMyPeopleGo
                 (
                     isDepature,
-                    GlobalState.Instance.Message = message,
+                    message,
                     allow: letPeopleGo
                 );
+            GlobalState.SetMessageWithTimestamp (message);
             GlobalState.Instance.HasError = true;
 
             return result;
@@ -198,11 +262,13 @@ internal class SigurHandler
         }
 
         GlobalState.Logger.LogError ("Unknown access point {Request}", request);
+        var errorMessage = $"Sigur прислал неизвестную точку доступа: {request.AccessPoint}";
         var finalResult = Resolution
             (
-                $"Неизвестная точка доступа: {request.AccessPoint}",
+                errorMessage,
                 allow: letPeopleGo
             );
+        GlobalState.SetMessageWithTimestamp (errorMessage);
         GlobalState.Instance.HasError = true;
 
         return finalResult;
@@ -217,20 +283,21 @@ internal class SigurHandler
             ReaderInfo reader
         )
     {
-        var message = Utility.GetArrivalMessage (request.KeyHex!);
-        message += $" ({reader.FullName})";
+        var message = Utility.GetArrivalMessage (request.KeyHex!)
+            + $" ({reader.FullName})";
 
         var result = Resolution
             (
-                message: GlobalState.Instance.Message = message,
+                message: message,
                 allow: true
             );
+        GlobalState.SetMessageWithTimestamp (message);
         GlobalState.Instance.HasError = false;
 
         // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
         SaveEventForFurtherSending (new PassEvent
         {
-            Type = request.AccessPoint,
+            Point = request.AccessPoint,
             Moment = request.Arrived,
             Id = request.KeyHex
         });
@@ -247,17 +314,18 @@ internal class SigurHandler
             ReaderInfo reader
         )
     {
-        request.NotUsed();
-        reader.NotUsed();
+        var message = Utility.GetDepartureMessage (request.KeyHex!)
+                      + $" ({reader.FullName})";
 
         // выходящие всегда выходят беспрепятственно
         var result = Resolution (message: null, allow: true);
         GlobalState.Instance.HasError = false;
+        GlobalState.SetMessageWithTimestamp (message);
 
         // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
         SaveEventForFurtherSending (new PassEvent
         {
-            Type = request.AccessPoint,
+            Point = request.AccessPoint,
             Moment = request.Arrived,
             Id = request.KeyHex
         });

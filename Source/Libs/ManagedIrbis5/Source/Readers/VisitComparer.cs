@@ -30,7 +30,7 @@ public static class VisitComparer
     /// <summary>
     /// Упорядочение по дате выдачи.
     /// </summary>
-    public sealed class ByDateGiven 
+    public sealed class ByDateGiven
         : IComparer<VisitInfo>
     {
         #region IComparer members
@@ -39,6 +39,22 @@ public static class VisitComparer
         public int Compare (VisitInfo? first, VisitInfo? second)
             => StringComparer.OrdinalIgnoreCase
                 .Compare (first?.DateGiven, second?.DateGiven);
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Обратное упорядочение по дате выдачи.
+    /// </summary>
+    public sealed class ByDateGivenReverse
+        : IComparer<VisitInfo>
+    {
+        #region IComparer members
+
+        /// <inheritdoc cref="IComparer{T}.Compare"/>
+        public int Compare (VisitInfo? first, VisitInfo? second)
+            => StringComparer.OrdinalIgnoreCase
+                .Compare (second?.DateGiven, first?.DateGiven);
 
         #endregion
     }

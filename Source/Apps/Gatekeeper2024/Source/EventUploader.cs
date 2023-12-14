@@ -45,11 +45,23 @@ internal sealed class EventUploader
     private readonly string _queueDirectory;
 
     /// <summary>
-    /// Получение одного (любого) файла, готового к отправке.
+    /// Получение одного (первого в хронологическом порядке) файла,
+    /// готового к отправке.
     /// </summary>
-    private string? GetOneFile() =>
-        Directory.EnumerateFiles (_queueDirectory, "*.json")
-            .FirstOrDefault();
+    private string? GetOneFile()
+    {
+        var files = Directory.GetFiles (_queueDirectory, "*.json");
+
+        // надо отсортировать, потому что файловая система
+        // может выдать список файлов в произвольном порядке,
+        // мы ведь кроссплатформенное приложение
+        Array.Sort (files);
+
+        // учитывая, что имена файлов строятся по схеме "yyyy-MM-dd-HH-mm-ss-ff",
+        // первый элемент отсортированного массива будет и хронологически первым
+
+        return files.FirstOrDefault();
+    }
 
     /// <summary>
     /// Удаление отработанного либо битого файла.
@@ -70,6 +82,9 @@ internal sealed class EventUploader
         }
     }
 
+    /// <summary>
+    /// Поиск читателя по его идентификатору.
+    /// </summary>
     private ReaderInfo? GetReader
         (
             ISyncProvider connection,
@@ -77,7 +92,7 @@ internal sealed class EventUploader
             string path
         )
     {
-        var readers = Utility.SearchForReader (readerId);
+        var readers = Utility.SearchForReader (connection, readerId);
         if (readers is null)
         {
             // не удалось связаться с сервером
@@ -111,8 +126,6 @@ internal sealed class EventUploader
             PassEvent passEvent
         )
     {
-        // TODO реализовать
-
         var readerId = passEvent.Id;
         if (string.IsNullOrEmpty (readerId))
         {
@@ -176,8 +189,12 @@ internal sealed class EventUploader
             PassEvent passEvent
         )
     {
-        var result = passEvent.Type is 1 or 2
-               && !string.IsNullOrEmpty (passEvent.Id);
+        var arrivalPoint = Utility.GetArrivalPoint();
+        var departurePoint = Utility.GetDeparturePoint();
+
+        var result = (passEvent.Point == arrivalPoint
+                      || passEvent.Point == departurePoint)
+                     && !string.IsNullOrEmpty (passEvent.Id);
 
         if (!result)
         {
@@ -198,8 +215,87 @@ internal sealed class EventUploader
     {
         // TODO реализовать
 
-        // при успешном окончании удаляем файл
-        DeleteFile (path);
+        var readerId = passEvent.Id;
+        if (string.IsNullOrEmpty (readerId))
+        {
+            GlobalState.Logger.LogError ("Empty reader ID in file {Path}", path);
+            DeleteFile (path);
+            return;
+        }
+
+        using var connection = Utility.ConnectToIrbis();
+        if (connection is null)
+        {
+            return;
+        }
+
+        var reader = GetReader (connection, readerId, path);
+        if (reader is null)
+        {
+            // файл не удаляем, это делает GetReader при необходимости
+            return;
+        }
+
+        var record = reader.Record;
+        if (record is null)
+        {
+            GlobalState.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            DeleteFile (path);
+            return;
+        }
+
+        var counter = 0;
+        var today = IrbisDate.TodayText;
+        var department = Utility.GetDepartment();
+        var person = Utility.GetPerson();
+        var description = Utility.GetEvent();
+        foreach (var field in record.EnumerateField (VisitInfo.Tag))
+        {
+            var visit = VisitInfo.Parse (field);
+            if (
+                    visit is { IsVisit: true, IsReturned: false }
+                    && visit.DateGivenString == today
+                    && visit.Department == department
+                    && visit.Description == description
+                    && visit.Responsible == person
+                    && string.IsNullOrEmpty (visit.DateReturnedString)
+                    && string.IsNullOrEmpty (visit.TimeOut)
+                )
+            {
+                field.Add ('d', IrbisDate.TodayText);
+                field.Add ('2', IrbisDate.NowText);
+                counter++;
+            }
+        }
+
+        var eventData = Utility.GetArrivalField (passEvent.Moment)
+            + Utility.GetDepartureField (DateTimeOffset.Now);
+        if (counter is 0)
+        {
+            record.Add (40, eventData);
+        }
+
+        // отправляем модифицированную запись на сервер
+        var parameters = new WriteRecordParameters
+        {
+            Record = record,
+            Lock = false,
+            Actualize = true,
+            DontParse = true
+        };
+
+        if (connection.WriteRecord (parameters))
+        {
+            GlobalState.Logger.LogInformation
+                (
+                    "Departure to Irbis success: {Ticket}, {EventData}",
+                    readerId,
+                    eventData
+                );
+
+            // при успешном окончании удаляем файл
+            DeleteFile (path);
+        }
     }
 
     private void ProcessFile
@@ -222,19 +318,19 @@ internal sealed class EventUploader
             return;
         }
 
-        switch (passEvent.Type)
+        var arrivalPoint = Utility.GetArrivalPoint();
+        var departurePoint = Utility.GetDeparturePoint();
+        if (passEvent.Point == arrivalPoint)
         {
-            case 1:
-                ProcessArrival (path, passEvent);
-                break;
-
-            case 2:
-                ProcessDeparture (path, passEvent);
-                break;
-
-            default:
-                GlobalState.Logger.LogError ("Bad event file {Path}", path);
-                break;
+            ProcessArrival (path, passEvent);
+        }
+        else if (passEvent.Point == departurePoint)
+        {
+            ProcessDeparture (path, passEvent);
+        }
+        else
+        {
+            GlobalState.Logger.LogError ("Bad event file {Path}", path);
         }
     }
 

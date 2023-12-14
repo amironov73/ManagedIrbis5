@@ -54,6 +54,9 @@ public partial class IrbisDate
     /// <summary>
     /// Текущее время в формате ИРБИС.
     /// </summary>
+    /// <remarks>
+    /// Обратите внимание на "HH" -- это означает время в 24-часовом формате.
+    /// </remarks>
     public static string NowText =>
         PlatformAbstractionLayer.Current.Now().ToString ("HH:mm:ss");
 
@@ -211,11 +214,16 @@ public partial class IrbisDate
             return new TimeSpan();
         }
 
+        var colon = time.Contains (':');
         var hours = int.Parse (time.Substring (0, 2));
-        var minutes = int.Parse (time.Substring (2, 2));
+        var minutes = colon
+            ? int.Parse (time.Substring (3, 2))
+            : int.Parse (time.Substring (2, 2));
         var seconds = time.Length < 6
             ? 0
-            : int.Parse (time.Substring (4, 2));
+            : colon
+                ? int.Parse (time.Substring (6, 2))
+                : int.Parse (time.Substring (4, 2));
         var result = new TimeSpan (hours, minutes, seconds);
 
         return result;

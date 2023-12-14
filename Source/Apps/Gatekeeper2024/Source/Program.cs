@@ -45,19 +45,14 @@ internal sealed /* нельзя static */ class Program
         // *******************************************************************
         // настройка конфигурации
 
-        // используем json5, чтобы невозбранно использовать комментарии
-        // хотя, говорят, можно было оставаться и на простом json
-        var configuration = builder.Configuration;
-        configuration.Sources.Clear();
-        configuration.AddCommandLine (args);
-        configuration.AddJsonFile ("appsettings.json5");
+        BuildConfiguration (builder, args);
 
         // *******************************************************************
         // остановка приложения по требованию
 
         if (args is ["stop"] or ["/stop"])
         {
-            RequestStop();
+            RequestStop (builder, args);
             return;
         }
 
@@ -75,6 +70,8 @@ internal sealed /* нельзя static */ class Program
         var services = builder.Services;
         services.AddHostedService<EventUploader>();
         services.AddSingleton<SigurHandler>();
+        services.AddSingleton<HistoryProvider>();
+        services.AddSingleton<StatProvider>();
 
         // *******************************************************************
         // предварительная настройка завершена, создаем объект приложения
@@ -104,8 +101,10 @@ internal sealed /* нельзя static */ class Program
         // создаем endpoint'ы
 
         var api = app.MapGroup("/api");
-        api.MapGet ("/state", GetState);
-        api.MapGet ("/stop", StopTheApplication);
+        api.MapGet ("state", GetState);
+        api.MapGet ("history", ShowHistory);
+        api.MapGet ("stat", ShowStat);
+        api.MapGet ("stop", StopTheApplication);
 
         app.MapPost ("/auth", HandleAuth);
 
@@ -125,18 +124,63 @@ internal sealed /* нельзя static */ class Program
         return sigurHandler.HandleRequest (context);
     }
 
+    private static IResult ShowHistory
+        (
+            HttpContext context
+        )
+    {
+        var historyProvider = GlobalState.Application.Services.GetRequiredService<HistoryProvider>();
+
+        return historyProvider.HandleRequest (context);
+    }
+
+    private static IResult ShowStat
+        (
+            HttpContext context
+        )
+    {
+        var statProvider = GlobalState.Application.Services.GetRequiredService<StatProvider>();
+
+        return statProvider.HandleRequest (context);
+    }
+
     private static IResult GetState()
     {
         return Results.Json (GlobalState.Instance);
     }
 
-    private static void RequestStop()
+    private static IConfiguration BuildConfiguration
+        (
+            WebApplicationBuilder builder,
+            string[] args
+        )
+    {
+        // используем json5, чтобы невозбранно использовать комментарии
+        // хотя, говорят, можно было оставаться и на простом json
+        var configuration = builder.Configuration;
+        configuration.Sources.Clear();
+        configuration.AddCommandLine (args);
+        configuration.AddJsonFile ("appsettings.json5");
+
+        return configuration;
+    }
+
+    private static void RequestStop
+        (
+            WebApplicationBuilder builder,
+            string[] args
+        )
     {
         Console.WriteLine ("Requesting stop the application");
         try
         {
-            var client = new RestClient ();
-            var request = new RestRequest ("http://127.0.0.1/api/stop");
+            var configuration = BuildConfiguration (builder, args);
+            var baseUrl = configuration["Urls"]!
+                .Split (';', StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries)
+                .First();
+
+            var client = new RestClient (baseUrl);
+            var request = new RestRequest ("/api/stop");
             var response = client.Execute (request);
             Console.WriteLine ($"Response is {response.StatusCode}");
         }

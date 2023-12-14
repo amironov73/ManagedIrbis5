@@ -4,6 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
+// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* Utility.cs -- утилитные методы
@@ -147,6 +148,19 @@ internal static class Utility
     }
 
     /// <summary>
+    /// Получение сообщения о выходе читателя из библиотеки.
+    /// </summary>
+    public static string GetDepartureMessage
+        (
+            string keyHex
+        )
+    {
+        const string defaultValue = "Зафиксирован выход читателя с пропуском {0}";
+        var result = GetString ("departure-message", defaultValue);
+        return string.Format (result!, keyHex);
+    }
+
+    /// <summary>
     /// Текущий момент времени.
     /// </summary>
     public static DateTimeOffset GetNow
@@ -163,7 +177,7 @@ internal static class Utility
             DateTimeOffset moment
         )
     {
-        const string defaultValue = "^d{date}^1{time}^c(Посещение)^isigur^v*";
+        const string defaultValue = "^d{date}^1{time}^c{event}^i{person}^v{department}";
         var result = GetString ("arrival-field", defaultValue);
         return FormatDateTime (result!, moment);
     }
@@ -178,7 +192,12 @@ internal static class Utility
         )
     {
         var result = format.Replace ("{date}", moment.ToString ("yyyyMMdd"));
-        result = result.Replace ("{time}", moment.ToString ("hh:mm:ss"));
+
+        // обрати внимание на "HH" -- это означает время в 24-часовом формате
+        result = result.Replace ("{time}", moment.ToString ("HH:mm:ss"));
+        result = result.Replace ("{department}", GetDepartment());
+        result = result.Replace ("{person}", GetPerson());
+        result = result.Replace ("{event}", GetEvent());
         return result;
     }
 
@@ -259,6 +278,7 @@ internal static class Utility
     /// </summary>
     public static ReaderInfo[]? SearchForReader
         (
+            ISyncProvider connection,
             string id
         )
     {
@@ -272,13 +292,6 @@ internal static class Utility
         // подставляем номер читательского в поисковое выражение
         expression = string.Format (expression, id);
 
-        using var connection = ConnectToIrbis();
-        if (connection is null)
-        {
-            GlobalState.Logger.LogError ("Can't connect to the IRBIS");
-            return null;
-        }
-
         var records = connection.SearchReadRecords (expression);
         if (records.IsNullOrEmpty())
         {
@@ -290,4 +303,43 @@ internal static class Utility
 
         return result;
     }
+
+    /// <summary>
+    /// Поиск читателя с указанным идентификатором.
+    /// Может найтись несколько, если в базе есть дублеты.
+    /// </summary>
+    public static ReaderInfo[]? SearchForReader
+        (
+            string id
+        )
+    {
+        using var connection = ConnectToIrbis();
+        if (connection is null)
+        {
+            GlobalState.Logger.LogError ("Can't connect to the IRBIS");
+            return null;
+        }
+
+        return SearchForReader (connection, id);
+    }
+
+    /// <summary>
+    /// Получение кода кафедры обслуживания.
+    /// </summary>
+    public static string GetDepartment() => GetString ("department", "*")!;
+
+    /// <summary>
+    /// Получение ответственного лица.
+    /// </summary>
+    public static string GetPerson() => GetString ("person", "sigur")!;
+
+    /// <summary>
+    /// Описание события.
+    /// </summary>
+    public static string GetEvent() => GetString ("event", "(Посещение)")!;
+
+    /// <summary>
+    /// Формат для имени файла, формируемого из текущей даты-времени.
+    /// </summary>
+    public static string GetDateTimeFormatForFileName() => "yyyy-MM-dd-HH-mm-ss-ff";
 }

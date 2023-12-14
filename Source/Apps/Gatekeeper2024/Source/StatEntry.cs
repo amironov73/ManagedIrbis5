@@ -6,7 +6,7 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
 
-/* PassEvent.cs -- событие прохода читателя
+/* StatEntry.cs -- элемент статистики
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -22,37 +22,38 @@ using JetBrains.Annotations;
 namespace Gatekeeper2024;
 
 /// <summary>
-/// Событие прохода читателя
-/// для отправки на сервер ИРБИС64.
+/// Элемент статистики.
 /// </summary>
 [PublicAPI]
-internal sealed class PassEvent
+internal sealed class StatEntry
 {
     #region Properties
 
     /// <summary>
-    /// Номер турникета: вход или выход.
+    /// Заголовок элемента.
     /// </summary>
-    [JsonPropertyName ("point")]
-    public int Point { get; set; }
+    [JsonPropertyName ("title")]
+    public string? Title { get; set; }
 
     /// <summary>
-    /// Момент.
+    /// Значение элемента
     /// </summary>
-    [JsonPropertyName ("moment")]
-    public DateTimeOffset Moment { get; set; }
+    [JsonPropertyName ("value")]
+    public string? Value { get; set; }
+
+    #endregion
+
+    #region Public methods
 
     /// <summary>
-    /// Идентификатор читателя.
+    /// Данные для тестирования.
     /// </summary>
-    [JsonPropertyName ("id")]
-    public string? Id { get; set; }
-
-    /// <summary>
-    /// Данные для отправки.
-    /// </summary>
-    [JsonPropertyName ("data")]
-    public string? Data { get; set; }
+    public static StatEntry[] FakeEntries() => new StatEntry[]
+    {
+        new () { Title = "Зашло", Value = "1234" },
+        new () { Title = "Вышло", Value = "1230" },
+        new () { Title = "В библиотеке", Value = "4" },
+    };
 
     #endregion
 
