@@ -36,7 +36,7 @@ internal static class Utility
             string? defaultValue = null
         )
     {
-        var configuration = GlobalState.Application.Configuration;
+        var configuration = Program.Application.Configuration;
         var result = configuration[keyName];
         if (string.IsNullOrEmpty (result))
         {
@@ -102,16 +102,28 @@ internal static class Utility
     /// <summary>
     /// Подключение к серверу ИРБИС64.
     /// </summary>
-    public static ISyncProvider? ConnectToIrbis()
+    public static ISyncProvider? ConnectToIrbis
+        (
+            bool gracefully = false
+        )
     {
         var connectionString = GetRequiredString ("irbis-connection");
         var timeout = GetInt32 ("timeout", 100);
-        var socket = new GracefulSocket
+        SyncConnection result;
+        if (gracefully)
         {
-            Timeout = timeout
-        };
-        var serviceProvider = GlobalState.Application.Services;
-        var result = new SyncConnection (socket, serviceProvider);
+            var socket = new GracefulSocket
+            {
+                Timeout = timeout
+            };
+            var serviceProvider = Program.Application.Services;
+            result = new SyncConnection (socket, serviceProvider);
+        }
+        else
+        {
+            result = new SyncConnection();
+        }
+
         result.ParseConnectionString (connectionString);
         if (!result.Connect() || !result.IsConnected)
         {
@@ -285,7 +297,7 @@ internal static class Utility
         var expression = GetSearchExpression();
         if (string.IsNullOrEmpty (expression))
         {
-            GlobalState.Logger.LogError ("Search expression not specified");
+            Program.Logger.LogError ("Search expression not specified");
             return null;
         }
 
@@ -310,13 +322,14 @@ internal static class Utility
     /// </summary>
     public static ReaderInfo[]? SearchForReader
         (
-            string id
+            string id,
+            bool gracefully = false
         )
     {
-        using var connection = ConnectToIrbis();
+        using var connection = ConnectToIrbis (gracefully);
         if (connection is null)
         {
-            GlobalState.Logger.LogError ("Can't connect to the IRBIS");
+            Program.Logger.LogError ("Can't connect to the IRBIS");
             return null;
         }
 

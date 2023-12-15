@@ -16,14 +16,14 @@
 #region Using directives
 
 using System.IO;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Unicode;
 
 using JetBrains.Annotations;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Json;
 
@@ -33,6 +33,24 @@ namespace AM.Json;
 [PublicAPI]
 public static class JsonUtility
 {
+    #region Properties
+
+    /// <summary>
+    /// Сообщение для сериализатора, что не нужно экранировать кириллицу,
+    /// читать неудобно :)
+    /// </summary>
+    public static JsonSerializerOptions DontEscapeCyrillic { get; }
+        = new ()
+        {
+            Encoder = JavaScriptEncoder.Create
+                (
+                    UnicodeRanges.BasicLatin,
+                    UnicodeRanges.Cyrillic
+                )
+        };
+
+    #endregion
+
     #region Public methods
 
     /// <summary>
@@ -52,6 +70,12 @@ public static class JsonUtility
 
         return result;
     }
+
+    /// <summary>
+    /// Сериализация с читаемой кириллицей.
+    /// </summary>
+    public static string SerializeWithReadableCyrillic<T> (T obj) =>
+        JsonSerializer.Serialize (obj, DontEscapeCyrillic);
 
     /// <summary>
     /// Serialize to short string.

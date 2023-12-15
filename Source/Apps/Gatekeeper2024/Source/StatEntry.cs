@@ -12,8 +12,9 @@
 
 #region Using directives
 
-using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using AM.Json;
 
 using JetBrains.Annotations;
 
@@ -60,7 +61,7 @@ internal sealed class StatEntry
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => JsonSerializer.Serialize (this);
+    public override string ToString() => JsonUtility.SerializeWithReadableCyrillic (this);
 
     #endregion
 }

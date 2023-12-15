@@ -43,7 +43,7 @@ internal class SigurHandler
         if (request is null)
         {
             // нам прислали непонятную штуку, отказываемся обрабатывать
-            GlobalState.Logger.LogError ("Can't parse the request body: {Body}", body);
+            Program.Logger.LogError ("Can't parse the request body: {Body}", body);
             var letPeopleGo = Utility.GetPeopleGo();
             return Results.Json (Resolution ("Запрос в неверном формате", letPeopleGo));
         }
@@ -134,7 +134,7 @@ internal class SigurHandler
         }
         catch (Exception exception)
         {
-            GlobalState.Logger.LogError
+            Program.Logger.LogError
                 (
                     exception,
                     "Can't create queue directory {Directory}",
@@ -154,7 +154,7 @@ internal class SigurHandler
         }
         catch (Exception exception)
         {
-            GlobalState.Logger.LogError
+            Program.Logger.LogError
                 (
                     exception,
                     "Can't save pass event file {Path}",
@@ -192,7 +192,8 @@ internal class SigurHandler
             return result;
         }
 
-        var readers = Utility.SearchForReader (readerId);
+        // ищем читателя очень быстро, чтобы не сработал тайм-аут у Sigur'а
+        var readers = Utility.SearchForReader (readerId, gracefully: true);
         if (readers is null)
         {
             // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
@@ -261,7 +262,7 @@ internal class SigurHandler
             return HandleDeparture (request, reader);
         }
 
-        GlobalState.Logger.LogError ("Unknown access point {Request}", request);
+        Program.Logger.LogError ("Unknown access point {Request}", request);
         var errorMessage = $"Sigur прислал неизвестную точку доступа: {request.AccessPoint}";
         var finalResult = Resolution
             (
@@ -375,7 +376,7 @@ internal class SigurHandler
             SigurResponse response
         )
     {
-        GlobalState.Logger.LogInformation
+        Program.Logger.LogInformation
             (
                 "Got auth request: {Request}, send {Response}",
                 request,

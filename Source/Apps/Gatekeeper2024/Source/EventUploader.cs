@@ -74,11 +74,11 @@ internal sealed class EventUploader
         try
         {
             File.Delete (path);
-            GlobalState.Logger.LogInformation ("Delete file {Path}", path);
+            Program.Logger.LogInformation ("Delete file {Path}", path);
         }
         catch (Exception exception)
         {
-            GlobalState.Logger.LogError (exception, "Can't delete file {Path}", path);
+            Program.Logger.LogError (exception, "Can't delete file {Path}", path);
         }
     }
 
@@ -102,14 +102,14 @@ internal sealed class EventUploader
 
         if (readers.Length == 0)
         {
-            GlobalState.Logger.LogError ("No reader with ticket {Ticket}", readerId);
+            Program.Logger.LogError ("No reader with ticket {Ticket}", readerId);
             DeleteFile (path);
             return null;
         }
 
         if (readers.Length != 1)
         {
-            GlobalState.Logger.LogError ("Many readers with ticket {Ticket}", readerId);
+            Program.Logger.LogError ("Many readers with ticket {Ticket}", readerId);
             DeleteFile (path);
             return null;
         }
@@ -129,7 +129,7 @@ internal sealed class EventUploader
         var readerId = passEvent.Id;
         if (string.IsNullOrEmpty (readerId))
         {
-            GlobalState.Logger.LogError ("Empty reader ID in file {Path}", path);
+            Program.Logger.LogError ("Empty reader ID in file {Path}", path);
             DeleteFile (path);
             return;
         }
@@ -150,7 +150,46 @@ internal sealed class EventUploader
         var record = reader.Record;
         if (record is null)
         {
-            GlobalState.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            DeleteFile (path);
+            return;
+        }
+
+        // проверяем, не зафиксировалось ли посещение с прошлой попытки
+        var found = false;
+        var today = Utility.FormatDateTime ("{date}", passEvent.Moment);
+        var now = Utility.FormatDateTime ("{time}", passEvent.Moment);
+        var department = Utility.GetDepartment();
+        var person = Utility.GetPerson();
+        var description = Utility.GetEvent();
+        foreach (var field in record.EnumerateField (VisitInfo.Tag))
+        {
+            var visit = VisitInfo.Parse (field);
+            if (
+                    visit is { IsVisit: true, IsReturned: false }
+                    && visit.DateGivenString == today
+                    && visit.TimeIn == now
+                    && visit.Department == department
+                    && visit.Description == description
+                    && visit.Responsible == person
+                )
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            // посещение уже зафиксировано, просто мы об этом не в курсе
+            // возможно, ответ от сервера ИРБИС64 до нас не дошел
+            Program.Logger.LogInformation
+                (
+                    "Arrival already registered: {Ticket}, {Moment}",
+                    readerId,
+                    passEvent.Moment
+                );
+
             DeleteFile (path);
             return;
         }
@@ -169,7 +208,7 @@ internal sealed class EventUploader
 
         if (connection.WriteRecord (parameters))
         {
-            GlobalState.Logger.LogInformation
+            Program.Logger.LogInformation
                 (
                     "Arrival to Irbis success: {Ticket}, {EventData}",
                     readerId,
@@ -198,7 +237,7 @@ internal sealed class EventUploader
 
         if (!result)
         {
-            GlobalState.Logger.LogError ("Bad PassEvent: {Event}", passEvent);
+            Program.Logger.LogError ("Bad PassEvent: {Event}", passEvent);
         }
 
         return result;
@@ -218,7 +257,7 @@ internal sealed class EventUploader
         var readerId = passEvent.Id;
         if (string.IsNullOrEmpty (readerId))
         {
-            GlobalState.Logger.LogError ("Empty reader ID in file {Path}", path);
+            Program.Logger.LogError ("Empty reader ID in file {Path}", path);
             DeleteFile (path);
             return;
         }
@@ -239,7 +278,7 @@ internal sealed class EventUploader
         var record = reader.Record;
         if (record is null)
         {
-            GlobalState.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
             DeleteFile (path);
             return;
         }
@@ -286,7 +325,7 @@ internal sealed class EventUploader
 
         if (connection.WriteRecord (parameters))
         {
-            GlobalState.Logger.LogInformation
+            Program.Logger.LogInformation
                 (
                     "Departure to Irbis success: {Ticket}, {EventData}",
                     readerId,
@@ -313,7 +352,7 @@ internal sealed class EventUploader
 
         if (passEvent is null || !VerifyEvent (passEvent))
         {
-            GlobalState.Logger.LogError ("Bad event file {Path}", path);
+            Program.Logger.LogError ("Bad event file {Path}", path);
             DeleteFile (path);
             return;
         }
@@ -330,7 +369,7 @@ internal sealed class EventUploader
         }
         else
         {
-            GlobalState.Logger.LogError ("Bad event file {Path}", path);
+            Program.Logger.LogError ("Bad event file {Path}", path);
         }
     }
 
@@ -357,7 +396,7 @@ internal sealed class EventUploader
         }
         catch (Exception exception)
         {
-            GlobalState.Logger.LogError (exception, "Error during CheckIrbisConnection");
+            Program.Logger.LogError (exception, "Error during CheckIrbisConnection");
         }
     }
 
@@ -370,7 +409,7 @@ internal sealed class EventUploader
         catch (Exception exception)
         {
             Console.Error.WriteLine($"Ошибка при создании директории {_queueDirectory}");
-            GlobalState.Logger.LogError
+            Program.Logger.LogError
                 (
                     exception,
                     "Can't create queue directory {Directory}", _queueDirectory
@@ -401,7 +440,7 @@ internal sealed class EventUploader
                 }
                 catch (Exception exception)
                 {
-                    GlobalState.Logger.LogError
+                    Program.Logger.LogError
                         (
                             exception,
                             "Error during processing file {File}",

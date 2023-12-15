@@ -28,16 +28,6 @@ internal sealed class GlobalState
     #region Properties
 
     /// <summary>
-    /// Логгер чисто для классов <c>GateKeeper2024.*</c>.
-    /// </summary>
-    public static ILogger Logger { get; set; } = null!;
-
-    /// <summary>
-    /// Веб-приложение.
-    /// </summary>
-    public static WebApplication Application { get; set; } = null!;
-
-    /// <summary>
     /// Общий экземпляр.
     /// </summary>
     public static readonly GlobalState Instance = new ();

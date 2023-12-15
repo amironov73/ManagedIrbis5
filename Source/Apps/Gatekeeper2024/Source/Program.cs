@@ -27,6 +27,22 @@ namespace Gatekeeper2024;
 
 internal sealed /* нельзя static */ class Program
 {
+    #region Properties
+
+    /// <summary>
+    /// Ссылка на веб-приложение.
+    /// </summary>
+    public static WebApplication Application { get; set; } = null!;
+
+    /// <summary>
+    /// Общий логгер для наших классов.
+    /// </summary>
+    public static ILogger Logger { get; private set; } = null!;
+
+    #endregion
+
+    #region Main
+
     internal static void Main
         (
             string[] args
@@ -36,7 +52,7 @@ internal sealed /* нельзя static */ class Program
         // начальная настройка
 
         // временный логгер, будет заменен постоянным
-        GlobalState.Logger = new NullLoggerFactory().CreateLogger ("null");
+        Logger = new NullLoggerFactory().CreateLogger ("null");
 
         // *******************************************************************
 
@@ -78,8 +94,8 @@ internal sealed /* нельзя static */ class Program
 
         var app = builder.Build();
 
-        GlobalState.Application = app;
-        GlobalState.Logger = app.Services.GetRequiredService <ILogger<Program>>();
+        Application = app;
+        Logger = app.Services.GetRequiredService <ILogger<Program>>();
 
         // *******************************************************************
         // отдача статических файлов
@@ -109,7 +125,7 @@ internal sealed /* нельзя static */ class Program
         app.MapPost ("/auth", HandleAuth);
 
         GlobalState.SetMessageWithTimestamp ("Пока никаких событий не зафиксировано");
-        GlobalState.Logger.LogInformation ("Application startup");
+        Logger.LogInformation ("Application startup");
 
         app.Run();
     }
@@ -119,17 +135,21 @@ internal sealed /* нельзя static */ class Program
             HttpContext context
         )
     {
-        var sigurHandler = GlobalState.Application.Services.GetRequiredService<SigurHandler>();
+        var sigurHandler = Application.Services.GetRequiredService<SigurHandler>();
 
         return sigurHandler.HandleRequest (context);
     }
+
+    #endregion
+
+    #region Private members
 
     private static IResult ShowHistory
         (
             HttpContext context
         )
     {
-        var historyProvider = GlobalState.Application.Services.GetRequiredService<HistoryProvider>();
+        var historyProvider = Application.Services.GetRequiredService<HistoryProvider>();
 
         return historyProvider.HandleRequest (context);
     }
@@ -139,7 +159,7 @@ internal sealed /* нельзя static */ class Program
             HttpContext context
         )
     {
-        var statProvider = GlobalState.Application.Services.GetRequiredService<StatProvider>();
+        var statProvider = Application.Services.GetRequiredService<StatProvider>();
 
         return statProvider.HandleRequest (context);
     }
@@ -192,9 +212,10 @@ internal sealed /* нельзя static */ class Program
 
     private static void StopTheApplication()
     {
-        GlobalState.Logger.LogInformation ("Stop the application requested");
-        var lifetime = GlobalState.Application.Services.GetRequiredService<IHostApplicationLifetime>();
+        Logger.LogInformation ("Stop the application requested");
+        var lifetime = Application.Services.GetRequiredService<IHostApplicationLifetime>();
         lifetime.StopApplication();
     }
 
+    #endregion
 }

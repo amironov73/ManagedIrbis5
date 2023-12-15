@@ -45,7 +45,7 @@ public sealed class GracefulSocket
     /// <summary>
     /// Тайм-аут подключения и сетевого обмена, миллисекунды.
     /// </summary>
-    public int Timeout { get; set; } = 100;
+    public int Timeout { get; init; } = 100;
 
     /// <summary>
     /// Подключение к ИРБИС-серверу, которое обслуживает данный сокет.
@@ -124,7 +124,7 @@ public sealed class GracefulSocket
             catch (Exception exception)
             {
                 // TODO обрабатывать
-                GlobalState.Logger.LogError (exception, "Error during IRBIS negotiation");
+                Program.Logger.LogError (exception, "Error during IRBIS negotiation");
             }
 
             logger?.LogTrace ("Send OK");
@@ -141,13 +141,13 @@ public sealed class GracefulSocket
         var result = new Response (Connection.ThrowIfNull());
         try
         {
-            int read;
             while (true)
             {
                 connection.ThrowIfCancelled();
 
                 var buffer = new byte[2048];
                 var chunk = new ArraySegment<byte> (buffer, 0, buffer.Length);
+                int read;
                 try
                 {
                     read = socket.Receive (chunk, SocketFlags.None);
@@ -159,7 +159,7 @@ public sealed class GracefulSocket
                 catch (Exception exception)
                 {
                     // TODO обрабатывать
-                    GlobalState.Logger.LogError (exception, "Error during IRBIS negotiation");
+                    Program.Logger.LogError (exception, "Error during IRBIS negotiation");
                     return default;
                 }
 

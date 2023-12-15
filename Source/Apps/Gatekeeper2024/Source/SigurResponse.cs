@@ -12,8 +12,9 @@
 
 #region Using directives
 
-using System.Text.Json;
 using System.Text.Json.Serialization;
+
+using AM.Json;
 
 using JetBrains.Annotations;
 
@@ -82,7 +83,8 @@ public sealed class SigurResponse
 
     #region Object members
 
-    public override string ToString() => JsonSerializer.Serialize (this);
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => JsonUtility.SerializeWithReadableCyrillic (this);
 
     #endregion
 }

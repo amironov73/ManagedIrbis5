@@ -67,6 +67,7 @@ internal sealed class StatProvider
             return Results.Json (result);
         }
 
+        // непростой подсчет посетителей, прошедших через турникет
         var today = IrbisDate.TodayText;
         var term = $"VS={today}/*";
         var postingsParameters = new PostingParameters
@@ -110,8 +111,13 @@ internal sealed class StatProvider
             }
         }
 
-        result.Add (new () { Title = "Посещений", Value = visitCount.ToInvariantString() });
+        result.Add (new ()
+        {
+            Title = "Посещений",
+            Value = visitCount.ToInvariantString()
+        });
 
+        // Количество читателей, находящихся в данный момент в библиотеке
         const string expression = "VIS=$";
         var searchParameters = new SearchParameters
         {
@@ -120,7 +126,21 @@ internal sealed class StatProvider
         };
         var readers = connection.Search (searchParameters);
         var insiderCount = readers?.Length ?? 0;
-        result.Add (new () { Title = "В библиотеке", Value = insiderCount.ToInvariantString() });
+        result.Add (new ()
+        {
+            Title = "В библиотеке",
+            Value = insiderCount.ToInvariantString()
+        });
+
+
+        // Длина очереди на отправку
+        var queueDirectory = Utility.GetQueueDirectory();
+        var files = Directory.GetFiles (queueDirectory);
+        result.Add (new ()
+        {
+            Title = "Очередь на отправку",
+            Value = files.Length.ToInvariantString()
+        });
 
         // var fake = StatEntry.FakeEntries();
 
