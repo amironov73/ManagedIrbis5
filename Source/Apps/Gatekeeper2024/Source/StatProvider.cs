@@ -12,7 +12,6 @@
 
 #region Using directives
 
-
 using AM;
 
 using ManagedIrbis;

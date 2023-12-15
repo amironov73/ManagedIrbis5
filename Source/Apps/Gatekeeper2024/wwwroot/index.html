@@ -5,6 +5,11 @@
     <title>Привратник 2024</title>
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
 
+    <!-- Отключаем кеширование для данной страницы -->
+    <meta http-equiv="Cache-Control" content="no-cache">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="-1">
+
 </head>
 <body>
 
@@ -28,14 +33,22 @@
 
 <div class="container">
 
-    <div class="row mt-3">
+    <!-- Думаю, не отвлекайте! -->
+    <div id="thinking" class="row mt-3" style="display: none;">
 
-        <!-- Думаем! -->
-        <div id="thinking" class="text-center" style="display: none;">
-            <span class="fs-1">Думаем</span>
-            <img src="img/working-med.gif" alt="Думаем!" />
-            <span class="fs-1">не мешайте</span>
+        <div class="col bg-warning">
+
+            <div class="text-center">
+                <span class="fs-1">Думаю</span>
+                <img src="img/working-med.gif" alt="Думаем!"/>
+                <span class="fs-1">не отвлекайте</span>
+            </div>
+
         </div>
+
+    </div>
+
+    <div class="row mt-3">
 
         <!-- Зона для отображения сообщений  -->
         <div class="col-9">
@@ -213,7 +226,7 @@
                 .catch(function () {
                     setMessage(false, "Ошибка связи с сервером веб-приложения")
                 })
-                .finally(function (){
+                .finally(function () {
                     setThinking(false)
                 })
         return false

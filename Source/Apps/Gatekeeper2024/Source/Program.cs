@@ -114,6 +114,13 @@ internal sealed /* нельзя static */ class Program
         // и при необходимости UseDirectoryBrowser.
 
         // *******************************************************************
+        // добавляем Middleware
+
+        // включаем заголовок "Cache-Control: no-cache" для всех файлов,
+        // чтобы не заморачиваться с закешировавшимися скриптами
+        app.UseMiddleware<NoCacheMiddleware>();
+
+        // *******************************************************************
         // создаем endpoint'ы
 
         var api = app.MapGroup("/api");
