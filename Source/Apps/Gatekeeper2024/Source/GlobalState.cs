@@ -59,7 +59,7 @@ internal sealed class GlobalState
             string? message
         )
     {
-        var timestamp = DateTime.Now.ToString ("HH:mm:ss");
+        var timestamp = DateTime.Now.ToString ("HH:mm");
         Instance.Message = $"{timestamp} => {message}";
 
         return message;

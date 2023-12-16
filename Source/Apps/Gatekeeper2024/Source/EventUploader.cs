@@ -283,8 +283,10 @@ internal sealed class EventUploader
             return;
         }
 
-        var counter = 0;
-        var today = IrbisDate.TodayText;
+        // проверяем, не зафиксировался ли выход с прошлой попытки
+        var found = false;
+        var date = Utility.FormatDateTime ("{date}", passEvent.Moment);
+        var time = Utility.FormatDateTime ("{time}", passEvent.Moment);
         var department = Utility.GetDepartment();
         var person = Utility.GetPerson();
         var description = Utility.GetEvent();
@@ -292,8 +294,42 @@ internal sealed class EventUploader
         {
             var visit = VisitInfo.Parse (field);
             if (
+                    visit is { IsVisit: true }
+                    && visit.DateReturnedString == date
+                    && visit.TimeOut == time
+                    && visit.Department == department
+                    && visit.Description == description
+                    && visit.Responsible == person
+                )
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (found)
+        {
+            // выход уже зафиксирован, просто мы об этом не в курсе
+            // возможно, ответ от сервера ИРБИС64 до нас не дошел
+            Program.Logger.LogInformation
+                (
+                    "Departure already registered: {Ticket}, {Moment}",
+                    readerId,
+                    passEvent.Moment
+                );
+
+            DeleteFile (path);
+            return;
+        }
+
+        // далее проверяем, есть ли соответствующие события входа
+        var counter = 0;
+        foreach (var field in record.EnumerateField (VisitInfo.Tag))
+        {
+            var visit = VisitInfo.Parse (field);
+            if (
                     visit is { IsVisit: true, IsReturned: false }
-                    && visit.DateGivenString == today
+                    && visit.DateGivenString == date
                     && visit.Department == department
                     && visit.Description == description
                     && visit.Responsible == person
@@ -301,16 +337,21 @@ internal sealed class EventUploader
                     && string.IsNullOrEmpty (visit.TimeOut)
                 )
             {
+                // событие входа есть, просто добавляем в поле
+                // информацию о выходе посетителя
                 field.Add ('d', IrbisDate.TodayText);
                 field.Add ('2', IrbisDate.NowText);
                 counter++;
             }
         }
 
+        // не заносите eventData под if
         var eventData = Utility.GetArrivalField (passEvent.Moment)
             + Utility.GetDepartureField (DateTimeOffset.Now);
         if (counter is 0)
         {
+            // события входа почему-то нет, ничего страшного,
+            // формируем собыитие входа-выхода
             record.Add (40, eventData);
         }
 
@@ -384,13 +425,13 @@ internal sealed class EventUploader
 
             if (connection is null)
             {
-                GlobalState.Instance.HasError = true;
                 GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64: ОШИБКА");
+                GlobalState.Instance.HasError = true;
             }
             else
             {
-                GlobalState.Instance.HasError = false;
                 GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64 выполнено успешно");
+                GlobalState.Instance.HasError = false;
                 connection.Dispose();
             }
         }

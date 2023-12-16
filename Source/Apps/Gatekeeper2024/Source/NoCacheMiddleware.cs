@@ -53,6 +53,8 @@ internal sealed class NoCacheMiddleware
         )
     {
         context.Response.Headers.CacheControl = "no-cache";
+        context.Response.Headers.Pragma = "no-cache";
+        context.Response.Headers.Expires = "-1";
 
         await _next.Invoke (context);
     }
