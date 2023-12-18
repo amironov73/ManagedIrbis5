@@ -71,6 +71,7 @@ sealed class PrefixNode
                     newValue = Increment (oldValue);
                     success = true;
                     break;
+
                 case "--":
                     newValue = Decrement (oldValue);
                     success = true;
@@ -110,4 +111,3 @@ sealed class PrefixNode
 
     #endregion
 }
-

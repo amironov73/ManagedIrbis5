@@ -1,6 +1,6 @@
 ﻿//
 // Подсчеты для перемещения книг на открытый доступ
-// в рамках организации модельной библиотеки
+// в рамках трансформации в модельную библиотеку
 //
 
 connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
@@ -38,7 +38,17 @@ foreach (book in books)
     if (counter > 2)
     {
         brief = format_record ("@brief", book.Mfn)
-        println(counter, "\t", brief)
+        popular = get_field (book, 999, 0)
+        if (popular)
+        {
+            popular = (int) popular.Value
+        }
+        else
+        {
+            popular = 0
+        }
+
+        println (counter, "\t", popular, "\t", brief)
     }
 }
 
