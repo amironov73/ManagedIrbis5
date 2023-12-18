@@ -1,0 +1,48 @@
+﻿//
+// Подсчеты для перемещения книг на открытый доступ
+// в рамках организации модельной библиотеки
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+xpression = "(IN=15$) * MHR=ФКХ"
+books = search_all (xpression)
+// println ("Books found: ", len (books))
+
+books = batch_read (books)
+foreach (book in books)
+{
+    counter = 0
+    foreach (one in get_exemplars (book))
+    {
+        status = one.Status
+        number = one.Number
+        if (number)
+        {
+            if (have_subfield (one.Field, 'h')
+                and len (number) == 7 and number > "15"
+                and (status == "0" or status == "1" or status == "9"))
+            {
+                counter = counter + 1
+            }
+        }
+    }
+
+    if (counter > 2)
+    {
+        brief = format_record ("@brief", book.Mfn)
+        println(counter, "\t", brief)
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
