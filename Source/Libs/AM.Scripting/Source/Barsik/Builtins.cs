@@ -143,6 +143,7 @@ public static class Builtins
         { "now", new FunctionDescriptor ("now", Now) },
         { "print", new FunctionDescriptor ("print", Print) },
         { "println", new FunctionDescriptor ("println", PrintLine) },
+        { "quote", new FunctionDescriptor ("quote", Quote) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
         { "trace", new FunctionDescriptor ("trace", Trace_) },
@@ -899,6 +900,22 @@ public static class Builtins
         context.Output.WriteLine();
 
         return null;
+    }
+
+    /// <summary>
+    /// Закавычивание указанной строки.
+    /// </summary>
+    public static dynamic? Quote
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        return firstArg is null
+            ? "\"\""
+            : "\"" + firstArg + "\"";
+
     }
 
     /// <summary>

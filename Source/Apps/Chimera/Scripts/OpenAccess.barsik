@@ -12,43 +12,39 @@ if (!is_connected())
 
 //=================================
 
-xpression = "(IN=15$) * MHR=ФКХ"
-books = search_all (xpression)
-// println ("Books found: ", len (books))
-
-books = batch_read (books)
+books = batch_read (true)
 foreach (book in books)
 {
-    counter = 0
-    foreach (one in get_exemplars (book))
+    if (is_book (book))
     {
-        status = one.Status
-        number = one.Number
-        if (number)
+        total = 0
+        kladovka = 0
+        foreach (one in get_exemplars (book))
         {
-            if (have_subfield (one.Field, 'h')
-                and len (number) == 7 and number > "15"
-                and (status == "0" or status == "1" or status == "9"))
+            status = one.Status
+            number = one.Number
+            if (number)
             {
-                counter = counter + 1
+                if (have_subfield (one.Field, 'h')
+                    and (status == "0" or status == "1" or status == "9"))
+                {
+                    total = total + 1
+
+                    if (one.Place == "ФКХ")
+                    {
+                        kladovka = kladovka + 1
+                    }
+                }
             }
         }
-    }
 
-    if (counter > 2)
-    {
         brief = format_record ("@brief", book.Mfn)
-        popular = get_field (book, 999, 0)
-        if (popular)
-        {
-            popular = (int) popular.Value
-        }
-        else
-        {
-            popular = 0
-        }
+        rental = book_rental_count (book)
+        year = quote (book_year (book))
+        bbk = book_classification (book)
 
-        println (counter, "\t", popular, "\t", brief)
+        println (book.Mfn, "\t", total, "\t", kladovka, "\t",
+            rental, "\t", year, "\t", bbk, "\t", brief)
     }
 }
 

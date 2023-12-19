@@ -33,14 +33,13 @@ using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.PftLite;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
 
 using static AM.Scripting.Barsik.Builtins;
 
 #endregion
-
-#nullable enable
 
 namespace ManagedIrbis.Scripting.Barsik;
 
@@ -99,6 +98,20 @@ public sealed class IrbisLib
         { "batch_read", new FunctionDescriptor ("batch_read", BatchRead) },
         { "batch_search", new FunctionDescriptor ("batch_search", BatchSearch) },
         { "batch_write", new FunctionDescriptor ("batch_write", BatchWrite) },
+        { "book_classification", new FunctionDescriptor ("book_classification", BookClassification) },
+        { "book_country", new FunctionDescriptor ("book_country", BookCountry) },
+        { "book_exemplars", new FunctionDescriptor ("book_exemplars", BookExemplars) },
+        { "book_holder", new FunctionDescriptor ("book_holder", BookHolder) },
+        { "book_image", new FunctionDescriptor ("book_image", BookImage) },
+        { "book_index", new FunctionDescriptor ("book_index", BookIndex) },
+        { "book_isbn", new FunctionDescriptor ("book_isbn", BookIsbn) },
+        { "book_issn", new FunctionDescriptor ("book_issn", BookIssn) },
+        { "book_knowledge", new FunctionDescriptor ("book_knowledge", BookKnowledge) },
+        { "book_language", new FunctionDescriptor ("book_language", BookLanguage) },
+        { "book_price", new FunctionDescriptor ("book_price", BookPrice) },
+        { "book_rental_count", new FunctionDescriptor ("book_rental_count", BookRentalCount) },
+        { "book_worksheet", new FunctionDescriptor ("book_price", BookWorksheet) },
+        { "book_year", new FunctionDescriptor ("book_year", BookYear) },
         { "carriage_return", new FunctionDescriptor ("carriage_return", NewLine) },
         { "clear_output", new FunctionDescriptor ("clear_output", ClearOutput) },
         { "connect", new FunctionDescriptor ("connect", Connect) },
@@ -125,7 +138,11 @@ public sealed class IrbisLib
         { "get_mark", new FunctionDescriptor ("get_mark", GetMark) },
         { "have_field", new FunctionDescriptor ("have_field", HaveField) },
         { "have_subfield", new FunctionDescriptor ("have_subfield", HaveSubfield) },
+        { "is_article", new FunctionDescriptor ("is_article", IsArticle) },
+        { "is_book", new FunctionDescriptor ("is_book", IsBook) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
+        { "is_issue", new FunctionDescriptor ("is_issue", IsIssue) },
+        { "is_magazine", new FunctionDescriptor ("is_magazine", IsMagazine) },
         { "list_files", new FunctionDescriptor ("list_processes", ListFiles) },
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
@@ -550,6 +567,258 @@ public sealed class IrbisLib
         }
 
         return new BatchRecordWriter (connection, database, capacity);
+    }
+
+    /// <summary>
+    /// Получение классификационного индекса для указанной записи.
+    /// </summary>
+    public static dynamic? BookClassification
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetClassification (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение страны происхождения для указанной записи.
+    /// </summary>
+    public static dynamic? BookCountry
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetCountryCode (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение экземпляров для указанной записи.
+    /// </summary>
+    public static dynamic? BookExemplars
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetExemplars (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение поля с держателем экземпляра для указанной записи.
+    /// </summary>
+    public static dynamic? BookHolder
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetHolderField (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение поля с графическими данными для указанной записи.
+    /// </summary>
+    public static dynamic? BookImage
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetImageField (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение шифра документа для указанной записи.
+    /// </summary>
+    public static dynamic? BookIndex
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetIndex (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение информации об ISBN для указанной записи.
+    /// </summary>
+    public static dynamic? BookIsbn
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetIsbn (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение информации об ISSN для указанной записи.
+    /// </summary>
+    public static dynamic? BookIssn
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetIssn (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение раздела знаний для указанной записи.
+    /// </summary>
+    public static dynamic? BookKnowledge
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetKnowledgeSection (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение кода языка для указанной записи.
+    /// </summary>
+    public static dynamic? BookLanguage
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetLanguageCode (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение цены экземпляра для указанной записи.
+    /// </summary>
+    public static dynamic? BookPrice
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetPrice (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение количества выдач для указанной записи.
+    /// </summary>
+    public static dynamic? BookRentalCount
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetRentalCount (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение рабочего листа для указанной записи.
+    /// </summary>
+    public static dynamic? BookWorksheet
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetWorksheet (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение года издания для указанной записи.
+    /// </summary>
+    public static dynamic? BookYear
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetYear (record);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -1213,6 +1482,42 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Проверка, представляет ли запись статью из журнала.
+    /// </summary>
+    public static dynamic IsArticle
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsArticle (record);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли запись книгу.
+    /// </summary>
+    public static dynamic IsBook
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsBook (record);
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Мы подключены к серверу.
     /// </summary>
     public static dynamic IsConnected
@@ -1227,6 +1532,42 @@ public sealed class IrbisLib
         }
 
         return connection.IsConnected;
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли запись выпуск журнала.
+    /// </summary>
+    public static dynamic IsIssue
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsMagazineIssue (record);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли запись сводную по журналу.
+    /// </summary>
+    public static dynamic IsMagazine
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsMagazineSummary (record);
+        }
+
+        return false;
     }
 
     /// <summary>

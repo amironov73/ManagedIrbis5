@@ -25,10 +25,9 @@ using AM.Json;
 using JetBrains.Annotations;
 
 using ManagedIrbis.Fields;
+using ManagedIrbis.Systematization;
 
 #endregion
-
-#nullable enable
 
 namespace ManagedIrbis.Records;
 
@@ -256,6 +255,24 @@ public sealed class RecordConfiguration
         return field is null
             ? null
             : Field203.ParseField (field);
+    }
+
+    /// <summary>
+    /// Получение классификационного индекса (ББК или другой классификации)
+    /// для указанной записи.
+    /// </summary>
+    public string? GetClassification
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var field = record.GetField (621) // ББК
+            ?? record.GetField (686) // другая классификация
+            ?? record.GetField (675); // УДК
+
+        return field?.Value;
     }
 
     /// <summary>
@@ -663,6 +680,65 @@ public sealed class RecordConfiguration
         Sure.NotNull (record);
 
         return record.FM (WorksheetTag) ?? defaultValue;
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли собой указанная запись
+    /// статью из журнала.
+    /// </summary>
+    public bool IsArticle
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var worksheet = GetWorksheet (record);
+        return IrbisUtility.IsAsp (worksheet);
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли собой указанная запись книгу.
+    /// </summary>
+    public bool IsBook
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var worksheet = GetWorksheet (record);
+        return IrbisUtility.IsBook (worksheet);
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли собой указанная запись
+    /// сводную информацию о журнале.
+    /// </summary>
+    public bool IsMagazineSummary
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var worksheet = GetWorksheet (record);
+        return IrbisUtility.IsMagazineSummary (worksheet);
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли собой указанная запись
+    /// информацию о выпуске журнала.
+    /// </summary>
+    public bool IsMagazineIssue
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var worksheet = GetWorksheet (record);
+        return IrbisUtility.IsMagazineIssue (worksheet);
     }
 
     /// <summary>
