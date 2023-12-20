@@ -9,7 +9,7 @@ using Avalonia.Styling;
 
 namespace AvaloniaTests;
 
-public sealed class DataGridDemo
+internal sealed class DataGridDemo
 {
     public sealed class People
     {

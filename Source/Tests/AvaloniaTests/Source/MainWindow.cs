@@ -600,6 +600,12 @@ public sealed class MainWindow
                     new LedIndicatorDemo().Show (this);
                 }),
 
+                new Button { Content = "ComfortableWindow" }
+                .OnClick ((sender, args) =>
+                {
+                    new ComfortableWindowDemo().Show (this);
+                }),
+
                 MakeButton ("Render")
                     .OnClick ((_, _) => new RenderDemo().DoRender())
 

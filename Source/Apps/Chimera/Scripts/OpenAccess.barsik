@@ -19,6 +19,7 @@ foreach (book in books)
     {
         total = 0
         kladovka = 0
+        numbers = []
         foreach (one in get_exemplars (book))
         {
             status = one.Status
@@ -26,13 +27,14 @@ foreach (book in books)
             if (number)
             {
                 if (have_subfield (one.Field, 'h')
-                    and (status == "0" or status == "1" or status == "9"))
+                    and (status == "0" or status == "1" or status == "5" or status == "9"))
                 {
                     total = total + 1
 
                     if (one.Place == "ФКХ")
                     {
                         kladovka = kladovka + 1
+                        numbers.Add (number)
                     }
                 }
             }
@@ -44,7 +46,7 @@ foreach (book in books)
         bbk = book_classification (book)
 
         println (book.Mfn, "\t", total, "\t", kladovka, "\t",
-            rental, "\t", year, "\t", bbk, "\t", brief)
+            numbers, "\t", rental, "\t", year, "\t", bbk, "\t", brief)
     }
 }
 

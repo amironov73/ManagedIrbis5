@@ -113,4 +113,28 @@ public sealed class LogTextBox
     Type IStyleable.StyleKey => typeof (TextBox);
 
     #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Вывод строки текста.
+    /// </summary>
+    public void WriteLine
+        (
+            LogLevel level,
+            string message
+        )
+    {
+        if (level >= MinLevel)
+        {
+            var timeStamp = TimeProvider.System.GetLocalNow().ToString("HH:mm:ss");
+            var levelText = level.ToString()?.ToUpperInvariant();
+            var line = $"{timeStamp}: {levelText} : {message}{NewLine}";
+
+            Text += line;
+            CaretIndex = int.MaxValue;
+        }
+    }
+
+    #endregion
 }

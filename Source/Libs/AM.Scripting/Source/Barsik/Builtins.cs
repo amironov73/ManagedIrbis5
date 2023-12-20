@@ -424,6 +424,8 @@ public static class Builtins
             dynamic?[] args
         )
     {
+        // TODO переименовать в is_empty
+
         var obj = Compute (context, args, 0);
 
         return obj switch
