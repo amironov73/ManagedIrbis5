@@ -25,7 +25,6 @@ using AM.Json;
 using JetBrains.Annotations;
 
 using ManagedIrbis.Fields;
-using ManagedIrbis.Systematization;
 
 #endregion
 
@@ -329,7 +328,25 @@ public sealed class RecordConfiguration
     }
 
     /// <summary>
-    /// Получение поля для настройки библиографической записи.
+    /// Получение кодов для указанной библиографической записи.
+    /// </summary>
+    [Pure]
+    public CodesInfo? GetCodes
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var field = record.GetField (CodesInfo.Tag);
+        return field is null
+            ? null
+            : CodesInfo.Parse (field);
+    }
+
+    /// <summary>
+    /// Получение поля для настройки библиографической записи
+    /// (метка 905).
     /// </summary>
     [Pure]
     public Field? GetCustomizationField
@@ -349,6 +366,21 @@ public sealed class RecordConfiguration
     public static RecordConfiguration GetDefault()
     {
         return new ();
+    }
+
+    /// <summary>
+    /// Получение типа документа.
+    /// </summary>
+    [Pure]
+    public string? GetDocumentType
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var codes = GetCodes (record);
+        return codes?.DocumentType;
     }
 
     /// <summary>
@@ -712,6 +744,11 @@ public sealed class RecordConfiguration
     }
 
     /// <summary>
+    /// Проверка, является ли документ электронным (компьютерным).
+    /// </summary>
+    public bool IsElectronic (Record record) => GetCodes (record)?.IsElectronic() ?? false;
+
+    /// <summary>
     /// Проверка, представляет ли собой указанная запись
     /// сводную информацию о журнале.
     /// </summary>
@@ -740,6 +777,11 @@ public sealed class RecordConfiguration
         var worksheet = GetWorksheet (record);
         return IrbisUtility.IsMagazineIssue (worksheet);
     }
+
+    /// <summary>
+    /// Проверка, является ли документ текстовым.
+    /// </summary>
+    public bool IsText (Record record) => GetCodes (record)?.IsText() ?? false;
 
     /// <summary>
     /// Проверка, всё ли нормально с рабочим листом?

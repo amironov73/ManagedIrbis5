@@ -110,6 +110,7 @@ public sealed class IrbisLib
         { "book_language", new FunctionDescriptor ("book_language", BookLanguage) },
         { "book_price", new FunctionDescriptor ("book_price", BookPrice) },
         { "book_rental_count", new FunctionDescriptor ("book_rental_count", BookRentalCount) },
+        { "book_type", new FunctionDescriptor ("book_type", BookType) },
         { "book_worksheet", new FunctionDescriptor ("book_price", BookWorksheet) },
         { "book_year", new FunctionDescriptor ("book_year", BookYear) },
         { "carriage_return", new FunctionDescriptor ("carriage_return", NewLine) },
@@ -141,8 +142,10 @@ public sealed class IrbisLib
         { "is_article", new FunctionDescriptor ("is_article", IsArticle) },
         { "is_book", new FunctionDescriptor ("is_book", IsBook) },
         { "is_connected", new FunctionDescriptor ("is_connected", IsConnected) },
+        { "is_electronic", new FunctionDescriptor ("is_electronic", IsElectronic) },
         { "is_issue", new FunctionDescriptor ("is_issue", IsIssue) },
         { "is_magazine", new FunctionDescriptor ("is_magazine", IsMagazine) },
+        { "is_text", new FunctionDescriptor ("is_text", IsText) },
         { "list_files", new FunctionDescriptor ("list_processes", ListFiles) },
         { "list_processes", new FunctionDescriptor ("list_files", ListProcesses) },
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
@@ -483,6 +486,16 @@ public sealed class IrbisLib
             return BatchRecordReader.WholeDatabase (connection, connection.Database);
         }
 
+        if (firstArg is int fromMfn)
+        {
+            if (Compute (context, args, 1) is int toMfn)
+            {
+                return BatchRecordReader.Interval (connection, fromMfn, toMfn);
+            }
+
+            return BatchRecordReader.Interval (connection, fromMfn);
+        }
+
         return null;
     }
 
@@ -780,6 +793,24 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetRentalCount (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение типа документа для указанной записи.
+    /// </summary>
+    public static dynamic? BookType
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetDocumentType (record);
         }
 
         return null;
@@ -1535,6 +1566,24 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Проверка, представляет ли запись электронный документ.
+    /// </summary>
+    public static dynamic IsElectronic
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsElectronic (record);
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Проверка, представляет ли запись выпуск журнала.
     /// </summary>
     public static dynamic IsIssue
@@ -1565,6 +1614,24 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().IsMagazineSummary (record);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Проверка, представляет ли запись текстовый документ.
+    /// </summary>
+    public static dynamic IsText
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().IsText (record);
         }
 
         return false;

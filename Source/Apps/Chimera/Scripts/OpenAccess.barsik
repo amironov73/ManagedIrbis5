@@ -15,38 +15,37 @@ if (!is_connected())
 books = batch_read (true)
 foreach (book in books)
 {
-    if (is_book (book))
+    if (is_book (book) and is_text (book))
     {
         total = 0
-        kladovka = 0
         numbers = []
         foreach (one in get_exemplars (book))
         {
             status = one.Status
             number = one.Number
-            if (number)
+            if (number
+                and have_subfield (one.Field, 'h')
+                and (status == "0" or status == "1" or status == "5" or status == "9"))
             {
-                if (have_subfield (one.Field, 'h')
-                    and (status == "0" or status == "1" or status == "5" or status == "9"))
-                {
-                    total = total + 1
+                total = total + 1
 
-                    if (one.Place == "ФКХ")
-                    {
-                        kladovka = kladovka + 1
-                        numbers.Add (number)
-                    }
+                if (one.Place == "ФКХ")
+                {
+                    numbers.Add (number)
                 }
             }
         }
 
-        brief = format_record ("@brief", book.Mfn)
-        rental = book_rental_count (book)
-        year = quote (book_year (book))
-        bbk = book_classification (book)
+        if (total)
+        {
+            brief = format_record ("@brief", book.Mfn)
+            rental = book_rental_count (book)
+            year = book_year (book)
+            bbk = book_classification (book)
 
-        println (book.Mfn, "\t", total, "\t", kladovka, "\t",
-            numbers, "\t", rental, "\t", year, "\t", bbk, "\t", brief)
+            println (book.Mfn, "\t", total, "\t", rental, "\t",
+                year, "\t", bbk, "\t", numbers, "\t", brief)
+        }
     }
 }
 
