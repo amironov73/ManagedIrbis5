@@ -414,33 +414,6 @@ internal sealed class EventUploader
         }
     }
 
-    /// <summary>
-    /// Проверка подключения к серверу ИРБИС64.
-    /// </summary>
-    private void CheckIrbisConnection()
-    {
-        try
-        {
-            var connection = Utility.ConnectToIrbis();
-
-            if (connection is null)
-            {
-                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64: ОШИБКА");
-                GlobalState.Instance.HasError = true;
-            }
-            else
-            {
-                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64 выполнено успешно");
-                GlobalState.Instance.HasError = false;
-                connection.Dispose();
-            }
-        }
-        catch (Exception exception)
-        {
-            Program.Logger.LogError (exception, "Error during CheckIrbisConnection");
-        }
-    }
-
     private bool CreateQueueDirectory()
     {
         try
@@ -468,7 +441,7 @@ internal sealed class EventUploader
             return;
         }
 
-        CheckIrbisConnection();
+        Utility.TestIrbisConnection();
 
         while (true)
         {

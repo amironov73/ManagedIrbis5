@@ -1,34 +1,45 @@
 ﻿<!DOCTYPE html>
 <html lang="ru">
 <head>
+
     <meta charset="UTF-8">
     <title>Привратник 2024</title>
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css">
-
-    <!-- Отключаем кеширование для данной страницы -->
-    <!-- Похоже, Kestrel это дело не поддерживает -->
-    <meta http-equiv="Cache-Control" content="no-cache">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="-1">
 
 </head>
 <body>
 
 <nav class="navbar navbar-expand navbar-dark bg-dark bg-gradient">
     <div class="container-fluid">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-                <a class="nav-link active" href="https://irklib.ru">
-                    <img src="img/gatekeeper.png" alt="Логотип">
-                    ГБУК ИОГУНБ
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">
-                    Привратник 2024
-                </a>
-            </li>
-        </ul>
+        <a class="navbar-brand" href="https://irklib.ru" target="_blank">
+            <img src="img/gatekeeper.png" alt="Логотип">
+            ГБУК ИОГУНБ
+        </a>
+        <button class="navbar-toggler" type="button"
+                data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarText" aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        Привратник 2024
+                    </a>
+                </li>
+            </ul>
+
+        </div>
+
+        <span class="navbar-text">
+            <a href="#" onclick="return testConnection()">
+                <img src="img/irbis.png" alt="Проверка связи с сервером ИРБИС64"
+                    title="Проверка связи с сервером ИРБИС64">
+            </a>
+        </span>
+
     </div>
 </nav>
 
@@ -41,7 +52,7 @@
 
             <div class="text-center">
                 <img src="img/working-small.gif" alt="Думаю!"/>
-                <span class="fs-4">Думаю, не отвлекайте! </span>
+                <span class="fs-4">Думаю, не отвлекайте!</span>
             </div>
 
         </div>
@@ -151,21 +162,21 @@
 <script>
 
     function setThinking(on) {
-        let thinkingBox = document.getElementById("thinking")
-        thinkingBox.style.display = on ? "block" : "none"
+        let thinkingBox = document.getElementById('thinking')
+        thinkingBox.style.display = on ? 'block' : 'none'
     }
 
     function setMessage(success, message) {
-        let alertBox = document.getElementById("alert-box")
-        let messageText = document.getElementById("message-text")
-        let successIcon = document.getElementById("success-icon")
-        let errorIcon = document.getElementById("error-icon")
+        let alertBox = document.getElementById('alert-box')
+        let messageText = document.getElementById('message-text')
+        let successIcon = document.getElementById('success-icon')
+        let errorIcon = document.getElementById('error-icon')
         alertBox.className = success
-                ? "alert alert-success"
-                : "alert alert-danger"
+                ? 'alert alert-success'
+                : 'alert alert-danger'
         messageText.innerText = message
-        successIcon.style.display = success ? "inline" : "none"
-        errorIcon.style.display = success ? "none" : "inline"
+        successIcon.style.display = success ? 'inline' : 'none'
+        errorIcon.style.display = success ? 'none' : 'inline'
     }
 
     function addTD(tr, text) {
@@ -176,10 +187,10 @@
     }
 
     function updateHistory() {
-        let historyBody = document.getElementById("history")
-        historyBody.innerHTML = ""
+        let historyBody = document.getElementById('history')
+        historyBody.innerHTML = ''
         setThinking(true)
-        axios.get("/api/history")
+        axios.get('/api/history')
                 .then(function (response) {
                     let counter = 0
                     response.data.forEach(function (obj) {
@@ -196,14 +207,30 @@
                         const tr = document.createElement('tr');
                         addTD(tr, '--')
                         addTD(tr, '--')
-                        addTD(tr, 'Нет данных о посещениях')
+                        addTD(tr, 'Пока нет данных о посещениях')
                         addTD(tr, '--')
                         historyBody.appendChild(tr)
                     }
                 })
                 .catch(function () {
                     setThinking(false)
-                    setMessage(false, "Ошибка связи с сервером веб-приложения")
+                    setMessage(false, 'Ошибка связи с сервером веб-приложения')
+                })
+                .finally(function () {
+                    setThinking(false)
+                })
+        return false
+    }
+
+    function testConnection() {
+        setThinking(true)
+        setMessage('Проверяем связь с сервером ИРБИС64')
+        axios.get('/api/test')
+                .then(function () {
+                    console.log('Проверка связи с сервером ИРБИС64')
+                })
+                .catch(function () {
+                    setMessage(false, 'Ошибка связи с сервером веб-приложения')
                 })
                 .finally(function () {
                     setThinking(false)
@@ -212,12 +239,12 @@
     }
 
     function updateStat() {
-        event.preventDefault()
-        let statBody = document.getElementById("stat")
-        statBody.innerHTML = ""
+        let statBody = document.getElementById('stat')
+        statBody.innerHTML = ''
         setThinking(true)
-        axios.get("/api/stat")
+        axios.get('/api/stat')
                 .then(function (response) {
+                    let counter = 0
                     response.data.forEach(function (obj) {
                         let tr = document.createElement('tr')
                         addTD(tr, obj.title)
@@ -226,11 +253,21 @@
                         value.innerText = obj.value
                         tr.appendChild(value)
                         statBody.appendChild(tr)
+                        counter++
                     })
+
+                    if (counter === 0) {
+                        let tr = document.createElement('tr')
+                        addTD(tr, '')
+                        addTD(tr, 'Пока статистика не накопилась')
+                        statBody.appendChild(tr)
+                    }
+                    else {
+                        setMessage(true, 'Получена статистика')
+                    }
                 })
                 .catch(function () {
-                    setThinking(false)
-                    setMessage(false, "Ошибка связи с сервером веб-приложения")
+                    setMessage(false, 'Ошибка связи с сервером веб-приложения')
                 })
                 .finally(function () {
                     setThinking(false)
@@ -239,12 +276,12 @@
     }
 
     setInterval(() => {
-                axios.get("/api/state")
+                axios.get('/api/state')
                         .then(function (response) {
                             setMessage(true, response.data.message)
                         })
                         .catch(function () {
-                            setMessage(false, "Ошибка связи с сервером веб-приложения")
+                            setMessage(false, 'Ошибка связи с сервером веб-приложения')
                         })
             },
             1000)

@@ -337,6 +337,33 @@ internal static class Utility
     }
 
     /// <summary>
+    /// Проверка подключения к серверу ИРБИС64.
+    /// </summary>
+    public static void TestIrbisConnection()
+    {
+        try
+        {
+            var connection = Utility.ConnectToIrbis();
+
+            if (connection is null)
+            {
+                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64: ОШИБКА");
+                GlobalState.Instance.HasError = true;
+            }
+            else
+            {
+                GlobalState.SetMessageWithTimestamp ("Тестовое подключение к серверу ИРБИС64 выполнено успешно");
+                GlobalState.Instance.HasError = false;
+                connection.Dispose();
+            }
+        }
+        catch (Exception exception)
+        {
+            Program.Logger.LogError (exception, $"Error during {nameof (TestIrbisConnection)}");
+        }
+    }
+
+    /// <summary>
     /// Получение кода кафедры обслуживания.
     /// </summary>
     public static string GetDepartment() => GetString ("department", "*")!;

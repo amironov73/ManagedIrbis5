@@ -124,12 +124,13 @@ internal sealed /* нельзя static */ class Program
         // создаем endpoint'ы
 
         var api = app.MapGroup("/api");
-        api.MapGet ("state", GetState);
-        api.MapGet ("history", ShowHistory);
-        api.MapGet ("stat", ShowStat);
-        api.MapGet ("stop", StopTheApplication);
+        api.MapGet ("state", HandleStateRequest);
+        api.MapGet ("history", HandleHistoryRequest);
+        api.MapGet ("stat", HandleStatRequest);
+        api.MapGet ("stop", HandleStopRequest);
+        api.MapGet ("test", HandleTestRequest);
 
-        app.MapPost ("/auth", HandleAuth);
+        app.MapPost ("/auth", HandleAuthRequest);
 
         GlobalState.SetMessageWithTimestamp ("Пока никаких событий не зафиксировано");
         Logger.LogInformation ("Application startup");
@@ -137,44 +138,115 @@ internal sealed /* нельзя static */ class Program
         app.Run();
     }
 
-    private static IResult HandleAuth
+    #endregion
+
+    #region HTTP request handlers
+
+    private static IResult HandleTestRequest()
+    {
+        try
+        {
+            Utility.TestIrbisConnection();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while testing IRBIS connection");
+        }
+
+        return Results.Ok();
+    }
+
+    private static IResult HandleAuthRequest
         (
-            HttpContext context
+            HttpContext context,
+            SigurHandler handler
         )
     {
-        var sigurHandler = Application.Services.GetRequiredService<SigurHandler>();
+        try
+        {
+            // var sigurHandler = Application.Services.GetRequiredService<SigurHandler>();
 
-        return sigurHandler.HandleRequest (context);
+            return handler.HandleRequest (context);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while handling Sigur request");
+        }
+
+        return Results.Problem();
+    }
+
+    private static IResult HandleHistoryRequest
+        (
+            HttpContext context,
+            HistoryProvider provider
+        )
+    {
+        try
+        {
+            // var historyProvider = Application.Services.GetRequiredService<HistoryProvider>();
+
+            return provider.HandleRequest (context);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while gathering history");
+        }
+
+        return Results.Problem();
+    }
+
+    private static IResult HandleStatRequest
+        (
+            HttpContext context,
+            StatProvider provider
+        )
+    {
+        try
+        {
+            // var statProvider = Application.Services.GetRequiredService<StatProvider>();
+
+            return provider.HandleRequest (context);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while handling stat request");
+        }
+
+        return Results.Problem();
+    }
+
+    private static IResult HandleStateRequest()
+    {
+        try
+        {
+            return Results.Json (GlobalState.Instance);
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while handling state request");
+        }
+
+        return Results.Problem();
+    }
+
+    private static void HandleStopRequest()
+    {
+        try
+        {
+            Logger.LogInformation ("Stop the application requested");
+            var lifetime = Application.Services.GetRequiredService<IHostApplicationLifetime>();
+            lifetime.StopApplication();
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while stopping the application");
+        }
     }
 
     #endregion
 
     #region Private members
-
-    private static IResult ShowHistory
-        (
-            HttpContext context
-        )
-    {
-        var historyProvider = Application.Services.GetRequiredService<HistoryProvider>();
-
-        return historyProvider.HandleRequest (context);
-    }
-
-    private static IResult ShowStat
-        (
-            HttpContext context
-        )
-    {
-        var statProvider = Application.Services.GetRequiredService<StatProvider>();
-
-        return statProvider.HandleRequest (context);
-    }
-
-    private static IResult GetState()
-    {
-        return Results.Json (GlobalState.Instance);
-    }
 
     private static IConfiguration BuildConfiguration
         (
@@ -198,12 +270,14 @@ internal sealed /* нельзя static */ class Program
             string[] args
         )
     {
+        const StringSplitOptions options = StringSplitOptions.TrimEntries
+            | StringSplitOptions.RemoveEmptyEntries;
         Console.WriteLine ("Requesting stop the application");
         try
         {
             var configuration = BuildConfiguration (builder, args);
             var baseUrl = configuration["Urls"]!
-                .Split (';', StringSplitOptions.TrimEntries|StringSplitOptions.RemoveEmptyEntries)
+                .Split (';', options)
                 .First();
 
             var client = new RestClient (baseUrl);
@@ -215,13 +289,6 @@ internal sealed /* нельзя static */ class Program
         {
             Console.Error.WriteLine (exception.Message);
         }
-    }
-
-    private static void StopTheApplication()
-    {
-        Logger.LogInformation ("Stop the application requested");
-        var lifetime = Application.Services.GetRequiredService<IHostApplicationLifetime>();
-        lifetime.StopApplication();
     }
 
     #endregion
