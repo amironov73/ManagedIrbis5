@@ -194,6 +194,59 @@ internal sealed class EventUploader
             return;
         }
 
+        // минимальный промежуток времени между последовательными
+        // проходами читателя, минуты
+        var minimumTimeSpan = Utility.GetTimeSpan();
+        if (minimumTimeSpan > 0)
+        {
+            string? lastVisit = null;
+            foreach (var field in record.EnumerateField (VisitInfo.Tag))
+            {
+                var visit = VisitInfo.Parse (field);
+                if (
+                        visit is { IsVisit: true }
+                        && visit.DateGivenString == today
+                        && visit.Department == department
+                        && visit.Description == description
+                        && visit.Responsible == person
+                    )
+                {
+                    var candidate = visit.TimeIn;
+                    if (string.CompareOrdinal (candidate, lastVisit) > 0)
+                    {
+                        lastVisit = candidate;
+                    }
+                }
+            }
+
+            if (lastVisit is not null)
+            {
+                // было предыдущее посещение, сравниваем моменты времени
+
+                // мы не берем DateTimeOffset.Now, т. к. имеем дело
+                // с отложенной записью посещений, т. е. реально
+                // посетитель мог пройти час назад, а дело до записи
+                // дошло только сейчас
+                var previousTime = Utility.ParseTime (lastVisit);
+                var currentTime = Utility.ParseTime (now);
+                var delta = (int) Math.Ceiling ((currentTime - previousTime).TotalMinutes);
+                if (delta < minimumTimeSpan)
+                {
+                    // прошло слишком мало времени, это посещение можно не регистрировать
+                    Program.Logger.LogInformation
+                        (
+                            "Last arrival was recently: {Ticket}, {Previous}, {Current}",
+                            readerId,
+                            lastVisit,
+                            passEvent.Moment
+                        );
+
+                    DeleteFile (path);
+                    return;
+                }
+            }
+        }
+
         var eventData = Utility.GetArrivalField (passEvent.Moment);
         record.Add (40, eventData);
 
@@ -350,6 +403,24 @@ internal sealed class EventUploader
             + Utility.GetDepartureField (DateTimeOffset.Now);
         if (counter is 0)
         {
+            // минимальный промежуток времени между последовательными
+            // проходами читателя, минуты
+            var minimumTimeSpan = Utility.GetTimeSpan();
+            if (minimumTimeSpan > 0)
+            {
+                // TODO реализовать проверку, насколько давно произошел выход
+
+                Program.Logger.LogInformation
+                    (
+                        "Departure was recently: {Ticket}, {Moment}",
+                        readerId,
+                        passEvent.Moment
+                    );
+
+                DeleteFile (path);
+                return;
+            }
+
             // события входа почему-то нет, ничего страшного,
             // формируем собыитие входа-выхода
             record.Add (40, eventData);

@@ -214,6 +214,12 @@ internal static class Utility
     }
 
     /// <summary>
+    /// Разбор момента времени в текстовом представлении.
+    /// </summary>
+    public static TimeOnly ParseTime (string text)
+        => TimeOnly.ParseExact (text, "HH:mm:ss");
+
+    /// <summary>
     /// Получение номера выходного турникета.
     /// </summary>
     public static int GetDeparturePoint()
@@ -382,4 +388,11 @@ internal static class Utility
     /// Формат для имени файла, формируемого из текущей даты-времени.
     /// </summary>
     public static string GetDateTimeFormatForFileName() => "yyyy-MM-dd-HH-mm-ss-ff";
+
+    /// <summary>
+    /// Минимальный промежуток времени между последовательными
+    /// проходами читателя, минуты.
+    /// </summary>
+    public static int GetTimeSpan() => GetInt32 ("minimum-time-span", 60);
+
 }
