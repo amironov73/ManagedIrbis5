@@ -15,8 +15,6 @@ using System;
 
 #endregion
 
-#nullable enable
-
 namespace AM;
 
 /// <summary>
