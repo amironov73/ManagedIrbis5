@@ -32,7 +32,7 @@ internal sealed /* нельзя static */ class Program
     /// <summary>
     /// Ссылка на веб-приложение.
     /// </summary>
-    public static WebApplication Application { get; set; } = null!;
+    public static WebApplication Application { get; private set; } = null!;
 
     /// <summary>
     /// Общий логгер для наших классов.
@@ -84,6 +84,11 @@ internal sealed /* нельзя static */ class Program
         // регистрация сервисов
 
         var services = builder.Services;
+        services.AddMemoryCache (options =>
+        {
+            options.SizeLimit = 1024;
+            options.ExpirationScanFrequency = TimeSpan.FromMinutes (1);
+        });
         services.AddHostedService<EventUploader>();
         services.AddSingleton<SigurHandler>();
         services.AddSingleton<HistoryProvider>();
@@ -111,7 +116,7 @@ internal sealed /* нельзя static */ class Program
         app.MapGet ("/", () => Results.Redirect ("/index.html"));
 
         // UseFileServer объединяет функции UseStaticFiles, UseDefaultFiles
-        // и при необходимости UseDirectoryBrowser.
+        // и при необходимости UseDirectoryBrowser. Но мы ее не используем
 
         // *******************************************************************
         // добавляем Middleware
@@ -164,8 +169,6 @@ internal sealed /* нельзя static */ class Program
     {
         try
         {
-            // var sigurHandler = Application.Services.GetRequiredService<SigurHandler>();
-
             return handler.HandleRequest (context);
         }
         catch (Exception exception)
@@ -184,8 +187,6 @@ internal sealed /* нельзя static */ class Program
     {
         try
         {
-            // var historyProvider = Application.Services.GetRequiredService<HistoryProvider>();
-
             return provider.HandleRequest (context);
         }
         catch (Exception exception)
@@ -204,8 +205,6 @@ internal sealed /* нельзя static */ class Program
     {
         try
         {
-            // var statProvider = Application.Services.GetRequiredService<StatProvider>();
-
             return provider.HandleRequest (context);
         }
         catch (Exception exception)

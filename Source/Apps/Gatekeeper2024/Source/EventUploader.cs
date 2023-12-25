@@ -17,6 +17,9 @@ using System.Text.Json;
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Readers;
+using ManagedIrbis.Records;
+
+using Microsoft.Extensions.Caching.Memory;
 
 #endregion
 
@@ -33,8 +36,12 @@ internal sealed class EventUploader
     /// <summary>
     /// Конструктор.
     /// </summary>
-    public EventUploader()
+    public EventUploader
+        (
+            IMemoryCache cache
+        )
     {
+        _cache = cache;
         _queueDirectory = Utility.GetQueueDirectory();
     }
 
@@ -43,6 +50,7 @@ internal sealed class EventUploader
     #region Private members
 
     private readonly string _queueDirectory;
+    private readonly IMemoryCache _cache;
 
     /// <summary>
     /// Получение одного (первого в хронологическом порядке) файла,
@@ -232,6 +240,15 @@ internal sealed class EventUploader
                 var delta = (int) Math.Ceiling ((currentTime - previousTime).TotalMinutes);
                 if (delta < minimumTimeSpan)
                 {
+                    // кладем в кеш, чтобы потом можно было взять его
+                    // при обработке выхода читателя
+                    _cache.Set
+                        (
+                            readerId,
+                            passEvent,
+                            TimeSpan.FromMinutes (minimumTimeSpan)
+                        );
+
                     // прошло слишком мало времени, это посещение можно не регистрировать
                     Program.Logger.LogInformation
                         (
@@ -249,6 +266,15 @@ internal sealed class EventUploader
 
         var eventData = Utility.GetArrivalField (passEvent.Moment);
         record.Add (40, eventData);
+
+        // Добавление поля 999 нужно для формирования словаря "VIS="
+        // (читатели в библиотеке)
+        // в RDR.FST есть строчка
+        // 999 0 mhl,"VIS="v999
+        record.SetValue (999, "1");
+
+        // на всякий случай удаляем событие из кэша, раз уж мы добрались сюда
+        _cache.Remove (readerId);
 
         // отправляем модифицированную запись на сервер
         var parameters = new WriteRecordParameters
@@ -315,6 +341,16 @@ internal sealed class EventUploader
             return;
         }
 
+        if (_cache.TryGetValue (readerId, out _))
+        {
+            // событие входа не было зарегистрировано,
+            // т. к. произошло слишком рано после предыдущего
+            _cache.Remove (readerId);
+            Program.Logger.LogError ("Arrival was skipped: {Reader}", readerId);
+            DeleteFile (path);
+            return;
+        }
+
         using var connection = Utility.ConnectToIrbis();
         if (connection is null)
         {
@@ -324,7 +360,7 @@ internal sealed class EventUploader
         var reader = GetReader (connection, readerId, path);
         if (reader is null)
         {
-            // файл не удаляем, это делает GetReader при необходимости
+            // файл не удаляем, т. к. это делает GetReader при необходимости
             return;
         }
 
@@ -332,6 +368,7 @@ internal sealed class EventUploader
         if (record is null)
         {
             Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            LogoutError (passEvent);
             DeleteFile (path);
             return;
         }
@@ -426,6 +463,10 @@ internal sealed class EventUploader
             record.Add (40, eventData);
         }
 
+        // удаляем поле 999, чтобы убрать читателя из словаря
+        // "VIS=" (читатели в библиотеке)
+        record.RemoveField (999);
+
         // отправляем модифицированную запись на сервер
         var parameters = new WriteRecordParameters
         {
@@ -446,6 +487,16 @@ internal sealed class EventUploader
 
             // при успешном окончании удаляем файл
             DeleteFile (path);
+        }
+        else
+        {
+            Program.Logger.LogInformation
+                (
+                    "Departure to Irbis failure: {Ticket}, {EventData}",
+                    readerId,
+                    eventData
+                );
+            LogoutError (passEvent);
         }
     }
 
@@ -503,6 +554,29 @@ internal sealed class EventUploader
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Запись в журнал ошибки выхода.
+    /// </summary>
+    private void LogoutError
+        (
+            PassEvent passEvent
+        )
+    {
+        try
+        {
+            var logDirectory = Utility.GetRequiredString ("log-directory");
+            var fileName = Path.Combine (logDirectory, "(logouterror.txt");
+            var entry = $"#10: {passEvent.Id}\n"
+                + Utility.FormatDateTime ("#40: ^f{date}^2{time}\n*****", passEvent.Moment);
+            using var stream = File.CreateText (fileName);
+            stream.WriteLine(entry);
+        }
+        catch (Exception exception)
+        {
+            Program.Logger.LogError (exception, "Can't log LogoutError");
+        }
     }
 
     private void MainLoop ()

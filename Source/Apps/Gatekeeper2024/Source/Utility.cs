@@ -394,5 +394,4 @@ internal static class Utility
     /// проходами читателя, минуты.
     /// </summary>
     public static int GetTimeSpan() => GetInt32 ("minimum-time-span", 60);
-
 }

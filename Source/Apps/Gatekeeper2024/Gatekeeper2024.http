@@ -13,6 +13,19 @@ Accept: application/json
 
 ###
 
+# Вход несуществующего
+POST {{Gatekeeper2024_HostAddress}}/auth/
+Accept: application/json
+
+{
+    "type": "NORMAL",
+    "keyHex": "6404656E",
+    "direction": 2,
+    "accessPoint": 1
+}
+
+###
+
 # Выход
 POST {{Gatekeeper2024_HostAddress}}/auth/
 Accept: application/json

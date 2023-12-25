@@ -74,4 +74,6 @@
   // минуты
   "minimum-time-span": 60,
 
+  // директория для хранения логов
+  "log-directory": "C:/Gatekeeper/Logs",
 }
