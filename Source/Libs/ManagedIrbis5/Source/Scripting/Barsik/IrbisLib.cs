@@ -104,6 +104,7 @@ public sealed class IrbisLib
         { "book_holder", new FunctionDescriptor ("book_holder", BookHolder) },
         { "book_image", new FunctionDescriptor ("book_image", BookImage) },
         { "book_index", new FunctionDescriptor ("book_index", BookIndex) },
+        { "book_info", new FunctionDescriptor ("book_info", BookInfo_) },
         { "book_isbn", new FunctionDescriptor ("book_isbn", BookIsbn) },
         { "book_issn", new FunctionDescriptor ("book_issn", BookIssn) },
         { "book_knowledge", new FunctionDescriptor ("book_knowledge", BookKnowledge) },
@@ -685,6 +686,27 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetIndex (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение всей информации о книге для указанной записи.
+    /// </summary>
+    public static dynamic? BookInfo_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                return new BookInfo (connection, record);
+            }
         }
 
         return null;

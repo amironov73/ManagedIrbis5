@@ -118,8 +118,8 @@ internal sealed class Program
                 // устанавливаем дату возврата равной дате выдачи
                 field.SetSubFieldValue ('f', field.GetFirstSubFieldValue ('d'));
 
-                // устанавливаем время возврата в полночь
-                field.SetSubFieldValue ('2', "23:59:59");
+                // устанавливаем время возврата времени входа
+                field.SetSubFieldValue ('2', field.GetFirstSubFieldValue ('1'));
                 modified = true;
             }
 

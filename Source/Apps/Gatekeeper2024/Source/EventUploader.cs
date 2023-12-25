@@ -246,7 +246,11 @@ internal sealed class EventUploader
                         (
                             readerId,
                             passEvent,
-                            TimeSpan.FromMinutes (minimumTimeSpan)
+                            new MemoryCacheEntryOptions
+                            {
+                                Size = 1,
+                                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes (minimumTimeSpan)
+                            }
                         );
 
                     // прошло слишком мало времени, это посещение можно не регистрировать

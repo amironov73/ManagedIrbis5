@@ -130,6 +130,14 @@ public class IrbisApplication
         // затем из переменных окружения
         CommandLineUtility.ConfigureConnectionFromEnvironment (Settings);
 
+        // затем из .env-файла
+        var envFile = EnvFile.GetDefaultEnvFile();
+        connectionString = envFile["IRBIS64_CONNECTION"];
+        if (!string.IsNullOrEmpty (connectionString))
+        {
+            Settings.ParseConnectionString (connectionString);
+        }
+
         // наконец, из командной строки
         // TODO: сделать по-умному
         // CommandLineUtility.ConfigureConnectionFromCommandLine (Settings, Args);

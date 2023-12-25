@@ -18,7 +18,10 @@ foreach (book in books)
     if (is_book (book) and is_text (book))
     {
         total = 0
-        numbers = []
+        fkh = []  // основное книгохранилище
+        f201 = [] // ЧЗ естественнонаучный
+        f202 = [] // ЧЗ гуманитарный
+        f506 = [] // ОЛИ книги
         foreach (one in get_exemplars (book))
         {
             status = one.Status
@@ -30,9 +33,16 @@ foreach (book in books)
                 total = total + 1
 
                 if (one.Place == "ФКХ")
-                {
-                    numbers.Add (number)
-                }
+                    fkh.Add (number)
+
+                if (one.Place == "Ф201")
+                    f201.Add (number)
+
+                if (one.Place == "Ф202")
+                    f202.Add (number)
+
+                if (one.Place == "Ф506")
+                    f506.Add (number)
             }
         }
 
@@ -44,7 +54,9 @@ foreach (book in books)
             bbk = book_classification (book)
 
             println (book.Mfn, "\t", total, "\t", rental, "\t",
-                year, "\t", bbk, "\t", numbers, "\t", brief)
+                year, "\t", bbk, "\t", join (", ", fkh), "\t",
+                join (", ", f201), "\t", join (", ", f202), "\t",
+                join (", ", f506), "\t", brief)
         }
     }
 }

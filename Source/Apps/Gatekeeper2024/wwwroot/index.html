@@ -82,7 +82,20 @@
                 </symbol>
             </svg>
 
-            <h4>Сообщения</h4>
+            <!-- Заголовок -->
+            <h4>
+                Сообщения
+
+                <!-- Кнопка временного запрета "бип-бип" -->
+                    <input class="btn-check" type="checkbox" value="" id="silence-box">
+                    <label class="btn btn-outline-primary btn-sm" for="silence-box">
+                        <img src="img/silent.svg" height="16" width="16"
+                             alt="Тишина" title="Тишина">
+                    </label>
+
+            </h4>
+
+            <!-- Собственно сообщение -->
             <div id="alert-box" class="alert alert-info">
                 <div>
                     <svg id="success-icon" display="none" class="bi flex-shrink-0 me-2" width="32" height="32"
@@ -95,14 +108,6 @@
                     </svg>
                     <span id="message-text" class="fs-3 text-success"></span>
                 </div>
-            </div>
-
-            <!-- Временный запрет "бип-бип" -->
-            <div class="form-check">
-                <input class="btn-check" type="checkbox" value="" id="silence-box">
-                <label class="btn btn-outline-primary" for="silence-box">
-                    Замолчи, пожалуйста!
-                </label>
             </div>
 
         </div>
