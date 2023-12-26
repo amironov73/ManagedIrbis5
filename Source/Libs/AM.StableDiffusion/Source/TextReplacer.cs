@@ -14,6 +14,7 @@
 #region Using directives
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -100,6 +101,25 @@ public sealed class TextReplacer
     #region Public methods
 
     /// <summary>
+    /// Разбор аргументов командной строки.
+    /// </summary>
+    public string[] ParseCommandLine
+        (
+            string[] args
+        )
+    {
+        Sure.NotNull (args);
+
+        var result = new List<string>();
+        foreach (var arg in args)
+        {
+            result.Add (arg);
+        }
+
+        return result.ToArray();
+    }
+
+    /// <summary>
     /// Замена указанного текста.
     /// </summary>
     /// <param name="path">Путь, где хранятся файлы.</param>
@@ -120,7 +140,8 @@ public sealed class TextReplacer
         var options = Recursive ?
             SearchOption.AllDirectories
             : SearchOption.TopDirectoryOnly;
-        foreach (var fileName in Directory.EnumerateFiles (path, pattern, options))
+        var foundFiles = Directory.GetFiles (path, pattern, options);
+        foreach (var fileName in foundFiles)
         {
             ProcessSingleFile (fileName, oldValue, newValue);
         }

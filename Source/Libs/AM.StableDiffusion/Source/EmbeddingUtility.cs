@@ -24,8 +24,6 @@ using SixLabors.ImageSharp;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion;
 
 /// <summary>

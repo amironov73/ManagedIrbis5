@@ -33,6 +33,7 @@ using ManagedIrbis.Fields;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.PftLite;
 using ManagedIrbis.Providers;
+using ManagedIrbis.Readers;
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Logging;
@@ -163,6 +164,9 @@ public sealed class IrbisLib
         { "read_record", new FunctionDescriptor ("read_record", ReadRecord) },
         { "read_terms", new FunctionDescriptor ("read_terms", ReadTerms) },
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
+        { "reader_id", new FunctionDescriptor ("reader_id", ReaderId) },
+        { "reader_info", new FunctionDescriptor ("reader_info", ReaderInfo_) },
+        { "reader_ticket", new FunctionDescriptor ("reader_ticket", ReaderTicket) },
         { "search", new FunctionDescriptor ("search", Search) },
         { "search_all", new FunctionDescriptor ("search_all", SearchAll) },
         { "search_count", new FunctionDescriptor ("search_count", SearchCount) },
@@ -2121,6 +2125,60 @@ public sealed class IrbisLib
         if (!specifications.IsNullOrEmpty())
         {
             return connection.ReadTextFiles (specifications.ToArray());
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение идентификатора читателя.
+    /// </summary>
+    public static dynamic? ReaderId
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return ReaderConfiguration.GetDefault().GetReaderId (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Разбор записи, содержащей информацию о читателе.
+    /// </summary>
+    public static dynamic? ReaderInfo_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return ReaderInfo.Parse (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение номера читательского билета.
+    /// </summary>
+    public static dynamic? ReaderTicket
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return ReaderConfiguration.GetDefault().GetTicket (record);
         }
 
         return null;

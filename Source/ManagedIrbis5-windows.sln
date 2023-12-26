@@ -293,6 +293,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EasyCaption", "Apps\EasyCap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReplaceText", "Apps\ReplaceText\ReplaceText.csproj", "{632E28BB-3AA3-477E-A32A-1CA9F922E474}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ResizeImages", "Apps\ResizeImages\ResizeImages.csproj", "{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1959,6 +1961,18 @@ Global
 		{632E28BB-3AA3-477E-A32A-1CA9F922E474}.Release|x64.Build.0 = Release|Any CPU
 		{632E28BB-3AA3-477E-A32A-1CA9F922E474}.Release|x86.ActiveCfg = Release|Any CPU
 		{632E28BB-3AA3-477E-A32A-1CA9F922E474}.Release|x86.Build.0 = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|x64.Build.0 = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Debug|x86.Build.0 = Debug|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|x64.ActiveCfg = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|x64.Build.0 = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|x86.ActiveCfg = Release|Any CPU
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2102,6 +2116,7 @@ Global
 		{5B6130D4-743D-4C72-A819-7EC1D0A7ED85} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{AF434BA9-21C6-435A-88FA-3597D44506E3} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{632E28BB-3AA3-477E-A32A-1CA9F922E474} = {1E5940AA-0540-4947-8216-45E381E76C72}
+		{CFB1D0D9-9497-428A-B42E-6BD7B079EAB5} = {1E5940AA-0540-4947-8216-45E381E76C72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

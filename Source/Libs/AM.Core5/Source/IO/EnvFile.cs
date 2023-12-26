@@ -98,7 +98,20 @@ public sealed class EnvFile
     #region Public methods
 
     /// <summary>
+    /// Применение переменных, найденных в файле.
+    /// </summary>
+    public void Apply()
+    {
+        foreach (var pair in _dictionary)
+        {
+            Environment.SetEnvironmentVariable (pair.Key, pair.Value);
+        }
+    }
+
+    /// <summary>
     /// Файл <c>.env</c>, лежащий рядом с программой.
+    /// Если такого файла нет, возвращается пустышка,
+    /// не содержащая ни одной переменной.
     /// </summary>
     public static EnvFile GetDefaultEnvFile()
     {

@@ -35,6 +35,32 @@ public static class StableUtility
     #region Public methods
 
     /// <summary>
+    /// Пропорционально масштабирует изображение так, чтобы оно
+    /// вписывалось в указанные размеры.
+    /// </summary>
+    public static (int, int) ProportionalResize
+        (
+            int imageWidth,
+            int imageHeight,
+            int maxWidth,
+            int maxHeight
+        )
+    {
+        double windowHeight = maxWidth;
+        double windowWidth = maxHeight;
+        var imageAspect = imageWidth / imageHeight;
+        var panelAspect = windowWidth / windowHeight;
+        var superAspect = imageAspect / panelAspect;
+        var ratio = (superAspect > 1.0)
+            ? windowWidth / imageWidth
+            : windowHeight / imageHeight;
+        imageWidth = (int) (imageWidth * ratio);
+        imageHeight = (int) (imageHeight * ratio);
+
+        return (imageWidth, imageHeight);
+    }
+
+    /// <summary>
     /// Считывание запроса из указанного файла.
     /// </summary>
     public static TResult FromFile<TResult>

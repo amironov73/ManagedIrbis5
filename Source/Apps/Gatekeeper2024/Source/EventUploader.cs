@@ -151,7 +151,7 @@ internal sealed class EventUploader
         var reader = GetReader (connection, readerId, path);
         if (reader is null)
         {
-            // файл не удаляем, это делает GetReader при необходимости
+            // файл не удаляем, т. к. это делает GetReader при необходимости
             return;
         }
 
@@ -433,8 +433,12 @@ internal sealed class EventUploader
             {
                 // событие входа есть, просто добавляем в поле
                 // информацию о выходе посетителя
-                field.Add ('d', IrbisDate.TodayText);
-                field.Add ('2', IrbisDate.NowText);
+                var departureText = Utility.GetDepartureField (passEvent.Moment);
+                var departureField = new Field(1, departureText);
+                foreach (SubField subfield in departureField.Subfields)
+                {
+                    field.Add (subfield.Clone());
+                }
                 counter++;
             }
         }
