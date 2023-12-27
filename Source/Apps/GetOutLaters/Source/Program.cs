@@ -146,6 +146,8 @@ internal sealed class Program
 
     private int DoTheWork()
     {
+        Connection.Database = "RDR"; // TODO исправить
+
         Logger.LogInformation ("Прогоняем ночующих");
         var database = Connection.EnsureDatabase();
 
@@ -184,6 +186,7 @@ internal sealed class Program
     {
         var program = new Program (args);
         program.ConfigureCancelKey();
+        program.Connection = new SyncConnection();
         program.Run();
 
         var result = program.DoTheWork();
