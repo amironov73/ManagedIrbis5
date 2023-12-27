@@ -28,27 +28,6 @@ namespace Gatekeeper2024;
 /// </summary>
 internal sealed class StatProvider
 {
-    #region Construction
-
-    // /// <summary>
-    // /// Конструктор.
-    // /// </summary>
-    // public StatProvider
-    //     (
-    //         ILogger<HistoryProvider> logger
-    //     )
-    // {
-    //     _logger = logger;
-    // }
-
-    #endregion
-
-    #region Private members
-
-    // private readonly ILogger _logger;
-
-    #endregion
-
     #region Public methods
 
     /// <summary>
@@ -141,6 +120,7 @@ internal sealed class StatProvider
             Value = files.Length.ToInvariantString()
         });
 
+        // фейки нужны при отладке
         // var fake = StatEntry.FakeEntries();
 
         return Results.Json (result);

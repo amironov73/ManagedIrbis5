@@ -134,6 +134,7 @@ internal sealed /* нельзя static */ class Program
         api.MapGet ("stat", HandleStatRequest);
         api.MapGet ("stop", HandleStopRequest);
         api.MapGet ("test", HandleTestRequest);
+        api.MapGet ("ok", HandleOkRequest);
 
         app.MapPost ("/auth", HandleAuthRequest);
 
@@ -240,6 +241,22 @@ internal sealed /* нельзя static */ class Program
         catch (Exception exception)
         {
             Logger.LogError (exception, "Error while stopping the application");
+        }
+    }
+
+    /// <summary>
+    /// Сигнал от пользователя о сбросе текущей ошибки.
+    /// </summary>
+    private static void HandleOkRequest()
+    {
+        try
+        {
+            Logger.LogInformation ("It's OK signal");
+            GlobalState.Instance.HasError = false;
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while handling It's OK signal");
         }
     }
 
