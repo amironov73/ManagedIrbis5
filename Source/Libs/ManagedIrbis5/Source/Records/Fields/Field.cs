@@ -665,7 +665,34 @@ public class Field
     }
 
     /// <summary>
-    /// Присваивание одного поля другому.
+    /// Добавление (с возможным замещением уже имеющихся)
+    /// подполей, разобранных из указанной строки.
+    /// </summary>
+    public Field Append
+        (
+            ReadOnlySpan<char> line
+        )
+    {
+        var temporary = new Field (1);
+        temporary.DecodeBody (line);
+        if (temporary.Value is not null)
+        {
+            Value = temporary.Value;
+        }
+
+        foreach (var subfield in temporary)
+        {
+            SetSubFieldValue (subfield.Code, subfield.Value);
+        }
+
+        return this;
+    }
+
+    /// <summary>
+    /// Присваивание одного поля другому
+    /// (с возможным замещением уже имеющихся).
+    /// Подполя, отсутствующие в поле-источнкие,
+    /// пропадают из поля назначения.
     /// </summary>
     public Field AssignFrom
         (
@@ -875,10 +902,6 @@ public class Field
             Magna.Logger.LogError
                 (
                     exception,
-                    nameof (Field) + "::" + nameof (DecodeBody)
-                );
-            Magna.Logger.LogError
-                (
                     nameof (Field) + "::" + nameof (DecodeBody)
                     + ": bad line: {Line}",
                     line.ToString()

@@ -1,8 +1,10 @@
 <Project>
+
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <NoWarn>NU1507</NoWarn>
   </PropertyGroup>
+
   <PropertyGroup>
     <MicrosoftVersion>8.0.0</MicrosoftVersion>
     <AvaloniaVersion>11.0.6</AvaloniaVersion>
@@ -13,6 +15,7 @@
     <NugetVersion>6.7.0</NugetVersion>
     <NLogVersion>5.2.7</NLogVersion>
   </PropertyGroup>
+
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
     <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.2" />
@@ -43,6 +46,7 @@
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
     <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
+    <PackageVersion Include="Cocona" Version="2.2.0" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="$(CommunityToolkitVersion)" />
@@ -166,4 +170,5 @@
     <PackageVersion Include="XamlNameReferenceGenerator" Version="1.6.1" />
     <PackageVersion Include="YamlDotNet" Version="13.3.1" />
   </ItemGroup>
+
 </Project>

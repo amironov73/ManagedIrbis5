@@ -13,6 +13,8 @@
 
 #region Using directives
 
+using System.Diagnostics;
+
 using Microsoft.Extensions.Logging.Abstractions;
 
 using NLog.Web;
@@ -135,6 +137,7 @@ internal sealed /* нельзя static */ class Program
         api.MapGet ("stop", HandleStopRequest);
         api.MapGet ("test", HandleTestRequest);
         api.MapGet ("ok", HandleOkRequest);
+        api.MapGet ("version", HandleVersionRequest);
 
         app.MapPost ("/auth", HandleAuthRequest);
 
@@ -258,6 +261,22 @@ internal sealed /* нельзя static */ class Program
         {
             Logger.LogError (exception, "Error while handling It's OK signal");
         }
+    }
+
+    private static IResult HandleVersionRequest()
+    {
+        try
+        {
+            var location = typeof (Program).Assembly.Location;
+            var version = FileVersionInfo.GetVersionInfo (location)?.FileVersion;
+            return Results.Text (version ?? "unknown");
+        }
+        catch (Exception exception)
+        {
+            Logger.LogError (exception, "Error while handling Version request");
+        }
+
+        return Results.Problem();
     }
 
     #endregion

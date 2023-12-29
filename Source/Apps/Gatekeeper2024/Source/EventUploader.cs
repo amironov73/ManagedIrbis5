@@ -97,7 +97,8 @@ internal sealed class EventUploader
         (
             ISyncProvider connection,
             string readerId,
-            string path
+            string path,
+            PassEvent passEvent
         )
     {
         var readers = Utility.SearchForReader (connection, readerId);
@@ -111,6 +112,7 @@ internal sealed class EventUploader
         if (readers.Length == 0)
         {
             Program.Logger.LogError ("No reader with ticket {Ticket}", readerId);
+            LogPassError (passEvent);
             DeleteFile (path);
             return null;
         }
@@ -118,6 +120,7 @@ internal sealed class EventUploader
         if (readers.Length != 1)
         {
             Program.Logger.LogError ("Many readers with ticket {Ticket}", readerId);
+            LogPassError (passEvent);
             DeleteFile (path);
             return null;
         }
@@ -148,7 +151,7 @@ internal sealed class EventUploader
             return;
         }
 
-        var reader = GetReader (connection, readerId, path);
+        var reader = GetReader (connection, readerId, path, passEvent);
         if (reader is null)
         {
             // файл не удаляем, т. к. это делает GetReader при необходимости
@@ -159,6 +162,7 @@ internal sealed class EventUploader
         if (record is null)
         {
             Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
+            LogPassError (passEvent);
             DeleteFile (path);
             return;
         }
@@ -335,8 +339,6 @@ internal sealed class EventUploader
             PassEvent passEvent
         )
     {
-        // TODO реализовать
-
         var readerId = passEvent.Id;
         if (string.IsNullOrEmpty (readerId))
         {
@@ -361,7 +363,7 @@ internal sealed class EventUploader
             return;
         }
 
-        var reader = GetReader (connection, readerId, path);
+        var reader = GetReader (connection, readerId, path, passEvent);
         if (reader is null)
         {
             // файл не удаляем, т. к. это делает GetReader при необходимости
@@ -372,7 +374,7 @@ internal sealed class EventUploader
         if (record is null)
         {
             Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
-            LogoutError (passEvent);
+            LogPassError (passEvent);
             DeleteFile (path);
             return;
         }
@@ -434,11 +436,7 @@ internal sealed class EventUploader
                 // событие входа есть, просто добавляем в поле
                 // информацию о выходе посетителя
                 var departureText = Utility.GetDepartureField (passEvent.Moment);
-                var departureField = new Field(1, departureText);
-                foreach (SubField subfield in departureField.Subfields)
-                {
-                    field.Add (subfield.Clone());
-                }
+                field.Append (departureText);
                 counter++;
             }
         }
@@ -496,16 +494,6 @@ internal sealed class EventUploader
             // при успешном окончании удаляем файл
             DeleteFile (path);
         }
-        else
-        {
-            Program.Logger.LogInformation
-                (
-                    "Departure to Irbis failure: {Ticket}, {EventData}",
-                    readerId,
-                    eventData
-                );
-            LogoutError (passEvent);
-        }
     }
 
     private void ProcessFile
@@ -530,6 +518,21 @@ internal sealed class EventUploader
 
         var arrivalPoint = Utility.GetArrivalPoint();
         var departurePoint = Utility.GetDeparturePoint();
+        if (passEvent.Moment < DateTimeOffset.Now.AddDays (-1))
+        {
+            // событие слишком старое, просто удаляем его
+            Program.Logger.LogInformation
+                (
+                    "Event is too old {Path}: {Moment}",
+                    path,
+                    passEvent.Moment
+                );
+
+            LogPassError (passEvent);
+            DeleteFile (path);
+            return;
+        }
+
         if (passEvent.Point == arrivalPoint)
         {
             ProcessArrival (path, passEvent);
@@ -565,9 +568,54 @@ internal sealed class EventUploader
     }
 
     /// <summary>
+    /// Запись в журнал ошибки.
+    /// </summary>
+    private void LogPassError
+        (
+            PassEvent passEvent
+        )
+    {
+        var arrivalPoint = Utility.GetArrivalPoint();
+        var departurePoint = Utility.GetDeparturePoint();
+
+        if (passEvent.Point == arrivalPoint)
+        {
+            LogArrivalError (passEvent);
+        }
+
+        if (passEvent.Point == departurePoint)
+        {
+            LogDepartureError (passEvent);
+        }
+    }
+
+    /// <summary>
+    /// Запись в журнал ошибки входа.
+    /// </summary>
+    private void LogArrivalError
+        (
+            PassEvent passEvent
+        )
+    {
+        try
+        {
+            var logDirectory = Utility.GetRequiredString ("log-directory");
+            var fileName = Path.Combine (logDirectory, "(loginerror.txt");
+            var entry = $"#10: {passEvent.Id}\n"
+                + Utility.FormatDateTime ("#40: ^d{date}^1{time}\n*****", passEvent.Moment);
+            using var stream = File.CreateText (fileName);
+            stream.WriteLine(entry);
+        }
+        catch (Exception exception)
+        {
+            Program.Logger.LogError (exception, "Can't log LogoutError");
+        }
+    }
+
+    /// <summary>
     /// Запись в журнал ошибки выхода.
     /// </summary>
-    private void LogoutError
+    private void LogDepartureError
         (
             PassEvent passEvent
         )
