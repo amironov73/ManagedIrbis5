@@ -26,14 +26,14 @@
     <PackageVersion Include="Avalonia.Controls.ColorPicker" Version="$(AvaloniaStable)" />
     <PackageVersion Include="Avalonia.Controls.ItemsRepeater" Version="$(AvaloniaStable)" />
     <PackageVersion Include="Avalonia.Controls.DataGrid" Version="$(AvaloniaVersion)" />
-    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.1" />
+    <PackageVersion Include="Avalonia.Controls.TreeDataGrid" Version="11.0.2" />
     <PackageVersion Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Diagnostics" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.HtmlRenderer" Version="11.0.0" />
-    <PackageVersion Include="Avalonia.Labs.Controls" Version="$(AvaloniaPrevious)" />
-    <PackageVersion Include="Avalonia.Labs.Lottie" Version="$(AvaloniaPrevious)" />
-    <PackageVersion Include="Avalonia.Labs.Qr" Version="$(AvaloniaPrevious)" />
+    <PackageVersion Include="Avalonia.Labs.Controls" Version="11.0.2" />
+    <PackageVersion Include="Avalonia.Labs.Lottie" Version="11.0.2" />
+    <PackageVersion Include="Avalonia.Labs.Qr" Version="11.0.2" />
     <PackageVersion Include="Avalonia.Markup.Xaml.Loader" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.ReactiveUI" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
