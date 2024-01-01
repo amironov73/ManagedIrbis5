@@ -68,7 +68,7 @@
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.4.1" />
     <PackageVersion Include="MailKit" Version="4.2.0" />
-    <PackageVersion Include="Material.Avalonia" Version="3.1.1" />
+    <PackageVersion Include="Material.Avalonia" Version="3.1.3" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.1.4" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="$(MicrosoftVersion)" />
@@ -145,7 +145,7 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.QrCode" Version="0.6.0" />
-    <PackageVersion Include="SharpCompress" Version="0.33.0" />
+    <PackageVersion Include="SharpCompress" Version="0.35.0" />
     <PackageVersion Include="SharpZipLib" Version="1.4.2" />
     <PackageVersion Include="Spectre.Console" Version="0.47.1-preview.0.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
