@@ -62,7 +62,7 @@
     <PackageVersion Include="Google.Protobuf" Version="3.24.2" />
     <PackageVersion Include="Grpc.Tools" Version="2.58.0" />
     <PackageVersion Include="GridExtra.Avalonia" Version="0.9.1" />
-    <PackageVersion Include="HtmlAgilityPack" Version="1.11.54" />
+    <PackageVersion Include="HtmlAgilityPack" Version="1.11.57" />
     <PackageVersion Include="KaitaiStruct.Runtime.CSharp" Version="0.10.0" />
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
