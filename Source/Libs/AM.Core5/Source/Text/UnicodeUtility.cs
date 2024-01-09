@@ -7,7 +7,7 @@
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
 
-/* UnicodeUtility.cs --
+/* UnicodeUtility.cs -- полезные методы для обработки Unicode-текстов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -17,12 +17,10 @@ using System.Collections.Generic;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Text;
 
 /// <summary>
-///
+/// Полезные методы для обработки Unicode-текстов.
 /// </summary>
 public static class UnicodeUtility
 {

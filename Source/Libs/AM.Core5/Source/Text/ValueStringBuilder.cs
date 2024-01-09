@@ -42,6 +42,14 @@ public ref struct ValueStringBuilder
     public int Capacity => _characters.Length;
 
     /// <summary>
+    /// Последний добавленный символ, либо <c>'\0'</c>,
+    /// если буфер пуст.
+    /// </summary>
+    public char LastChar => _position > 0
+        ? _characters[_position - 1]
+        : '\0';
+
+    /// <summary>
     /// Текущая длина в символах.
     /// </summary>
     public int Length

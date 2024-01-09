@@ -23,6 +23,7 @@
         <ProjectReference Include="..\..\Libs\AM.Linguistics\AM.Linguistics.csproj" />
         <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
         <ProjectReference Include="..\..\Libs\AM.Skia\AM.Skia.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.StableDiffusion\AM.StableDiffusion.csproj" />
     </ItemGroup>
 
 </Project>

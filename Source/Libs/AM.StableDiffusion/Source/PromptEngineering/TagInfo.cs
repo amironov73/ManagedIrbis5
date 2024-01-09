@@ -54,6 +54,18 @@ public sealed class TagInfo
 
     #endregion
 
+    #region Public methods
+
+    /// <summary>
+    /// Неполное клонирование.
+    /// </summary>
+    public TagInfo IncompleteClone() => new TagInfo
+    {
+        Title = Title
+    };
+
+    #endregion
+
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
