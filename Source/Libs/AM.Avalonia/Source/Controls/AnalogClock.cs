@@ -21,8 +21,6 @@ using Avalonia.Threading;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Avalonia.Controls;
 
 /// <summary>

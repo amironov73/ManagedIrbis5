@@ -10,6 +10,12 @@
 
     <ItemGroup>
         <None Remove=".gitignore" />
+        <None Update="Images\cat-and-coffee.jpg">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+        <None Update="Images\cat-mask.png">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

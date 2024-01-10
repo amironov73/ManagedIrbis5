@@ -606,6 +606,12 @@ public sealed class MainWindow
                     new ComfortableWindowDemo().Show (this);
                 }),
 
+                new Button { Content = "MaskEditor" }
+                .OnClick ((sender, args) =>
+                {
+                    new MaskEditorDemo().Show (this);
+                }),
+
                 MakeButton ("Render")
                     .OnClick ((_, _) => new RenderDemo().DoRender())
 

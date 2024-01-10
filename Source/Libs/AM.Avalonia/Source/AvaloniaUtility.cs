@@ -700,6 +700,28 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Пытается вписать внутренний прямоугольник во внешний.
+    /// </summary>
+    public static Rect Fit
+        (
+            Rect outer,
+            Rect inner
+        )
+    {
+        var outerAspect = outer.Width / outer.Height;
+        var innerAspect = inner.Width / inner.Height;
+        var fitInHeight = outerAspect < innerAspect;
+        var ratio = fitInHeight
+            ? outer.Width / inner.Width
+            : outer.Height / inner.Height;
+        var width = inner.Width * ratio;
+        var height = inner.Height * ratio;
+        var left = (outer.Width - width) / 2;
+        var top = (outer.Height - height) / 2;
+        return new Rect (left, top, width, height);
+    }
+
+    /// <summary>
     /// Получение темы для контрола указанного типа.
     /// </summary>
     public static ControlTheme? GetControlTheme
