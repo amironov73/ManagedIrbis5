@@ -2,13 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ForCanBeConvertedToForeach
-// ReSharper disable InvokeAsExtensionMethod
-// ReSharper disable PropertyCanBeMadeInitOnly.Local
 // ReSharper disable StringLiteralTypo
 
 #region Using directives
-
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
