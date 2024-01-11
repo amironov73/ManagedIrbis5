@@ -1,0 +1,11 @@
+﻿//
+// Извлечение метаинформации из модели (чекпоинта или лоры).
+//
+
+foreach (name in __ARGS__)
+{
+    println (name)
+    // println (read_all_metadata (name))
+    // println (read_metadata (name))
+    println (parse_data_blocks (name))
+}

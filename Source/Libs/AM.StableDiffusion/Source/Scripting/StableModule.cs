@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 
 /* StableModule.cs -- модуль для Барсика
  * Ars Magna project, http://arsmagna.ru
@@ -13,16 +14,19 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using System.Text.Json;
 
 using AM.Scripting.Barsik;
 
 using JetBrains.Annotations;
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 using static AM.Scripting.Barsik.Builtins;
 
 #endregion
-
-#nullable enable
 
 namespace AM.StableDiffusion.Scripting;
 
@@ -43,6 +47,9 @@ public sealed class StableModule
         { "check_prepared_image", new FunctionDescriptor ("check_prepared_image", CheckPreparedImage) },
         { "check_prepared_images", new FunctionDescriptor ("check_prepared_images", CheckPreparedImages) },
         { "decode_text_data", new FunctionDescriptor ("decode_text_data", DecodeTextData) },
+        { "parse_data_blocks", new FunctionDescriptor ("parse_data_blocks", ParseSafetensorsDataBlocks) },
+        { "read_all_metadata", new FunctionDescriptor ("read_all_metadata", ReadRawMetadata) },
+        { "read_metadata", new FunctionDescriptor ("read_metadata", ReadSafetensorsMetadata) },
         { "retrieve_text_data", new FunctionDescriptor ("retrieve_text_data", RetrieveTextData) },
         { "slice_image", new FunctionDescriptor ("slice_image", SliceImage) },
 
@@ -114,6 +121,70 @@ public sealed class StableModule
 
         return null;
     }
+
+    /// <summary>
+    /// Чтение метаданных модели (чекпоинта или лоры).
+    /// Метаданные никак не интерпретируются.
+    /// </summary>
+    public static dynamic? ReadRawMetadata
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (fileName))
+        {
+            using var inputStream = File.OpenRead (fileName);
+            var bytes = Safetensors.GetRawMetadata (inputStream);
+            var json = Encoding.UTF8.GetString (bytes);
+            var parsed = JObject.Parse (json);
+            return parsed.ToString (Formatting.Indented);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Разбор блоков данных модели (чекпоинта или лоры).
+    /// </summary>
+    public static dynamic? ParseSafetensorsDataBlocks
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (fileName))
+        {
+            using var inputStream = File.OpenRead (fileName);
+            var bytes = Safetensors.GetRawMetadata (inputStream);
+            var json = Encoding.UTF8.GetString (bytes);
+            var document = JsonDocument.Parse (json);
+            return Safetensors.ParseBlocks (document);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Чтение метаданных модели (чекпоинта или лоры).
+    /// </summary>
+    public static dynamic? ReadSafetensorsMetadata
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (fileName))
+        {
+            return Safetensors.ReadMetadata (fileName);
+        }
+
+        return null;
+    }
+
     /// <summary>
     /// Получение текстовых данных из указанного файла.
     /// </summary>
@@ -163,7 +234,7 @@ public sealed class StableModule
         var outputDirectory = BarsikUtility.ToString (Compute (context, args, 1));
         if (string.IsNullOrEmpty (outputDirectory))
         {
-            context.Error.WriteLine ("No output directory spcified");
+            context.Error.WriteLine ("No output directory specified");
             return null;
         }
 

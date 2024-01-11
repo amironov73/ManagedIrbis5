@@ -23,6 +23,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using AM.Collections;
 using AM.Text;
 
 #endregion
@@ -154,6 +155,17 @@ public static class BarsikUtility
                     interpreter.Context.Error.WriteLine (result);
                 }
             }
+
+            // два минуса подряд означают начало аргументов для скрипта
+            var scriptArguments = new List<string>();
+            var twoMinuses = Array.IndexOf (args, "--");
+            if (twoMinuses >= 0)
+            {
+                scriptArguments.AddRange (args.Skip (twoMinuses + 1));
+                args = args.Take (twoMinuses).ToArray();
+            }
+
+            interpreter.Context.Defines.Add ("__ARGS__", scriptArguments);
 
             foreach (var fileName in args)
             {
