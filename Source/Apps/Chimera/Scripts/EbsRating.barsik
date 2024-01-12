@@ -1,0 +1,44 @@
+﻿//
+// Подсчет количества экземпляров, изданных ИРНИТУ
+//
+
+asm = load ("System.Text.RegularExpressions")
+rxtype = asm.GetType ("System.Text.RegularExpressions.Regex")
+
+//=================================
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=ISTU;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+rx1 = new rxtype ("/er-\\d+")
+rx2 = /"\d+"/
+foreach (line in file_read_lines ("metrika.csv"))
+{
+    match = rx1.Match (line)
+    counts = rx2.Matches (line)
+    if (match.Success and len (counts) == 2)
+    {
+        match = match.ToString().Substring(1).ToUpperInvariant()
+        xpression = format ("{1}IN={0}{1}", match, '"')
+        descr = join (", ", search_format (xpression, "@brief"))
+        if (empty (descr))
+        {
+            descr = "Библиографическое описание отсутствует"
+        }
+        views = counts[0].Value.Trim ('"')
+        people = counts[1].Value.Trim ('"')
+
+        println (match, "\t", descr, "\t", views, "\t", people)
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

@@ -124,6 +124,9 @@ public sealed class AutomaticModule
 
     #region Public methods
 
+    /// <summary>
+    /// Смена текущего чекпоинта.
+    /// </summary>
     public static dynamic? ChangeCheckpoint
         (
             Context context,

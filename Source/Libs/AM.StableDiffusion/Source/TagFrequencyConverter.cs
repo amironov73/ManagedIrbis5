@@ -55,9 +55,7 @@ internal sealed class TagFrequencyConverter
             writer.WriteStartObject (pair1.Key);
             foreach (var pair2 in pair1.Value)
             {
-                writer.WriteStartObject();
                 writer.WriteNumber (pair2.Key, pair2.Value);
-                writer.WriteEndObject();
             }
             writer.WriteEndObject();
         }

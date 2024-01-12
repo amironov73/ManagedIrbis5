@@ -75,6 +75,7 @@ public sealed class StdLib
         { "file_exists", new FunctionDescriptor ("file_exists", FileExists) },
         { "file_get_contents", new FunctionDescriptor ("file_get_contents", FileGetContents) },
         { "file_put_contents", new FunctionDescriptor ("file_put_contents", FilePutContents) },
+        { "file_read_lines", new FunctionDescriptor ("file_read_lines", FileReadLines) },
         { "fopen", new FunctionDescriptor ("fopen", Fopen) },
         { "fputs", new FunctionDescriptor ("fputs", Fputs) },
         { "fread", new FunctionDescriptor ("fread", Fread) },
@@ -592,6 +593,48 @@ public sealed class StdLib
         catch (Exception exception)
         {
             context.Error.WriteLine ($"Error writing file {fileName}: {exception.Message}");
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Запись всего файла как массива строк.
+    /// </summary>
+    public static dynamic? FileReadLines
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var fileName = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (fileName))
+        {
+            return null;
+        }
+
+        try
+        {
+            if (fileName.StartsWith ("http:") || fileName.StartsWith ("https:"))
+            {
+                var client = new HttpClient();
+                var text = client.GetStringAsync (fileName).GetAwaiter().GetResult();
+                return text.SplitLines();
+            }
+
+            var encodingName = Compute (context, args, 1) as string;
+            if (!string.IsNullOrEmpty (encodingName))
+            {
+                var encoding = Encoding.GetEncoding (encodingName);
+
+                return File.ReadLines (fileName, encoding);
+            }
+
+            return File.ReadLines (fileName);
+        }
+        catch (Exception exception)
+        {
+            context.Error.WriteLine ($"Error reading file {fileName}: {exception.Message}");
         }
 
         return null;
