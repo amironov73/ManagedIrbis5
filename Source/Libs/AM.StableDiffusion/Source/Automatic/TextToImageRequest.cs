@@ -33,6 +33,13 @@ public sealed class TextToImageRequest
     #region Properties
 
     /// <summary>
+    /// Разрешение Hires.fix.
+    /// </summary>
+    [JsonPropertyName ("enable_hr")]
+    [JsonProperty ("enable_hr", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public bool EnableHiresFix { get; set; }
+
+    /// <summary>
     /// Кратность масштабирования.
     /// </summary>
     [JsonPropertyName ("hr_scale")]
@@ -59,6 +66,13 @@ public sealed class TextToImageRequest
     [JsonPropertyName ("hr_resize_y")]
     [JsonProperty ("hr_resize_y", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeY { get; set; }
+
+    /// <summary>
+    /// Количество шагов Hires.fix.
+    /// </summary>
+    [JsonPropertyName ("hr_second_pass_steps")]
+    [JsonProperty ("hr_second_pass_steps", DefaultValueHandling = DefaultValueHandling.Ignore)]
+    public int SecondPassSteps { get; set; }
 
     #endregion
 
@@ -91,16 +105,27 @@ public sealed class TextToImageRequest
         }
 
         // TODO Styles
-        Prompt ??= other.Prompt;
-        NegativePrompt ??= other.NegativePrompt;
+        Checkpoint = other.Checkpoint ?? Checkpoint;
+        Prompt = other.Prompt ?? Prompt;
+        NegativePrompt = other.NegativePrompt ?? NegativePrompt;
         Seed = other.Seed is 0 ? Seed : other.Seed;
-        SamplerName ??= other.SamplerName;
+        SamplerName = other.SamplerName ?? SamplerName;
         BatchSize = other.BatchSize is 0 ? BatchSize : other.BatchSize;
         Iterations = other.Iterations is 0 ? Iterations : other.Iterations;
         Steps = other.Steps is 0 ? Steps : other.Steps;
         CfgScale = other.CfgScale is 0.0f ? CfgScale : other.CfgScale;
         Width = other.Width is 0 ? Width : other.Width;
         Height = other.Height is 0 ? Height : other.Height;
+        RestoreFaces = other.RestoreFaces ? other.RestoreFaces : RestoreFaces;
+        Tiling = other.Tiling ? other.Tiling : Tiling;
+        DenoisingStrength = other.DenoisingStrength is 0.0f ? DenoisingStrength : other.DenoisingStrength;
+        EnableHiresFix = other.EnableHiresFix ? other.EnableHiresFix : EnableHiresFix;
+        Scale = other.Scale is 0.0f ? Scale : other.Scale;
+        Upscaler = other.Upscaler ?? Upscaler;
+        ResizeX = other.ResizeX is 0 ? ResizeX : other.ResizeX;
+        ResizeY = other.ResizeY is 0 ? ResizeY : other.ResizeY;
+        SecondPassSteps = other.SecondPassSteps is 0 ? SecondPassSteps : other.SecondPassSteps;
+
         // TODO прочие члены
 
         return this;
@@ -137,6 +162,11 @@ public sealed class TextToImageRequest
                 case "--batch":
                 case "batch":
                     result.BatchSize = args[++i].SafeToInt32 (1);
+                    break;
+
+                case "--checkpoint":
+                case "checkpoint":
+                    result.Checkpoint = args[++i];
                     break;
 
                 case "--cfg":
@@ -191,6 +221,42 @@ public sealed class TextToImageRequest
                 case "--width":
                 case "width":
                     result.Width = args[++i].SafeToInt32 (512);
+                    break;
+
+                case "--hr-scale":
+                case "--hr_scale":
+                case "hr_scale":
+                case "hr-scale":
+                case "hires_scale":
+                case "hires-scale":
+                case "scale":
+                    result.EnableHiresFix = true;
+                    result.Scale = (float) args[++i].SafeToDouble (2.0);
+                    break;
+
+                case "--hr_upscaler":
+                case "--hr-upscaler":
+                case "hr_upscaler":
+                case "hr-upscaler":
+                case "upscaler":
+                    result.EnableHiresFix = true;
+                    result.Upscaler = args[++i];
+                    break;
+
+                case "--hr_steps":
+                case "--hr-steps":
+                case "hires_steps":
+                case "hires-steps":
+                    result.EnableHiresFix = true;
+                    result.SecondPassSteps = args[++i].SafeToInt32 (0);
+                    break;
+
+                case "--denoising":
+                case "--denoise":
+                case "denoising":
+                case "denoise":
+                    result.EnableHiresFix = true;
+                    result.DenoisingStrength = (float) args[++i].SafeToDouble (0.33);
                     break;
             }
         }

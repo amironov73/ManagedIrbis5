@@ -1,3 +1,3 @@
-﻿@echo off
+@echo off
 
-SDcli txt2img width 512 height 768 sampler "DPM++ 2M Karras" cfg 7 steps 40 prompt "a photo of beautiful ukrainian 18 years old girl"
+SDcli txt2img --url "http://station:7860/sdapi/v1/" checkpoint "0001softrealistic_v155xxx" width 512 height 683 sampler "DPM++ 2M Karras" cfg 5 steps 40 batch 4 scale 2 upscaler "4x-UltraSharp" hires-steps 20 denoise 0.33 prompt "photorealistic full body (tiny ultrarealistic statue:1.53) of woman standing on a pedestal on a desk, perfect lighting, photorealistic, highly detailed, depth of field, 0001SRGoodPictureV8, ultrarealistic, HDR, UHD, 8K, physically-based rendering, (hdr, hyperdetailed:1.2), intricate background, highly detailed, lifelike, precise, accurate" negative "(bow, hairbow:1.6), 0001SoftRealisticNegativeV9,, cartoon, painting, illustration, (worst quality, low quality, normal quality:2), under exposed, dull eyes, poor composition, bad-hands-5 badhandv4, abstract, low detail, unrealistic, inaccurate"
