@@ -1,0 +1,33 @@
+﻿//
+// Генерация изображения по описанию
+//
+
+connect ("http://station:7860/sdapi/v1/")
+// println (memory_stat())
+// println()
+
+request = text_to_image()
+request.Checkpoint = "0001softrealistic_v155xxx"
+request.Prompt = "photorealistic full body (tiny ultrarealistic statue:1.53) of woman standing on a pedestal on a desk, perfect lighting, photorealistic, highly detailed, depth of field, 0001SRGoodPictureV8, ultrarealistic, HDR, UHD, 8K, physically-based rendering, (hdr, hyperdetailed:1.2), intricate background, highly detailed, lifelike, precise, accurate"
+request.NegativePrompt = "(bow, hairbow:1.6), 0001SoftRealisticNegativeV9,, cartoon, painting, illustration, (worst quality, low quality, normal quality:2), under exposed, dull eyes, poor composition, bad-hands-5 badhandv4, abstract, low detail, unrealistic, inaccurate"
+request.SamplerName = "DPM++ 2M Karras"
+request.BatchSize = 1
+request.Iterations = 1
+request.Steps = 40
+request.CfgScale = 5.0f
+request.Width = 512
+request.Height = 683
+request.EnableHiresFix = true
+request.Scale = 2.0f
+request.Upscaler = "4x-UltraSharp"
+request.SecondPassSteps = 20
+request.DenoisingStrength = 0.25f
+
+println (request)
+println()
+
+image = text_to_image (request)
+// println (image)
+file_put_contents ("image.png", image)
+
+println ("THAT'S ALL, FOLKS!")

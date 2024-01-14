@@ -22,8 +22,6 @@ using static AM.Scripting.Barsik.Builtins;
 
 #endregion
 
-#nullable enable
-
 namespace AM.StableDiffusion.Automatic;
 
 /// <summary>
@@ -336,7 +334,7 @@ public sealed class AutomaticModule
     {
         if (Compute (context, args, 0) is not TextToImageRequest payload)
         {
-            return null;
+            return new TextToImageRequest();
         }
 
         if (!TryGetConnection (context, out var connection))

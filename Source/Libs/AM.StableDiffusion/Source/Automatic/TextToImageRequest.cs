@@ -15,9 +15,13 @@
 using System.Globalization;
 using System.Text.Json.Serialization;
 
+using AM.Json;
+
 using JetBrains.Annotations;
 
 using Newtonsoft.Json;
+
+using Ignore=System.Text.Json.Serialization.JsonIgnoreAttribute;
 
 #endregion
 
@@ -36,6 +40,7 @@ public sealed class TextToImageRequest
     /// Разрешение Hires.fix.
     /// </summary>
     [JsonPropertyName ("enable_hr")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonProperty ("enable_hr", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public bool EnableHiresFix { get; set; }
 
@@ -43,6 +48,7 @@ public sealed class TextToImageRequest
     /// Кратность масштабирования.
     /// </summary>
     [JsonPropertyName ("hr_scale")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonProperty ("hr_scale", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public float Scale { get; set; }
 
@@ -50,6 +56,7 @@ public sealed class TextToImageRequest
     /// Применяемый апскейлер, если есть.
     /// </summary>
     [JsonPropertyName ("hr_upscaler")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonProperty ("hr_upscaler", NullValueHandling = NullValueHandling.Ignore)]
     public string? Upscaler { get; set; }
 
@@ -57,6 +64,7 @@ public sealed class TextToImageRequest
     /// Масштабирование до указанного размера по ширине.
     /// </summary>
     [JsonPropertyName ("hr_resize_x")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonProperty ("hr_resize_x", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeX { get; set; }
 
@@ -64,6 +72,7 @@ public sealed class TextToImageRequest
     /// Масштабирование до указанного размера по высоте.
     /// </summary>
     [JsonPropertyName ("hr_resize_y")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonProperty ("hr_resize_y", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int ResizeY { get; set; }
 
@@ -71,6 +80,7 @@ public sealed class TextToImageRequest
     /// Количество шагов Hires.fix.
     /// </summary>
     [JsonPropertyName ("hr_second_pass_steps")]
+    [Ignore (Condition = JsonIgnoreCondition.WhenWritingDefault)]
     [JsonProperty ("hr_second_pass_steps", DefaultValueHandling = DefaultValueHandling.Ignore)]
     public int SecondPassSteps { get; set; }
 
@@ -118,13 +128,15 @@ public sealed class TextToImageRequest
         Height = other.Height is 0 ? Height : other.Height;
         RestoreFaces = other.RestoreFaces ? other.RestoreFaces : RestoreFaces;
         Tiling = other.Tiling ? other.Tiling : Tiling;
-        DenoisingStrength = other.DenoisingStrength is 0.0f ? DenoisingStrength : other.DenoisingStrength;
+        DenoisingStrength = other.DenoisingStrength is 0.0f ? DenoisingStrength
+            : other.DenoisingStrength;
         EnableHiresFix = other.EnableHiresFix ? other.EnableHiresFix : EnableHiresFix;
         Scale = other.Scale is 0.0f ? Scale : other.Scale;
         Upscaler = other.Upscaler ?? Upscaler;
         ResizeX = other.ResizeX is 0 ? ResizeX : other.ResizeX;
         ResizeY = other.ResizeY is 0 ? ResizeY : other.ResizeY;
-        SecondPassSteps = other.SecondPassSteps is 0 ? SecondPassSteps : other.SecondPassSteps;
+        SecondPassSteps = other.SecondPassSteps is 0 ? SecondPassSteps
+            : other.SecondPassSteps;
 
         // TODO прочие члены
 
@@ -263,6 +275,13 @@ public sealed class TextToImageRequest
 
         return result;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => JsonUtility.SerializeIndented (this);
 
     #endregion
 }

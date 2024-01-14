@@ -574,6 +574,20 @@ public sealed class StdLib
             return null;
         }
 
+        if (Compute (context, args, 1) is byte[] bytes)
+        {
+            try
+            {
+                File.WriteAllBytes (fileName, bytes);
+            }
+            catch (Exception exception)
+            {
+                context.Error.WriteLine ($"Error writing file {fileName}: {exception.Message}");
+            }
+
+            return null;
+        }
+
         var contents = Compute (context, args, 1) as string;
 
         try

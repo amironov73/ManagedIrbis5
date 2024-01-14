@@ -158,7 +158,7 @@ public sealed class AutomaticClient
     {
         var outputPath = "output";
         var baseUrl = Environment.GetEnvironmentVariable ("AUTOMATIC")
-            ?? AutomaticClient.DefaultUrl;
+            ?? DefaultUrl;
         for (var i = 0; i < args.Length; i++)
         {
             var arg = args[i];

@@ -16,11 +16,10 @@ using System.Text;
 
 using AM;
 using AM.Scripting.Barsik;
+using AM.StableDiffusion.Automatic;
 using AM.StableDiffusion.Scripting;
 
 #endregion
-
-#nullable enable
 
 namespace StableBarsik;
 
@@ -48,6 +47,7 @@ internal static class Program
                 {
                     interpreter.WithStdLib();
                     interpreter.Context.AttachModule (new StableModule());
+                    interpreter.Context.AttachModule (new AutomaticModule());
                 },
                 (_, exception) =>
                 {
