@@ -11,7 +11,9 @@
 
 #region Using directives
 
+using System;
 using System.Diagnostics;
+using System.Reflection;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -34,12 +36,13 @@ public sealed class MaskEditor
 {
     #region Private members
 
-    private IImage? _image;
-    private IImage? _mask;
+    private Bitmap? _image;
+    private RenderTargetBitmap? _mask;
     private bool _circleVisible;
     private Point _circlePoint;
     private double _circleSize = 10;
     private bool _drawing;
+    private bool _clearing;
 
     private Rect GetImageRect()
     {
@@ -55,6 +58,29 @@ public sealed class MaskEditor
         return AvaloniaUtility.Fit (Bounds, imaskBounds);
     }
 
+    private DrawingContext CreateDrawingContextNotClear
+        (
+            RenderTargetBitmap bitmap
+        )
+    {
+        var bitmapType = bitmap.GetType();
+        var platformProperty = bitmapType.GetProperty
+            (
+                "PlatformImpl",
+                BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.DeclaredOnly
+            );
+        var platform = platformProperty!.GetValue (bitmap)!;
+        var platformType = platform.GetType();
+        var itemProperty = platformType.GetProperty ("Item")!;
+        var item = itemProperty.GetValue (platform)!;
+        var itemType = item.GetType();
+        var createMethod = itemType.GetMethod ("CreateDrawingContext")!;
+        var temporary = createMethod.Invoke (item, null);
+        var pdcType = typeof (Brush).Assembly.GetType ("Avalonia.Media.PlatformDrawingContext")!;
+        var result = (DrawingContext) Activator.CreateInstance (pdcType, temporary, true)!;
+        return result;
+    }
+
     #endregion
 
     #region Public methods
@@ -64,7 +90,7 @@ public sealed class MaskEditor
     /// </summary>
     public void SetImage
         (
-            IImage image
+            Bitmap image
         )
     {
         Sure.NotNull (image);
@@ -78,16 +104,29 @@ public sealed class MaskEditor
     /// </summary>
     public void SetMask
         (
-            IImage image
+            Bitmap image
         )
     {
         Sure.NotNull (image);
 
-        _mask = image;
+        var size = new PixelSize
+            (
+                (int) image.Size.Width,
+                (int) image.Size.Height
+            );
+        _mask = new RenderTargetBitmap (size, image.Dpi);
+        using (var maskContext = CreateDrawingContextNotClear (_mask))
+        {
+            maskContext.DrawImage (image, new Rect (_mask.Size));
+        }
+
         InvalidateVisual();
     }
 
-    private void _Draw()
+    private void _Draw
+        (
+            bool clear
+        )
     {
         if (_image is null
             || _mask is null
@@ -100,27 +139,28 @@ public sealed class MaskEditor
         Debug.WriteLine ($"Fitted image: {fittedImage}");
         var fittedMask = GetMaskRect();
         Debug.WriteLine ($"Fitted mask: {fittedMask}");
+
+        using var drawingContext = CreateDrawingContextNotClear (_mask);
         // using var drawingContext = _mask.CreateDrawingContext();
-        // drawingContext.FillRectangle
-        //     (
-        //         Brushes.Aqua,
-        //         new Rect (fittedMask.Size)
-        //     );
-        // var circleCenter = new Point
-        //     (
-        //         fittedMask.X + _circlePoint.X,
-        //         fittedMask.Y + _circlePoint.Y
-        //     );
-        // Debug.WriteLine ($"Circle center: {circleCenter}");
-        // drawingContext.DrawEllipse
-        //     (
-        //         Brushes.Red,
-        //         null,
-        //         circleCenter,
-        //         _circleSize,
-        //         _circleSize
-        //     );
-        //
+        var circleCenter = new Point
+            (
+                fittedMask.X + _circlePoint.X /* * 2.2 */,
+                fittedMask.Y + _circlePoint.Y /* * 2.5 */
+            );
+        Debug.WriteLine($"Circle center: {circleCenter}");
+        var brush = clear
+            ? Brushes.Transparent
+            : Brushes.Red;
+
+        drawingContext.DrawEllipse
+            (
+                brush,
+                null,
+                circleCenter,
+                _circleSize,
+                _circleSize
+            );
+
         // _mask.Save ("mask.png", 100);
     }
 
@@ -136,7 +176,9 @@ public sealed class MaskEditor
     {
         base.OnPointerPressed (eventArgs);
         _drawing = true;
-        _Draw();
+        var kind = eventArgs.GetCurrentPoint (null).Properties.PointerUpdateKind;
+        _clearing = kind != PointerUpdateKind.LeftButtonPressed;
+        _Draw (_clearing);
         InvalidateVisual();
     }
 
@@ -180,7 +222,7 @@ public sealed class MaskEditor
 
             if (_drawing)
             {
-                _Draw();
+                _Draw (_clearing);
             }
         }
         else
@@ -212,12 +254,10 @@ public sealed class MaskEditor
             context.DrawImage (_image, imageBounds, fittedImage);
             if (_mask is not null)
             {
-                var maskBounds = new Rect (_mask.Size);
-                var fittedMask = GetMaskRect();
-                context.DrawImage (_mask, maskBounds, fittedMask);
-
-                // var visual = new Visual();
-                // _mask.Render (visual);
+                // var maskBounds = new Rect (_mask.Size);
+                // var fittedMask = GetMaskRect();
+                var fittedMask = new Rect (0, 0, fittedImage.Width * 2, fittedImage.Height * 2);
+                context.DrawImage (_mask, imageBounds, fittedMask);
             }
 
             if (_circleVisible)
