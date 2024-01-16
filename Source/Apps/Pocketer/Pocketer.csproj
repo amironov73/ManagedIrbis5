@@ -1,29 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>WinExe</OutputType>
-        <ApplicationIcon>barsik.ico</ApplicationIcon>
+       <OutputType>WinExe</OutputType>
+       <ApplicationIcon>barsik.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="Scripts\Hello.meow" />
       <None Remove="Properties\launchSettings.json" />
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="Scripts\Hello.meow">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <None Remove="Scripts\Calc.meow" />
-      <Content Include="Scripts\Calc.meow">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <AvaloniaResource Include="barsik.ico" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
-      <ProjectReference Include="..\..\Libs\AM.Kotik\AM.Kotik.csproj" />
-      <ProjectReference Include="..\..\Libs\AM.Kotik.Avalonia\AM.Kotik.Avalonia.csproj" />
+        <ProjectReference Include="..\..\Libs\AM.Avalonia\AM.Avalonia.csproj" />
     </ItemGroup>
 
     <!-- Централизованное управление пакетами -->
@@ -35,7 +26,6 @@
         <PackageReference Include="Avalonia.Themes.Fluent" />
         <PackageReference Include="DynamicData" />
         <PackageReference Include="DynamicData.ReactiveUI" />
-        <PackageReference Include="GridExtra.Avalonia" />
         <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
         <PackageReference Include="Microsoft.Extensions.Configuration" />
         <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" />
@@ -53,6 +43,12 @@
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
         <PackageReference Include="XamlNameReferenceGenerator" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="appsettings.json" />
+      <Content Include="appsettings.json">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>
