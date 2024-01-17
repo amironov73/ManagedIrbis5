@@ -97,6 +97,11 @@ public sealed class Record
     public bool Deleted => (Status & IsDeleted) != 0;
 
     /// <summary>
+    /// Признак -- запись помечена как заблокированная.
+    /// </summary>
+    public bool IsLocked => (Status & RecordStatus.Locked) != 0;
+
+    /// <summary>
     /// Список полей.
     /// </summary>
     public FieldCollection Fields { get; }

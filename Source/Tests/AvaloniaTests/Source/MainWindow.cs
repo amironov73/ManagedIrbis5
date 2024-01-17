@@ -612,6 +612,12 @@ public sealed class MainWindow
                     new MaskEditorDemo().Show (this);
                 }),
 
+                new Button { Content = "Console" }
+                .OnClick ((sender, args) =>
+                {
+                    new ConsoleDemo().Show (this);
+                }),
+
                 MakeButton ("Render")
                     .OnClick ((_, _) => new RenderDemo().DoRender())
 

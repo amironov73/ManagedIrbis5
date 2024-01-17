@@ -28,8 +28,16 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
+                <!-- текущеее время -->
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="return false" id="version">
+                    <a class="nav-link fs-5 text-light" href="http://time.is/" id="clock">
+                        ВРЕМЯ
+                    </a>
+                </li>
+
+                <!-- версия программы -->
+                <li class="nav-item">
+                    <a class="nav-link" href="http://arsmagna.ru/"  id="version">
                         Привратник 2024
                     </a>
                 </li>
@@ -340,6 +348,9 @@
     }
 
     setInterval(() => {
+                // выводим текущее время
+                document.getElementById('clock').innerText = new Date().toLocaleTimeString()
+
                 axios.get('/api/state')
                         .then(function (response) {
                             const data = response.data

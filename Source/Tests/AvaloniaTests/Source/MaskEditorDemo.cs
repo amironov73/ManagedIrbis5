@@ -10,7 +10,7 @@ using Avalonia.Media.Imaging;
 
 namespace AvaloniaTests;
 
-public class MaskEditorDemo
+internal sealed class MaskEditorDemo
 {
     public async void Show
         (

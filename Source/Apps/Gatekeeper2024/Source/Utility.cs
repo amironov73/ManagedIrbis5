@@ -206,7 +206,7 @@ internal static class Utility
         var result = format.Replace ("{date}", moment.ToString ("yyyyMMdd"));
 
         // обрати внимание на "HH" -- это означает время в 24-часовом формате
-        result = result.Replace ("{time}", moment.ToString ("HH:mm:ss"));
+        result = result.Replace ("{time}", moment.ToString ("HHmmss"));
         result = result.Replace ("{department}", GetDepartment());
         result = result.Replace ("{person}", GetPerson());
         result = result.Replace ("{event}", GetEvent());
@@ -224,6 +224,20 @@ internal static class Utility
     /// </summary>
     public static int GetDeparturePoint()
         => GetRequiredInt32 ("departure");
+
+    /// <summary>
+    /// Получение поля 40, формируемого при выходе читателя из библиотеки.
+    /// Поскольку читатель не отметился на выходе, проставляем время выхода
+    /// равным времени входа.
+    /// </summary>
+    public static string GetDepartureField
+        (
+            VisitInfo visit
+        )
+    {
+        var result = $"^f{visit.DateGivenString}^2{visit.TimeIn}";
+        return result;
+    }
 
     /// <summary>
     /// Получение поля 40, формируемого при выходе читателя из библиотеки.

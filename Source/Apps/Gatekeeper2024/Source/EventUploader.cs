@@ -16,6 +16,7 @@ using System.Text.Json;
 
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
+using ManagedIrbis.Providers;
 using ManagedIrbis.Readers;
 using ManagedIrbis.Records;
 
@@ -151,6 +152,17 @@ internal sealed class EventUploader
             return;
         }
 
+        // проверяем блокировку базы в целом
+        var dbInfo = connection.GetDatabaseInfo();
+        if (dbInfo is { DatabaseLocked: true })
+        {
+            var dbName = connection.EnsureDatabase();
+            Program.Logger.LogError ("Databse {Name} is locked", dbName);
+            GlobalState.SetMessageWithTimestamp ($"База данных {dbName} заблокирована");
+            GlobalState.Instance.HasError = true;
+            return;
+        }
+
         var reader = GetReader (connection, readerId, path, passEvent);
         if (reader is null)
         {
@@ -164,6 +176,19 @@ internal sealed class EventUploader
             Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
             LogPassError (passEvent);
             DeleteFile (path);
+            return;
+        }
+
+        if (record.IsLocked)
+        {
+            // запись заблокирована, поэтому наши попытки отправить событие на сервер
+            // заранее обречены на наудачу, посему просто удаляем запись
+            // и помещаем ее в лог ошибок
+            Program.Logger.LogError ("Record for ticket {Ticket} is locked", readerId);
+            GlobalState.SetMessageWithTimestamp ($"Запись читателя {reader.FullName} заблокирована");
+            GlobalState.Instance.HasError = true;
+            LogPassError (passEvent);
+            DeleteFile (path); // потому что ждать разблокирования можно долго
             return;
         }
 
@@ -353,6 +378,8 @@ internal sealed class EventUploader
             // т. к. произошло слишком рано после предыдущего
             _cache.Remove (readerId);
             Program.Logger.LogError ("Arrival was skipped: {Reader}", readerId);
+
+            // поэтому и выход мы регистрировать не будем
             DeleteFile (path);
             return;
         }
@@ -360,6 +387,17 @@ internal sealed class EventUploader
         using var connection = Utility.ConnectToIrbis();
         if (connection is null)
         {
+            return;
+        }
+
+        // проверяем блокировку базы в целом
+        var dbInfo = connection.GetDatabaseInfo();
+        if (dbInfo is { DatabaseLocked: true })
+        {
+            var dbName = connection.EnsureDatabase();
+            Program.Logger.LogError ("Databse {Name} is locked", dbName);
+            GlobalState.SetMessageWithTimestamp ($"База данных {dbName} заблокирована");
+            GlobalState.Instance.HasError = true;
             return;
         }
 
@@ -376,6 +414,19 @@ internal sealed class EventUploader
             Program.Logger.LogError ("Strange thing: reader.Record is null: {Event}", passEvent);
             LogPassError (passEvent);
             DeleteFile (path);
+            return;
+        }
+
+        if (record.IsLocked)
+        {
+            // запись заблокирована, поэтому наши попытки отправить событие на сервер
+            // заранее обречены на наудачу, посему просто удаляем запись
+            // и помещаем ее в лог ошибок
+            Program.Logger.LogError ("Record for ticket {Ticket} is locked", readerId);
+            GlobalState.SetMessageWithTimestamp ($"Запись читателя {reader.FullName} заблокирована");
+            GlobalState.Instance.HasError = true;
+            LogPassError (passEvent);
+            DeleteFile (path); // потому что ждать разблокирования можно долго
             return;
         }
 
@@ -420,6 +471,7 @@ internal sealed class EventUploader
 
         // далее проверяем, есть ли соответствующие события входа
         var counter = 0;
+        VisitInfo? lastVisit = null;
         foreach (var field in record.EnumerateField (VisitInfo.Tag))
         {
             var visit = VisitInfo.Parse (field);
@@ -433,15 +485,37 @@ internal sealed class EventUploader
                     && string.IsNullOrEmpty (visit.TimeOut)
                 )
             {
+                // последний вход понимается как последний по времени,
+                // а не по повторению поля
+                if (lastVisit is null)
+                {
+                    lastVisit = visit;
+                }
+                else
+                {
+                    if (string.CompareOrdinal (visit.DateGivenString, lastVisit.DateGivenString) > 0)
+                    {
+                        lastVisit = visit;
+                    }
+                }
+
                 // событие входа есть, просто добавляем в поле
                 // информацию о выходе посетителя
-                var departureText = Utility.GetDepartureField (passEvent.Moment);
+                // сначала всем в качестве момента выхода задаем момент входа
+                var departureText = Utility.GetDepartureField (visit);
                 field.Append (departureText);
                 counter++;
             }
         }
 
-        // не заносите eventData под if
+        if (lastVisit is not null)
+        {
+            // затем последнему визиту проставляем правильное время выхода
+            var departureText = Utility.GetDepartureField (passEvent.Moment);
+            lastVisit.Field!.Append (departureText);
+        }
+
+        // не заноси eventData под if
         var eventData = Utility.GetArrivalField (passEvent.Moment)
             + Utility.GetDepartureField (DateTimeOffset.Now);
         if (counter is 0)
