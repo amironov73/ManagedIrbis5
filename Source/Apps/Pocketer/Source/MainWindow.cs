@@ -54,6 +54,9 @@ internal sealed class MainWindow
 
         this.SetWindowIcon ("barsik.ico");
 
+        DataContext = new PocketerModel();
+        var model = ViewModel!;
+
         var busyStripe = new BusyStripe
             {
                 IsVisible = false,
@@ -61,6 +64,7 @@ internal sealed class MainWindow
                 Text = "Обращение к серверу",
             }
             .DockTop();
+        model.Busy = busyStripe;
 
         var statusBar = new Border
             {
@@ -97,18 +101,11 @@ internal sealed class MainWindow
                     new TextBox
                     {
                         Text = "println (\"Hello\")",
-                        [TextBox.TextProperty] = AvaloniaUtility.MakeBinding<string>
-                            (
-                                nameof (ViewModel.BarsikCommand),
-                                it => ((PocketerModel) it).BarsikCommand,
-                                (it, value) => ((PocketerModel) it).BarsikCommand = (string?) value
-                            )
+                        [!TextBox.TextProperty] = model.SearchExpressionBinding()
                     }
                 }
             }
             .DockBottom();
-
-        DataContext = new PocketerModel { Busy = busyStripe };
 
         Content = new DockPanel
         {
@@ -141,12 +138,7 @@ internal sealed class MainWindow
                                 new TextBox
                                 {
                                     Width = 200,
-                                    [!TextBox.TextProperty] = AvaloniaUtility.MakeBinding<string>
-                                        (
-                                            nameof (ViewModel.SearchExpression),
-                                            it => ((PocketerModel) it).SearchExpression,
-                                            (it, value) => ((PocketerModel) it).SearchExpression = (string?) value
-                                        )
+                                    [!TextBox.TextProperty] = model.SearchExpressionBinding()
                                 },
                                 new Button
                                 {

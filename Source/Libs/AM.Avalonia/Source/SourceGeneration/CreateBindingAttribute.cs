@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* BindingAttribute.cs -- генерирует компайл-тайм привязку Avalonia
+/* CreateBindingAttribute.cs -- генерирует компайл-тайм привязку Avalonia
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -21,7 +21,7 @@ namespace AM.Avalonia.SourceGeneration;
 /// Атрибут, заставляющий генерировать компайл-тайм привязку Avalonia.
 /// </summary>
 [AttributeUsage (AttributeTargets.Property)]
-public sealed class BindingAttribute
+public sealed class CreateBindingAttribute
     : Attribute
 {
     // пустое тело класса

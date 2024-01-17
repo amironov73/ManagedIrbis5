@@ -18,6 +18,7 @@ using AM;
 using AM.Avalonia;
 using AM.Avalonia.AppServices;
 using AM.Avalonia.Controls;
+using AM.Avalonia.SourceGeneration;
 
 using Avalonia;
 using Avalonia.Controls;
@@ -37,7 +38,7 @@ namespace Pocketer;
 /// <summary>
 /// Модель данных главного окна.
 /// </summary>
-internal sealed class PocketerModel
+internal sealed partial class PocketerModel
     : ReactiveObject
 {
     #region Properties
@@ -50,11 +51,13 @@ internal sealed class PocketerModel
     /// <summary>
     /// Поисковое выражение.
     /// </summary>
+    [CreateBinding]
     public string? SearchExpression { get; set; }
 
     /// <summary>
     /// Команда Barsik.
     /// </summary>
+    [CreateBinding]
     public string? BarsikCommand { get; set; }
 
     #endregion

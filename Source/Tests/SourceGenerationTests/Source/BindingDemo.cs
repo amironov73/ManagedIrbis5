@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable LocalizableElement
 
 /* BindingDemo.cs -- канареечный класс для генерации привязок
  * Ars Magna project, http://arsmagna.ru
@@ -24,7 +25,7 @@ internal partial class BindingDemo
     /// <summary>
     /// Некое свойство, нуждающееся в привязке.
     /// </summary>
-    [Binding]
+    [CreateBinding]
     public string? Title { get; set; }
 
     public void DoBinding()
