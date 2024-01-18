@@ -17,6 +17,8 @@
 
 using System;
 
+using AM.Avalonia;
+
 using Avalonia;
 using Avalonia.ReactiveUI;
 
@@ -43,5 +45,6 @@ internal sealed class Program
         => AppBuilder.Configure<App>()
             .UseReactiveUI()
             .UsePlatformDetect()
+            .WithFiraMono()
             .LogToTrace();
 }

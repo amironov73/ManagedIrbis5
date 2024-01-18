@@ -3,6 +3,7 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
+// ReSharper disable IdentifierTypo
 // ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable StringLiteralTypo
@@ -39,6 +40,7 @@ using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.MarkupExtensions.CompiledBindings;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
+using Avalonia.Media.Fonts;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using Avalonia.Skia;
@@ -289,6 +291,7 @@ public static class AvaloniaUtility
         )
     {
         var baseMode = light ? BaseThemeMode.Light : BaseThemeMode.Dark;
+
         // var uri = new Uri ("avares://Material.Styles/MaterialToolKit.xaml");
         var result = new MaterialTheme (Magna.Host.Services)
         {
@@ -1053,12 +1056,12 @@ public static class AvaloniaUtility
     /// Создание рамки с контролами, ориентированных вертикально.
     /// </summary>
     public static Border MakeBorder (params Control[] children) => new ()
+    {
+        Child = new StackPanel
         {
-            Child = new StackPanel
-            {
-                Orientation = Orientation.Vertical
-            }.WithChildren (children)
-        };
+            Orientation = Orientation.Vertical
+        }.WithChildren (children)
+    };
 
     /// <summary>
     /// Создание <c>CompiledBinding</c> из кода.
@@ -1107,6 +1110,7 @@ public static class AvaloniaUtility
     {
         Sure.NotNullNorEmpty (propertyName);
         Sure.NotNull (getter);
+
         // setter может быть null, если очень нужно
 
         var propertyInfo = new ClrPropertyInfo
@@ -1420,10 +1424,10 @@ public static class AvaloniaUtility
             double thickness
         )
         => new ()
-    {
-        Property = Layoutable.MarginProperty,
-        Value = new Thickness (thickness)
-    };
+        {
+            Property = Layoutable.MarginProperty,
+            Value = new Thickness (thickness)
+        };
 
     /// <summary>
     /// Установка полей снаружи контрола.
@@ -1775,10 +1779,10 @@ public static class AvaloniaUtility
             double spacing
         )
         => new ()
-    {
-        Property = StackPanel.SpacingProperty,
-        Value = spacing
-    };
+        {
+            Property = StackPanel.SpacingProperty,
+            Value = spacing
+        };
 
     /// <summary>
     /// Установка иконки для окна.
@@ -2029,14 +2033,16 @@ public static class AvaloniaUtility
             Visual visual
         )
     {
+        // TODO посмотреть, не изменилось ли чего, вдруг, теперь можно рендерить по-человечески
+
         if (_platformDrawingContext is null)
         {
             var assembly = typeof (AvaloniaObject).Assembly;
             _platformDrawingContext = assembly.GetType
-                (
-                    "Avalonia.Media.PlatformDrawingContext",
-                    true
-                )
+                    (
+                        "Avalonia.Media.PlatformDrawingContext",
+                        true
+                    )
                 .ThrowIfNull();
         }
 
@@ -2045,17 +2051,47 @@ public static class AvaloniaUtility
                 canvas,
                 SkiaPlatform.DefaultDpi
             );
-        using var drawingContext = (DrawingContext) Activator.CreateInstance
-            (
-                _platformDrawingContext,
-                drawingContextImpl,
-                false
-            )
+        using var drawingContext = (DrawingContext)Activator.CreateInstance
+                (
+                    _platformDrawingContext,
+                    drawingContextImpl,
+                    false
+                )
             .ThrowIfNull();
 
         Render (drawingContext, visual, visual.Bounds);
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Получение шрифта Fira Mono.
+    /// </summary>
+    public static FontFamily GetFiraMono() => new ("fonts:Fira#Fira Mono");
+
+    /// <summary>
+    /// Добавление коллекции шрифтов Fira Mono.
+    /// </summary>
+    public static AppBuilder WithFiraMono
+        (
+            this AppBuilder builder
+        )
+    {
+        Sure.NotNull (builder);
+
+        builder.ConfigureFonts (fontManager =>
+        {
+            fontManager.AddFontCollection
+                (
+                    new EmbeddedFontCollection
+                        (
+                            new Uri ("fonts:Fira", UriKind.Absolute),
+                            new Uri ("avares://AM.Avalonia/Assets/Fonts/Fira", UriKind.Absolute)
+                        )
+                );
+        });
+
+        return builder;
     }
 
     #endregion

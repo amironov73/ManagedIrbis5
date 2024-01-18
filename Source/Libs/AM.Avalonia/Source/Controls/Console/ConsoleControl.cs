@@ -337,6 +337,9 @@ public sealed class ConsoleControl
                 Bounds
             );
 
+        var firaMono = AvaloniaUtility.GetFiraMono();
+        var typeface = new Typeface (firaMono);
+
         var y = 0;
         for (var i = 0; i < _rows; i++)
         {
@@ -345,7 +348,7 @@ public sealed class ConsoleControl
                     new string (_buffer[i]),
                     CultureInfo.CurrentCulture,
                     FlowDirection.LeftToRight,
-                    Typeface.Default,
+                    typeface,
                     14.0,
                     Brushes.White
                 );
@@ -356,7 +359,7 @@ public sealed class ConsoleControl
 
         if (_cursorDrawn)
         {
-            var cursorX = 7.0 * _currentColumn;
+            var cursorX = 9.0 * _currentColumn;
             var cursorY = 14.0 * _currentRow;
             var pen = new Pen (Brushes.White);
             context.DrawLine
