@@ -7,10 +7,10 @@
 
   <PropertyGroup>
     <MicrosoftVersion>8.0.0</MicrosoftVersion>
-    <AvaloniaVersion>11.0.6</AvaloniaVersion>
+    <AvaloniaVersion>11.0.7</AvaloniaVersion>
     <AvaloniaStable>11.0.4</AvaloniaStable>
     <AvaloniaPrevious>11.0.1</AvaloniaPrevious>
-    <SkiaVersion>2.88.6</SkiaVersion>
+    <SkiaVersion>2.88.7</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
     <NugetVersion>6.7.0</NugetVersion>
     <NLogVersion>5.2.8</NLogVersion>
@@ -144,7 +144,7 @@
     <PackageVersion Include="SkiaSharp.HarfBuzz" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaVersion)" />
-    <PackageVersion Include="SkiaSharp.QrCode" Version="0.6.0" />
+    <PackageVersion Include="SkiaSharp.QrCode" Version="0.7.0" />
     <PackageVersion Include="SharpCompress" Version="0.35.0" />
     <PackageVersion Include="SharpZipLib" Version="1.4.2" />
     <PackageVersion Include="Spectre.Console" Version="0.47.1-preview.0.8" />

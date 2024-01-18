@@ -16,6 +16,8 @@ internal sealed class ConsoleDemo
     {
         var console = new ConsoleControl
         {
+            EchoEnabled = true,
+
             HorizontalAlignment = HorizontalAlignment.Stretch,
             VerticalAlignment = VerticalAlignment.Stretch
         };

@@ -22,8 +22,12 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 using JetBrains.Annotations;
+
+using Brushes = Avalonia.Media.Brushes;
+using Point = Avalonia.Point;
 
 #endregion
 
@@ -82,11 +86,17 @@ public sealed class ConsoleControl
         _columns = columns;
         _rows = rows;
         _buffer = new char[rows][];
-        for (var i = 0; i < rows; i++)
+        for (var i = 0; i < _rows; i++)
         {
-            _buffer[i] = new char[columns];
-            Array.Fill (_buffer[i], ' ');
+            _buffer[i] = new char[_columns];
         }
+        Clear();
+
+        DispatcherTimer.Run
+            (
+                BlinkCursor,
+                TimeSpan.FromMilliseconds (300)
+            );
     }
 
     #endregion
@@ -100,16 +110,16 @@ public sealed class ConsoleControl
     /// <summary>
     /// Количество колонок с символами.
     /// </summary>
-    [StyledProperty]
-    private int _columns;
+    [StyledProperty] private int _columns;
 
     /// <summary>
     /// Количество строк с символами.
     /// </summary>
-    [StyledProperty]
-    private int _rows;
+    [StyledProperty] private int _rows;
 
     private char[][] _buffer;
+
+    private bool _cursorDrawn;
 
     /// <summary>
     /// Продвижение курсора.
@@ -123,6 +133,14 @@ public sealed class ConsoleControl
         }
 
         ScrollIfNecessarry();
+    }
+
+    private bool BlinkCursor()
+    {
+        _cursorDrawn = !_cursorDrawn;
+        InvalidateVisual();
+
+        return true;
     }
 
     private void ScrollDown()
@@ -147,6 +165,20 @@ public sealed class ConsoleControl
     #endregion
 
     #region Public methods
+
+    /// <summary>
+    /// Очистка консоли, пермемещение курсора в левый верхний угол.
+    /// </summary>
+    public void Clear()
+    {
+        _currentColumn = _currentRow = 0;
+        for (var i = 0; i < _rows; i++)
+        {
+            Array.Fill (_buffer[i], ' ');
+        }
+
+        InvalidateVisual();
+    }
 
     /// <summary>
     /// Переход на новую строку.
@@ -322,6 +354,25 @@ public sealed class ConsoleControl
             y += 14;
         }
 
+        if (_cursorDrawn)
+        {
+            var cursorX = 7.0 * _currentColumn;
+            var cursorY = 14.0 * _currentRow;
+            var pen = new Pen (Brushes.White);
+            context.DrawLine
+                (
+                    pen,
+                    new Point (cursorX, cursorY),
+                    new Point (cursorX, cursorY + 14)
+                );
+            cursorX++;
+            context.DrawLine
+                (
+                    pen,
+                    new Point (cursorX, cursorY),
+                    new Point (cursorX, cursorY + 14)
+                );
+        }
     }
 
     #endregion
