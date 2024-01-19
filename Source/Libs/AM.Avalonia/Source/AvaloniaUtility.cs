@@ -2094,5 +2094,36 @@ public static class AvaloniaUtility
         return builder;
     }
 
+    /// <summary>
+    /// Отрисовка последовательности символов.
+    /// </summary>
+    public static void DrawGlyphRun
+        (
+            DrawingContext context,
+            IGlyphTypeface typeface,
+            double emSize,
+            ReadOnlyMemory<char> text,
+            Point point,
+            IBrush brush
+        )
+    {
+        var length = text.Length;
+        var glyphs = new ushort[length];
+        for (var i = 0; i < length; i++)
+        {
+            glyphs[i] = typeface.GetGlyph (text.Span[i]);
+        }
+
+        var run = new GlyphRun
+            (
+                typeface,
+                emSize,
+                text,
+                glyphs,
+                point
+            );
+        context.DrawGlyphRun (brush, run);
+    }
+
     #endregion
 }
