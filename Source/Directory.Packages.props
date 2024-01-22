@@ -90,11 +90,11 @@
     <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.1" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
