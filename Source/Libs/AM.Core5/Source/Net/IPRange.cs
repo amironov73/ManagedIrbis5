@@ -15,13 +15,13 @@
 #region Using directives
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.RegularExpressions;
 
 #endregion
-
-#nullable enable
 
 namespace AM.Net;
 
@@ -29,7 +29,8 @@ namespace AM.Net;
 /// Диапазон IP-адресов.
 /// </summary>
 public sealed class IPRange
-    : IEquatable<IPRange>
+    : IEquatable<IPRange>,
+    IEnumerable<IPAddress>
 {
     #region Properties
 
@@ -196,6 +197,16 @@ public sealed class IPRange
                && Begin.Equals (other.Begin)
                && End.Equals (other.End);
     }
+
+    #endregion
+
+    #region IEnumerable<T> members
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <inheritdoc cref="IEnumerable{T}.GetEnumerator"/>
+    public IEnumerator<IPAddress> GetEnumerator() =>
+        new IPEnumerator (Begin, End);
 
     #endregion
 

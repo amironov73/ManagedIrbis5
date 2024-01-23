@@ -17,8 +17,6 @@ using System.Linq;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Net;
 
 /// <summary>

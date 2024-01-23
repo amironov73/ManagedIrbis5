@@ -16,9 +16,13 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+
+using AM.Net;
 
 using JetBrains.Annotations;
 
@@ -131,6 +135,82 @@ public sealed class AutomaticClient
     #endregion
 
     #region Public methods
+
+
+    /// <summary>
+    /// Пингуется ли указанный хост?
+    /// </summary>
+    public static bool IsPingable
+        (
+            IPAddress address
+        )
+    {
+        Sure.NotNull (address);
+
+        var ping = new Ping();
+
+        return ping.Send (address).Status == IPStatus.Success;
+    }
+
+    /// <summary>
+    /// Присутствует ли по указанному адресу SDAPI?
+    /// </summary>
+    public static bool HasSdapi
+        (
+            IPAddress address,
+            int port = 7860
+        )
+    {
+        Sure.NotNull (address);
+
+        var uri = $"{address}:{port}/sdapi/v1";
+        var client = new AutomaticClient (uri);
+        try
+        {
+            client.GetProgressAsync().GetAwaiter().GetResult();
+            return true;
+        }
+        catch
+        {
+            // нечего делать
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Поиск хоста с работающим A1111.
+    /// </summary>
+    public static string? FindHost
+        (
+            bool includeLocalhost = true,
+            int port = 7860
+        )
+    {
+        if (includeLocalhost)
+        {
+            var loopback = IPAddress.Loopback;
+            if (HasSdapi (loopback))
+            {
+                return loopback.ToString();
+            }
+        }
+
+        var networks = NetUtility.GetLocalNetwork();
+        foreach (var network in networks)
+        {
+            foreach (var address in network)
+            {
+                if (IsPingable (address)
+                    && HasSdapi (address, port))
+                {
+                    return address.ToString();
+                }
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Преобразование строки в байты.
