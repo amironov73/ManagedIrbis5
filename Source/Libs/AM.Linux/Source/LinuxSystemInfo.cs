@@ -19,8 +19,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Linux;
 
 /// <summary>
@@ -36,7 +34,7 @@ public sealed class LinuxSystemInfo
     /// Дистрибутив, например, "debian".
     /// </summary>
     public required string Distribution { get; init; }
-    
+
     /// <summary>
     /// Версия дистрибутива, например, "11.6".
     /// </summary>
@@ -46,12 +44,12 @@ public sealed class LinuxSystemInfo
     /// Имя компьютера.
     /// </summary>
     public required string NodeName { get; init; }
-    
+
     /// <summary>
     /// Версия ядра, например, "6.1.12".
     /// </summary>
     public required Version KernelVersion { get; init; }
-    
+
     /// <summary>
     /// Архитектура, например, "x86_64".
     /// </summary>
