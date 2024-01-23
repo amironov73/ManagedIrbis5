@@ -45,7 +45,7 @@
     <!-- PackageVersion Include="Avalonia.Xaml.Interactivity" Version="$(AvaloniaVersion)" / -->
     <PackageVersion Include="BCrypt.Net-Next.StrongName" Version="4.0.3" />
     <PackageVersion Include="BenchmarkDotNet" Version="0.13.9" />
-    <PackageVersion Include="Citrus.Avalonia" Version="1.6.1" />
+    <PackageVersion Include="Citrus.Avalonia" Version="2.1.1" />
     <PackageVersion Include="Cocona" Version="2.2.0" />
     <PackageVersion Include="CommunityToolkit.Common" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
