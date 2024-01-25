@@ -282,6 +282,19 @@ public sealed class SubField
     }
 
     /// <summary>
+    /// Деконструкция подполя.
+    /// </summary>
+    public void Deconstruct
+        (
+            out char code,
+            out string? value
+        )
+    {
+        code = Code;
+        value = Value;
+    }
+
+    /// <summary>
     /// Установка нового значения подполя.
     /// </summary>
     public void SetValue

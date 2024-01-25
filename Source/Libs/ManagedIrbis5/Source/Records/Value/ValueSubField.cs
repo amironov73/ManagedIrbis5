@@ -112,6 +112,19 @@ public readonly struct ValueSubField
         return result;
     }
 
+    /// <summary>
+    /// Деконструкция подполя.
+    /// </summary>
+    public void Deconstruct
+        (
+            out char code,
+            out Memory<char> value
+        )
+    {
+        code = Code;
+        value = Value;
+    }
+
     #endregion
 
     #region IVerifiable members

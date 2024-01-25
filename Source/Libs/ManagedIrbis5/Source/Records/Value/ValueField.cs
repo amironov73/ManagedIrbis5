@@ -102,6 +102,19 @@ public readonly struct ValueField
     #region Public methods
 
     /// <summary>
+    /// Деконструкция поля.
+    /// </summary>
+    public void Deconstruct
+        (
+            out int tag,
+            out Memory<ValueSubField> subfields
+        )
+    {
+        tag = Tag;
+        subfields = Subfields;
+    }
+
+    /// <summary>
     /// Перечисление подполей с указанным кодом.
     /// </summary>
     public IEnumerable<ValueSubField> EnumerateSubFields

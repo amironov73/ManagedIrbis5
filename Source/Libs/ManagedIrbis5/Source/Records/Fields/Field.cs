@@ -912,6 +912,19 @@ public class Field
     }
 
     /// <summary>
+    /// Деконструкция поля.
+    /// </summary>
+    public void Deconstruct
+        (
+            out int tag,
+            out SubFieldCollection subfields
+        )
+    {
+        tag = Tag;
+        subfields = Subfields;
+    }
+
+    /// <summary>
     /// Получение первого подполя с указанным кодом.
     /// </summary>
     public SubField? GetFirstSubField
