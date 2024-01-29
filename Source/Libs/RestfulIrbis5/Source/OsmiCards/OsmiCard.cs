@@ -15,27 +15,83 @@
 
 #region Using directives
 
+using System.Text;
 using System.Text.Json.Serialization;
+
+using AM;
+using AM.Collections;
+
+using Newtonsoft.Json.Linq;
 
 #endregion
 
 #nullable enable
 
-namespace RestfulIrbis.OsmiCards
+namespace RestfulIrbis.OsmiCards;
+
+/// <summary>
+/// Карточка пользователя системы OSMI Cards.
+/// </summary>
+public sealed class OsmiCard
 {
+    #region Properties
+
     /// <summary>
-    /// Карточка пользователя системы OSMI Cards.
+    /// Массив пар "ключ-значение".
     /// </summary>
-    public sealed class OsmiCard
+    [JsonPropertyName("values")]
+    public OsmiValue[]? Values { get; set; }
+
+    #endregion
+
+    #region Public methods
+
+    /// <summary>
+    /// Convert <see cref="JObject"/> to
+    /// <see cref="OsmiCard"/>.
+    /// </summary>
+    public static OsmiCard? FromJObject
+        (
+            JObject jObject
+        )
     {
-        #region Properties
+        Sure.NotNull (jObject);
 
-        /// <summary>
-        /// Массив пар "ключ-значение".
-        /// </summary>
-        [JsonPropertyName("values")]
-        public OsmiValue[]? Values { get; set; }
+        var values = jObject["values"];
+        if (ReferenceEquals (values, null))
+        {
+            return null;
+        }
 
-        #endregion
+        var result = new OsmiCard
+        {
+            Values = values.ToObject<OsmiValue[]>()
+        };
+
+        return result;
     }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString()
+    {
+        var values = Values;
+        if (values.IsNullOrEmpty())
+        {
+            return "(null)";
+        }
+
+        var builder = new StringBuilder();
+        foreach (var value in values)
+        {
+            builder.AppendLine (value.ToString());
+        }
+
+        return builder.ToString();
+    }
+
+    #endregion
 }

@@ -55,7 +55,7 @@ public static class OsmiUtility
     {
         Sure.NotNull (obj);
 
-        var result = (JObject?) obj["values"].ThrowIfNull()
+        var result = (JObject?)obj["values"].ThrowIfNull()
             .FirstOrDefault
                 (
                     token => token["label"]?.Value<string>() == label
@@ -95,7 +95,7 @@ public static class OsmiUtility
 
         var name = reader.FamilyName.ThrowIfNull();
         var fio = reader.FullName.ThrowIfNull();
-        var result = (JObject) templateObject.DeepClone();
+        var result = (JObject)templateObject.DeepClone();
 
         JObject? block = null;
         if (!string.IsNullOrEmpty (config.FioField))
@@ -162,20 +162,30 @@ public static class OsmiUtility
             }
         }
 
-        var barcodeField = config.BarcodeField;
-        if (!string.IsNullOrEmpty (barcodeField))
-        {
-            block = (JObject?) result[barcodeField];
-            if (block is not null)
-            {
-                block.Property ("messageType")?.Remove();
-                block.Property ("signatureType")?.Remove();
-                block["message"] = ticket;
-                block["signature"] = ticket;
-            }
-        }
+        UpdateCardBarcode (result, ticket, config);
 
         return result;
+    }
+
+    /// <summary>
+    /// Обновление информации о штрих-коде для указанной карты.
+    /// </summary>
+    public static void UpdateCardBarcode
+        (
+            JObject card,
+            string barcode,
+            DicardsConfiguration config
+        )
+    {
+        var barcodeField = config.BarcodeField;
+        if (!string.IsNullOrEmpty (barcodeField)
+            && card[barcodeField] is JObject block)
+        {
+            block.Property ("messageType")?.Remove();
+            block.Property ("signatureType")?.Remove();
+            block["message"] = barcode;
+            block["signature"] = barcode;
+        }
     }
 
     /// <summary>

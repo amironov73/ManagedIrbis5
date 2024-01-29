@@ -55,5 +55,12 @@ namespace RestfulIrbis.OsmiCards
         public string? ChangeMessage { get; set; }
 
         #endregion
+
+        #region Object members
+
+        /// <inheritdoc cref="object.ToString"/>
+        public override string ToString() => $"{Label}: {Value}";
+
+        #endregion
     }
 }

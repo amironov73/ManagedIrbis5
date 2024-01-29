@@ -418,6 +418,8 @@ public sealed class DicardsConfiguration
             string fileName
         )
     {
+        Sure.FileExists (fileName);
+
         var result = JsonUtility.ReadObjectFromFile<DicardsConfiguration> (fileName);
         result.ApiId = Unprotect (result.ApiId);
         result.ApiKey = Unprotect (result.ApiKey);
@@ -434,13 +436,15 @@ public sealed class DicardsConfiguration
             string fileName
         )
     {
-        var clone = (DicardsConfiguration)MemberwiseClone();
+        Sure.NotNullNorEmpty (fileName);
+
+        var clone = (DicardsConfiguration) MemberwiseClone();
         clone.ApiId = Protect (ApiId);
         clone.ApiKey = Protect (ApiKey);
         clone.ConnectionString = Protect (ConnectionString);
 
         JsonUtility.SaveObjectToFile (clone, fileName);
-    } // method SaveConfiguration
+    }
 
     /// <summary>
     /// Примитивная защита от подглядывания паролей и прочего.
@@ -460,7 +464,7 @@ public sealed class DicardsConfiguration
         var result = "!" + Convert.ToBase64String (bytes);
 
         return result;
-    } // method Protect
+    }
 
     /// <summary>
     /// Раскодирование (при необходимости) строкового значения,
@@ -485,7 +489,7 @@ public sealed class DicardsConfiguration
         var result = Encoding.UTF8.GetString (bytes);
 
         return result;
-    } // method Unprotect
+    }
 
     #endregion
 
@@ -536,6 +540,4 @@ public sealed class DicardsConfiguration
     } // method Verify
 
     #endregion
-} // class DicardsConfiguration
-
-// method RestfulIrbis.OsmiCards
+}
