@@ -64,10 +64,12 @@ internal class SigurHandler
 
     private string GetDumpDirectory()
     {
+        var today = AM.Utility.Today.ToString ("yyyy-MM-dd");
         var result = Path.Combine
             (
                 AppContext.BaseDirectory,
-                "Dump"
+                "Dump",
+                today
             );
 
         Directory.CreateDirectory (result);

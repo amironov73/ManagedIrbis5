@@ -108,6 +108,12 @@ internal static class Utility
         )
     {
         var connectionString = GetRequiredString ("irbis-connection");
+        if (string.IsNullOrWhiteSpace (connectionString))
+        {
+            Program.Logger.LogError ("IRBIS connection string is empty");
+            return null;
+        }
+
         var timeout = GetInt32 ("timeout", 100);
         SyncConnection result;
         if (gracefully)

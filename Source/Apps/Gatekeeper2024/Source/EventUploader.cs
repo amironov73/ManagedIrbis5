@@ -14,6 +14,8 @@
 
 using System.Text.Json;
 
+using AM;
+
 using ManagedIrbis;
 using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Providers;
@@ -182,7 +184,7 @@ internal sealed class EventUploader
         if (record.IsLocked)
         {
             // запись заблокирована, поэтому наши попытки отправить событие на сервер
-            // заранее обречены на наудачу, посему просто удаляем запись
+            // заведомо обречены на наудачу, посему просто удаляем запись
             // и помещаем ее в лог ошибок
             Program.Logger.LogError ("Record for ticket {Ticket} is locked", readerId);
             GlobalState.SetMessageWithTimestamp ($"Запись читателя {reader.FullName} заблокирована");
@@ -204,11 +206,11 @@ internal sealed class EventUploader
             var visit = VisitInfo.Parse (field);
             if (
                     visit is { IsVisit: true, IsReturned: false }
-                    && visit.DateGivenString == today
-                    && visit.TimeIn == now
-                    && visit.Department == department
-                    && visit.Description == description
-                    && visit.Responsible == person
+                    && visit.DateGivenString.SameString (today)
+                    && visit.TimeIn.SameString (now)
+                    && visit.Department.SameString (department)
+                    && visit.Description.SameString (description)
+                    && visit.Responsible.SameString (person)
                 )
             {
                 found = true;
@@ -242,10 +244,10 @@ internal sealed class EventUploader
                 var visit = VisitInfo.Parse (field);
                 if (
                         visit is { IsVisit: true }
-                        && visit.DateGivenString == today
-                        && visit.Department == department
-                        && visit.Description == description
-                        && visit.Responsible == person
+                        && visit.DateGivenString.SameString (today)
+                        && visit.Department.SameString (department)
+                        && visit.Description.SameString (description)
+                        && visit.Responsible.SameString (person)
                     )
                 {
                     var candidate = visit.TimeIn;
@@ -420,7 +422,7 @@ internal sealed class EventUploader
         if (record.IsLocked)
         {
             // запись заблокирована, поэтому наши попытки отправить событие на сервер
-            // заранее обречены на наудачу, посему просто удаляем запись
+            // заведомо обречены на наудачу, посему просто удаляем запись
             // и помещаем ее в лог ошибок
             Program.Logger.LogError ("Record for ticket {Ticket} is locked", readerId);
             GlobalState.SetMessageWithTimestamp ($"Запись читателя {reader.FullName} заблокирована");
@@ -442,11 +444,11 @@ internal sealed class EventUploader
             var visit = VisitInfo.Parse (field);
             if (
                     visit is { IsVisit: true }
-                    && visit.DateReturnedString == date
-                    && visit.TimeOut == time
-                    && visit.Department == department
-                    && visit.Description == description
-                    && visit.Responsible == person
+                    && visit.DateReturnedString.SameString (date)
+                    && visit.TimeOut.SameString (time)
+                    && visit.Department.SameString (department)
+                    && visit.Description.SameString (description)
+                    && visit.Responsible.SameString (person)
                 )
             {
                 found = true;
@@ -477,10 +479,10 @@ internal sealed class EventUploader
             var visit = VisitInfo.Parse (field);
             if (
                     visit is { IsVisit: true, IsReturned: false }
-                    && visit.DateGivenString == date
-                    && visit.Department == department
-                    && visit.Description == description
-                    && visit.Responsible == person
+                    && visit.DateGivenString.SameString (date)
+                    && visit.Department.SameString (department)
+                    && visit.Description.SameString (description)
+                    && visit.Responsible.SameString (person)
                     && string.IsNullOrEmpty (visit.DateReturnedString)
                     && string.IsNullOrEmpty (visit.TimeOut)
                 )
@@ -674,7 +676,7 @@ internal sealed class EventUploader
         try
         {
             var logDirectory = Utility.GetRequiredString ("log-directory");
-            var fileName = Path.Combine (logDirectory, "(loginerror.txt");
+            var fileName = Path.Combine (logDirectory, "loginerror.txt");
             var entry = $"#10: {passEvent.Id}\n"
                 + Utility.FormatDateTime ("#40: ^d{date}^1{time}\n*****", passEvent.Moment);
             using var stream = File.CreateText (fileName);
