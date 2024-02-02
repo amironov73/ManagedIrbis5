@@ -51,6 +51,7 @@
     <PackageVersion Include="CommunityToolkit.Diagnostics" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.HighPerformance" Version="$(CommunityToolkitVersion)" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="$(CommunityToolkitVersion)" />
+    <PackageVersion Include="Coravel" Version="5.0.2" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.0" />
     <PackageVersion Include="DevExpress.Win.Spreadsheet" Version="22.1.11" />
