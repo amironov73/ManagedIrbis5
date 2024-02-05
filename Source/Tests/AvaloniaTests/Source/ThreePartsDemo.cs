@@ -7,7 +7,7 @@ using Avalonia.Layout;
 
 namespace AvaloniaTests;
 
-internal class ThreePartsDemo
+internal sealed class ThreePartsDemo
 {
     public async void Show
         (
@@ -31,7 +31,7 @@ internal class ThreePartsDemo
 
         var window = new Window
         {
-            Title = "ComfortableWindow demo",
+            Title = "ThreePartLayout demo",
             Width = 600,
             MinWidth = 600,
             Height = 400,
@@ -46,5 +46,4 @@ internal class ThreePartsDemo
 
         await window.ShowDialog (owner);
     }
-
 }

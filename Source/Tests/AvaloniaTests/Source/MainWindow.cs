@@ -623,6 +623,11 @@ public sealed class MainWindow
                     {
                         new ThreePartsDemo().Show (this);
                     }),
+                new Button { Content = "Grid UI" }
+                    .OnClick ((sender, args) =>
+                    {
+                        new GridUIDemo().Show (this);
+                    }),
 
                 MakeButton ("Render")
                     .OnClick ((_, _) => new RenderDemo().DoRender())

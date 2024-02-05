@@ -19,8 +19,6 @@ using Avalonia.Layout;
 
 using JetBrains.Annotations;
 
-using HorizontalAlignment = Avalonia.Layout.HorizontalAlignment;
-
 #endregion
 
 namespace AM.Avalonia.Controls;
@@ -49,7 +47,7 @@ public class StatusBar
     #region Public methods
 
     /// <summary>
-    /// Добавление метки.
+    /// Добавление кнопки.
     /// </summary>
     public StatusBar AddButton
         (
