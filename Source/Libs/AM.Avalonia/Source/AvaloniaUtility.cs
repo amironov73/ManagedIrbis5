@@ -845,6 +845,18 @@ public static class AvaloniaUtility
     }
 
     /// <summary>
+    /// Кисть с цветом фона текущей темы.
+    /// </summary>
+    public static Brush GetThemeBackgroundBrush() =>
+        GetThemeResources (Application.Current!).ThemeBackgroundBrush;
+
+    /// <summary>
+    /// Кисть с цветом текста текущей темы.
+    /// </summary>
+    public static Brush GetThemeForegroundBrush() =>
+        GetThemeResources (Application.Current!).ThemeForegroundBrush;
+
+    /// <summary>
     /// Получение доступа к ресурсам темы.
     /// </summary>
     public static IThemeResources GetThemeResources

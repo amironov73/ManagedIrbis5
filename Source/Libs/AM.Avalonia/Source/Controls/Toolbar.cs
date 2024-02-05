@@ -4,7 +4,7 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 
-/* StatusBar.cs -- строка статуса
+/* Toolbar.cs -- панель инструментов
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -19,17 +19,15 @@ using Avalonia.Layout;
 
 using JetBrains.Annotations;
 
-using HorizontalAlignment = Avalonia.Layout.HorizontalAlignment;
-
 #endregion
 
 namespace AM.Avalonia.Controls;
 
 /// <summary>
-/// Строка статуса.
+/// Панель инструментов.
 /// </summary>
 [PublicAPI]
-public class StatusBar
+public class Toolbar
     : StackPanel
 {
     #region Construction
@@ -37,9 +35,10 @@ public class StatusBar
     /// <summary>
     /// Конструктор по умолчанию.
     /// </summary>
-    public StatusBar()
+    public Toolbar()
     {
         Spacing = 5;
+        Margin = new Thickness (5);
         Orientation = Orientation.Horizontal;
         HorizontalAlignment = HorizontalAlignment.Stretch;
     }
@@ -51,7 +50,7 @@ public class StatusBar
     /// <summary>
     /// Добавление метки.
     /// </summary>
-    public StatusBar AddButton
+    public Toolbar AddButton
         (
             string text,
             EventHandler<RoutedEventArgs> action
@@ -59,7 +58,7 @@ public class StatusBar
     {
         Sure.NotNull (action);
 
-        var button = new StatusButton (text);
+        var button = new Button { Content = text };
         button.Click += action;
 
         return AddControl (button);
@@ -68,7 +67,7 @@ public class StatusBar
     /// <summary>
     /// Добавление произвольного контрола.
     /// </summary>
-    public StatusBar AddControl
+    public Toolbar AddControl
         (
             Control control
         )
@@ -83,7 +82,7 @@ public class StatusBar
     /// <summary>
     /// Добавление метки.
     /// </summary>
-    public StatusBar AddLabel (string text) => AddControl (new StatusLabel (text));
+    public Toolbar AddLabel (string text) => AddControl (new Label { Content = text });
 
     #endregion
 

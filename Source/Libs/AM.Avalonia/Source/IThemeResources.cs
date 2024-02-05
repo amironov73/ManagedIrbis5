@@ -11,7 +11,6 @@
 
 #region Using directives
 
-using Avalonia.Controls;
 using Avalonia.Media;
 
 #endregion

@@ -618,6 +618,12 @@ public sealed class MainWindow
                     new ConsoleDemo().Show (this);
                 }),
 
+                new Button { Content = "3 parts" }
+                    .OnClick ((sender, args) =>
+                    {
+                        new ThreePartsDemo().Show (this);
+                    }),
+
                 MakeButton ("Render")
                     .OnClick ((_, _) => new RenderDemo().DoRender())
 
