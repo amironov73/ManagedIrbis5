@@ -238,4 +238,11 @@ public class GridUI
     }
 
     #endregion
+
+    #region StyledElement members
+
+    /// <inheritdoc cref="StyledElement.StyleKeyOverride"/>
+    protected override Type StyleKeyOverride => typeof (Grid);
+
+    #endregion
 }

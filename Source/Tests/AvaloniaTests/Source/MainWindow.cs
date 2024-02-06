@@ -623,10 +623,17 @@ public sealed class MainWindow
                     {
                         new ThreePartsDemo().Show (this);
                     }),
+
                 new Button { Content = "Grid UI" }
                     .OnClick ((sender, args) =>
                     {
                         new GridUIDemo().Show (this);
+                    }),
+
+                new Button { Content = "SplitPanel" }
+                    .OnClick ((sender, args) =>
+                    {
+                        new SplitPanelDemo().Show (this);
                     }),
 
                 MakeButton ("Render")

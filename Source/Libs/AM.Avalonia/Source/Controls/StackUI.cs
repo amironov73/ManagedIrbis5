@@ -118,4 +118,11 @@ public class StackUI
     }
 
     #endregion
+
+    #region StyledElement members
+
+    /// <inheritdoc cref="StyledElement.StyleKeyOverride"/>
+    protected override Type StyleKeyOverride => typeof (StackPanel);
+
+    #endregion
 }
