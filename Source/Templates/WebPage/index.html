@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <title>Заголовок страницы</title>
+
+    <link rel='icon' type='image/png' href='img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-light navbar-expand-md py-3">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" href="https://library.istu.edu">
+        <span class="bs-icon-sm bs-icon-rounded bs-icon-primary d-flex justify-content-center align-items-center me-2 bs-icon">
+            <img src="img/logo.png" height="30" alt="НТБ ИрНИТУ">
+        </span>
+            <span>НТБ ИРНИТУ</span>
+        </a>
+
+        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navcol-2"><span
+                class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+
+        <div id="navcol-2" class="collapse navbar-collapse">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link active" href="#">Первое</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Второе</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Компот</a></li>
+            </ul>
+            <a class="btn btn-primary ms-md-2" role="button" href="#">Кнопка</a>
+        </div>
+
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="row">
+
+        <form class="col-lg-6 offset-lg-3 mt-3" autocomplete="off" onsubmit="return handleSubmit()">
+
+            <div class="form-group">
+                <label for="input1">Поисковое выражение:</label>
+                <input id="input1" type="text" class="form-control">
+            </div>
+
+            <div class="d-flex justify-content-center mt-3 mb-3">
+                <button type="submit" class="btn btn-primary w-50">Поиск</button>
+                &nbsp;
+                <button type="reset" class="btn btn-outline-primary">Сброс</button>
+            </div>
+
+        </form>
+
+        <div id="busyIndicator" class="text-center mb-5" style="display: none;">
+            <h2><img id="arctic-fox" src="img/arctic-fox.gif" alt="полярная лисичка"></h2>
+        </div>
+
+        <div id="errorIndicator" class="text-center text-danger mb-5" style="display: none;">
+            <h2 id="errorMessage">Произошла ошибка</h2>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-8 offset-lg-2 mt-3">
+
+            <table id="resultHolder">
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/fontawesome.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/script.js"></script>
+
+<script>
+
+    $(function () {
+        const queryString = window.location.search
+        if (queryString) {
+            console.log(queryString)
+            const urlParams = new URLSearchParams(queryString)
+            const expression = urlParams.get('expression')
+            if (expression) {
+                console.log(expression)
+                performSearch(expression)
+            }
+        }
+    })
+
+</script>
+
+</body>
+
+</html>
