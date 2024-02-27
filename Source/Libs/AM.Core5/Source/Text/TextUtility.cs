@@ -18,8 +18,6 @@ using JetBrains.Annotations;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Text;
 
 /// <summary>
@@ -281,7 +279,7 @@ public static class TextUtility
         var bytes = fromEncoding.GetBytes (text);
         return toEncoding.GetString (bytes);
     }
-    
+
     /// <summary>
     /// Удаление пробельных символов в конце текста.
     /// </summary>

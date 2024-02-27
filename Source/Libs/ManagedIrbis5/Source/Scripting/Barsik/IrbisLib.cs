@@ -26,6 +26,7 @@ using AM;
 using AM.Collections;
 using AM.Configuration;
 using AM.Scripting.Barsik;
+using AM.Text;
 
 using ManagedIrbis.AppServices;
 using ManagedIrbis.Batch;
@@ -153,6 +154,7 @@ public sealed class IrbisLib
         { "list_users", new FunctionDescriptor ("list_users", ListUsers) },
         { "load_record", new FunctionDescriptor ("load_record", LoadRecord) },
         { "max_mfn", new FunctionDescriptor ("max_mfn", MaxMfn) },
+        { "normalize_text", new FunctionDescriptor ("normalize_text", NormalizeText) },
         { "parse_book", new FunctionDescriptor ("parse_book", ParseBook) },
         { "ping", new FunctionDescriptor ("ping", Ping) },
         { "protect", new FunctionDescriptor ("protect", Protect) },
@@ -167,6 +169,7 @@ public sealed class IrbisLib
         { "reader_id", new FunctionDescriptor ("reader_id", ReaderId) },
         { "reader_info", new FunctionDescriptor ("reader_info", ReaderInfo_) },
         { "reader_ticket", new FunctionDescriptor ("reader_ticket", ReaderTicket) },
+        { "relax_utf8", new FunctionDescriptor ("relax_utf8", RelaxUtf8) },
         { "search", new FunctionDescriptor ("search", Search) },
         { "search_all", new FunctionDescriptor ("search_all", SearchAll) },
         { "search_count", new FunctionDescriptor ("search_count", SearchCount) },
@@ -176,10 +179,12 @@ public sealed class IrbisLib
         { "server_stat", new FunctionDescriptor ("server_stat", ServerStat) },
         { "server_version", new FunctionDescriptor ("server_version", ServerVersion) },
         { "set_mark", new FunctionDescriptor ("set_mark", SetMark) },
+        { "sort", new FunctionDescriptor ("sort", Sort) },
         { "sub_field", new FunctionDescriptor ("sub_field", GetSubfield) },
         { "truncate_database", new FunctionDescriptor ("truncate_database", TruncateDatabase) },
         { "unprotect", new FunctionDescriptor ("unprotect", Unprotect) },
         { "unlock_database", new FunctionDescriptor ("unlock_database", UnlockDatabase) },
+        { "url_encode", new FunctionDescriptor ("url_encode", UrlEncode) },
         { "write_record", new FunctionDescriptor ("write_record", WriteRecord) },
     };
 
@@ -1285,6 +1290,8 @@ public sealed class IrbisLib
 
     /// <summary>
     /// Простой доступ к полям записи.
+    /// Можно вызывать так: <code>fma(910)</code>
+    /// или так: <code>fma(910, 'a')</code>.
     /// </summary>
     public static dynamic? FMA
         (
@@ -1811,6 +1818,38 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Нормализация текста: убираем лишние пробелы.
+    /// Первый символ прописной, остальные - строчные.
+    /// </summary>
+    public static dynamic? NormalizeText
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var text = Compute (context, args, 0) as string;
+        if (string.IsNullOrEmpty (text))
+        {
+            return text;
+        }
+
+        var result = new Sparcer().SparceText (text);
+        if (!string.IsNullOrEmpty (result))
+        {
+            Span<char> span = stackalloc char[result.Length];
+            span[0] = char.ToUpperInvariant (result[0]);
+            for (var i = 1; i < result.Length; i++)
+            {
+                span[i] = char.ToLowerInvariant (result[i]);
+            }
+
+            result = span.ToString();
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Разбор книги по косточкам.
     /// </summary>
     public static dynamic? ParseBook
@@ -2185,6 +2224,20 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Расслабляем UTF-8, чтобы не бросалась исключениями.
+    /// </summary>
+    public static dynamic? RelaxUtf8
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        IrbisEncoding.RelaxUtf8();
+
+        return null;
+    }
+
+    /// <summary>
     /// Поиск по словарю.
     /// </summary>
     public static dynamic? Search
@@ -2396,6 +2449,33 @@ public sealed class IrbisLib
     }
 
     /// <summary>
+    /// Сортировка.
+    /// </summary>
+    public static dynamic? Sort
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+
+        if (firstArg is Array array1)
+        {
+            Array.Sort (array1);
+            return array1;
+        }
+
+        if (firstArg is IEnumerable enumerable)
+        {
+            var array2 = enumerable.Cast<object>().ToArray();
+            Array.Sort (array2);
+            return array2;
+        }
+
+        return firstArg;
+    }
+
+    /// <summary>
     /// Опустошение базы данных.
     /// </summary>
     public static dynamic? TruncateDatabase
@@ -2448,6 +2528,24 @@ public sealed class IrbisLib
         }
 
         return Compute (context, args, 0);
+    }
+
+    /// <summary>
+    /// Кодирование текста как URL.
+    /// </summary>
+    public static dynamic? UrlEncode
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var text = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (text))
+        {
+            return Utility.UrlEncode (text, IrbisEncoding.Utf8);
+        }
+
+        return text;
     }
 
     /// <summary>

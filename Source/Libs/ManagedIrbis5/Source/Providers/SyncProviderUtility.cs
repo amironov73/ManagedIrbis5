@@ -35,6 +35,8 @@ using ManagedIrbis.Infrastructure;
 using ManagedIrbis.Menus;
 using ManagedIrbis.Records;
 
+using Microsoft.Extensions.Logging;
+
 #endregion
 
 #nullable enable
@@ -520,7 +522,21 @@ public static class SyncProviderUtility
             var directResult = new List<Record>();
             foreach (var mfn in batch)
             {
-                var record = direct.ReadRecord (mfn);
+                Record? record = null;
+                try
+                {
+                    record = direct.ReadRecord (mfn);
+                }
+                catch (Exception exception)
+                {
+                    Magna.Logger.LogError
+                        (
+                            exception,
+                            "Can't read MFN {Mfn}",
+                            mfn
+                        );
+                }
+
                 if (record is not null)
                 {
                     directResult.Add (record);

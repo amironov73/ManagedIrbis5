@@ -29,9 +29,9 @@ using AM;
 using AM.Collections;
 using AM.IO;
 
-#endregion
+using Microsoft.Extensions.Logging;
 
-#nullable enable
+#endregion
 
 namespace ManagedIrbis.Infrastructure;
 
@@ -331,7 +331,26 @@ public sealed class Response
             return string.Empty;
         }
 
-        return encoding.GetString (bytes);
+        string result;
+
+        try
+        {
+            result = encoding.GetString (bytes);
+        }
+        catch (Exception exception)
+        {
+            var dump = DumpUtility.DumpToText (bytes);
+            Magna.Logger.LogError
+                (
+                    exception,
+                    "Can't read line: {Dump}",
+                    dump
+                );
+
+            throw;
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -763,7 +782,7 @@ public sealed class Response
 
         while (!EOT)
         {
-            string line = ReadLine (IrbisEncoding.Utf8);
+            var line = ReadLine (IrbisEncoding.Utf8);
             result.Add (line);
         }
 

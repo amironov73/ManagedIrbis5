@@ -405,6 +405,15 @@ public sealed class BatchRecordReader
             }
             catch (Exception exception)
             {
+                // var packageMfns = Utility.JoinText (package);
+                //
+                // Magna.Logger.LogError
+                //     (
+                //         exception,
+                //         "Package MFNS: {Mfns}",
+                //         packageMfns
+                //     );
+
                 Magna.Logger.LogError
                     (
                         exception,

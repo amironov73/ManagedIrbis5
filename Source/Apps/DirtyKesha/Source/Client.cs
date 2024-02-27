@@ -390,13 +390,22 @@ internal sealed class Client
         //     return;
         // }
 
-        await client.SendChatActionAsync
-            (
-                message.Chat.Id,
-                ChatAction.Typing,
-                null,
-                token
-            );
+        try
+        {
+
+            await client.SendChatActionAsync
+                (
+                    message.Chat.Id,
+                    ChatAction.Typing,
+                    null,
+                    token
+                );
+        }
+        catch (Exception exception)
+        {
+            Program.Logger.LogError (exception, "Error during SendChatActionAsync");
+            return;
+        }
 
         var found = await GetAndCleanDescriptions (messageText);
 

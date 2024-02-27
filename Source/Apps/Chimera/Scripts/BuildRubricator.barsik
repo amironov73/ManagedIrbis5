@@ -1,0 +1,43 @@
+﻿//
+// Болванка для рубрикатора для репозитория статей
+//
+
+relax_utf8()
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=PERIO;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+found = batch_search ("VRL=ASP*TEK=HTTP://$")
+formatted = {}
+
+foreach (book in found)
+{
+    rr = fma (book, 225, 'a')
+    foreach (r in rr)
+    {
+        text = normalize_text (r.ToString())
+        formatted[text] = 1
+    }
+}
+
+keys = formatted.Keys
+keys = sort (keys)
+quotes = chr (34)
+println ("<ul>")
+foreach (book in keys)
+{
+    print ("<li><a href=", quotes, "search.html?expression=ZRU=", url_encode(book), quotes, ">")
+    print (book)
+    println ("</a></li>")
+}
+println ("</ul>")
+
+//=================================
+
+disconnect()

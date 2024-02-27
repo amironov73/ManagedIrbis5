@@ -20,8 +20,6 @@ using System.Text;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Text;
 
 /// <summary>
