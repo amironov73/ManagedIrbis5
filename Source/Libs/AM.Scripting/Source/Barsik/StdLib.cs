@@ -94,6 +94,10 @@ public sealed class StdLib
         { "module", new FunctionDescriptor ("module", LoadModule) },
         { "protect", new FunctionDescriptor ("protect", Protect) },
         { "put_cache", new FunctionDescriptor ("put_cache", PutCache) },
+        { "ob_clean", new FunctionDescriptor ("ob_clean", ObClean) },
+        { "ob_end", new FunctionDescriptor ("ob_end", ObEnd) },
+        { "ob_get", new FunctionDescriptor ("ob_get", ObGet) },
+        { "ob_start", new FunctionDescriptor ("ob_start", ObStart) },
         { "readdir", new FunctionDescriptor ("readdir", ReadDirectory) },
         { "remove", new FunctionDescriptor ("remove", RemoveFile) },
         { "rename", new FunctionDescriptor ("rename", RenameFile) },
@@ -1039,6 +1043,83 @@ public sealed class StdLib
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Очистка перехваченного вывода.
+    /// </summary>
+    public static dynamic ObClean
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (context.Output is StringWriter writer)
+        {
+            var builder = writer.GetStringBuilder();
+            builder.Clear();
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Прекращение перехвата вывода.
+    /// </summary>
+    public static dynamic? ObEnd
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (context.Output is StringWriter writer)
+        {
+            if (context._outputBuffers is { Count: not 0} buffers)
+            {
+                var index = buffers.Count - 1;
+                context.Output = buffers[index];
+                buffers.RemoveAt (index);
+            }
+
+            return writer.ToString();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение перехваченного вывода.
+    /// </summary>
+    public static dynamic? ObGet
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (context.Output is StringWriter writer)
+        {
+            return writer.ToString();
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Начало перехвата вывода.
+    /// </summary>
+    public static dynamic ObStart
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        context._outputBuffers ??= new List<TextWriter>();
+        context._outputBuffers.Add (context.Output);
+        context.Output = new StringWriter();
+
+        return true;
     }
 
     /// <summary>

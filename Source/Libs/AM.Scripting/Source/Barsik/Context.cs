@@ -137,6 +137,11 @@ public sealed class Context
     internal readonly Dictionary<string, ProgramNode> _inclusions;
 
     /// <summary>
+    /// Предыдущие буферы вывода.
+    /// </summary>
+    internal List<TextWriter>? _outputBuffers;
+
+    /// <summary>
     /// Делаем контекст внимательным к выводу текста.
     /// </summary>
     internal void MakeAttentive()
