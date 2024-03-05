@@ -1,0 +1,43 @@
+﻿//
+// Болванка для списка авторов для репозитория статей
+//
+
+relax_utf8()
+
+connect ("host=127.0.0.1;port=6666;user=librarian;password=secret;db=PERIO;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+found = batch_search ("VRL=ASP*TEK=HTTP://$")
+formatted = {}
+
+foreach (book in found)
+{
+    rr = book_authors (book)
+    foreach (r in rr)
+    {
+        formatted[r] = 1
+    }
+}
+
+keys = formatted.Keys
+keys = sort (keys)
+quotes = chr (34)
+println ("<ul>")
+foreach (author in keys)
+{
+    name = split (author, ',')[0]
+    print ("<li><a href=", quotes, "search.html?expression=A=", url_encode(name), "$", quotes, ">")
+    print  (author)
+    println ("</a></li>")
+}
+println ("</ul>")
+
+//=================================
+
+disconnect()

@@ -100,6 +100,7 @@ public sealed class IrbisLib
         { "batch_read", new FunctionDescriptor ("batch_read", BatchRead) },
         { "batch_search", new FunctionDescriptor ("batch_search", BatchSearch) },
         { "batch_write", new FunctionDescriptor ("batch_write", BatchWrite) },
+        { "book_authors", new FunctionDescriptor ("book_authors", BookAuthors) },
         { "book_classification", new FunctionDescriptor ("book_classification", BookClassification) },
         { "book_country", new FunctionDescriptor ("book_country", BookCountry) },
         { "book_exemplars", new FunctionDescriptor ("book_exemplars", BookExemplars) },
@@ -195,7 +196,7 @@ public sealed class IrbisLib
     /// <summary>
     /// Ограничители, после которых нельзя ставить точку
     /// </summary>
-    private static readonly char[] _delimiters = { '!', '?', '.', ',' };
+    private static readonly char[] _delimiters = ['!', '?', '.', ','];
 
     /// <summary>
     /// Отыскиваем текущее подключение к серверу.
@@ -590,6 +591,24 @@ public sealed class IrbisLib
         }
 
         return new BatchRecordWriter (connection, database, capacity);
+    }
+
+    /// <summary>
+    /// Получение массива ФИО авторов для указанной записи.
+    /// </summary>
+    public static dynamic? BookAuthors
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return ChimeraUtility.GetAuthors (record);
+        }
+
+        return null;
     }
 
     /// <summary>

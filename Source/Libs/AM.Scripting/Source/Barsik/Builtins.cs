@@ -146,6 +146,7 @@ public static class Builtins
         { "quote", new FunctionDescriptor ("quote", Quote) },
         { "readln", new FunctionDescriptor ("readln", ReadLine) },
         { "reduce", new FunctionDescriptor ("reduce", Reduce, false) },
+        { "split", new FunctionDescriptor ("split", Split) },
         { "trace", new FunctionDescriptor ("trace", Trace_) },
         { "trim", new FunctionDescriptor ("trim", Trim) },
         { "warn", new FunctionDescriptor ("warn", Warn) },
@@ -989,6 +990,33 @@ public static class Builtins
         return result;
     }
 
+
+    /// <summary>
+    /// Разбиение строки на подстроки.
+    /// </summary>
+    public static dynamic? Split
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var text = Compute (context, args, 0) as string;
+        if (!string.IsNullOrEmpty (text))
+        {
+            var secondArg = Compute (context, args, 1);
+            if (secondArg is char chr)
+            {
+                return text.Split (chr);
+            }
+
+            if (secondArg is string str)
+            {
+                return text.Split (str);
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// Трассировочное сообщение.
