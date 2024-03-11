@@ -6,19 +6,20 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MicrosoftVersion>8.0.0</MicrosoftVersion>
-    <AvaloniaVersion>11.0.7</AvaloniaVersion>
+    <MicrosoftVersion>8.0.2</MicrosoftVersion>
+    <MicrosoftStable>8.0.0</MicrosoftStable>
+    <AvaloniaVersion>11.0.10</AvaloniaVersion>
     <AvaloniaStable>11.0.4</AvaloniaStable>
     <AvaloniaPrevious>11.0.1</AvaloniaPrevious>
     <SkiaVersion>2.88.7</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
-    <NugetVersion>6.7.0</NugetVersion>
+    <NugetVersion>6.9.1</NugetVersion>
     <NLogVersion>5.2.8</NLogVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
   <ItemGroup>
-    <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.2" />
+    <PackageVersion Include="ActiproSoftware.Controls.Avalonia" Version="23.1.3" />
     <PackageVersion Include="Autofac" Version="7.1.0" />
     <PackageVersion Include="Avalonia" Version="$(AvaloniaVersion)" />
     <PackageVersion Include="Avalonia.Android" Version="$(AvaloniaStable)" />
@@ -79,23 +80,23 @@
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.1" />
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.7.0" />
     <PackageVersion Include="Microsoft.DotNet.PlatformAbstractions" Version="5.0.0-preview.5.20278.1" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(MicrosoftStable)" />
     <PackageVersion Include="Microsoft.Extensions.Caching.SqlServer" Version="7.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="7.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Localization" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)" />
-    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="8.0.1" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftStable)" />
+    <PackageVersion Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)" />
     <PackageVersion Include="Microsoft.IO.RecyclableMemoryStream" Version="3.0.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="8.0.0" />
@@ -136,7 +137,7 @@
     <PackageVersion Include="RestSharp" Version="110.2.0" />
     <PackageVersion Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
     <PackageVersion Include="Rookout" Version="0.1.140" />
-    <PackageVersion Include="SixLabors.ImageSharp" Version="3.0.2" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="3.1.3" />
     <PackageVersion Include="SixLabors.ImageSharp.Drawing" Version="1.0.0-beta15" />
     <PackageVersion Include="SixLabors.Fonts" Version="1.0.0" />
     <PackageVersion Include="SkiaSharp" Version="$(SkiaVersion)" />
@@ -145,22 +146,22 @@
     <PackageVersion Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaVersion)" />
     <PackageVersion Include="SkiaSharp.QrCode" Version="0.7.0" />
-    <PackageVersion Include="SharpCompress" Version="0.35.0" />
+    <PackageVersion Include="SharpCompress" Version="0.36.0" />
     <PackageVersion Include="SharpZipLib" Version="1.4.2" />
     <PackageVersion Include="Spectre.Console" Version="0.47.1-preview.0.8" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-    <PackageVersion Include="System.CodeDom" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="System.CodeDom" Version="$(MicrosoftStable)" />
     <PackageVersion Include="System.CommandLine" Version="2.0.0-beta3.22114.1" />
-    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="System.Configuration.ConfigurationManager" Version="$(MicrosoftStable)" />
     <PackageVersion Include="System.Data.SqlClient" Version="4.8.6" />
     <PackageVersion Include="System.Drawing.Common" Version="8.0.0" />
     <PackageVersion Include="System.Linq.Async" Version="6.0.1" />
     <PackageVersion Include="System.Memory" Version="4.5.5" />
-    <PackageVersion Include="System.Resources.Extensions" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="System.Resources.Extensions" Version="$(MicrosoftStable)" />
     <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="7.0.0" />
-    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="$(MicrosoftStable)" />
     <PackageVersion Include="System.Security.Permissions" Version="7.0.0" />
-    <PackageVersion Include="System.Text.Encoding.CodePages" Version="$(MicrosoftVersion)" />
+    <PackageVersion Include="System.Text.Encoding.CodePages" Version="$(MicrosoftStable)" />
     <PackageVersion Include="TaskScheduler" Version="2.10.1" />
     <PackageVersion Include="Telegram.Bot" Version="19.0.0" />
     <PackageVersion Include="Telegram.Bot.Extensions.Polling" Version="1.0.2" />
