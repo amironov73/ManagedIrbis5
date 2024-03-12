@@ -28,15 +28,20 @@ foreach (book in found)
 keys = formatted.Keys
 keys = sort (keys)
 quotes = chr (34)
-println ("<ul>")
+
+println ("[")
 foreach (author in keys)
 {
+    item = expando()
     name = split (author, ',')[0]
-    print ("<li><a href=", quotes, "search.html?expression=A=", url_encode(name), "$", quotes, ">")
-    print  (author)
-    println ("</a></li>")
+    xpr = "search.html?expression=A="
+    xpr += url_encode(name)
+    xpr += "$"
+    item.text = author
+    item.expr = xpr
+    println (json_encode (item), ",")
 }
-println ("</ul>")
+println ("]")
 
 //=================================
 

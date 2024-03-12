@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <title>Заголовок страницы</title>
+
+    <link rel='icon' type='image/png' href='img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-lg-8 offset-lg-2 mt-3">
+
+            <table id="resultHolder">
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/fontawesome.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/script.js"></script>
+
+<script>
+
+    $(function () {
+        const queryString = window.location.search
+        if (queryString) {
+            console.log(queryString)
+            const urlParams = new URLSearchParams(queryString)
+            const expression = urlParams.get('expression')
+            if (expression) {
+                console.log(expression)
+                showResult('Выражение: ' + expression)
+            }
+        }
+    })
+
+</script>
+
+</body>
+
+</html>

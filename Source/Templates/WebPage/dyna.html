@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <title>Заголовок страницы</title>
+
+    <link rel='icon' type='image/png' href='img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <div id="busyIndicator" class="text-center mb-5" style="display: none;">
+            <h2><img id="arctic-fox" src="img/arctic-fox.gif" alt="полярная лисичка"></h2>
+        </div>
+
+        <div id="errorIndicator" class="text-center text-danger mb-5" style="display: none;">
+            <h2 id="errorMessage">Произошла ошибка</h2>
+        </div>
+
+        <form class="col-lg-6 offset-lg-3 mt-3" autocomplete="off" onsubmit="return false">
+
+            <div id="rootElement" class="form-group">
+            </div>
+
+            <ul id="theList"></ul>
+
+        </form>
+
+
+    </div>
+
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/fontawesome.min.js"></script>
+<script src="js/jquery.min.js"></script>
+<script src="js/script.js"></script>
+<script src="js/SearchableList.js"></script>
+
+<script>
+
+
+    $(function () {
+
+        const rootElement = document.getElementById('rootElement')
+
+        const list1 =  new SearchableList('input1', 'Про попа', 'search.html?expression=')
+        list1.render(rootElement)
+        list1.loadFrom('data/preacher.json')
+
+        const list2 =  new SearchableList('input2', 'Про короля', 'search.html?expression=')
+        list2.render(rootElement)
+        list2.loadFrom('data/king.json')
+    })
+
+</script>
+
+</body>
+</html>
