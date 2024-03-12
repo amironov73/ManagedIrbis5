@@ -29,14 +29,15 @@ foreach (book in found)
 keys = formatted.Keys
 keys = sort (keys)
 quotes = chr (34)
-println ("<ul>")
+println ("[")
 foreach (book in keys)
 {
-    print ("<li><a href=", quotes, "search.html?expression=ZRU=", url_encode(book), quotes, ">")
-    print (book)
-    println ("</a></li>")
+    item = expando()
+    item.text = book
+    item.expr = "search.html?expression=ZRU=" + url_encode(book)
+    println (json_encode (item), ",")
 }
-println ("</ul>")
+println ("]")
 
 //=================================
 
