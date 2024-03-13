@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+
+    <title>Крутилочка Bootstrap</title>
+
+    <link rel='icon' type='image/png' href='img/favicon.ico'>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="offset-lg-2 col-lg-8">
+
+            <p class="m-3">
+                Товарищи! начало повседневной работы по формированию позиции влечет за собой процесс внедрения и
+                модернизации дальнейших направлений развития.
+            </p>
+
+            <ul id="theList"></ul>
+
+            <div id="theSpinner" class="text-center">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Загружаем...</span>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/jquery.min.js"></script>
+
+<script type="application/javascript">
+
+    $(function () {
+
+        axios.get('data/king.json')
+            .then (response => {
+                const theList = document.getElementById('theList')
+                const data = response.data
+                for (const item of data) {
+                    const li = document.createElement('li')
+                    li.innerText = item.text
+                    theList.appendChild(li)
+                }
+
+                const theSpinner = document.getElementById('theSpinner')
+                theSpinner.style.display = 'none'
+            })
+            .catch (function (error) {
+                console.log(error)
+            })
+
+    })
+
+</script>
+
+</body>
+</html>
