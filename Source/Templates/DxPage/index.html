@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Осваиваем DevExtreme</title>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/dx.all.js"></script>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/dx.softblue.css">
+
+    <style>
+        .my-table       { display: table; }
+        .my-table-row   { display: table-row; }
+        .my-table-cell  { display: table-cell; padding: 2px; }
+    </style>
+
+</head>
+
+<body class="dx-viewport">
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col">
+
+            <h1>Осваиваем DevExtreme</h1>
+
+            <div class="my-table mx-auto my-5">
+                <div class="my-table-row">
+                    <div class="my-table-cell">
+                        Страна:
+                    </div>
+                    <div class="my-table-cell">
+                        <div id="countryBox"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p>
+                Жизнь в большом городе зачастую накладывает на людей очень много обязательств,
+                которые многим мешают планировать свое время. Поэтому времени катастрофически
+                не хватает на все, в том числе и на нормальную здоровую пищу. Полезные продукты
+                необходимо включать в рацион каждый день: они богаты аминокислотами, витаминами,
+                микро- и макроэлементами, жирными кислотами, клетчаткой. На самом деле мы боремся
+                не за вкус еды, а со своей ленью, потому что нам очень удобно купить полуфабрикаты
+                или готовые продукты, чтобы быстрее приготовить.
+            </p>
+
+            <div class="dx-form my-5 border">
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label">Первое слагаемое:</div>
+                        <div class="dx-field-value">
+                            <div id="firstTerm"></div>
+                        </div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label">Второе слагаемое:</div>
+                        <div class="dx-field-value">
+                            <div id="secondTerm"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label">
+                            <div id="sumButton"></div>
+                        </div>
+                        <div class="dx-field-value">
+                            <div id="sum"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2>Итак, мы научились вычислять сумму двух чисел</h2>
+
+            <p>
+                С целью снизить число людей с ожирением рестораны быстрого питания и сети супермаркетов вводят новые,
+                более полезные опции (например, салаты, сэндвичи с цельнозерновым хлебом или напитки без сахара), а
+                также предоставляют информацию о пищевой ценности продуктов в меню или на упаковке. Вторично разогретая
+                пища, особенно если после её приготовления прошло уже несколько часов, практически не содержит ни
+                витаминов, ни других полезных веществ. На поведение потребителей могут повлиять не только вкусовые
+                предпочтения, но и немедленные желания получить определенную еду.
+            </p>
+
+            <p>
+                Рис, гречка два отличных источника углеводов. Именно их при диете можно употреблять в небольших порциях.
+                сли уж без кофе совсем никак, тогда лучше пить его уже после еды, и с добавлением молока. Для
+                правильного перекуса прекрасно подойдет яблоко, стакан кефира или горсть орехов. Правильный завтрак
+                спортсмена или человека с высокой физической активностью, отличается от завтрака обычного человека.
+                Здоровое питание укрепляет иммунитет, особенно если совмещать его с занятиями спортом и прогулками на
+                свежем воздухе.
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script type="text/javascript">
+
+    const countries = [
+        { country: 'Австралия',      capital: 'Канберра',     area: 7686850, population: 24238610  },
+        { country: 'Австрия',        capital: 'Вена',         area: 83858,   population: 8741753   },
+        { country: 'Азербайджан',    capital: 'Баку',         area: 86600,   population: 9705600   },
+        { country: 'Алжир',          capital: 'Алжир',        area: 2381740, population: 39813722  },
+        { country: 'Ангола',         capital: 'Луанда',       area: 1246700, population: 25831000  },
+        { country: 'Аргентина',      capital: 'Буэнос-Айрес', area: 2766890, population: 43847000  },
+        { country: 'Армения',        capital: 'Ереван',       area: 29741,   population: 2995100   },
+        { country: 'Афганистан',     capital: 'Кабул',        area: 647500,  population: 29822848  },
+        { country: 'Бангладеш',      capital: 'Дакка',        area: 144000,  population: 160221000 },
+        { country: 'Белоруссия',     capital: 'Минск',        area: 207595,  population: 9498400   },
+        { country: 'Бельгия',        capital: 'Брюссель',     area: 30528,   population: 11250585  },
+        { country: 'Болгария',       capital: 'София',        area: 110910,  population: 7153784   },
+        { country: 'Бразилия',       capital: 'Бразилиа',     area: 8511965, population: 206081432 },
+        { country: 'Ватикан',        capital: 'Ватикан',      area: 0.44,    population: 842       },
+        { country: 'Великобритания', capital: 'Лондон',       area: 244820,  population: 65341183  },
+        { country: 'Венгрия',        capital: 'Будапешт',     area: 93030,   population: 9830485   },
+        { country: 'Венесуэла',      capital: 'Каракас',      area: 912050,  population: 31028637  },
+        { country: 'Вьетнам',        capital: 'Ханой',        area: 329560,  population: 91713300  }
+    ];
+
+    $(function () {
+
+        $("#countryBox").dxAutocomplete({
+                dataSource: countries,
+                placeholder: 'Введите название страны',
+                showClearButton: true,
+                stylingMode: 'filled',
+                valueExpr: 'country',
+                width: 300
+            })
+            .dxAutocomplete('instance');
+
+        const firstTermBox = $("#firstTerm").dxTextBox({
+            placeholder: "Первое слагаемое",
+            showClearButton: true,
+            stylingMode: 'filled'
+        }).dxTextBox('instance')
+
+        const secondTermBox = $("#secondTerm").dxTextBox({
+            placeholder: "Второе слагаемое",
+            showClearButton: true,
+            stylingMode: 'filled'
+        }).dxTextBox('instance')
+
+        const sumBox = $("#sum").dxTextBox({
+            reaOnly: true,
+            stylingMode: 'filled'
+        }).dxTextBox('instance')
+
+        $("#sumButton").dxButton({
+            text: "Вычислить сумму",
+            type: "default",
+            onClick: function () {
+                const firstTerm = parseFloat(firstTermBox.option('value'))
+                const secondTerm = parseFloat(secondTermBox.option('value'))
+                sumBox.option('value', firstTerm + secondTerm)
+            }
+        })
+    })
+
+</script>
+
+</body>
+</html>
