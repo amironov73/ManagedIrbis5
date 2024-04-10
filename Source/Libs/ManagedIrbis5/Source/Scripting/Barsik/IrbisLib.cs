@@ -100,6 +100,7 @@ public sealed class IrbisLib
         { "batch_read", new FunctionDescriptor ("batch_read", BatchRead) },
         { "batch_search", new FunctionDescriptor ("batch_search", BatchSearch) },
         { "batch_write", new FunctionDescriptor ("batch_write", BatchWrite) },
+        { "book_author", new FunctionDescriptor ("book_author", BookAuthor) },
         { "book_authors", new FunctionDescriptor ("book_authors", BookAuthors) },
         { "book_classification", new FunctionDescriptor ("book_classification", BookClassification) },
         { "book_country", new FunctionDescriptor ("book_country", BookCountry) },
@@ -110,6 +111,7 @@ public sealed class IrbisLib
         { "book_info", new FunctionDescriptor ("book_info", BookInfo_) },
         { "book_isbn", new FunctionDescriptor ("book_isbn", BookIsbn) },
         { "book_issn", new FunctionDescriptor ("book_issn", BookIssn) },
+        { "book_keywords", new FunctionDescriptor ("book_keywords", BookKeywords) },
         { "book_knowledge", new FunctionDescriptor ("book_knowledge", BookKnowledge) },
         { "book_language", new FunctionDescriptor ("book_language", BookLanguage) },
         { "book_price", new FunctionDescriptor ("book_price", BookPrice) },
@@ -596,6 +598,36 @@ public sealed class IrbisLib
     /// <summary>
     /// Получение массива ФИО авторов для указанной записи.
     /// </summary>
+    public static dynamic? BookAuthor
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return ChimeraUtility.GetAuthor (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return ChimeraUtility.GetAuthors (record2);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение массива ФИО авторов для указанной записи.
+    /// </summary>
     public static dynamic? BookAuthors
         (
             Context context,
@@ -606,6 +638,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return ChimeraUtility.GetAuthors (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return ChimeraUtility.GetAuthors (record2);
+                }
+            }
         }
 
         return null;
@@ -626,6 +670,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetClassification (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetClassification (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -642,6 +698,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetCountryCode (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetCountryCode (record2);
+                }
+            }
         }
 
         return null;
@@ -662,6 +730,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetExemplars (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetExemplars (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -678,6 +758,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetHolderField (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetHolderField (record2);
+                }
+            }
         }
 
         return null;
@@ -698,6 +790,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetImageField (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetImageField (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -714,6 +818,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetIndex (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetIndex (record2);
+                }
+            }
         }
 
         return null;
@@ -737,6 +853,18 @@ public sealed class IrbisLib
             }
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return new BookInfo (connection, record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -753,6 +881,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetIsbn (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetIsbn (record2);
+                }
+            }
         }
 
         return null;
@@ -773,6 +913,48 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetIssn (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetIssn (record2);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение массива ключевых слов из указанной записи.
+    /// </summary>
+    public static dynamic? BookKeywords
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return record.FMA (610);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return record2.FMA (610);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -789,6 +971,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetKnowledgeSection (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetKnowledgeSection (record2);
+                }
+            }
         }
 
         return null;
@@ -809,6 +1003,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetLanguageCode (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetLanguageCode (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -825,6 +1031,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetPrice (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetPrice (record2);
+                }
+            }
         }
 
         return null;
@@ -845,6 +1063,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetRentalCount (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetRentalCount (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -861,6 +1091,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetDocumentType (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetDocumentType (record2);
+                }
+            }
         }
 
         return null;
@@ -881,6 +1123,18 @@ public sealed class IrbisLib
             return RecordConfiguration.GetDefault().GetWorksheet (record);
         }
 
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetWorksheet (record2);
+                }
+            }
+        }
+
         return null;
     }
 
@@ -897,6 +1151,18 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return RecordConfiguration.GetDefault().GetYear (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetYear (record2);
+                }
+            }
         }
 
         return null;

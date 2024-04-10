@@ -105,6 +105,22 @@ public static class ChimeraUtility
     }
 
     /// <summary>
+    /// Получение ФИО первого автора.
+    /// </summary>
+    public static string? GetAuthor
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var fields = record.EnumerateField (700);
+        var result = GetAuthors (fields);
+
+        return result.FirstOrDefault();
+    }
+
+    /// <summary>
     /// Получение массива ФИО авторов.
     /// </summary>
     public static string[] GetAuthors
