@@ -1,0 +1,57 @@
+﻿//
+// Подсчет количества экземпляров, прошедших инвентаризацию в определенном фонде
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+place = "Ф505"
+xpression = "MHR=" + place
+mfns = search_all (xpression)
+println ("Found=", len(mfns))
+books = batch_read (mfns)
+
+total = 0
+barcoded = 0
+verified = 0
+
+foreach (book in books)
+{
+    foreach (one in get_exemplars (book))
+    {
+        status = one.Status
+        number = one.Number
+        if (number)
+        {
+            if (one.Place == place)
+            {
+                total = total + 1
+
+                if (have_subfield (one.Field, 'h'))
+                {
+                    barcoded = barcoded + 1
+                    if (have_subfield (one.Field, 's'))
+                    {
+                        verified = verified + 1
+                    }
+                }
+            }
+        }
+    }
+}
+
+println()
+println ("Total=", total)
+println ("Barcode=", barcoded)
+println ("Verified=", verified)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

@@ -450,6 +450,40 @@ public sealed class ExemplarInfo
     }
 
     /// <summary>
+    /// Подсчет количества свободных экземпляров.
+    /// </summary>
+    public static int GetFreeCount
+        (
+            IEnumerable<ExemplarInfo> exemplars
+        )
+    {
+        Sure.NotNull (exemplars);
+
+        var result = 0;
+
+        foreach (var exemplar in exemplars)
+        {
+            result += exemplar.GetFreeCount();
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подсчет количества свободных экземпляров.
+    /// </summary>
+    public static int GetFreeCount
+        (
+            Record record,
+            int tag = ExemplarTag
+        )
+    {
+        Sure.NotNull (record);
+
+        return GetFreeCount (ParseRecord (record, tag));
+    }
+
+    /// <summary>
     /// Вычисляет количество свободных экземпляров,
     /// описанных в данной структуре.
     /// </summary>
@@ -494,6 +528,40 @@ public sealed class ExemplarInfo
     }
 
     /// <summary>
+    /// Подсчет общего количества экземпляров.
+    /// </summary>
+    public static int GetTotalCount
+        (
+            IEnumerable<ExemplarInfo> exemplars
+        )
+    {
+        Sure.NotNull (exemplars);
+
+        var result = 0;
+
+        foreach (var exemplar in exemplars)
+        {
+            result += exemplar.GetTotalCount();
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Подсчет общего количества экземпляров.
+    /// </summary>
+    public static int GetTotalCount
+        (
+            Record record,
+            int tag = ExemplarTag
+        )
+    {
+        Sure.NotNull (record);
+
+        return GetTotalCount (ParseRecord (record, tag));
+    }
+
+    /// <summary>
     /// Вычисляет общее количество экземпляров,
     /// описанных в данной структуре.
     /// </summary>
@@ -529,6 +597,32 @@ public sealed class ExemplarInfo
 
         return 0;
     }
+
+    /// <summary>
+    /// Доступен ли экземпляр для системы книговыдачи?
+    /// </summary>
+    public bool IsAvailable() => Status.FirstChar() switch
+    {
+        '0' or '1' or '5' or '9' => true,
+        'U' or 'u' or 'C' or 'c' => GetFreeCount() > 0,
+        _ => false
+    };
+
+    /// <summary>
+    /// Свободен ли экземпляр (можно ли выдать читателю)?
+    /// </summary>
+    public bool IsFree() => Status.FirstChar() switch
+    {
+        '0' => true,
+        'U' or 'u' or 'C' or 'c' => GetFreeCount() > 0,
+        _ => false
+    };
+
+    /// <summary>
+    /// Экземпляр индивидуального учета?
+    /// </summary>
+    public bool IsIndividualAccounting() => Status.FirstChar()
+        is '0' or '1' or '2' or '3' or '4' or '5' or '6' or '9';
 
     /// <summary>
     /// Parses the specified field.
