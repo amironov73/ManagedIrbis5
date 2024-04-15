@@ -28,6 +28,7 @@
 
     <!-- Централизованное управление пакетами -->
     <ItemGroup>
+        <PackageReference Include="HtmlAgilityPack" />
         <PackageReference Include="linq2db" />
         <PackageReference Include="MaxMind.GeoIP2" />
         <PackageReference Include="Microsoft.AspNetCore.Razor.Language" />
@@ -49,6 +50,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\AM.Scripting\AM.Scripting.csproj" />
     </ItemGroup>
 
 

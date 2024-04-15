@@ -18,6 +18,7 @@ using System.Text;
 
 using AM;
 using AM.Scripting.Barsik;
+using AM.Web.Scripting;
 
 using Istu.OldModel;
 
@@ -52,6 +53,7 @@ internal static class Program
                     interpreter.WithStdLib();
                     interpreter.Context.AttachModule (new IrbisLib());
                     interpreter.Context.AttachModule (new IstuLib());
+                    interpreter.Context.AttachModule (new WebLib());
                 },
                 static (_, exception) =>
                 {

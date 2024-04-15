@@ -28,6 +28,8 @@ using AM.Text;
 
 using ManagedIrbis.Mapping;
 
+using VerificationException = System.Security.VerificationException;
+
 #endregion
 
 #nullable enable
@@ -514,6 +516,11 @@ public sealed class ExemplarInfo
                 var free = total - nonFree;
                 return free;
 
+            // электронный экземпляр
+            case 'E':
+            case 'e':
+                return 1;
+
             // прочие статусы не считаем
             // R - требуется размножение (ещё не отработал AUTOIN)
             // 8 - поступил, но не дошел до места хранения
@@ -585,6 +592,11 @@ public sealed class ExemplarInfo
                 var count = Amount.SafeToInt32();
                 return count;
 
+            // электронный экземпляр
+            case 'E':
+            case 'e':
+                return 1;
+
             // прочие статусы не считаем
             // R - требуется размножение (ещё не отработал AUTOIN)
             // 8 - поступил, но не дошел до места хранения
@@ -604,9 +616,15 @@ public sealed class ExemplarInfo
     public bool IsAvailable() => Status.FirstChar() switch
     {
         '0' or '1' or '5' or '9' => true,
+        'E' or 'e' => true, // электронный экземпляр
         'U' or 'u' or 'C' or 'c' => GetFreeCount() > 0,
         _ => false
     };
+
+    /// <summary>
+    /// Электронный экземпляр?
+    /// </summary>
+    public bool IsElectronic() => Status.FirstChar() is 'E' or 'e';
 
     /// <summary>
     /// Свободен ли экземпляр (можно ли выдать читателю)?
@@ -614,6 +632,7 @@ public sealed class ExemplarInfo
     public bool IsFree() => Status.FirstChar() switch
     {
         '0' => true,
+        'E' or 'e' => true, // электронный экземпляр
         'U' or 'u' or 'C' or 'c' => GetFreeCount() > 0,
         _ => false
     };
@@ -625,7 +644,7 @@ public sealed class ExemplarInfo
         is '0' or '1' or '2' or '3' or '4' or '5' or '6' or '9';
 
     /// <summary>
-    /// Parses the specified field.
+    /// Разбор указанного поля библиографической записи.
     /// </summary>
     public static ExemplarInfo ParseField
         (
@@ -792,6 +811,44 @@ public sealed class ExemplarInfo
         }
 
         return result.Count == 0 ? null : result.Values.ToArray();
+    }
+
+    /// <summary>
+    /// Проверка, что статус задан верно (т. е. подлежит интерпретации).
+    /// </summary>
+    public bool VerifyStatus()
+    {
+        var status = Status;
+        var result = false;
+        if (!string.IsNullOrEmpty (status)
+            && status.Length == 1)
+        {
+            var code = status[0];
+            result = code is '0' or '1' or '2' or '3' or '4'
+                or '5' or '6' or '8' or '9' or 'u' or 'U'
+                or 'c' or 'C' or 'p' or 'P' or 'e' or 'r' or 'R';
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Проверка, что статус задан верно (т. е. подлежит интерпретации).
+    /// </summary>
+    public bool VerifyStatus
+        (
+            bool throwOnError
+        )
+    {
+        var result = VerifyStatus();
+
+        if (!result && throwOnError)
+        {
+            var message = $"Bad status '{Status.ToVisibleString()}' for exemplar '{Number}'";
+            throw new VerificationException (message);
+        }
+
+        return result;
     }
 
     #endregion
