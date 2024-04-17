@@ -18,6 +18,8 @@
 using System;
 using System.Net.Http;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -27,6 +29,7 @@ namespace AM.Web;
 /// <summary>
 /// Полезные методы для работы с Webю
 /// </summary>
+[PublicAPI]
 public static class WebUtility
 {
     #region Public methods
@@ -51,6 +54,35 @@ public static class WebUtility
         var response = httpClient.Send (request);
 
         return (int) response.StatusCode;
+    }
+
+    /// <summary>
+    /// Соединение пути к файлу относительно заданного URI.
+    /// </summary>
+    /// <param name="baseUri">Базовый URI.</param>
+    /// <param name="relativePath">Относительный путь к файлу.</param>
+    /// <returns>Путь к файлу.</returns>
+    public static Uri MergeUri
+        (
+            Uri baseUri,
+            string relativePath
+        )
+    {
+        Sure.NotNull (baseUri);
+        Sure.NotNullNorEmpty (relativePath);
+
+        // если относительный путь начинается с "http://" или "https://"
+        // значит, это не относительный, а полный путь
+        if (relativePath.StartsWith ("http://", StringComparison.OrdinalIgnoreCase)
+            || relativePath.StartsWith ("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            // просто возвращаем полный путь
+            return new Uri (relativePath);
+        }
+
+        var uri = new Uri (baseUri, relativePath);
+
+        return uri;
     }
 
     /*

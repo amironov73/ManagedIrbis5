@@ -7,7 +7,6 @@
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedParameter.Local
 
 /* PathUtility.cs -- работа с путями к файлам
  * Ars Magna project, http://arsmagna.ru
@@ -20,6 +19,8 @@ using System.IO;
 
 using AM.Text;
 
+using JetBrains.Annotations;
+
 #endregion
 
 #nullable enable
@@ -29,6 +30,7 @@ namespace AM.IO;
 /// <summary>
 /// Работа с путями к файлам.
 /// </summary>
+[PublicAPI]
 public static class PathUtility
 {
     #region Constants
@@ -37,6 +39,18 @@ public static class PathUtility
     /// Максимальная длина имени файла.
     /// </summary>
     public const int MaxPath = 256;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Символы, которые могут использоваться в имени файла (по нашей версии).
+    /// </summary>
+    public static string GoodCharacters { get; set; }
+        = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+          + "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя"
+          + "0123456789_ []()!$-";
 
     #endregion
 
@@ -92,6 +106,48 @@ public static class PathUtility
             );
 
         return result;
+    }
+
+    /// <summary>
+    /// Убеждаемся, что имя файла корректно с точки зрения файловой системы.
+    /// </summary>
+    /// <param name="name">Проверяемое имя файла.</param>
+    /// <returns>Исправленное, если надо, имя файла.</returns>
+    public static string EnsureGoodName
+        (
+            string name
+        )
+    {
+        Sure.NotNullNorEmpty (name);
+
+        var goodChars = GoodCharacters;
+        var ok = true;
+        foreach (var c in name)
+        {
+            if (goodChars.IndexOf (c, StringComparison.Ordinal) < 0)
+            {
+                ok = false;
+                break;
+            }
+        }
+
+        if (ok)
+        {
+            return name;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        foreach (var c in name)
+        {
+            builder.Append
+                (
+                    goodChars.IndexOf (c, StringComparison.Ordinal) < 0
+                        ? '_'
+                        : c
+                );
+        }
+
+        return builder.ReturnShared();
     }
 
     /// <summary>

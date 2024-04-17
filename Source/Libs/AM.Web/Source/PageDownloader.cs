@@ -18,6 +18,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
+using AM.IO;
+
 using JetBrains.Annotations;
 
 using HtmlAgilityPack;
@@ -98,12 +100,28 @@ public sealed class PageDownloader
 
     #region Private members
 
+    private string GetLocalFileName
+        (
+            Uri uri
+        )
+    {
+        var fileName = Path.GetFileName (uri.AbsolutePath);
+        fileName = string.IsNullOrEmpty (fileName)
+            // либо сочиняем уникальное имя файла
+            ? Guid.NewGuid().ToString ("N")
+            // либо удаляем символы в имени файла, которые нам не нравятся
+            : PathUtility.EnsureGoodName (fileName);
+
+        return fileName;
+    }
+
     /// <summary>
     /// Скачивание изображений.
     /// </summary>
     private async Task DownloadImagesAsync
         (
-            HtmlNode rootNode
+            HtmlNode rootNode,
+            Uri baseUri
         )
     {
         const string imagePath = "images";
@@ -123,8 +141,9 @@ public sealed class PageDownloader
                 continue;
             }
 
-            var bytes = await Client.GetByteArrayAsync (src);
-            var fileName = Path.GetFileName (src); // TODO: проверить, что имя файла корректно
+            var uri = WebUtility.MergeUri (baseUri, src);
+            var bytes = await Client.GetByteArrayAsync (uri);
+            var fileName = GetLocalFileName (uri);
             var filePath = Path.Combine (imagePath, fileName);
             image.SetAttributeValue ("src", filePath);
             await File.WriteAllBytesAsync (filePath, bytes);
@@ -136,7 +155,8 @@ public sealed class PageDownloader
     /// </summary>
     private async Task DownloadScriptsAsync
         (
-            HtmlNode rootNode
+            HtmlNode rootNode,
+            Uri baseUri
         )
     {
         const string scriptPath = "scripts";
@@ -158,8 +178,9 @@ public sealed class PageDownloader
                 continue;
             }
 
-            var bytes = await Client.GetByteArrayAsync (src);
-            var fileName = Path.GetFileName (src); // TODO: проверить, что имя файла корректно
+            var uri = WebUtility.MergeUri (baseUri, src);
+            var bytes = await Client.GetByteArrayAsync (uri);
+            var fileName = GetLocalFileName (uri);
             var filePath = Path.Combine (scriptPath, fileName);
             script.SetAttributeValue ("src", filePath);
             await File.WriteAllBytesAsync (filePath, bytes);
@@ -171,7 +192,8 @@ public sealed class PageDownloader
     /// </summary>
     private async Task DownloadStylesAsync
         (
-            HtmlNode rootNode
+            HtmlNode rootNode,
+            Uri baseUri
         )
     {
         const string stylesPath = "styles";
@@ -193,8 +215,9 @@ public sealed class PageDownloader
                 continue;
             }
 
-            var bytes = await Client.GetByteArrayAsync (href);
-            var fileName = Path.GetFileName (href); // TODO: проверить, что имя файла корректно
+            var uri = WebUtility.MergeUri (baseUri, href);
+            var bytes = await Client.GetByteArrayAsync (uri);
+            var fileName = GetLocalFileName (uri);
             var filePath = Path.Combine (stylesPath, fileName);
             style.SetAttributeValue ("href", filePath);
             await File.WriteAllBytesAsync (filePath, bytes);
@@ -266,13 +289,13 @@ public sealed class PageDownloader
         var rootNode = document.DocumentNode;
 
         // обрабатываем изображения
-        await DownloadImagesAsync (rootNode);
+        await DownloadImagesAsync (rootNode, webUrl);
 
         // обрабатываем стили
-        await DownloadStylesAsync (rootNode);
+        await DownloadStylesAsync (rootNode, webUrl);
 
         // обрабатываем скрипты
-        await DownloadScriptsAsync (rootNode);
+        await DownloadScriptsAsync (rootNode, webUrl);
 
         // сохраняем документ с учетом всех изменений
         document.Save (fileName);
