@@ -165,7 +165,6 @@ public sealed class SubField
 
     // ReSharper disable InconsistentNaming
     public static bool TrimValue;
-
     // ReSharper restore InconsistentNaming
 
     #endregion

@@ -12,6 +12,7 @@
 
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using JetBrains.Annotations;
@@ -31,7 +32,7 @@ public static class TextUtility
     /// <summary>
     /// Ограничители, после которых нельзя ставить точку.
     /// </summary>
-    private static readonly char[] _delimiters = { '!', '?', '.', ',' };
+    private static readonly char[] _delimiters = ['!', '?', '.', ','];
 
     #endregion
 
@@ -59,6 +60,32 @@ public static class TextUtility
         }
 
         return builder;
+    }
+
+    /// <summary>
+    /// Проверка, содержит ли строка специальные символы.
+    /// </summary>
+    /// <param name="text">Текст для проверки.</param>
+    /// <returns>Возвращает true, если текст содержит специальные символы.</returns>
+    public static bool ContainsSpecialChars
+        (
+            this string? text
+        )
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return false;
+        }
+
+        foreach (var c in text)
+        {
+            if (c.IsSpecialChar())
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -112,6 +139,14 @@ public static class TextUtility
 
         return builder.Length == 0 ? '\0' : builder[^1];
     }
+
+    /// <summary>
+    /// Является ли данный символ специальным (проще говоря, непечатным).
+    /// </summary>
+    /// <param name="c">Символ для проверки.</param>
+    /// <returns>Возвращает true, если символ является специальным.</returns>
+    [MethodImpl (MethodImplOptions.AggressiveInlining)]
+    public static bool IsSpecialChar (this char c) => c < ' ';
 
     /// <summary>
     /// Получение последнего непробельного символа.
