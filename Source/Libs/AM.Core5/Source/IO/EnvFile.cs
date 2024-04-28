@@ -11,6 +11,7 @@
 #region Using directives
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -95,13 +96,18 @@ namespace AM.IO;
 /// </summary>
 [PublicAPI]
 public sealed partial class EnvFile
+    : IDictionary<string, string?>
 {
     #region Properties
 
     /// <summary>
     /// Доступ к строкам по именам.
     /// </summary>
-    public string? this [string key] => _dictionary.GetValueOrDefault (key);
+    public string? this [string key]
+    {
+        get => _dictionary.GetValueOrDefault (key);
+        set => _dictionary[key] = value!;
+    }
 
     #endregion
 
@@ -257,6 +263,59 @@ public sealed partial class EnvFile
             ? new EnvFile ()
             : new EnvFile (path);
     }
+
+    #endregion
+
+    #region IDictionary members
+
+    IEnumerator IEnumerable.GetEnumerator() =>
+        _dictionary.GetEnumerator();
+
+    IEnumerator<KeyValuePair<string, string?>> IEnumerable<KeyValuePair<string, string?>>.GetEnumerator() =>
+        _dictionary.GetEnumerator();
+
+    /// <inheritdoc cref="ICollection{T}.Clear"/>
+    public void Clear() => _dictionary.Clear();
+
+    void ICollection<KeyValuePair<string, string?>>.Add (KeyValuePair<string, string?> item) =>
+        ((ICollection<KeyValuePair<string, string?>>) _dictionary).Add (item);
+
+    bool ICollection<KeyValuePair<string, string?>>.Contains (KeyValuePair<string, string?> item) =>
+        ((ICollection<KeyValuePair<string, string?>>) _dictionary).Contains (item);
+
+    void ICollection<KeyValuePair<string, string?>>.CopyTo (KeyValuePair<string, string?>[] array, int arrayIndex) =>
+        ((ICollection<KeyValuePair<string, string?>>) _dictionary).CopyTo (array, arrayIndex);
+
+    bool ICollection<KeyValuePair<string, string?>>.Remove (KeyValuePair<string, string?> item) =>
+        ((ICollection<KeyValuePair<string, string?>>) _dictionary).Remove (item);
+
+
+    int ICollection<KeyValuePair<string, string?>>.Count =>
+        _dictionary.Count;
+
+    bool ICollection<KeyValuePair<string, string?>>.IsReadOnly =>
+        ((ICollection<KeyValuePair<string, string?>>) _dictionary).IsReadOnly;
+
+    void IDictionary<string, string?>.Add (string key, string? value) =>
+        _dictionary.Add (key, value!);
+
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.ContainsKey"/>
+    public bool ContainsKey (string key) =>
+        _dictionary.ContainsKey (key);
+
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.Remove(TKey)"/>
+    public bool Remove (string key) =>
+        _dictionary.Remove (key);
+
+    /// <inheritdoc cref="IDictionary{TKey,TValue}.TryGetValue"/>
+    public bool TryGetValue (string key, out string? value) =>
+        _dictionary.TryGetValue (key, out value);
+
+    ICollection<string> IDictionary<string, string?>.Keys =>
+        _dictionary.Keys;
+
+    ICollection<string?> IDictionary<string, string?>.Values =>
+        _dictionary.Values!;
 
     #endregion
 }
