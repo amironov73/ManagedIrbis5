@@ -2,10 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable UnusedMember.Global
 
 /* Unix.cs -- возня вокруг регистрозависимости имен файлов в системе UNIX
  * Ars Magna project, http://arsmagna.ru
@@ -20,9 +18,9 @@ using System.Text;
 
 using AM.Text;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace AM;
 
@@ -30,6 +28,7 @@ namespace AM;
 /// Возня вокру регистрозависимости имен файлов
 /// в системе UNIX.
 /// </summary>
+[PublicAPI]
 public static class Unix
 {
     #region Private members
@@ -131,6 +130,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         File.AppendAllLines (found, lines, encoding);
@@ -147,13 +148,15 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         File.AppendAllText (found, text, encoding);
     }
 
     /// <summary>
-    /// Создает <see cref="StreamWriter"/> для добавления текста.
+    /// Создание <see cref="StreamWriter"/> для добавления текста.
     /// </summary>
     public static StreamWriter AppendText
         (
@@ -162,9 +165,28 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
-        var found = FindDirectoryOrThrow (path);
+        Sure.NotNullNorEmpty (path);
+
+        var found = FindFileOrThrow (path);
 
         return new StreamWriter (found, true, encoding);
+    }
+
+    /// <summary>
+    /// Создание <see cref="StreamWriter"/> с нуля.
+    /// </summary>
+    public static StreamWriter CreateText
+        (
+            string path,
+            Encoding? encoding = default
+        )
+    {
+        encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
+        var found = FindFile (path) ?? path;
+
+        return new StreamWriter (found, false, encoding);
     }
 
     /// <summary>
@@ -202,6 +224,8 @@ public static class Unix
             string directoryName
         )
     {
+        Sure.NotNullNorEmpty (directoryName);
+
         if (Directory.Exists (directoryName))
         {
             return directoryName;
@@ -250,6 +274,8 @@ public static class Unix
             string directoryName
         )
     {
+        Sure.NotNullNorEmpty (directoryName);
+
         var result = FindDirectory (directoryName);
         if (string.IsNullOrEmpty (result))
         {
@@ -267,6 +293,8 @@ public static class Unix
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         if (File.Exists (fileName))
         {
             return fileName;
@@ -310,6 +338,8 @@ public static class Unix
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         var result = FindFile (fileName);
         if (string.IsNullOrEmpty (result))
         {
@@ -328,6 +358,8 @@ public static class Unix
             FileMode mode
         )
     {
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.Open (found, mode);
@@ -343,6 +375,8 @@ public static class Unix
             FileAccess access
         )
     {
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.Open (found, mode, access);
@@ -359,6 +393,8 @@ public static class Unix
             FileShare share
         )
     {
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.Open (found, mode, access, share);
@@ -372,6 +408,8 @@ public static class Unix
             string fileName
         )
     {
+        Sure.NotNullNorEmpty(fileName);
+
         var found = FindFileOrThrow (fileName);
 
         return File.OpenRead (found);
@@ -385,6 +423,8 @@ public static class Unix
             string path
         )
     {
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.OpenText (found);
@@ -398,6 +438,8 @@ public static class Unix
             string fileName
         )
     {
+        Sure.NotNullNorEmpty (fileName);
+
         var found = FindFileOrThrow (fileName);
 
         return File.OpenWrite (found);
@@ -411,6 +453,8 @@ public static class Unix
             string path
         )
     {
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.ReadAllBytes (found);
@@ -426,6 +470,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.ReadAllLines (found, encoding);
@@ -441,6 +487,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         return File.ReadAllText (found, encoding);
@@ -456,6 +504,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindDirectoryOrThrow (path);
 
         return File.ReadLines (found, encoding);
@@ -470,6 +520,9 @@ public static class Unix
             byte[] bytes
         )
     {
+        Sure.NotNullNorEmpty (path);
+        Sure.NotNull (bytes);
+
         var found = FindFileOrThrow (path);
 
         File.WriteAllBytes (found, bytes);
@@ -486,6 +539,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         File.WriteAllLines (found, lines, encoding);
@@ -502,6 +557,8 @@ public static class Unix
         )
     {
         encoding ??= Encoding.UTF8;
+        Sure.NotNullNorEmpty (path);
+
         var found = FindFileOrThrow (path);
 
         File.WriteAllText (found, text, encoding);

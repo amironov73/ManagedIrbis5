@@ -118,7 +118,9 @@ public sealed partial class EnvFile
     /// </summary>
     private EnvFile()
     {
-        _dictionary = new CaseInsensitiveDictionary<string>();
+        _dictionary = OperatingSystem.IsWindows()
+            ? new CaseInsensitiveDictionary<string>()
+            : new Dictionary<string, string>();
     }
 
     /// <summary>
@@ -201,7 +203,7 @@ public sealed partial class EnvFile
     {
         Sure.FileExists (fileName);
 
-        using var stream = File.OpenText (fileName);
+        using var stream = Unix.OpenText (fileName);
         while (stream.ReadLine() is { } line)
         {
             ExtractOneVariable (line);
@@ -262,6 +264,37 @@ public sealed partial class EnvFile
         return File.Exists (path)
             ? new EnvFile ()
             : new EnvFile (path);
+    }
+
+    /// <summary>
+    /// Сохранение переменных окружения в файл с указанным именем.
+    /// </summary>
+    /// <param name="fileName">Имя файла.</param>
+    public void Save
+        (
+            string fileName
+        )
+    {
+        Sure.NotNullNorEmpty (fileName);
+
+        using var stream = Unix.CreateText (fileName);
+        WriteTo (stream);
+    }
+
+    /// <summary>
+    /// Вывод переменных окружения в текстовый поток.
+    /// </summary>
+    public void WriteTo
+        (
+            TextWriter writer
+        )
+    {
+        Sure.NotNull (writer);
+
+        foreach (var pair in _dictionary)
+        {
+            writer.WriteLine ($"{pair.Key}={pair.Value}");
+        }
     }
 
     #endregion
