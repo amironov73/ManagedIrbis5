@@ -3,3 +3,11 @@
     min-width: 100px;
     max-width: 500px;
 }
+
+.beautiful {
+    color: blue;
+}
+
+.highlighting {
+    background-color: yellow;
+}

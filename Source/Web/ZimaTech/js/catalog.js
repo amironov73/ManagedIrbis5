@@ -70,9 +70,18 @@ function buildExpression() {
 
     const database = 'ZIMA'
     const format = '@brief'
-    const result = baseURL + '?op=search_format&db=' +  database + '&expr=' + encodeURIComponent (expression) + '&format=' + format
+    const result = baseURL + '?op=search_format&db=' + database + '&expr=' + encodeURIComponent (expression) + '&format=' + format
     console.log (result)
 
+    return result
+}
+
+function buildUrl (expression) {
+    const database = 'ZIMA'
+    const format = '@brief'
+    const result = baseURL + '?op=search_format&db=' + database + '&expr=' + encodeURIComponent(expression)
+        + '&format=' + format
+    console.log(result)
     return result
 }
 
@@ -91,6 +100,23 @@ function handleSuccess (data) {
         item.innerHTML = description
         resultContainer.appendChild (item)
     }
+}
+
+function performSearch(expression) {
+    hideError()
+    resultContainer.innerHTML = ''
+    const url = buildUrl (expression)
+    showBusy()
+    axios.get (url)
+        .then (function (response) {
+            handleSuccess (response.data)
+            hideBusy ()
+        })
+        .catch (function (error) {
+            console.log(error)
+            hideBusy ()
+            showError ('Сервер не ответил либо прислал невалидный ответ')
+        })
 }
 
 function handleSubmit() {

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="description" content="Архитектура и строительство в условиях континентального климата">
 
-    <title>Зимние технологии</title>
+    <title>Каталог проекта &laquo;Зимний город&raquo;</title>
 
     <link rel='icon' type='image/png' href='img/favicon.ico'>
     <link rel="stylesheet" href="css/bootstrap.min.css">
@@ -25,7 +25,7 @@
 <div class="container">
 
     <div class="row">
-        <h2 class="text-center my-5">Каталог проекта &laquo;Зимние технологии&raquo;</h2>
+        <h2 class="text-center my-5">Каталог проекта &laquo;Зимний город&raquo;</h2>
 
         <form class="col-lg-6 offset-lg-3 mt-3" autocomplete="off" onsubmit="return handleSubmit()">
 
@@ -124,6 +124,15 @@
     $(function () {
         $('#navBar').load('_nav.html')
         $('#footer').load('_footer.html')
+
+        const queryString = window.location.search
+        if (queryString) {
+            const urlParams = new URLSearchParams(queryString)
+            const expression = urlParams.get('expression')
+            if (expression) {
+                performSearch(expression)
+            }
+        }
     })
 
 </script>
