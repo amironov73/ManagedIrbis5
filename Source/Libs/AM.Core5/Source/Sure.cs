@@ -130,6 +130,25 @@ public static class Sure
     }
 
     /// <summary>
+    /// Проверка, равно ли переданное значение <paramref name="actualValue"/>
+    /// ожидаемому значению <paramref name="expectedValue"/>.
+    /// </summary>
+    public static void Equals<TValue>
+        (
+            TValue actualValue,
+            TValue expectedValue,
+            [CallerArgumentExpression (nameof (actualValue))]
+            string? message = null
+        )
+        where TValue: IEquatable<TValue>
+    {
+        if (!actualValue.Equals (expectedValue))
+        {
+            throw new ArgumentException ($"{message}: expected {expectedValue}, got {actualValue}");
+        }
+    }
+
+    /// <summary>
     /// Проверка существования файла с указанным именем.
     /// </summary>
     [DebuggerHidden]
