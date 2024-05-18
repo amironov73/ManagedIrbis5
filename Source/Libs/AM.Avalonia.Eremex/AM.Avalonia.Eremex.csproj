@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <RootNamespace>AM.Avalonia.Eremex</RootNamespace>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Description>Eremex.Avalonia.Controls library support for Ars Magna</Description>
+        <Title>Avalonia.Avalonia.Controls library support for Ars Magna</Title>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\AM.Core5\AM.Core5.csproj" />
+        <ProjectReference Include="..\AM.Avalonia\AM.Avalonia.csproj" />
+    </ItemGroup>
+
+    <!-- Централизованное управление пакетами -->
+    <ItemGroup>
+        <PackageReference Include="Avalonia" />
+        <PackageReference Include="Avalonia.Desktop" />
+        <PackageReference Include="Avalonia.Diagnostics" />
+        <PackageReference Include="Avalonia.ReactiveUI" />
+        <PackageReference Include="Avalonia.Skia" />
+        <PackageReference Include="Eremex.Avalonia.Charts" />
+        <PackageReference Include="Eremex.Avalonia.Controls" />
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+        <PackageReference Include="ReactiveUI" />
+        <PackageReference Include="ReactiveUI.Fody" />
+        <PackageReference Include="SkiaSharp" />
+        <PackageReference Include="System.Linq.Async" />
+    </ItemGroup>
+
+</Project>

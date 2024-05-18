@@ -307,6 +307,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OsmiChanger", "Apps\OsmiCha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Brains", "Libs\AM.Brains\AM.Brains.csproj", "{DC5589B9-D23B-4555-BFCF-83A56E29DCF8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AM.Avalonia.Eremex", "Libs\AM.Avalonia.Eremex\AM.Avalonia.Eremex.csproj", "{8648E85E-2781-4DFE-A8A8-C07807DDE68C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2057,6 +2059,18 @@ Global
 		{DC5589B9-D23B-4555-BFCF-83A56E29DCF8}.Release|x64.Build.0 = Release|Any CPU
 		{DC5589B9-D23B-4555-BFCF-83A56E29DCF8}.Release|x86.ActiveCfg = Release|Any CPU
 		{DC5589B9-D23B-4555-BFCF-83A56E29DCF8}.Release|x86.Build.0 = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|x64.Build.0 = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Debug|x86.Build.0 = Debug|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|x64.ActiveCfg = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|x64.Build.0 = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|x86.ActiveCfg = Release|Any CPU
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2207,6 +2221,7 @@ Global
 		{848421DB-9DC3-4E4E-A11E-36F63A9C1AEB} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{A608EE3C-AAC0-415A-A188-7CE3F4550BE4} = {1E5940AA-0540-4947-8216-45E381E76C72}
 		{DC5589B9-D23B-4555-BFCF-83A56E29DCF8} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
+		{8648E85E-2781-4DFE-A8A8-C07807DDE68C} = {F7FE7B9E-2592-439F-A9CF-DA7D8D3DBC91}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
