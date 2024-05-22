@@ -28,6 +28,7 @@
         <PackageReference Include="Avalonia.Skia" />
         <PackageReference Include="Eremex.Avalonia.Charts" />
         <PackageReference Include="Eremex.Avalonia.Controls" />
+        <PackageReference Include="Eremex.Avalonia.Icons" />
         <PackageReference Include="Microsoft.Extensions.Logging" />
         <PackageReference Include="ReactiveUI" />
         <PackageReference Include="ReactiveUI.Fody" />
