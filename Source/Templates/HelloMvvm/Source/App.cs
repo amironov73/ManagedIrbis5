@@ -3,11 +3,6 @@
 
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
-// ReSharper disable CoVariantArrayConversion
-// ReSharper disable IdentifierTypo
-// ReSharper disable InconsistentNaming
-// ReSharper disable LocalizableElement
-// ReSharper disable StringLiteralTypo
 
 /* App.cs -- класс приложения
  * Ars Magna project, http://arsmagna.ru
@@ -21,7 +16,9 @@ using Avalonia.ThemeManager;
 
 #endregion
 
-namespace AvaloniaApp;
+#nullable enable
+
+namespace HelloMvvm;
 
 /// <summary>
 /// Класс приложения.
@@ -29,13 +26,13 @@ namespace AvaloniaApp;
 public sealed class App
     : Application
 {
-    public static IThemeManager? ThemeManager;
-    
+    private static IThemeManager? _themeManager;
+
     /// <inheritdoc cref="Application.Initialize"/>
     public override void Initialize()
     {
-        ThemeManager = new FluentThemeManager();
-        ThemeManager.Initialize (this);
+        _themeManager = new FluentThemeManager();
+        _themeManager.Initialize (this);
     }
 
     /// <inheritdoc cref="Application.OnFrameworkInitializationCompleted"/>

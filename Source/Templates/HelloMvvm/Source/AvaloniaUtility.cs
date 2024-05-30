@@ -44,7 +44,7 @@ using SkiaSharp;
 
 #endregion
 
-namespace AvaloniaApp;
+namespace HelloMvvm;
 
 /// <summary>
 /// Полезные расширения для Avalonia UI.

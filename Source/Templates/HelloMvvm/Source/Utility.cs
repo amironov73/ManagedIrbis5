@@ -2,14 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 
 // ReSharper disable CheckNamespace
-// ReSharper disable ClassNeverInstantiated.Global
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable InconsistentNaming
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Local
 
 /* Utility.cs -- сборник простых вспомогательных методов
  * Ars Magna project, http://arsmagna.ru
@@ -39,7 +34,7 @@ using System.Threading.Tasks;
 
 #endregion
 
-namespace AvaloniaApp;
+namespace HelloMvvm;
 
 /// <summary>
 /// Сборник простых вспомогательных методов.
@@ -5776,7 +5771,7 @@ public static class Utility
                     {
                         Debug.WriteLine
                             (
-                                nameof (Utility) + "::" + nameof (Unwrap) 
+                                nameof (Utility) + "::" + nameof (Unwrap)
                                 + ": " + ex.Message
                             );
 
@@ -5978,7 +5973,7 @@ public static class Utility
         )
         where T : struct
     {
-        MemoryMarshal.Write (span[offset..], ref value);
+        MemoryMarshal.Write (span[offset..], in value);
     }
 
     /// <summary>

@@ -31,7 +31,9 @@ using NLog.Extensions.Logging;
 
 #endregion
 
-namespace AvaloniaApp;
+#nullable enable
+
+namespace HelloMvvm;
 
 internal sealed class Program
 {

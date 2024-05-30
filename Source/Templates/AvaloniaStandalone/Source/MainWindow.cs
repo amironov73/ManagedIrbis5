@@ -28,8 +28,6 @@ using ReactiveUI.Fody.Helpers;
 
 #endregion
 
-#nullable enable
-
 namespace AvaloniaApp;
 
 /// <summary>
