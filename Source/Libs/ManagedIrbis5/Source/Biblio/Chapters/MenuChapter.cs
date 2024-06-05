@@ -497,7 +497,14 @@ public class MenuChapter
                     {
                         var key = subChapter.Key
                             .ThrowIfNull ("subChapter.Key");
-                        dictionary.Add (key, subChapter);
+                        if (dictionary.ContainsKey (key))
+                        {
+                            log.Write ("Duplicate key '{0}'", key);
+                        }
+                        else
+                        {
+                            dictionary.Add (key, subChapter);
+                        }                    
                     }
                 };
                 Walk (action);
