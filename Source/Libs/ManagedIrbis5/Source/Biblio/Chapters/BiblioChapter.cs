@@ -57,6 +57,24 @@ public /* not sealed */ class BiblioChapter
     public ReportAttributes Attributes { get; private set; }
 
     /// <summary>
+    /// Украшать ли записи?
+    /// </summary>
+    [JsonProperty ("beautifyRecords")]
+    public bool BeautifyRecords { get; set; }
+
+    /// <summary>
+    /// Исправлять ли даты?
+    /// </summary>
+    [JsonProperty ("fixDates")]
+    public bool FixDates { get; set; }
+
+    /// <summary>
+    /// Исправлять ли сортировку?
+    /// </summary>
+    [JsonProperty ("trimOrder")]
+    public bool TrimOrder { get; set; }
+
+    /// <summary>
     /// Дочерние главы (не элементы!).
     /// Дочерние главы неактивной главы не рендерятся.
     /// </summary>

@@ -446,7 +446,7 @@ public class SimpleChapter
             log.WriteLine (" done");
         }
 
-        Items.SortByOrder();
+        Items.SortByOrder (TrimOrder);
 
         log.WriteLine ("Items: {0}", Items.Count);
 

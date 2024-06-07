@@ -196,6 +196,11 @@ public class MenuChapter
             Record record
         )
     {
+        if (!BeautifyRecords)
+        {
+            return;
+        }
+
         // Украшаем запись согласно вкусам библиографов
 
         foreach (var field in record.Fields)
@@ -277,6 +282,11 @@ public class MenuChapter
             Record record
         )
     {
+        if (!FixDates)
+        {
+            return;
+        }
+
         //
         // Переделываем даты у газет, как нравится библиографам
         // из "№ 11 (5 мая)" в просто "5 мая".

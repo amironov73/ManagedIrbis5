@@ -163,12 +163,18 @@ public sealed class ItemCollection
     /// <summary>
     /// Sort items by <see cref="BiblioItem.Order"/> field.
     /// </summary>
-    public void SortByOrder()
+    public void SortByOrder
+        (
+            bool trimOrder
+        )
     {
         var list = this.ToList();
         foreach (var item in list)
         {
-            item.Order = _TrimOrder (item.Order);
+            if (trimOrder)
+            {
+                item.Order = _TrimOrder (item.Order);
+            }
         }
 
         list.Sort (_Comparison);

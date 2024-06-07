@@ -144,8 +144,8 @@ public class MenuSubChapter
         }
 
         var result = text
-            .Replace (". - ", ". – ")
-            .Replace ("№", "\\'B9");
+            .Replace (". - ", ". – ");
+            // .Replace ("№", "\\'B9");
 
         return result;
     }
@@ -257,7 +257,7 @@ public class MenuSubChapter
 
                 log.WriteLine (" done");
 
-                Items.SortByOrder();
+                Items.SortByOrder (TrimOrder);
 
                 log.WriteLine ("Items: {0}", Items.Count);
             }
