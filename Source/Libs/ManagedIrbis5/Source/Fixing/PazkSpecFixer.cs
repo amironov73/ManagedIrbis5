@@ -5,9 +5,6 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedParameter.Global
-// ReSharper disable UnusedType.Global
 
 /* PazkSpecFixer.cs -- преобразует запись из рабочего листа PAZK в SPEC
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +14,8 @@
 
 using AM;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Records;
 
 using Microsoft.Extensions.Hosting;
@@ -24,14 +23,13 @@ using Microsoft.Extensions.Logging;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis.Fixing;
 
 /// <summary>
 /// Преобразует библиографическую запись из рабочего листа PAZK
 /// в SPEC, если это необходимо.
 /// </summary>
+[PublicAPI]
 public sealed class PazkSpecFixer
 {
     #region Properties

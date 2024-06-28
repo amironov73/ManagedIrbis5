@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable UnusedMember.Global
-// ReSharper disable UnusedType.Global
 
 /* ExemplarStatus.cs -- коды для статуса экземпляра книги/журнала/газеты
  * Ars Magna project, http://arsmagna.ru
@@ -18,15 +16,16 @@ using System.ComponentModel;
 
 using AM.Reflection;
 
-#endregion
+using JetBrains.Annotations;
 
-#nullable enable
+#endregion
 
 namespace ManagedIrbis.Fields;
 
 /// <summary>
 /// Коды для статуса экземпляра книги/журнала/газеты.
 /// </summary>
+[PublicAPI]
 public static class ExemplarStatus
 {
     #region Constants

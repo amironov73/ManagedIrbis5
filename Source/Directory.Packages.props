@@ -59,8 +59,8 @@
     <PackageVersion Include="DocX" Version="3.0.23523.1209" />
     <PackageVersion Include="DynamicData" Version="7.12.1" />
     <PackageVersion Include="DynamicData.ReactiveUI" Version="6.11.0.2613" />
-    <PackageVersion Include="Eremex.Avalonia.Controls" Version="1.0.28" />
-    <PackageVersion Include="Eremex.Avalonia.Themes.DeltaDesign" Version="1.0.28" />
+    <PackageVersion Include="Eremex.Avalonia.Controls" Version="1.0.31" />
+    <PackageVersion Include="Eremex.Avalonia.Themes.DeltaDesign" Version="1.0.31" />
     <PackageVersion Include="Faker.Net" Version="2.0.154" />
     <PackageVersion Include="FastExcel" Version="3.0.13" />
     <PackageVersion Include="Google.Protobuf" Version="3.24.2" />

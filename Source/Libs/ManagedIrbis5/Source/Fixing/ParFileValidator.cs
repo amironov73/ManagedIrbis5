@@ -21,8 +21,6 @@ using ManagedIrbis.Menus;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis.Fixing;
 
 /// <summary>

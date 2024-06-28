@@ -26,19 +26,20 @@ using AM.IO;
 using AM.Runtime;
 using AM.Text;
 
+using JetBrains.Annotations;
+
 using ManagedIrbis.Mapping;
 
 using VerificationException = System.Security.VerificationException;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis.Fields;
 
 /// <summary>
 /// Информация об экземпляре (поле 910).
 /// </summary>
+[PublicAPI]
 [XmlRoot ("exemplar")]
 public sealed class ExemplarInfo
     : IHandmadeSerializable,
@@ -814,14 +815,20 @@ public sealed class ExemplarInfo
     }
 
     /// <summary>
-    /// Проверка, что статус задан верно (т. е. подлежит интерпретации).
+    /// Проверка, что статус задан верно  (т. е. подлежит интерпретации).
     /// </summary>
-    public bool VerifyStatus()
+    public static bool VerifyStatus
+        (
+            [NotNullWhen (true)] string? status
+        )
     {
-        var status = Status;
+        if (string.IsNullOrWhiteSpace (status))
+        {
+            return false;
+        }
+
         var result = false;
-        if (!string.IsNullOrEmpty (status)
-            && status.Length == 1)
+        if (status.Length == 1)
         {
             var code = status[0];
             result = code is '0' or '1' or '2' or '3' or '4'
@@ -831,6 +838,11 @@ public sealed class ExemplarInfo
 
         return result;
     }
+
+    /// <summary>
+    /// Проверка, что статус задан верно (т. е. подлежит интерпретации).
+    /// </summary>
+    public bool VerifyStatus() => VerifyStatus (Status);
 
     /// <summary>
     /// Проверка, что статус задан верно (т. е. подлежит интерпретации).

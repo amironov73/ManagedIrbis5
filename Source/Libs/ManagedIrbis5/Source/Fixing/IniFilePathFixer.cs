@@ -22,8 +22,6 @@ using ManagedIrbis.Infrastructure;
 
 #endregion
 
-#nullable enable
-
 namespace ManagedIrbis.Fixing;
 
 /// <summary>
