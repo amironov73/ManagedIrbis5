@@ -31,10 +31,9 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.10</AvaloniaVersion>
+        <AvaloniaVersion>11.0.11</AvaloniaVersion>
         <AvaloniaStable>11.0.4</AvaloniaStable>
-        <MicrosoftVersion>8.0.4</MicrosoftVersion>
-        <MicrosoftStable>8.0.0</MicrosoftStable>
+        <MicrosoftVersion>8.0.0</MicrosoftVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -61,17 +60,17 @@
         <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftVersion)"/>
-        <PackageReference Include="Microsoft.Extensions.Localization" Version="$(MicrosoftStable)"/>
+        <PackageReference Include="Microsoft.Extensions.Localization" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftVersion)"/>
-        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftStable)"/>
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="Microsoft.Extensions.Options" Version="$(MicrosoftVersion)"/>
         <PackageReference Include="NLog" Version="5.3.2"/>
         <PackageReference Include="NLog.Extensions.Logging" Version="5.3.11"/>
         <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
         <PackageReference Include="ReactiveUI" Version="18.3.1"/>
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.6" />
+        <PackageReference Include="SkiaSharp" Version="2.88.7" />
     </ItemGroup>
 
 </Project>
