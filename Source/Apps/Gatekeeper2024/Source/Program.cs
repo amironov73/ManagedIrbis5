@@ -138,6 +138,7 @@ internal sealed /* нельзя static */ class Program
         api.MapGet ("test", HandleTestRequest);
         api.MapGet ("ok", HandleOkRequest);
         api.MapGet ("version", HandleVersionRequest);
+        api.MapGet ("blat", HandlePrivateRequest);
 
         app.MapPost ("/auth", HandleAuthRequest);
 
@@ -277,6 +278,22 @@ internal sealed /* нельзя static */ class Program
         }
 
         return Results.Problem();
+    }
+
+    private static IResult HandlePrivateRequest
+        (
+            bool on
+        )
+    {
+        var now = DateTime.Now.ToShortTimeString();
+        var message = on
+            ? "Вход только для библиотекарей"
+            : "Библиотека открыта для посещения";
+        GlobalState.Instance.Message = $"{now}: {message}";
+        GlobalState.Instance.IsBlatOnly = on;
+        Logger.LogInformation ("Private = " + GlobalState.Instance.IsBlatOnly);
+
+        return Results.Text (message);
     }
 
     #endregion

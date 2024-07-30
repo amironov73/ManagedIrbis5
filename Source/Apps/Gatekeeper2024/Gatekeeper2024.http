@@ -13,6 +13,19 @@ Accept: application/json
 
 ###
 
+# Вход простого смертного
+POST {{Gatekeeper2024_HostAddress}}/auth/
+Accept: application/json
+
+{
+    "type": "NORMAL",
+    "keyHex": "6404BDD8",
+    "direction": 2,
+    "accessPoint": 1
+}
+
+###
+
 # Вход несуществующего
 POST {{Gatekeeper2024_HostAddress}}/auth/
 Accept: application/json
@@ -56,5 +69,15 @@ GET {{Gatekeeper2024_HostAddress}}/api/stat
 
 # Текущее состояние
 GET {{Gatekeeper2024_HostAddress}}/api/state
+
+###
+
+# Могут входит только свои
+GET {{Gatekeeper2024_HostAddress}}/api/blat?on=true
+
+###
+
+# Библиотека открыта для посещений
+GET {{Gatekeeper2024_HostAddress}}/api/blat?on=false
 
 ###

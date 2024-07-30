@@ -414,4 +414,14 @@ internal static class Utility
     /// проходами читателя, минуты.
     /// </summary>
     public static int GetTimeSpan() => GetInt32 ("minimum-time-span", 60);
+
+    /// <summary>
+    /// Метка поля "Место работы".
+    /// </summary>
+    public static int GetPrivilegeTag() => GetInt32 ("privilege-tag", 15);
+
+    /// <summary>
+    /// Место работы, означающее что читатель свой.
+    /// </summary>
+    public static string GetPrivilegeText() => GetString ("privilege-text", "ИОГУНБ")!;
 }

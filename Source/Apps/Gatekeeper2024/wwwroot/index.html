@@ -59,6 +59,28 @@
                     </a>
                 </li>
 
+                <!-- Кнопка входа только блатных -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="return toggleBlat()">
+                        <img src="img/stop.png" width="32" height="32"
+                             alt="Вход только для своих"
+                             title="Вход только для своих"
+                             id="blatSign">
+                        <span id="blatText">Вход только для своих</span>
+                    </a>
+                </li>
+
+                <!-- Кнопка для проходного двора -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" onclick="return togglePassage()">
+                        <img src="img/letmypeoplego.png" width="32" height="32"
+                             alt="Проходной двор"
+                             title="Проходной двор"
+                             id="passageSign">
+                        <span id="passageText">Проходной двор</span>
+                    </a>
+                </li>
+
             </ul>
 
         </div>
@@ -204,6 +226,9 @@
 
 <script>
 
+    // вход только для своих
+    var blatOnly = true
+
     function setThinking(on) {
         let thinkingBox = document.getElementById('thinking')
         thinkingBox.style.display = on ? 'block' : 'none'
@@ -347,6 +372,44 @@
         return false
     }
 
+    function showBlat() {
+        const blatSign = document.getElementById ('blatSign')
+        blatSign.src = blatOnly? 'img/stop.png' : 'img/opendoor.png'
+
+        const blatText = document.getElementById ('blatText')
+        blatText.innerText = blatOnly? 'Библиотека закрыта для читателей'
+            : 'Библиотека открыта для посещения'
+    }
+
+    function sendBlat() {
+        const blatArg = blatOnly? 'true' : 'false'
+        axios.get('/api/blat?on=' + blatArg)
+            .then(function (response) {
+                const data = response.data
+                setMessage(true, data)
+                if (data.error) {
+                    makeBeep()
+                }
+            })
+            .catch(function () {
+                setMessage(false, 'Ошибка связи с сервером веб-приложения')
+                makeBeep()
+            })
+    }
+
+    function toggleBlat() {
+        blatOnly = !blatOnly
+
+        sendBlat()
+        showBlat()
+
+        return false
+    }
+
+    function togglePassage() {
+
+    }
+
     setInterval(() => {
                 // выводим текущее время
                 document.getElementById('clock').innerText = new Date().toLocaleTimeString()
@@ -358,6 +421,8 @@
                             if (data.error) {
                                 makeBeep()
                             }
+
+                            blatOnly = data.isBlatOnly
                         })
                         .catch(function () {
                             setMessage(false, 'Ошибка связи с сервером веб-приложения')
@@ -373,6 +438,8 @@
                     const version = document.getElementById('version')
                     version.innerText = version.innerText + ' (' + data + ')'
                 })
+
+            sendBlat()
         },
         100)
 

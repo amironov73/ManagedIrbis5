@@ -44,6 +44,12 @@ internal sealed class GlobalState
     [JsonPropertyName ("error")]
     public bool HasError { get; set; }
 
+    /// <summary>
+    /// Вход только для своих.
+    /// </summary>
+    [JsonPropertyName ("isBlatOnly")]
+    public bool IsBlatOnly { get; set; } = true;
+
     #endregion
 
     #region Private members

@@ -14,6 +14,9 @@
 
 using System.Text.Json;
 
+using AM.Collections;
+
+using ManagedIrbis;
 using ManagedIrbis.Readers;
 
 #endregion
@@ -277,6 +280,45 @@ internal class SigurHandler
         return finalResult;
     }
 
+    private string? HandlePrivateMode
+        (
+            ReaderInfo reader
+        )
+    {
+        if (!GlobalState.Instance.IsBlatOnly)
+        {
+            // не активирован режим "только для своих"
+            return null;
+        }
+
+        // активирован специальный режим "только для своих",
+        // когда входить могут только те,
+        // у кого в специальном поле имеется специальная подстрока
+        var privilegeTag = Utility.GetPrivilegeTag(); // метка специального поля
+        var privilegeText = Utility.GetPrivilegeText(); // специальная подстрока
+        var workplaces = reader.Record?.Fields.GetField (privilegeTag);
+        if (workplaces.IsNullOrEmpty())
+        {
+            return "Не задано место работы, пропускать нельзя";
+        }
+
+        foreach (var field in workplaces)
+        {
+            var workplace = field.ToText();
+            if (workplace.Contains
+                (
+                    privilegeText,
+                    StringComparison.InvariantCultureIgnoreCase
+                ))
+            {
+                // входить можно
+                return null;
+            }
+        }
+
+        return "Библиотека еще не открыта";
+    }
+
     /// <summary>
     /// Обработка входа читателя.
     /// </summary>
@@ -289,21 +331,40 @@ internal class SigurHandler
         var message = Utility.GetArrivalMessage (request.KeyHex!)
             + $" ({reader.FullName})";
 
+        var allow = true;
+        var privateMode = HandlePrivateMode (reader);
+        if (!string.IsNullOrEmpty (privateMode))
+        {
+            if (!string.IsNullOrEmpty (message))
+            {
+                message += $" ({privateMode})";
+            }
+            else
+            {
+                message = privateMode;
+            }
+
+            allow = false;
+        }
+
         var result = Resolution
             (
                 message: message,
-                allow: true
+                allow
             );
         GlobalState.SetMessageWithTimestamp (message);
         GlobalState.Instance.HasError = false;
 
-        // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
-        SaveEventForFurtherSending (new PassEvent
+        if (allow)
         {
-            Point = request.AccessPoint,
-            Moment = request.Arrived,
-            Id = request.KeyHex
-        });
+            // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+            SaveEventForFurtherSending (new PassEvent
+            {
+                Point = request.AccessPoint,
+                Moment = request.Arrived,
+                Id = request.KeyHex
+            });
+        }
 
         return result;
     }
