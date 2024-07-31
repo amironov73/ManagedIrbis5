@@ -138,7 +138,8 @@ internal sealed /* нельзя static */ class Program
         api.MapGet ("test", HandleTestRequest);
         api.MapGet ("ok", HandleOkRequest);
         api.MapGet ("version", HandleVersionRequest);
-        api.MapGet ("blat", HandlePrivateRequest);
+        api.MapGet ("staff", HandleStaffRequest);
+        api.MapGet ("passage", HandlePassageRequest);
 
         app.MapPost ("/auth", HandleAuthRequest);
 
@@ -280,18 +281,34 @@ internal sealed /* нельзя static */ class Program
         return Results.Problem();
     }
 
-    private static IResult HandlePrivateRequest
+    private static IResult HandleStaffRequest
         (
             bool on
         )
     {
         var now = DateTime.Now.ToShortTimeString();
         var message = on
-            ? "Вход только для библиотекарей"
+            ? "Вход только для сотрудников"
             : "Библиотека открыта для посещения";
         GlobalState.Instance.Message = $"{now}: {message}";
-        GlobalState.Instance.IsBlatOnly = on;
-        Logger.LogInformation ("Private = " + GlobalState.Instance.IsBlatOnly);
+        GlobalState.Instance.IsStaffOnly = on;
+        Logger.LogInformation ("Staff only = " + GlobalState.Instance.IsStaffOnly);
+
+        return Results.Text (message);
+    }
+
+    private static IResult HandlePassageRequest
+        (
+            bool on
+        )
+    {
+        var now = DateTime.Now.ToShortTimeString();
+        var message = on
+            ? "Режим проходного двора"
+            : "Обычный режим работы";
+        GlobalState.Instance.Message = $"{now}: {message}";
+        GlobalState.Instance.IsPassageMode = on;
+        Logger.LogInformation ("Passage = " + GlobalState.Instance.IsPassageMode);
 
         return Results.Text (message);
     }

@@ -418,10 +418,10 @@ internal static class Utility
     /// <summary>
     /// Метка поля "Место работы".
     /// </summary>
-    public static int GetPrivilegeTag() => GetInt32 ("privilege-tag", 15);
+    public static int GetStaffTag() => GetInt32 ("staff-tag", 15);
 
     /// <summary>
     /// Место работы, означающее что читатель свой.
     /// </summary>
-    public static string GetPrivilegeText() => GetString ("privilege-text", "ИОГУНБ")!;
+    public static string GetStaffText() => GetString ("staff-text", "ИОГУНБ")!;
 }

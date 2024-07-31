@@ -12,8 +12,8 @@
 <nav class="navbar navbar-expand navbar-dark bg-dark bg-gradient">
     <div class="container-fluid">
 
-        <a class="navbar-brand" href="https://irklib.ru" target="_blank">
-            <img src="img/gatekeeper.png" alt="Логотип">
+        <a class="navbar-brand mt-2" href="https://irklib.ru" target="_blank">
+            <img src="img/owl.png" width="48" height="48" alt="Логотип">
             ГБУК ИОГУНБ
         </a>
 
@@ -28,24 +28,24 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-                <!-- текущеее время -->
+                <!-- версия программы -->
                 <li class="nav-item">
-                    <a class="nav-link fs-5 text-light" href="http://time.is/" id="clock">
-                        ВРЕМЯ
+                    <a class="nav-link fs-5 mt-2" href="http://arsmagna.ru/"  id="version">
+                        Привратник 2024
                     </a>
                 </li>
 
-                <!-- версия программы -->
+                <!-- текущеее время -->
                 <li class="nav-item">
-                    <a class="nav-link" href="http://arsmagna.ru/"  id="version">
-                        Привратник 2024
+                <a class="nav-link fs-5 text-light mt-2" href="http://time.is/" id="clock">
+                        ВРЕМЯ
                     </a>
                 </li>
 
                 <!-- кнопка перехода в полноэкранный режим -->
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="return turnFullscreen()">
-                        <img src="img/fullscreen.png" width="32" height="32"
+                        <img src="img/fullscreen.png" width="48" height="48"
                             alt="Полноэкранный режим" title="Полноэкранный режим">
                     </a>
                 </li>
@@ -53,31 +53,31 @@
                 <!-- Кнопка для проверки связи с сервером ИРБИС64 -->
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="return testConnection()">
-                        <img src="img/irbis.png" width="32" height="32"
+                        <img src="img/irbis.png" width="48" height="48"
                              alt="Проверка связи с сервером ИРБИС64"
                              title="Проверка связи с сервером ИРБИС64">
                     </a>
                 </li>
 
-                <!-- Кнопка входа только блатных -->
+                <!-- Кнопка входа только сотрудников -->
                 <li class="nav-item">
-                    <a class="nav-link" href="#" onclick="return toggleBlat()">
-                        <img src="img/stop.png" width="32" height="32"
-                             alt="Вход только для своих"
-                             title="Вход только для своих"
-                             id="blatSign">
-                        <span id="blatText">Вход только для своих</span>
+                    <a class="nav-link" href="#" onclick="return toggleStaff()">
+                        <img src="img/one.png" width="48" height="48"
+                             alt="Вход только для сотрудников"
+                             title="Вход только для сотрудников"
+                             id="staffSign">
+                        <span id="staffText">Вход только для сотрудников"</span>
                     </a>
                 </li>
 
                 <!-- Кнопка для проходного двора -->
                 <li class="nav-item">
                     <a class="nav-link" href="#" onclick="return togglePassage()">
-                        <img src="img/letmypeoplego.png" width="32" height="32"
+                        <img src="img/nobody.png" width="48" height="48"
                              alt="Проходной двор"
                              title="Проходной двор"
                              id="passageSign">
-                        <span id="passageText">Проходной двор</span>
+                        <span id="passageText">Обычный режим работы</span>
                     </a>
                 </li>
 
@@ -226,8 +226,11 @@
 
 <script>
 
-    // вход только для своих
-    var blatOnly = true
+    // вход только для сотрудников
+    var staffOnly = true
+
+    // режим проходного двора
+    var passageMode = false
 
     function setThinking(on) {
         let thinkingBox = document.getElementById('thinking')
@@ -372,18 +375,27 @@
         return false
     }
 
-    function showBlat() {
-        const blatSign = document.getElementById ('blatSign')
-        blatSign.src = blatOnly? 'img/stop.png' : 'img/opendoor.png'
+    function showStaff() {
+        const blatSign = document.getElementById ('staffSign')
+        blatSign.src = staffOnly? 'img/one.png' : 'img/three.png'
 
-        const blatText = document.getElementById ('blatText')
-        blatText.innerText = blatOnly? 'Библиотека закрыта для читателей'
+        const blatText = document.getElementById ('staffText')
+        blatText.innerText = staffOnly? 'Вход только для сотрудников'
             : 'Библиотека открыта для посещения'
     }
 
-    function sendBlat() {
-        const blatArg = blatOnly? 'true' : 'false'
-        axios.get('/api/blat?on=' + blatArg)
+    function showPassage() {
+        const passageSign = document.getElementById ('passageSign')
+        passageSign.src = passageMode? 'img/beatles.png' : 'img/nobody.png'
+
+        const passageText = document.getElementById ('passageText')
+        passageText.innerText = passageMode? 'Режим проходного двора'
+            : 'Обычный режим работы'
+    }
+
+    function sendStaff() {
+        const staffArg = staffOnly? 'true' : 'false'
+        axios.get('/api/staff?on=' + staffArg)
             .then(function (response) {
                 const data = response.data
                 setMessage(true, data)
@@ -397,17 +409,38 @@
             })
     }
 
-    function toggleBlat() {
-        blatOnly = !blatOnly
+    function sendPassage() {
+        const passageArg = passageMode? 'true' : 'false'
+        axios.get('/api/passage?on=' + passageArg)
+            .then(function (response) {
+                const data = response.data
+                setMessage(true, data)
+                if (data.error) {
+                    makeBeep()
+                }
+            })
+            .catch(function () {
+                setMessage(false, 'Ошибка связи с сервером веб-приложения')
+                makeBeep()
+            })
+    }
 
-        sendBlat()
-        showBlat()
+    function toggleStaff() {
+        staffOnly = !staffOnly
+
+        sendStaff()
+        showStaff()
 
         return false
     }
 
     function togglePassage() {
+        passageMode = !passageMode
 
+        sendPassage()
+        showPassage()
+
+        return false
     }
 
     setInterval(() => {
@@ -422,7 +455,11 @@
                                 makeBeep()
                             }
 
-                            blatOnly = data.isBlatOnly
+                            staffOnly = data.isStaffOnly
+                            passageMode = data.isPassageMode
+
+                            showStaff()
+                            showPassage()
                         })
                         .catch(function () {
                             setMessage(false, 'Ошибка связи с сервером веб-приложения')
@@ -439,7 +476,7 @@
                     version.innerText = version.innerText + ' (' + data + ')'
                 })
 
-            sendBlat()
+            sendStaff()
         },
         100)
 

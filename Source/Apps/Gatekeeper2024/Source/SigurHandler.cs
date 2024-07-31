@@ -280,23 +280,23 @@ internal class SigurHandler
         return finalResult;
     }
 
-    private string? HandlePrivateMode
+    private string? HandleStaffOnlyMode
         (
             ReaderInfo reader
         )
     {
-        if (!GlobalState.Instance.IsBlatOnly)
+        if (!GlobalState.Instance.IsStaffOnly)
         {
             // не активирован режим "только для своих"
             return null;
         }
 
-        // активирован специальный режим "только для своих",
+        // активирован специальный режим "только для сотрудников",
         // когда входить могут только те,
         // у кого в специальном поле имеется специальная подстрока
-        var privilegeTag = Utility.GetPrivilegeTag(); // метка специального поля
-        var privilegeText = Utility.GetPrivilegeText(); // специальная подстрока
-        var workplaces = reader.Record?.Fields.GetField (privilegeTag);
+        var staffTag = Utility.GetStaffTag(); // метка специального поля
+        var staffText = Utility.GetStaffText(); // специальная подстрока
+        var workplaces = reader.Record?.Fields.GetField (staffTag);
         if (workplaces.IsNullOrEmpty())
         {
             return "Не задано место работы, пропускать нельзя";
@@ -307,7 +307,7 @@ internal class SigurHandler
             var workplace = field.ToText();
             if (workplace.Contains
                 (
-                    privilegeText,
+                    staffText,
                     StringComparison.InvariantCultureIgnoreCase
                 ))
             {
@@ -332,19 +332,27 @@ internal class SigurHandler
             + $" ({reader.FullName})";
 
         var allow = true;
-        var privateMode = HandlePrivateMode (reader);
-        if (!string.IsNullOrEmpty (privateMode))
+        if (GlobalState.Instance.IsPassageMode)
         {
-            if (!string.IsNullOrEmpty (message))
+            // режим проходного двора
+            // разрешаем входить абсолютно всем
+        }
+        else
+        {
+            var staffOnlyMessage = HandleStaffOnlyMode (reader);
+            if (!string.IsNullOrEmpty (staffOnlyMessage))
             {
-                message += $" ({privateMode})";
-            }
-            else
-            {
-                message = privateMode;
-            }
+                if (!string.IsNullOrEmpty (message))
+                {
+                    message += $" ({staffOnlyMessage})";
+                }
+                else
+                {
+                    message = staffOnlyMessage;
+                }
 
-            allow = false;
+                allow = false;
+            }
         }
 
         var result = Resolution

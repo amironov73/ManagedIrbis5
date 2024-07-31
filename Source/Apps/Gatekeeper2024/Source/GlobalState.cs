@@ -45,10 +45,16 @@ internal sealed class GlobalState
     public bool HasError { get; set; }
 
     /// <summary>
-    /// Вход только для своих.
+    /// Вход только для сотрудников.
     /// </summary>
-    [JsonPropertyName ("isBlatOnly")]
-    public bool IsBlatOnly { get; set; } = true;
+    [JsonPropertyName ("isStaffOnly")]
+    public bool IsStaffOnly { get; set; } = true;
+
+    /// <summary>
+    /// Режим проходного двора.
+    /// </summary>
+    [JsonPropertyName ("isPassageMode")]
+    public bool IsPassageMode { get; set; } = Utility.GetPeopleGo();
 
     #endregion
 

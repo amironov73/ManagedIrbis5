@@ -72,12 +72,12 @@ GET {{Gatekeeper2024_HostAddress}}/api/state
 
 ###
 
-# Могут входит только свои
-GET {{Gatekeeper2024_HostAddress}}/api/blat?on=true
+# Могут входит только сотрудники
+GET {{Gatekeeper2024_HostAddress}}/api/staff?on=true
 
 ###
 
 # Библиотека открыта для посещений
-GET {{Gatekeeper2024_HostAddress}}/api/blat?on=false
+GET {{Gatekeeper2024_HostAddress}}/api/staff?on=false
 
 ###
