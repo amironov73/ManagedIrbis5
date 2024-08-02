@@ -280,6 +280,10 @@ internal class SigurHandler
         return finalResult;
     }
 
+    /// <summary>
+    /// Возвращаем null, если претензий на уровне "только для сотрудников" нет.
+    /// Любое ненулевое значение надо понимать как "не пущать".
+    /// </summary>
     private string? HandleStaffOnlyMode
         (
             ReaderInfo reader
@@ -288,6 +292,7 @@ internal class SigurHandler
         if (!GlobalState.Instance.IsStaffOnly)
         {
             // не активирован режим "только для своих"
+            // поэтому "пускать или нет" пусть решает другой код
             return null;
         }
 
