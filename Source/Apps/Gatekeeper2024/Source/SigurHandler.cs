@@ -176,10 +176,10 @@ internal class SigurHandler
             SigurRequest request
         )
     {
-        var arrivalPoint = Utility.GetArrivalPoint();
-        var departurePoint = Utility.GetDeparturePoint();
-        var isDepature = request.AccessPoint == departurePoint;
-        var letPeopleGo = Utility.GetPeopleGo();
+        var arrivalPoint = Utility.GetArrivalPoint(); // номер турникета на входе
+        var departurePoint = Utility.GetDeparturePoint(); // номер турникета на выходе
+        var isDepature = request.AccessPoint == departurePoint; // сработал турникет на выходе?
+        var letPeopleGo = GlobalState.Instance.IsPassageMode; // сейчас активен режим проходного двора?
 
         var readerId = request.KeyHex;
         if (string.IsNullOrEmpty (readerId))
@@ -201,14 +201,6 @@ internal class SigurHandler
         var readers = Utility.SearchForReader (readerId, gracefully: true);
         if (readers is null)
         {
-            // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
-            SaveEventForFurtherSending (new PassEvent
-            {
-                Point = request.AccessPoint,
-                Moment = request.Arrived,
-                Id = readerId
-            });
-
             var message = Utility.GetIrbisFailure (readerId);
             var result = LetMyPeopleGo
                 (
@@ -218,6 +210,18 @@ internal class SigurHandler
                 );
             GlobalState.SetMessageWithTimestamp (message);
             GlobalState.Instance.HasError = true;
+
+            if (result.Allow)
+            {
+                // только если разрешили вход
+                // сохраняем событие для дальнейшей отправки на сервер ИРБИС64
+                SaveEventForFurtherSending (new PassEvent
+                {
+                    Point = request.AccessPoint,
+                    Moment = request.Arrived,
+                    Id = readerId
+                });
+            }
 
             return result;
         }
