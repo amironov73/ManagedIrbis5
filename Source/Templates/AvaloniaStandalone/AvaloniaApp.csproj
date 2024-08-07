@@ -31,7 +31,7 @@
     </ItemGroup>
 
     <PropertyGroup>
-        <AvaloniaVersion>11.0.11</AvaloniaVersion>
+        <AvaloniaVersion>11.1.1</AvaloniaVersion>
         <AvaloniaStable>11.0.4</AvaloniaStable>
         <MicrosoftVersion>8.0.0</MicrosoftVersion>
     </PropertyGroup>
@@ -70,7 +70,7 @@
         <PackageReference Include="ReactiveHistory" Version="0.10.7"/>
         <PackageReference Include="ReactiveUI" Version="18.3.1"/>
         <PackageReference Include="ReactiveUI.Fody" Version="18.3.1"/>
-        <PackageReference Include="SkiaSharp" Version="2.88.7" />
+        <PackageReference Include="SkiaSharp" Version="2.88.8" />
     </ItemGroup>
 
 </Project>
