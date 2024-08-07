@@ -296,7 +296,7 @@ public struct UnicodeSequence
     /// <returns></returns>
     public bool Equals (string? other)
     {
-        return other is not null && other.Codepoints().SequenceEqual (_codepoints);
+        return other is not null && other.AsSpan().Codepoints().SequenceEqual (_codepoints);
     }
 
     /// <inheritdoc cref="ValueType.ToString"/>
