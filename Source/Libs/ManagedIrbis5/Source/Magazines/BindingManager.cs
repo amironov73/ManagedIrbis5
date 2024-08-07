@@ -101,6 +101,52 @@ public sealed class BindingManager
 
     #region Public methods
 
+
+    /// <summary>
+    /// Добавление номера (например, из другого года) в подшивку.
+    /// </summary>
+    /// <param name="bindingRecord">Запись подшивки.</param>
+    /// <param name="issueRecord">Запись добавляемого номера журнала.</param>
+    /// <param name="exemplarField">Поле с подшиваемым экземпляром.</param>
+    public void BindIssue
+        (
+            Record bindingRecord,
+            Record issueRecord,
+            Field exemplarField
+        )
+    {
+        Sure.NotNull (bindingRecord);
+        Sure.NotNull (issueRecord);
+        Sure.NotNull (exemplarField);
+
+        // TODO: добавление информации о приплетенном номере?
+
+        var bindingIndex = RecordConfiguration.GetIndex (bindingRecord).ThrowIfNullOrEmpty ();
+        var bindingNumber = RecordConfiguration.GetExemplars (bindingRecord).First().Number;
+        exemplarField.SetSubFieldValue ('a', ExemplarStatus.Bound) // подполе A: статус экземпляра
+            .SetSubFieldValue ('p', bindingIndex) // подполе P: шифр подшивки
+            .SetSubFieldValue ('i', bindingNumber); // подполе I: инвентарный номер подшивки
+        // если нет поля 463, добавляем его
+        if (issueRecord.GetField (463, 'w', bindingIndex, 0) is null)
+        {
+            issueRecord.Add
+                (
+                    463, // поле 463: издание, в котором опубликована статья
+                    'w', // подполе W: шифр документа в базе
+                    bindingIndex
+                );
+        }
+
+        // меняем рабочий лист на подходящий
+        issueRecord.SetValue
+            (
+                RecordConfiguration.WorksheetTag,
+                Constants.Njp
+            );
+
+        Provider.WriteRecord (issueRecord);
+    }
+
     /// <inheritdoc cref="IBindingManager.BindMagazines"/>
     public void BindMagazines
         (
@@ -236,15 +282,12 @@ public sealed class BindingManager
             }
 
             // меняем рабочий лист на подходящий
-            if (!RecordConfiguration.GetWorksheet (issueRecord).SameString (Constants.Njp))
-            {
-                issueRecord.SetValue
-                    (
-                        RecordConfiguration.WorksheetTag,
-                        Constants.Njp
-                    );
-                _logger.LogDebug ("Issue {IssueIndex}: worksheet changed", issueIndex);
-            }
+            issueRecord.SetValue
+                (
+                    RecordConfiguration.WorksheetTag,
+                    Constants.Njp
+                );
+            _logger.LogDebug ("Issue {IssueIndex}: worksheet changed", issueIndex);
 
             Provider.WriteRecord (issueRecord);
             _logger.LogTrace ("Issue {IssueIndex} saved", issueIndex);
