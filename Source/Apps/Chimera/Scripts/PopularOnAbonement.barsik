@@ -1,0 +1,34 @@
+﻿//
+// Составление рейтинга популярности книг на абонементе
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+books = batch_read ("MHR=Ф302")
+foreach (book in books)
+{
+    exemplars = book_exemplars (book)
+    if (len (exemplars) == 1)
+    {
+        brief = format_record ("@brief", book.Mfn)
+        rental = book_rental_count (book)
+        price = book_price (book)
+        year = book_year (book)
+        bbk = book_classification (book)
+
+        println (brief, "\t", exemplars[0].Number, "\t", rental, "\t",
+            price, "\t", year, "\t", bbk)
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

@@ -137,7 +137,7 @@ public static class UnicodeUtility
 
     // Список служебных символов Unicode
     private static char[] _specialUnicodeCharacters =
-    {
+    [
         '\u00AD', // Soft hyphen
         '\u00A0', // Non-breaking space
         '\u200B', // Zero-width space
@@ -145,8 +145,24 @@ public static class UnicodeUtility
         '\u200D', // Zero-width joiner
         '\u202F', // Narrow no-break space
         '\u2060', // Word joiner
-        '\uFEFF' // Zero-width no-break space
-    };
+        '\uFEFF'  // Zero-width no-break space
+    ];
+
+    // Список символов, которые могут использоваться
+    // для эксплуатации уязвимостей
+    private static char[] _dangerousCharacters =
+    [
+        '\u200B', // Zero Width Space
+        '\u202A', // Left-to-Right Embedding
+        '\u202B', // Right-to-Left Embedding
+        '\u202D', // Left-to-Right Override
+        '\u202E', // Right-to-Left Override
+        '\u2066', // Left-to-Right Isolate
+        '\u2067', // Right-to-Left Isolate
+        '\u2068', // First Strong Isolate
+        '\u202C', // Pop Directional Formatting
+        '\u2069'  // Pop Directional Isolate
+    ];
 
     #endregion
 
@@ -157,7 +173,7 @@ public static class UnicodeUtility
     /// </summary>
     public static IEnumerable<Codepoint> Codepoints
         (
-            this ReadOnlySpan<char> text
+            this string text
         )
     {
         for (var i = 0; i < text.Length; ++i)
@@ -207,10 +223,10 @@ public static class UnicodeUtility
     /// </summary>
     public static bool TextContainsNonLatinNorCyrillicSymbols
         (
-            ReadOnlySpan<char> text
+            string text
         )
     {
-        if (text.IsEmpty)
+        if (string.IsNullOrEmpty (text))
         {
             return false;
         }
@@ -229,7 +245,7 @@ public static class UnicodeUtility
     }
 
     /// <summary>
-    ///
+    /// Перечисление символов в заданном тексте.
     /// </summary>
     public static IEnumerable<string> Letters
         (
@@ -264,7 +280,7 @@ public static class UnicodeUtility
     /// </summary>
     public static UnicodeSequence AsUnicodeSequence
         (
-            this ReadOnlySpan<char> text
+            this string text
         )
     {
         return new UnicodeSequence (text.Codepoints());
@@ -425,6 +441,40 @@ public static class UnicodeUtility
                 culture,
                 CompareOptions.IgnoreNonSpace
             );
+
+    /// <summary>
+    /// Содержит ли указанный текст символы Unicode,
+    /// допускающие эксплуатацию уязвимостей?
+    /// </summary>
+    /// <remarks>
+    /// Многие редакторы кода и инструменты разработки не отображают
+    /// символы BIDI и другие специальные символы Unicode, что делает
+    /// их невидимыми для разработчиков. Это приводит к тому,
+    /// что отображаемый код может выглядеть иначе, чем код, который
+    /// фактически выполняется компилятором. Таким образом, злоумышленник
+    /// может скрыть вредоносные изменения, что создает возможность
+    /// для внедрения уязвимостей в программное обеспечение, особенно
+    /// в открытых проектах. Это создает риск, что разработчик случайно
+    /// вставит вредоносный код, скопировав его из уязвимого источника.
+    /// Таким образом, уязвимость BIDI может быть использована
+    /// для обхода стандартных проверок безопасности.
+    /// </remarks>
+    public static bool ContainsAnyDangerousCharacters
+        (
+            ReadOnlySpan<char> text
+        )
+    {
+        foreach (var c in text)
+        {
+            if (Array.IndexOf (_dangerousCharacters, c) != -1)
+            {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
 
     #endregion
 }

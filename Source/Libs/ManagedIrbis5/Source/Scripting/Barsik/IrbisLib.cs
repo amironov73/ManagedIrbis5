@@ -499,6 +499,11 @@ public sealed class IrbisLib
             return BatchRecordReader.WholeDatabase (connection, connection.Database);
         }
 
+        if (firstArg is string searchExpression)
+        {
+            return BatchRecordReader.Search (connection, searchExpression, database: connection.Database);
+        }
+
         if (firstArg is int fromMfn)
         {
             if (Compute (context, args, 1) is int toMfn)
