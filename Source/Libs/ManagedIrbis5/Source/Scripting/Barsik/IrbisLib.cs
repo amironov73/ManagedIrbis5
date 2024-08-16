@@ -123,6 +123,7 @@ public sealed class IrbisLib
         { "clear_output", new FunctionDescriptor ("clear_output", ClearOutput) },
         { "connect", new FunctionDescriptor ("connect", Connect) },
         { "create_connection", new FunctionDescriptor ("create_connection", CreateConnection) },
+        { "create_counter", new FunctionDescriptor ("create_counter", CreateCounter) },
         { "create_database", new FunctionDescriptor ("create_database", CreateDatabase) },
         { "create_dictionary", new FunctionDescriptor ("create_dictionary", CreateDictionary) },
         { "create_record", new FunctionDescriptor ("create_record", CreateRecord) },
@@ -501,7 +502,9 @@ public sealed class IrbisLib
 
         if (firstArg is string searchExpression)
         {
-            return BatchRecordReader.Search (connection, searchExpression, database: connection.Database);
+            var found = connection.SearchAll (searchExpression);
+            return new BatchRecordReader (connection, found, database: connection.Database);
+            // return BatchRecordReader.Search (connection, searchExpression, database: connection.Database);
         }
 
         if (firstArg is int fromMfn)
@@ -1260,6 +1263,18 @@ public sealed class IrbisLib
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Создание простого счетчика (костыль!).
+    /// </summary>
+    public static dynamic CreateCounter
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        return new DictionaryCounter<object, int>();
     }
 
     /// <summary>

@@ -24,8 +24,6 @@ using System.Numerics;
 
 #endregion
 
-#nullable enable
-
 namespace AM.Collections;
 
 /// <summary>

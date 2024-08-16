@@ -1,0 +1,41 @@
+﻿//
+// Получение списка коллекций в фонде ФКХ
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+counter = create_counter()
+
+found = search_all ("MHR=ФКХ")
+println (len (found))
+books = batch_read (found)
+total = 0
+foreach (book in books)
+{
+    total = total + 1
+    exemplars = book_exemplars (book)
+    foreach (plar in exemplars)
+    {
+        if (plar.Collection and plar.Place == "ФКХ")
+        {
+            counter.Increment (plar.Collection)
+        }
+    }
+}
+
+//=================================
+
+println (total)
+println (counter)
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")
