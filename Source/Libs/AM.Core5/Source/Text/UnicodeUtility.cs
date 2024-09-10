@@ -17,6 +17,8 @@ using System.Globalization;
 
 using JetBrains.Annotations;
 
+using Microsoft.Extensions.Primitives;
+
 #endregion
 
 namespace AM.Text;
@@ -284,6 +286,87 @@ public static class UnicodeUtility
         )
     {
         return new UnicodeSequence (text.Codepoints());
+    }
+
+    /// <summary>
+    /// Исправление русской буквы Ё, набранной с ошибкой.
+    /// </summary>
+    [return: NotNullIfNotNull ("input")]
+    public static string? FixRussianYo
+        (
+            string? input
+        )
+    {
+        const char latinSmallLetterE = '\x0065';
+        const char latinCapitalLetterE = '\x0045';
+        const char cyrillicSmallLetterIe = '\x0435';
+        const char cyrillicCapitalLetterIe = '\x0415';
+        const char cyrillicSmallLetterIo = '\x0451';
+        const char cyrillicCapitalLetterIo = '\x0401';
+        const char doubleDotAbove = '\x0308'; // две точки над буквой
+
+        if (string.IsNullOrWhiteSpace (input))
+        {
+            return input;
+        }
+
+        // сначала проверяем, есть ли необходимость в исправлении
+        var length = input.Length;
+        var lengthMinusOne = length - 1;
+        int i;
+        if (lengthMinusOne <= 0)
+        {
+            return input;
+        }
+
+        var found = false;
+        for (i = 0; i < lengthMinusOne; i++)
+        {
+            var c = input[i];
+            if (c is latinSmallLetterE or latinCapitalLetterE
+                    or cyrillicSmallLetterIe or cyrillicCapitalLetterIe
+                && input[i + 1] == doubleDotAbove)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            return input;
+        }
+
+        var builder = StringBuilderPool.Shared.Get();
+        builder.EnsureCapacity (lengthMinusOne);
+        for (i = 0; i < lengthMinusOne; i++)
+        {
+            switch (input[i])
+            {
+                case latinSmallLetterE or cyrillicSmallLetterIe
+                when input[i + 1] == doubleDotAbove:
+                    builder.Append (cyrillicSmallLetterIo);
+                    i++;
+                    break;
+
+                case latinCapitalLetterE or cyrillicCapitalLetterIe
+                     when input[i + 1] == doubleDotAbove:
+                    builder.Append (cyrillicCapitalLetterIo);
+                    i++;
+                    break;
+
+                default:
+                    builder.Append (input[i]);
+                    break;
+            }
+        }
+
+        for (; i < length; i++)
+        {
+            builder.Append (input[i]);
+        }
+
+        return builder.ReturnShared();
     }
 
     /// <summary>
