@@ -17,8 +17,6 @@ using System.Globalization;
 
 using JetBrains.Annotations;
 
-using Microsoft.Extensions.Primitives;
-
 #endregion
 
 namespace AM.Text;
@@ -289,21 +287,27 @@ public static class UnicodeUtility
     }
 
     /// <summary>
-    /// Исправление русской буквы Ё, набранной с ошибкой.
+    /// Исправление кириллических букв <c>Ё</c>
+    /// и <c>Й</c>, набранных с ошибкой.
     /// </summary>
     [return: NotNullIfNotNull ("input")]
-    public static string? FixRussianYo
+    public static string? FixRussianLetters
         (
             string? input
         )
     {
-        const char latinSmallLetterE = '\x0065';
-        const char latinCapitalLetterE = '\x0045';
-        const char cyrillicSmallLetterIe = '\x0435';
-        const char cyrillicCapitalLetterIe = '\x0415';
-        const char cyrillicSmallLetterIo = '\x0451';
-        const char cyrillicCapitalLetterIo = '\x0401';
+        const char latinSmallLetterE = '\x0065'; // строчная латинская `e`
+        const char latinCapitalLetterE = '\x0045'; // прописная латинская `E`
+        const char cyrillicSmallLetterIe = '\x0435'; // строчная кириллическая `e`
+        const char cyrillicCapitalLetterIe = '\x0415'; // прописная кириллическая `E`
+        const char cyrillicSmallLetterI = '\x0438'; // строчная кириллическая `и`
+        const char cyrillicCapitalLetterI = '\x0418'; // прописная кириллическая `И`
+        const char cyrillicSmallLetterIo = '\x0451'; // строчная `ё`
+        const char cyrillicCapitalLetterIo = '\x0401'; // прописная `Ё`
+        const char cyrillicSmallLetterShortI = '\x0439'; // строчная `й`
+        const char cyrillicCapitalLetterShortI = '\x0419'; // прописная `Й`
         const char doubleDotAbove = '\x0308'; // две точки над буквой
+        const char combiningBreve = '\x0306'; // дужка над буквой
 
         if (string.IsNullOrWhiteSpace (input))
         {
@@ -325,7 +329,10 @@ public static class UnicodeUtility
             var c = input[i];
             if (c is latinSmallLetterE or latinCapitalLetterE
                     or cyrillicSmallLetterIe or cyrillicCapitalLetterIe
-                && input[i + 1] == doubleDotAbove)
+                && input[i + 1] == doubleDotAbove
+
+                || c is cyrillicSmallLetterI or cyrillicCapitalLetterI
+                && input[i + 1] == combiningBreve)
             {
                 found = true;
                 break;
@@ -352,6 +359,16 @@ public static class UnicodeUtility
                 case latinCapitalLetterE or cyrillicCapitalLetterIe
                      when input[i + 1] == doubleDotAbove:
                     builder.Append (cyrillicCapitalLetterIo);
+                    i++;
+                    break;
+
+                case cyrillicSmallLetterI when input[i + 1] == combiningBreve:
+                    builder.Append (cyrillicSmallLetterShortI);
+                    i++;
+                    break;
+
+                case cyrillicCapitalLetterI when input[i + 1] == combiningBreve:
+                    builder.Append (cyrillicCapitalLetterShortI);
                     i++;
                     break;
 
