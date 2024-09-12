@@ -116,7 +116,7 @@ internal class DigestAuthenticatorManager
         request.AddOrUpdateHeader("Accept", "*/*");
         request.AddOrUpdateHeader("User-Agent", $"RestSharp.Authenticators.Digest/{_assemblyVersion}");
         request.AddOrUpdateHeader("Accept-Encoding", "gzip, deflate, br");
-        request.Timeout = _timeout;
+        request.Timeout = TimeSpan.FromMilliseconds (_timeout);
         using var client = new RestClient(new RestClientOptions()
         {
             Proxy = proxy
