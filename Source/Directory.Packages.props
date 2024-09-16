@@ -6,14 +6,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <MicrosoftVersion>8.0.2</MicrosoftVersion>
+    <MicrosoftVersion>8.0.8</MicrosoftVersion>
     <MicrosoftStable>8.0.0</MicrosoftStable>
     <AvaloniaVersion>11.1.3</AvaloniaVersion>
     <AvaloniaStable>11.0.4</AvaloniaStable>
     <SkiaVersion>2.88.8</SkiaVersion>
     <CommunityToolkitVersion>8.2.1</CommunityToolkitVersion>
-    <NugetVersion>6.9.1</NugetVersion>
-    <NLogVersion>5.3.3</NLogVersion>
+    <NugetVersion>6.11.0</NugetVersion>
+    <NLogVersion>5.3.4</NLogVersion>
   </PropertyGroup>
 
   <!-- Централизованное управление пакетами -->
@@ -70,7 +70,7 @@
     <PackageVersion Include="linq2db" Version="3.7.0" />
     <PackageVersion Include="Linq.Extras" Version="5.0.0" />
     <PackageVersion Include="Live.Avalonia" Version="1.4.1" />
-    <PackageVersion Include="MailKit" Version="4.5.0" />
+    <PackageVersion Include="MailKit" Version="4.7.1.1" />
     <PackageVersion Include="Material.Avalonia" Version="3.1.3" />
     <PackageVersion Include="MaxMind.GeoIP2" Version="5.1.0" />
     <PackageVersion Include="MessageBox.Avalonia" Version="3.1.4" />
@@ -116,7 +116,7 @@
     <PackageVersion Include="Nito.StructuredConcurrency" Version="1.0.0-alpha.9" />
     <PackageVersion Include="Nito.Try" Version="1.1.1" />
     <PackageVersion Include="NLog" Version="$(NLogVersion)" />
-    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.12" />
+    <PackageVersion Include="NLog.Extensions.Logging" Version="5.3.13" />
     <PackageVersion Include="NLog.Schema" Version="$(NLogVersion)" />
     <PackageVersion Include="NLog.Web.AspNetCore" Version="5.3.11" />
     <PackageVersion Include="NPOI" Version="2.6.2" />
