@@ -1,0 +1,54 @@
+﻿//
+// Подсчеты для перемещения книг на открытый доступ
+// в рамках трансформации в модельную библиотеку
+//
+
+connect("host=127.0.0.1;port=6666;user=librarian;password=secret;db=IBIS;")
+if (!is_connected())
+{
+    error ("Not connected")
+    exit()
+}
+
+//=================================
+
+books = batch_read (true)
+foreach (book in books)
+{
+
+    // Отбираем книги по следующим критериям:
+    // 1. Фонд ФКХ или Ф602
+    // 2. Год издания до 1917 включительно
+    // 3. Место издания содержит "Иркутск"
+    // 4. Не списано
+
+    if (is_book (book) and is_text (book))
+    {
+        plars = get_exemplars (book)
+        if (len (plars) == 1)
+        {
+            one = plars[0]
+            status = one.Status
+            place = one.Place
+            city = book_city (book)
+            number = one.Number
+            year = book_year (book)
+
+            if (number and year and city and (place == "ФКХ" or place == "Ф602"))
+            {
+                if (year < "1918"
+                    and city ~ "Иркутск"
+                    and (status == "0" or status == "1" or status == "5" or status == "9"))
+                {
+                    brief = format_record ("@brief", book.Mfn)
+                    println (book.Mfn, "\t", year, "\t", city, "\t", place, "\t", number, "\t", brief)
+                }
+            }
+        }
+    }
+}
+
+//=================================
+
+disconnect()
+println ("THAT'S ALL, FOLKS!")

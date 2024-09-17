@@ -84,11 +84,8 @@ public sealed class IrbisLib
     // Оператор DEL
     // Оператор UNDOR (откат)
 
-    // TODO добавить работу с читателями
-    // parse_reader
-
     /// <summary>
-    /// Реестр стандартных функций.
+    /// Реестр функций модуля.
     /// </summary>
     public static readonly Dictionary<string, FunctionDescriptor> Registry = new ()
     {
@@ -102,6 +99,7 @@ public sealed class IrbisLib
         { "batch_write", new FunctionDescriptor ("batch_write", BatchWrite) },
         { "book_author", new FunctionDescriptor ("book_author", BookAuthor) },
         { "book_authors", new FunctionDescriptor ("book_authors", BookAuthors) },
+        { "book_city", new FunctionDescriptor ("book_city", BookCity) },
         { "book_classification", new FunctionDescriptor ("book_classification", BookClassification) },
         { "book_country", new FunctionDescriptor ("book_country", BookCountry) },
         { "book_exemplars", new FunctionDescriptor ("book_exemplars", BookExemplars) },
@@ -686,6 +684,36 @@ public sealed class IrbisLib
                 if (record2 is not null)
                 {
                     return RecordConfiguration.GetDefault().GetClassification (record2);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение места издания (города) для указанной записи.
+    /// </summary>
+    public static dynamic? BookCity
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is Record record)
+        {
+            return RecordConfiguration.GetDefault().GetCity (record);
+        }
+
+        if (firstArg is int mfn)
+        {
+            if (TryGetConnection (context, out var connection))
+            {
+                var record2 = connection.ReadRecord (mfn);
+                if (record2 is not null)
+                {
+                    return RecordConfiguration.GetDefault().GetCity (record2);
                 }
             }
         }

@@ -805,6 +805,25 @@ public sealed class RecordConfiguration
     }
 
     /// <summary>
+    /// Получение места издания (города).
+    /// </summary>
+    public string? GetCity
+        (
+            Record record
+        )
+    {
+        Sure.NotNull (record);
+
+        var result = record.FM (210, 'a');
+        if (result.IsEmpty())
+        {
+            result = record.FM (461, 'd');
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Получение года издания (выхода из печати).
     /// </summary>
     public string? GetYear
