@@ -170,6 +170,8 @@ public sealed class IrbisLib
         { "read_text_file", new FunctionDescriptor ("read_text_file", ReadTextFile) },
         { "reader_id", new FunctionDescriptor ("reader_id", ReaderId) },
         { "reader_info", new FunctionDescriptor ("reader_info", ReaderInfo_) },
+        { "reader_by_ticket", new FunctionDescriptor ("reader_by_ticket", ReaderByTicket) },
+        { "reader_manager", new FunctionDescriptor ("reader_manager", ReaderManager_) },
         { "reader_ticket", new FunctionDescriptor ("reader_ticket", ReaderTicket) },
         { "relax_utf8", new FunctionDescriptor ("relax_utf8", RelaxUtf8) },
         { "search", new FunctionDescriptor ("search", Search) },
@@ -2551,6 +2553,47 @@ public sealed class IrbisLib
         if (firstArg is Record record)
         {
             return ReaderConfiguration.GetDefault().GetTicket (record);
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Получение менеджера читателей.
+    /// </summary>
+    public static dynamic? ReaderManager_
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        return new ReaderManager (connection);
+    }
+
+    /// <summary>
+    /// Поиск читателя по номеру билета.
+    /// </summary>
+    public static dynamic? ReaderByTicket
+        (
+            Context context,
+            dynamic?[] args
+        )
+    {
+        if (!TryGetConnection (context, out var connection))
+        {
+            return null;
+        }
+
+        var firstArg = Compute (context, args, 0);
+        if (firstArg is string ticket)
+        {
+            var manager = new ReaderManager (connection);
+            return manager.GetReader (ticket);
         }
 
         return null;
