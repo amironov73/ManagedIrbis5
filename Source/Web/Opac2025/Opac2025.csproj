@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <ItemGroup>
+
+    <PackageReference Include="Microsoft.Extensions.Hosting"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd"/>
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices"/>
+    <PackageReference Include="Microsoft.Extensions.Logging"/>
+
+    <PackageReference Include="NLog"/>
+    <PackageReference Include="NLog.Schema"/>
+    <PackageReference Include="NLog.Extensions.Logging"/>
+    <PackageReference Include="NLog.Web.AspNetCore"/>
+
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <None Update="opac.conf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
+    <None Update="opac.service">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libs\AM.Core5\AM.Core5.csproj" />
+    <ProjectReference Include="..\..\Libs\AM.AOT5\AM.AOT5.csproj" />
+    <ProjectReference Include="..\..\Libs\AM.Scripting\AM.Scripting.csproj" />
+    <ProjectReference Include="..\..\Libs\ManagedIrbis5\ManagedIrbis5.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="NLog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

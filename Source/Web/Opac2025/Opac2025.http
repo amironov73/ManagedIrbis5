@@ -1,0 +1,6 @@
+@Opac2025_HostAddress = http://localhost:5005
+
+GET {{Opac2025_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
