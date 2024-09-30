@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* Exemplar.cs -- информация об экземпляре
  * Ars Magna project, http://arsmagna.ru
@@ -40,6 +38,13 @@ public class Exemplar
     /// </summary>
     [JsonPropertyName ("status")]
     public string? Status { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Number}: {Status}";
 
     #endregion
 }

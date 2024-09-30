@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* Reader.cs -- информация о читателе
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +15,8 @@ using System.Text.Json.Serialization;
 
 using JetBrains.Annotations;
 
+using LinqToDB.Mapping;
+
 #endregion
 
 namespace Opac2025;
@@ -25,6 +25,7 @@ namespace Opac2025;
 /// Информация о читателе.
 /// </summary>
 [PublicAPI]
+[Table (Name = "readers")]
 public sealed class Reader
 {
     #region Properties
@@ -46,6 +47,13 @@ public sealed class Reader
     /// </summary>
     [JsonPropertyName ("mail")]
     public string? Mail { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Ticket}: {Name}";
 
     #endregion
 }

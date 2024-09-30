@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* Order.cs -- информация о заказе
  * Ars Magna project, http://arsmagna.ru
@@ -17,6 +15,8 @@ using System.Text.Json.Serialization;
 
 using JetBrains.Annotations;
 
+using LinqToDB.Mapping;
+
 #endregion
 
 namespace Opac2025;
@@ -25,6 +25,7 @@ namespace Opac2025;
 /// Информация о заказе.
 /// </summary>
 [PublicAPI]
+[Table ("orders")]
 public sealed class Order
 {
     #region Properties
@@ -38,7 +39,7 @@ public sealed class Order
     /// <summary>
     /// Номер читательского билета.
     /// </summary>
-    [JsonPropertyName ("description")]
+    [JsonPropertyName ("ticket")]
     public string? Ticket { get; set; }
 
     /// <summary>
@@ -54,10 +55,17 @@ public sealed class Order
     public DateTimeOffset Date { get; set; }
 
     /// <summary>
-    /// Статус заказа.
+    /// Статус заказа (см. константы в <see cref="Constants"/>).
     /// </summary>
     [JsonPropertyName ("status")]
     public string? Status { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Ticket}: {Book}: {Date}: {Status}";
 
     #endregion
 }

@@ -4,7 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
 // ReSharper disable StringLiteralTypo
 
 /* OpacUtility.cs -- утилитные методы
@@ -164,4 +163,10 @@ internal static class OpacUtility
 
         return true;
     }
+
+    /// <summary>
+    /// Упрощенное формирование локальной даты (для отладочных целей).
+    /// </summary>
+    public static DateTimeOffset LocalDate (int year, int month, int day)
+        => new DateTime (year, month, day);
 }

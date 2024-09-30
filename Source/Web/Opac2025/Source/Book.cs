@@ -4,8 +4,6 @@
 // ReSharper disable CheckNamespace
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable StringLiteralTypo
 
 /* Book.cs -- информация о книге
  * Ars Magna project, http://arsmagna.ru
@@ -46,6 +44,13 @@ public sealed class Book
     /// </summary>
     [JsonPropertyName ("exemplars")]
     public Exemplar[]? Exemplars { get; set; }
+
+    #endregion
+
+    #region Object members
+
+    /// <inheritdoc cref="object.ToString"/>
+    public override string ToString() => $"{Id}: {Description}";
 
     #endregion
 }

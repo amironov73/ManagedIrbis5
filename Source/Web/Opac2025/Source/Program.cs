@@ -61,7 +61,7 @@ internal sealed /* нельзя static */ class Program
         // *******************************************************************
         // остановка приложения по требованию
 
-        if (args is ["stop"] or ["/stop"])
+        if (args is ["stop"] or ["/stop"] or ["-stop"] or ["--stop"] )
         {
             RequestStop (builder, args);
             return;
@@ -84,6 +84,16 @@ internal sealed /* нельзя static */ class Program
             options.SizeLimit = 1024;
             options.ExpirationScanFrequency = TimeSpan.FromMinutes (1);
         });
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen
+            (
+                config =>
+                {
+                    config.EnableAnnotations();
+                }
+            );
+
         // services.AddHostedService<EventUploader>();
         // services.AddSingleton<StatProvider>();
 
@@ -134,7 +144,17 @@ internal sealed /* нельзя static */ class Program
         //
         // app.MapPost ("/auth", HandleAuthRequest);
         //
-        // GlobalState.SetMessageWithTimestamp ("Пока никаких событий не зафиксировано");
+
+        var handler = new ApiHandler (app);
+        handler.Register (api);
+
+        // Добавляем Swagger
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+        }
+
         Logger.LogInformation ("Application startup");
 
         app.Run();
@@ -167,12 +187,10 @@ internal sealed /* нельзя static */ class Program
             string[] args
         )
     {
-        // используем json5, чтобы невозбранно использовать комментарии
-        // хотя, говорят, можно было оставаться и на простом json
         var configuration = builder.Configuration;
         configuration.Sources.Clear();
         configuration.AddCommandLine (args);
-        configuration.AddJsonFile ("appsettings.json5");
+        configuration.AddJsonFile ("appsettings.json");
 
         return configuration;
     }
