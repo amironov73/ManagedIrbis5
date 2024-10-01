@@ -247,14 +247,14 @@ internal sealed class ApiHandler
     private IResult ListScenarios
         (
             [SwaggerParameter ("Name of the database")]
-            string databaseName
+            string database
         )
     {
-        Sure.NotNullNorEmpty (databaseName);
+        Sure.NotNullNorEmpty (database);
 
         // using var storehouse = GetStorehouse();
         _logger.LogTrace (nameof (ListScenarios) +
-                          ": {Database} : OK", databaseName);
+                          ": {Database} : OK", database);
 
         return Results.Json (_mockup.Scenarios);
     }
@@ -294,13 +294,13 @@ internal sealed class ApiHandler
     private IResult SearchBooks
         (
             [SwaggerParameter ("Database name")]
-            string databaseName,
+            string database,
 
             [SwaggerParameter ("Query text")]
             string query
         )
     {
-        Sure.NotNullNorEmpty (databaseName);
+        Sure.NotNullNorEmpty (database);
         Sure.NotNullNorEmpty (query);
 
         var books = _mockup.Books;

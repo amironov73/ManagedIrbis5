@@ -3,3 +3,28 @@
     min-width: 100px;
     max-width: 500px;
 }
+
+.found-card {
+    background-color: aliceblue;
+    margin: 1em 0;
+    padding: 1em;
+    border: none;
+}
+
+.serial {
+    font-weight: bold;
+}
+
+.exemplar {
+    text-align: end;
+    font-weight: bold;
+    color: white;
+}
+
+.exemplar-good {
+    background: green;
+}
+
+.exemplar-bad {
+    background: indianred;
+}
