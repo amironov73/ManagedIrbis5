@@ -28,10 +28,10 @@ public sealed class Loan
     #region Properties
 
     /// <summary>
-    /// Инвентарный номер книги.
+    /// Ссылка на выданный экземпляр книги.
     /// </summary>
-    [JsonPropertyName ("number")]
-    public string? Number { get; set; }
+    [JsonPropertyName ("instance")]
+    public Instance? Instance { get; set; }
 
     /// <summary>
     /// Библиографическое описание книги.
@@ -62,7 +62,7 @@ public sealed class Loan
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => $"{Number}: {Description}";
+    public override string ToString() => $"{Instance}: {Description}";
 
     #endregion
 }

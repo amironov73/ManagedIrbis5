@@ -67,7 +67,7 @@ internal sealed class ApiHandler
         // using var storehouse = GetStorehouse();
         _logger.LogTrace (nameof (ListOrders) + ": OK");
 
-        return Results.Json (_mockup._orders);
+        return Results.Json (_mockup.Orders);
     }
 
     /// <summary>
@@ -82,11 +82,32 @@ internal sealed class ApiHandler
     {
         Sure.NotNullNorEmpty (status);
 
-        var orders = _mockup._orders
+        var orders = _mockup.Orders
             .Where (o => o.Status == status)
             .ToArray();
 
         _logger.LogTrace (nameof (ListOrdersWithStatus) + ": {Status}: OK", status);
+
+        return Results.Json (orders);
+    }
+
+    /// <summary>
+    /// Перечисление заказов указанного читателя.
+    /// </summary>
+    [SwaggerOperation ("Find orders of the reader")]
+    private IResult ListOrdersOfReader
+        (
+            [SwaggerParameter ("Ticket number")]
+            string ticket
+        )
+    {
+        Sure.NotNullNorEmpty (ticket);
+
+        var orders = _mockup.Orders
+            .Where (o => o.Ticket == ticket)
+            .ToArray();
+
+        _logger.LogTrace (nameof (ListOrdersOfReader) + ": {Ticket}: OK", ticket);
 
         return Results.Json (orders);
     }
@@ -104,7 +125,7 @@ internal sealed class ApiHandler
         Sure.NotNull (newOrder);
 
         newOrder.Id = _mockup.GetNextOrderId();
-        _mockup._orders.Add (newOrder);
+        _mockup.Orders.Add (newOrder);
 
         _logger.LogTrace (nameof (CreateOrder) + ": {Order}: OK", newOrder);
 
@@ -123,7 +144,7 @@ internal sealed class ApiHandler
     {
         Sure.NotNull (updatedOrder);
 
-        var existingOrder = _mockup._orders.SingleOrDefault
+        var existingOrder = _mockup.Orders.SingleOrDefault
             (
                 o => o.Id == updatedOrder.Id
             );
@@ -131,11 +152,11 @@ internal sealed class ApiHandler
         {
             _logger.LogTrace (nameof (UpdateOrder)
                               + ": {Order}: not found", updatedOrder);
-            return Results.NotFound ();
+            return Results.NotFound();
         }
 
         existingOrder.Status = updatedOrder.Status;
-        existingOrder.Book = updatedOrder.Book;
+        existingOrder.Instance = updatedOrder.Instance;
         existingOrder.Ticket = updatedOrder.Ticket;
         existingOrder.Date = updatedOrder.Date;
 
@@ -161,7 +182,7 @@ internal sealed class ApiHandler
         Sure.NonNegative (orderId);
         Sure.NotNullNorEmpty (newStatus);
 
-        var existingOrder = _mockup._orders.SingleOrDefault
+        var existingOrder = _mockup.Orders.SingleOrDefault
             (
                 o => o.Id == orderId
             );
@@ -191,7 +212,7 @@ internal sealed class ApiHandler
     {
         Sure.NonNegative (orderId);
 
-        var existingOrder = _mockup._orders.SingleOrDefault
+        var existingOrder = _mockup.Orders.SingleOrDefault
             (
                 o => o.Id == orderId
             );
@@ -201,10 +222,107 @@ internal sealed class ApiHandler
             return Results.NotFound();
         }
 
-        _mockup._orders.Remove (existingOrder);
+        _mockup.Orders.Remove (existingOrder);
         _logger.LogTrace (nameof (DeleteOrder) + ": {Order}: OK", existingOrder);
 
         return Results.Ok();
+    }
+
+    /// <summary>
+    /// Получение списка баз данных.
+    /// </summary>
+    [SwaggerOperation ("List all databases")]
+    private IResult ListDatabases()
+    {
+        // using var storehouse = GetStorehouse();
+        _logger.LogTrace (nameof (ListDatabases) + ": OK");
+
+        return Results.Json (_mockup.Databases);
+    }
+
+    /// <summary>
+    /// Получение списка сценариев поиска.
+    /// </summary>
+    [SwaggerOperation ("List all databases")]
+    private IResult ListScenarios
+        (
+            [SwaggerParameter ("Name of the database")]
+            string databaseName
+        )
+    {
+        Sure.NotNullNorEmpty (databaseName);
+
+        // using var storehouse = GetStorehouse();
+        _logger.LogTrace (nameof (ListScenarios) +
+                          ": {Database} : OK", databaseName);
+
+        return Results.Json (_mockup.Scenarios);
+    }
+
+    /// <summary>
+    /// Поиск читателя по номеру его билета.
+    /// </summary>
+    [SwaggerOperation ("Search the reader by ticket number")]
+    private IResult GetReader
+        (
+            [SwaggerParameter ("Ticket number to search by")]
+            string ticket
+        )
+    {
+        Sure.NotNullNorEmpty (ticket);
+
+        var reader = _mockup.Readers.SingleOrDefault
+            (
+                r => r.Ticket == ticket
+            );
+        if (reader is null)
+        {
+            _logger.LogTrace (nameof (GetReader)
+                              + ": {Ticket}: not found", ticket);
+            return Results.NotFound();
+        }
+
+        _logger.LogTrace (nameof (GetReader) + ": OK: {Reader}", reader);
+
+        return Results.Json (reader);
+    }
+
+    /// <summary>
+    /// Поиск книг по каталогу.
+    /// </summary>
+    [SwaggerOperation ("Search for the books")]
+    private IResult SearchBooks
+        (
+            [SwaggerParameter ("Database name")]
+            string databaseName,
+
+            [SwaggerParameter ("Query text")]
+            string query
+        )
+    {
+        Sure.NotNullNorEmpty (databaseName);
+        Sure.NotNullNorEmpty (query);
+
+        var books = _mockup.Books;
+        var result = new List<Book>();
+        var random = new Random();
+        var howMany = random.Next (books.Count);
+        var found = new List<int>();
+        for (var i = 0; i < howMany; i++)
+        {
+            while (true)
+            {
+                var candidate = random.Next (books.Count);
+                if (!found.Contains (candidate))
+                {
+                    found.Add (candidate);
+                    result.Add (books[i]);
+                    break;
+                }
+            }
+        }
+
+        return Results.Json (result);
     }
 
     #endregion
@@ -221,13 +339,17 @@ internal sealed class ApiHandler
     {
         Sure.NotNull (api);
 
+        api.MapGet ("/databases", ListDatabases);
+        api.MapGet ("/scenarios/{database}", ListScenarios);
+        api.MapGet ("/readers/{ticket}", GetReader);
+        api.MapGet ("/search/{database}/{query}", SearchBooks);
         api.MapGet ("/orders", ListOrders);
-        api.MapGet ("/orders/{status}", ListOrdersWithStatus);
+        api.MapGet ("/orders/status/{status}", ListOrdersWithStatus);
+        api.MapGet ("/orders/ticket/{ticket}", ListOrdersOfReader);
         api.MapPost ("/orders", CreateOrder);
         api.MapPut ("/orders", UpdateOrder);
-        api.MapPut ("/orders/{status}", UpdateOrderStatus);
+        api.MapPut ("/orders/status/{id}/{status}", UpdateOrderStatus);
         api.MapDelete ("/orders/{id}", DeleteOrder);
-
     }
 
     #endregion

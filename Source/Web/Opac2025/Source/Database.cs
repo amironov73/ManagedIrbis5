@@ -5,7 +5,7 @@
 // ReSharper disable CommentTypo
 // ReSharper disable IdentifierTypo
 
-/* Reader.cs -- информация о читателе
+/* Database.cs -- информация о базе данных ИРБИС64
  * Ars Magna project, http://arsmagna.ru
  */
 
@@ -15,51 +15,36 @@ using System.Text.Json.Serialization;
 
 using JetBrains.Annotations;
 
-using LinqToDB.Mapping;
-
 #endregion
 
 namespace Opac2025;
 
 /// <summary>
-/// Информация о читателе.
+/// Информация о базе данных ИРБИС64.
 /// </summary>
 [PublicAPI]
-[Table (Name = "readers")]
-public sealed class Reader
+public sealed class Database
 {
     #region Properties
 
     /// <summary>
-    /// Номер читательского билета.
-    /// </summary>
-    [JsonPropertyName ("ticket")]
-    public string? Ticket { get; set; }
-
-    /// <summary>
-    /// ФИО читателя.
+    /// Имя базы данных.
     /// </summary>
     [JsonPropertyName ("name")]
     public string? Name { get; set; }
 
     /// <summary>
-    /// Адрес почты для связи.
+    /// Описание в произвольной форме.
     /// </summary>
-    [JsonPropertyName ("mail")]
-    public string? Mail { get; set; }
-
-    /// <summary>
-    /// Книги на руках у читателя.
-    /// </summary>
-    [JsonPropertyName ("loans")]
-    public Loan[]? Loans { get; set; }
+    [JsonPropertyName ("description")]
+    public string? Description { get; set; }
 
     #endregion
 
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => $"{Ticket}: {Name}";
+    public override string ToString() => $"{Name}: {Description}";
 
     #endregion
 }

@@ -43,10 +43,10 @@ public sealed class Order
     public string? Ticket { get; set; }
 
     /// <summary>
-    /// Идентификатор заказанной книги.
+    /// Ссылка на заказанный экземпляр книги.
     /// </summary>
-    [JsonPropertyName ("book")]
-    public string? Book { get; set; }
+    [JsonPropertyName ("instance")]
+    public Instance? Instance { get; set; }
 
     /// <summary>
     /// Дата создания заказа.
@@ -65,7 +65,7 @@ public sealed class Order
     #region Object members
 
     /// <inheritdoc cref="object.ToString"/>
-    public override string ToString() => $"{Ticket}: {Book}: {Date}: {Status}";
+    public override string ToString() => $"{Ticket}: {Instance}: {Date}: {Status}";
 
     #endregion
 }
