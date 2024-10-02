@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Песочница">
+
+    <title>Электронный каталог</title>
+    <link rel='icon' type='image/png' href='./img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-6 offset-3">
+            <h3 class="mt-3">Список задач</h3>
+
+            <div>
+                <ul id="task-list">
+                </ul>
+            </div>
+
+            <div class="input-group">
+                <label class="form-control" for="new-task">Новая задача:&nbsp;</label>
+                <input class="form-control" id="new-task" type="text">
+                <button id="add-button"
+                        class="form-control btn btn-primary"
+                        onclick="addTask()">Добавить</button>
+            </div>
+            <div class="input-group mt-1">
+                <button class="form-control btn btn-outline-danger" onclick="clearTasks()">Очистить</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/fontawesome.min.js"></script>
+<script src="js/jquery.min.js"></script>
+
+<script type="application/javascript">
+
+    const taskList = document.getElementById('task-list')
+    let tasks = []
+
+    function appendList(task) {
+        const child = document.createElement('li')
+        child.innerHTML = task
+        taskList.appendChild(child)
+    }
+
+    function addTask() {
+        const newTask = document.getElementById('new-task')
+        const task = newTask.value
+        if (task) {
+            tasks.push(task)
+            appendList(task)
+            newTask.value = ''
+            localStorage.setItem('tasks', JSON.stringify(tasks))
+        }
+    }
+
+    function clearTasks() {
+        tasks = []
+        localStorage.setItem('tasks', JSON.stringify(tasks))
+        taskList.innerHTML = ''
+    }
+
+    setTimeout(function () {
+        document.getElementById('new-task').addEventListener('keydown', e => {
+            if (e.key === 'Enter') {
+                addTask()
+            }
+        })
+
+        if (localStorage.getItem('tasks')) {
+            tasks = JSON.parse(localStorage.getItem('tasks'))
+            for (const task of tasks) {
+                appendList(task)
+            }
+        }
+    })
+
+</script>
+
+</html>
