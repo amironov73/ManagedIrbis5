@@ -89,13 +89,15 @@ function handleSuccess(data) {
         description.innerHTML = book.description
         item.appendChild(description)
 
+        const exemplarsDiv = document.createElement('div')
+        exemplarsDiv.classList.add('exemplar')
         for (const exemplar of book.exemplars) {
-            const area = document.createElement('div')
-            area.classList.add('exemplar')
+            const area = document.createElement('span')
             area.classList.add(exemplar.status === '0' ? 'exemplar-good' : 'exemplar-bad')
             area.innerText = exemplar.number + ' (' + exemplar.status + ')'
-            item.appendChild(area)
+            exemplarsDiv.appendChild(area)
         }
+        item.appendChild(exemplarsDiv)
 
         resultContainer.appendChild(item)
     }
@@ -145,6 +147,7 @@ function createRow() {
     const select = document.createElement('select')
     select.classList.add('btn')
     select.classList.add('btn-outline-primary')
+    select.style.setProperty('text-align', 'left')
     inputGroup.appendChild(select)
 
     const input = document.createElement('input')
