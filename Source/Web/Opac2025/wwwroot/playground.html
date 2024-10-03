@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <meta name="description" content="Песочница">
 
-    <title>Электронный каталог</title>
+    <title>Песочница</title>
     <link rel='icon' type='image/png' href='./img/favicon.ico'>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/fontawesome.min.css">
@@ -17,7 +17,31 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-6 offset-3">
+
+        <div class="col-lg-6 offset-lg-3">
+            <h3 class="mt-3">Функция fetch</h3>
+
+            <div class="input-group">
+                <button class="btn btn-outline-primary" onclick="callFetch()"
+                    >Нажми для вызова <strong>fetch</strong></button>
+            </div>
+
+            <div class="input-group">
+                <label class="form-control" for="fetch-result">
+                    Результат вызова <strong>fetch</strong>
+                </label>
+            </div>
+            <div class="input-group">
+                <textarea class="form-control"
+                          placeholder="Тут будет помещен результат"
+                          id="fetch-result"></textarea>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-6 offset-lg-3">
             <h3 class="mt-3">Список задач</h3>
 
             <div>
@@ -48,6 +72,16 @@
 <script src="js/jquery.min.js"></script>
 
 <script type="application/javascript">
+
+    const fetchResult = document.getElementById('fetch-result')
+
+    async function callFetch() {
+        fetchResult.innerText = await (await fetch('https://httpbin.org/uuid')).text()
+
+        //fetch('https://httpbin.org/uuid')
+        //    .then(response => response.text())
+        //    .then(responseText => fetchResult.innerText = responseText)
+    }
 
     const taskList = document.getElementById('task-list')
     let tasks = []

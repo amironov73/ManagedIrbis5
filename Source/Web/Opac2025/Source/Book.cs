@@ -40,6 +40,12 @@ public sealed class Book
     public string? Description { get; set; }
 
     /// <summary>
+    /// Ссылка на изображение обложки (опционально).
+    /// </summary>
+    [JsonPropertyName ("cover")]
+    public string? Cover { get; set; }
+
+    /// <summary>
     /// Массив экземпляров.
     /// </summary>
     [JsonPropertyName ("exemplars")]

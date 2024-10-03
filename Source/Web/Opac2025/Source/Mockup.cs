@@ -24,129 +24,150 @@ internal sealed class Mockup
     /// </summary>
     public readonly List<Book> Books =
     [
-        new Book
+        new ()
         {
             Id = "K1/2",
             Description = "Паустовский, Константин. Исаак Левитан : повесть. — М., 1937",
+            Cover = "cover/332441.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "A6001",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ФКХ"
                 },
                 new Exemplar
                 {
                     Number = "A60002",
-                    Status = "6"
+                    Status = "6",
+                    Sigla = "ЧЗ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "K2/3",
             Description = "Федоров-Давыдов, А. А. И. И. Левитан. Жизнь и творчество. — М., 1960",
+            Cover = "cover/398241.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "A6003",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ФКХ"
                 },
                 new Exemplar
                 {
                     Number = "A60004",
-                    Status = "2"
+                    Status = "2",
+                    Sigla = "ЧЗ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "K3/4",
             Description = "Левитан М. А. Палеоокеанология Индийского океана в мелунеогене. - М.: Наука. 1992. 244с.",
+            Cover = "cover/450241.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "A6005",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ЧЗ"
                 },
                 new Exemplar
                 {
                     Number = "A60006",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ФКХ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "K3/4",
             Description = "Бродский Б. И. Романтические ведуты: Рассказы об удивительных городах и знаменитых постройках древнего мира. — М.: Советский художник. — (Страницы истории искусств)",
+            Cover = "cover/458841.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "A6005",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ЧЗ"
                 },
                 new Exemplar
                 {
                     Number = "A60006",
-                    Status = "1"
+                    Status = "1",
+                    Sigla = "ФКХ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "K5/7",
             Description = "Кузнецов Э. Д. Звери и птицы Евгения Чарушина. — М.: Советский художник, 1983. — 160 с. — (Рассказы о художниках)",
+            Cover = "cover/477141.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "A6007",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ЧЗ"
                 },
                 new Exemplar
                 {
                     Number = "A60008",
-                    Status = "1"
+                    Status = "1",
+                    Sigla = "ФКХ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "L711",
             Description = "Сагалович М. В. По следам Фернана Леже. — М.: Советский художник, 1983. — 352 с. — (Рассказы о художниках)",
+            Cover = "cover/483641.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "B6102",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ЧЗ"
                 },
                 new Exemplar
                 {
                     Number = "B6103",
-                    Status = "1"
+                    Status = "1",
+                    Sigla = "ФКХ"
                 }
             ]
         },
-        new Book
+        new ()
         {
             Id = "M712",
             Description = "Варшавский А. Подвиг художника. — М.: Советский художник, 1965. — 176 с. — (Страницы истории искусств)",
+            Cover = "cover/484541.png",
             Exemplars =
             [
                 new Exemplar
                 {
                     Number = "M1112",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ФКХ"
                 },
                 new Exemplar
                 {
                     Number = "M1113",
-                    Status = "0"
+                    Status = "0",
+                    Sigla = "ЧЗ"
                 }
             ]
         },
@@ -162,17 +183,17 @@ internal sealed class Mockup
             Name = "ISTU",
             Description = "Учебники, монографии и продолжающиеся издания"
         },
-        new Database
+        new ()
         {
             Name = "HUDO",
             Description = "Художественная литература"
         },
-        new Database
+        new ()
         {
             Name = "NTD",
             Description = "Нормативно-техническая документация"
         },
-        new Database
+        new ()
         {
             Name = "USO",
             Description = "Литература в филиалах ИРНИТУ"

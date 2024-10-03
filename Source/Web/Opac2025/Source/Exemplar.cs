@@ -39,6 +39,12 @@ public class Exemplar
     [JsonPropertyName ("status")]
     public string? Status { get; set; }
 
+    /// <summary>
+    /// Место хранения экземпляра.
+    /// </summary>
+    [JsonPropertyName ("sigla")]
+    public string? Sigla { get; set; }
+
     #endregion
 
     #region Object members

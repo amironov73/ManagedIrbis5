@@ -85,6 +85,14 @@ function handleSuccess(data) {
         serial.innerText = (++index).toString()
         item.appendChild(serial)
 
+        const coverUrl = book.cover
+        if (coverUrl) {
+            const cover = document.createElement('img')
+            cover.src = coverUrl
+            cover.width = 100
+            item.appendChild(cover)
+        }
+
         const description = document.createElement('div')
         description.innerHTML = book.description
         item.appendChild(description)
@@ -95,6 +103,12 @@ function handleSuccess(data) {
             const area = document.createElement('span')
             area.classList.add(exemplar.status === '0' ? 'exemplar-good' : 'exemplar-bad')
             area.innerText = exemplar.number + ' (' + exemplar.status + ')'
+
+            const sigla = document.createElement('span')
+            sigla.classList.add('sigla')
+            sigla.innerText = exemplar.sigla
+            area.appendChild(sigla)
+
             exemplarsDiv.appendChild(area)
         }
         item.appendChild(exemplarsDiv)

@@ -34,3 +34,8 @@
     padding: 0.3em 0.5em;
     border-radius: 0.5em;
 }
+
+.sigla {
+    color: yellow;
+    margin-left: 0.3em;
+}
