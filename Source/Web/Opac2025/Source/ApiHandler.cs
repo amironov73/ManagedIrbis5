@@ -113,6 +113,37 @@ internal sealed class ApiHandler
     }
 
     /// <summary>
+    /// Перечисление заказов указанного читателя.
+    /// </summary>
+    [SwaggerOperation ("Find orders of the book exemplar")]
+    private IResult ListOrdersOfExemplar
+        (
+            [SwaggerParameter ("Database name")]
+            string database,
+
+            [SwaggerParameter ("Book identifier")]
+            string book,
+
+            [SwaggerParameter ("Inventory number")]
+            string number
+        )
+    {
+        Sure.NotNullNorEmpty (database);
+        Sure.NotNullNorEmpty (book);
+        Sure.NotNullNorEmpty (number);
+
+        var orders = _mockup.Orders
+            .Where (o => o.Instance?.Database == database
+                && o.Instance.Book == book
+                && o.Instance?.Number == number)
+            .ToArray();
+
+        _logger.LogTrace (nameof (ListOrdersOfExemplar) + ": {Number}: OK", number);
+
+        return Results.Json (orders);
+    }
+
+    /// <summary>
     /// Создание нового заказа.
     /// </summary>
     [SwaggerOperation ("Create an order")]
@@ -346,6 +377,7 @@ internal sealed class ApiHandler
         api.MapGet ("/orders", ListOrders);
         api.MapGet ("/orders/status/{status}", ListOrdersWithStatus);
         api.MapGet ("/orders/ticket/{ticket}", ListOrdersOfReader);
+        api.MapGet ("/orders/number/{database}/{book}/{number}", ListOrdersOfExemplar);
         api.MapPost ("/orders", CreateOrder);
         api.MapPut ("/orders", UpdateOrder);
         api.MapPut ("/orders/status/{id}/{status}", UpdateOrderStatus);

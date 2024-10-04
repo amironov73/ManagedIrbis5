@@ -11,10 +11,74 @@
     <link rel="stylesheet" href="css/fontawesome.min.css">
     <link rel="stylesheet" href="css/styles.css">
 
+    <style>
+
+        .inner-item {
+            margin: 1em;
+            padding: 1em;
+            border: 1px solid black;
+        }
+
+        .beautiful {
+            border-radius: 1em 1em 0 1em;
+            padding: 1em;
+            background: rgb(238,237,255);
+            background: linear-gradient(180deg, rgba(238,237,255,1) 0%, rgba(171,201,252,1) 10%, rgba(149,199,255,1) 90%, rgba(238,237,255,1) 100%);
+        }
+
+    </style>
+
 </head>
 <body>
 
 <div class="container">
+
+    <div class="row">
+
+        <div class="col-lg-6 offset-lg-3">
+
+        <h3 class="mt-3">Gradient</h3>
+
+        <div class="d-flex flex-row border beautiful"
+            style="height: 100px;">
+            У попа была собака, он ее любил. Она съела кусок мяса.
+            Он ее убил. В землю закопал. Надпись написал.
+        </div>
+
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-6 offset-lg-3">
+
+            <h3 class="mt-3">Flexbox</h3>
+
+            <div class="w100 d-flex flex-row beautiful">
+
+                <div class="inner-item" style="color: red;">
+                    Первое
+                </div>
+
+                <div class="inner-item">
+                    <img src="cover/332441.png" width="100">
+                </div>
+
+                <div class="inner-item" style="color: yellow;">
+                    Второе
+                </div>
+
+                <div class="inner-item" style="color: green;">
+                    Третье
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 
     <div class="row">
 

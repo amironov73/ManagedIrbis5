@@ -31,13 +31,13 @@ internal sealed class Mockup
             Cover = "cover/332441.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "A6001",
                     Status = "0",
                     Sigla = "ФКХ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "A60002",
                     Status = "6",
@@ -52,13 +52,13 @@ internal sealed class Mockup
             Cover = "cover/398241.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "A6003",
                     Status = "0",
                     Sigla = "ФКХ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "A60004",
                     Status = "2",
@@ -73,13 +73,13 @@ internal sealed class Mockup
             Cover = "cover/450241.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "A6005",
                     Status = "0",
                     Sigla = "ЧЗ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "A60006",
                     Status = "0",
@@ -94,13 +94,13 @@ internal sealed class Mockup
             Cover = "cover/458841.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "A6005",
                     Status = "0",
                     Sigla = "ЧЗ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "A60006",
                     Status = "1",
@@ -115,13 +115,13 @@ internal sealed class Mockup
             Cover = "cover/477141.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "A6007",
                     Status = "0",
                     Sigla = "ЧЗ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "A60008",
                     Status = "1",
@@ -133,16 +133,16 @@ internal sealed class Mockup
         {
             Id = "L711",
             Description = "Сагалович М. В. По следам Фернана Леже. — М.: Советский художник, 1983. — 352 с. — (Рассказы о художниках)",
-            Cover = "cover/483641.png",
+            // Cover = "cover/483641.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "B6102",
                     Status = "0",
                     Sigla = "ЧЗ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "B6103",
                     Status = "1",
@@ -157,13 +157,13 @@ internal sealed class Mockup
             Cover = "cover/484541.png",
             Exemplars =
             [
-                new Exemplar
+                new ()
                 {
                     Number = "M1112",
                     Status = "0",
                     Sigla = "ФКХ"
                 },
-                new Exemplar
+                new ()
                 {
                     Number = "M1113",
                     Status = "0",
@@ -178,7 +178,7 @@ internal sealed class Mockup
     /// </summary>
     public readonly List<Database> Databases =
     [
-        new Database
+        new ()
         {
             Name = "ISTU",
             Description = "Учебники, монографии и продолжающиеся издания"
@@ -205,21 +205,21 @@ internal sealed class Mockup
     /// </summary>
     public readonly List<Reader> Readers =
     [
-        new Reader
+        new ()
         {
             Ticket = "00001",
             Name = "Билибин Иван Яковлевич",
             Mail = "bilibin@mail.ru",
             Loans = []
         },
-        new Reader
+        new ()
         {
             Ticket = "00002",
             Name = "Васнецов Юрий Алексеевич",
             Mail = "vasyur@mail.ru",
             Loans = []
         },
-        new Reader
+        new ()
         {
             Ticket = "00003",
             Name = "Репин Илья Ефимович",
@@ -241,7 +241,7 @@ internal sealed class Mockup
                 },
             ]
         },
-        new Reader
+        new ()
         {
             Ticket = "00004",
             Name = "Рерих Николай Константинович",
@@ -277,17 +277,17 @@ internal sealed class Mockup
     /// </summary>
     public readonly List<Scenario> Scenarios =
     [
-        new Scenario
+        new ()
         {
             Prefix  = "A=",
             Description = "Автор"
         },
-        new Scenario
+        new ()
         {
             Prefix  = "T=",
             Description = "Заглавие"
         },
-        new Scenario
+        new ()
         {
             Prefix  = "K=",
             Description = "Ключевое слово"
@@ -299,7 +299,7 @@ internal sealed class Mockup
     /// </summary>
     public readonly List<Order> Orders =
     [
-        new Order
+        new ()
         {
             Id = 1,
             Ticket = "123",
@@ -313,7 +313,7 @@ internal sealed class Mockup
             Status = Constants.New
         },
 
-        new Order
+        new ()
         {
             Id = 2,
             Ticket = "124",
@@ -327,7 +327,7 @@ internal sealed class Mockup
             Status = Constants.Done
         },
 
-        new Order
+        new ()
         {
             Id = 3,
             Ticket = "125",
@@ -341,7 +341,7 @@ internal sealed class Mockup
             Status = Constants.Ready
         },
 
-        new Order
+        new ()
         {
             Id = 4,
             Ticket = "126",
@@ -355,7 +355,7 @@ internal sealed class Mockup
             Status = Constants.Cancelled
         },
 
-        new Order
+        new ()
         {
             Id = 5,
             Ticket = "126",

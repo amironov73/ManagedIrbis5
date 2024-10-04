@@ -79,9 +79,12 @@ function handleSuccess(data) {
     for (const book of documents) {
         const item = document.createElement('div')
         item.classList.add('found-card')
+        item.classList.add('d-flex')
+        item.classList.add('flex-row')
 
         const serial = document.createElement('div')
         serial.classList.add('serial')
+        serial.style.setProperty('margin-right', '1em')
         serial.innerText = (++index).toString()
         item.appendChild(serial)
 
@@ -94,11 +97,21 @@ function handleSuccess(data) {
         }
 
         const description = document.createElement('div')
+        description.style.setProperty('flex-grow', '1')
+        description.style.setProperty('margin-left', '1em')
+        // description.style.setProperty('align-self', 'stretch')
         description.innerHTML = book.description
         item.appendChild(description)
 
         const exemplarsDiv = document.createElement('div')
         exemplarsDiv.classList.add('exemplar')
+
+        const label = document.createElement('span')
+        label.classList.add('mr-1')
+        label.classList.add('text-primary')
+        label.innerText = 'Экземпляры:'
+        exemplarsDiv.appendChild(label)
+
         for (const exemplar of book.exemplars) {
             const area = document.createElement('span')
             area.classList.add(exemplar.status === '0' ? 'exemplar-good' : 'exemplar-bad')
@@ -111,7 +124,7 @@ function handleSuccess(data) {
 
             exemplarsDiv.appendChild(area)
         }
-        item.appendChild(exemplarsDiv)
+        description.appendChild(exemplarsDiv)
 
         resultContainer.appendChild(item)
     }
