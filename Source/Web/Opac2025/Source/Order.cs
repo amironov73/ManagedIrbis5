@@ -43,6 +43,12 @@ public sealed class Order
     public string? Ticket { get; set; }
 
     /// <summary>
+    /// Библиографическое описание заказанной книги.
+    /// </summary>
+    [JsonPropertyName ("description")]
+    public string? Description { get; set; }
+
+    /// <summary>
     /// Ссылка на заказанный экземпляр книги.
     /// </summary>
     [JsonPropertyName ("instance")]

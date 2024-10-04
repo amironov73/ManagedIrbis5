@@ -303,6 +303,7 @@ internal sealed class Mockup
         {
             Id = 1,
             Ticket = "123",
+            Description = "Какая-то книжка",
             Instance = new Instance
             {
                 Database = "ISTU",
@@ -317,6 +318,7 @@ internal sealed class Mockup
         {
             Id = 2,
             Ticket = "124",
+            Description = "Еще какая-то книжка",
             Instance = new Instance
             {
                 Database = "ISTU",
@@ -331,6 +333,7 @@ internal sealed class Mockup
         {
             Id = 3,
             Ticket = "125",
+            Description = "Третья книжка",
             Instance = new Instance
             {
                 Database = "ISTU",
@@ -345,6 +348,7 @@ internal sealed class Mockup
         {
             Id = 4,
             Ticket = "126",
+            Description = "Четвертая книжка",
             Instance = new Instance
             {
                 Database = "ISTU",
@@ -359,6 +363,7 @@ internal sealed class Mockup
         {
             Id = 5,
             Ticket = "126",
+            Description = "Пятая книжка",
             Instance = new Instance
             {
                 Database = "ISTU",

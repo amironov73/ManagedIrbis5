@@ -9,6 +9,7 @@
     <link rel='icon' type='image/png' href='./img/favicon.ico'>
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/solid.min.css">
     <link rel="stylesheet" href="css/styles.css">
 
     <style>
@@ -22,8 +23,24 @@
         .beautiful {
             border-radius: 1em 1em 0 1em;
             padding: 1em;
-            background: rgb(238,237,255);
-            background: linear-gradient(180deg, rgba(238,237,255,1) 0%, rgba(171,201,252,1) 10%, rgba(149,199,255,1) 90%, rgba(238,237,255,1) 100%);
+            background: rgb(238, 237, 255);
+            background: linear-gradient(180deg, rgba(238, 237, 255, 1) 0%, rgba(171, 201, 252, 1) 10%, rgba(149, 199, 255, 1) 90%, rgba(238, 237, 255, 1) 100%);
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            #printableArea, #printableArea * {
+                visibility: visible;
+            }
+
+            #printableArea {
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
         }
 
     </style>
@@ -37,94 +54,195 @@
 
         <div class="col-lg-6 offset-lg-3">
 
-        <h3 class="mt-3">Gradient</h3>
+            <h3 class="mt-3">Печать текста</h3>
+
+            <div class="d-flex">
+                <div id="book-1">
+
+                    <p>Бренд Tern и разработчики WinRAR объединили усилия
+                        для создания необычной коллекции. Результатом
+                        стали сумка и футболка, вдохновленные легендарным
+                        архиватором.
+                    </p>
+
+                    <p>Сумка воспроизводит дизайн той самой иконки WinRAR.
+                        Футболка представляет собой еще более оригинальный
+                        концепт. Она поставляется "архивированном" виде
+                        и требует "распаковки" - намочить водой перед
+                        использованием.
+                    </p>
+
+                    <p>Старт продаж обоих изделий назначен на 4 октября.
+                        Tern уже открыл предварительную регистрацию
+                        для желающих приобрести новинки. Однако цены пока
+                        не объявлены.
+                    </p>
+
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="printElem('book-1')">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex">
+                <div id="book-2">
+
+                    <p>Разработчики Аньфу Нгуен и Кейн Ардайфио создали
+                       прототип ИИ-очков I-XRAY, способных в реальном
+                       времени идентифицировать людей и выдавать их личную
+                       информацию.
+                    </p>
+
+                    <p>I-XRAY объединяет несколько ключевых компонентов.
+                        В основе лежат смарт-очки Ray Ban 2 с встроенной
+                        камерой. Система использует алгоритмы обратного
+                        распознавания лиц для поиска совпадений в интернете.
+                        Найденные ссылки обрабатываются языковой моделью,
+                        извлекающей персональные данные.
+                    </p>
+
+                </div>
+                <div>
+                    <button class="btn btn-primary" onclick="printElem('book-2')">
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-6 offset-lg-3">
+
+        <h3 class="mt-3">Кнопки</h3>
+
+        <div class="text-center">
+
+            <button class="btn btn-primary" onclick="say('Печать')">
+                <i class="fa-solid fa-print"></i>
+                Печать
+            </button>
+
+            <button class="btn btn-primary" onclick="say('Корзина')">
+                <i class="fa-solid fa-cart-shopping"></i>
+                Корзина: <strong>0</strong>
+            </button>
+
+            <button class="btn btn-primary" onclick="say('Заказ')">
+                <i class="fa-solid fa-basket-shopping"></i>
+                Заказ
+            </button>
+
+            <button class="btn btn-primary" onclick="say('Удаление')">
+                <i class="fa-regular fa-circle-xmark"></i>
+                Удаление
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-6 offset-lg-3">
+
+        <h3 class="mt-3">Градиент</h3>
 
         <div class="d-flex flex-row border beautiful"
-            style="height: 100px;">
+             style="height: 100px;">
             У попа была собака, он ее любил. Она съела кусок мяса.
             Он ее убил. В землю закопал. Надпись написал.
         </div>
 
+    </div>
+
+</div>
+
+<div class="row">
+
+    <div class="col-lg-6 offset-lg-3">
+
+        <h3 class="mt-3">Flexbox</h3>
+
+        <div class="w100 d-flex flex-row beautiful">
+
+            <div class="inner-item" style="color: red;">
+                Первое
+            </div>
+
+            <div class="inner-item">
+                <img src="cover/332441.png" width="100" alt="#">
+            </div>
+
+            <div class="inner-item" style="color: yellow;">
+                Второе
+            </div>
+
+            <div class="inner-item" style="color: green;">
+                Третье
+            </div>
+
         </div>
 
     </div>
 
-    <div class="row">
+</div>
 
-        <div class="col-lg-6 offset-lg-3">
 
-            <h3 class="mt-3">Flexbox</h3>
+<div class="row">
 
-            <div class="w100 d-flex flex-row beautiful">
+    <div class="col-lg-6 offset-lg-3">
+        <h3 class="mt-3">Функция fetch</h3>
 
-                <div class="inner-item" style="color: red;">
-                    Первое
-                </div>
-
-                <div class="inner-item">
-                    <img src="cover/332441.png" width="100">
-                </div>
-
-                <div class="inner-item" style="color: yellow;">
-                    Второе
-                </div>
-
-                <div class="inner-item" style="color: green;">
-                    Третье
-                </div>
-
-            </div>
-
+        <div class="input-group">
+            <button class="btn btn-outline-primary" onclick="callFetch()"
+            >Нажми для вызова <strong>fetch</strong></button>
         </div>
 
-    </div>
-
-
-    <div class="row">
-
-        <div class="col-lg-6 offset-lg-3">
-            <h3 class="mt-3">Функция fetch</h3>
-
-            <div class="input-group">
-                <button class="btn btn-outline-primary" onclick="callFetch()"
-                    >Нажми для вызова <strong>fetch</strong></button>
-            </div>
-
-            <div class="input-group">
-                <label class="form-control" for="fetch-result">
-                    Результат вызова <strong>fetch</strong>
-                </label>
-            </div>
-            <div class="input-group">
+        <div class="input-group">
+            <label class="form-control" for="fetch-result">
+                Результат вызова <strong>fetch</strong>
+            </label>
+        </div>
+        <div class="input-group">
                 <textarea class="form-control"
                           placeholder="Тут будет помещен результат"
                           id="fetch-result"></textarea>
-            </div>
-
         </div>
+
     </div>
+</div>
 
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <h3 class="mt-3">Список задач</h3>
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <h3 class="mt-3">Список задач</h3>
 
-            <div>
-                <ul id="task-list">
-                </ul>
-            </div>
-
-            <div class="input-group">
-                <label class="form-control" for="new-task">Новая задача:&nbsp;</label>
-                <input class="form-control" id="new-task" type="text">
-                <button id="add-button"
-                        class="form-control btn btn-primary"
-                        onclick="addTask()">Добавить</button>
-            </div>
-            <div class="input-group mt-1">
-                <button class="form-control btn btn-outline-danger" onclick="clearTasks()">Очистить</button>
-            </div>
-
+        <div>
+            <ul id="task-list">
+            </ul>
         </div>
+
+        <div class="input-group">
+            <label class="form-control" for="new-task">Новая задача:&nbsp;</label>
+            <input class="form-control" id="new-task" type="text">
+            <button id="add-button"
+                    class="form-control btn btn-primary"
+                    onclick="addTask()">Добавить
+            </button>
+        </div>
+        <div class="input-group mt-1">
+            <button class="form-control btn btn-outline-danger" onclick="clearTasks()">Очистить</button>
+        </div>
+
     </div>
 </div>
 
@@ -136,6 +254,27 @@
 <script src="js/jquery.min.js"></script>
 
 <script type="application/javascript">
+
+    function say(what) {
+        alert(what)
+    }
+
+    function printElem(elem) {
+        const mywindow = window.open()
+
+        mywindow.document.write('<html lang="ru"><head><title>' + document.title + '</title>')
+        mywindow.document.write('</head><body >')
+        mywindow.document.write(document.getElementById(elem).innerHTML)
+        mywindow.document.write('</body></html>')
+
+        mywindow.document.close() // necessary for IE >= 10
+        mywindow.focus() // necessary for IE >= 10
+
+        mywindow.print()
+        mywindow.close()
+
+        return true;
+    }
 
     const fetchResult = document.getElementById('fetch-result')
 

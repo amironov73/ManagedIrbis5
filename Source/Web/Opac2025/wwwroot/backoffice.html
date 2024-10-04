@@ -1,0 +1,205 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta name="description" content="Электронный каталог">
+
+    <title>Обработка заказов</title>
+    <link rel='icon' type='image/png' href='./img/favicon.ico'>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    <link rel="stylesheet" href="css/solid.min.css">
+    <link rel="stylesheet" href="css/styles.css">
+
+</head>
+<body>
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2 mt-3">
+            <h2 class="text-center">Обработка заказов</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2 mt-3">
+            <div id="order-table">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="js/axios.min.js"></script>
+<script src="js/bootstrap.bundle.min.js"></script>
+<script src="js/fontawesome.min.js"></script>
+<script src="js/jquery.min.js"></script>
+
+<script type="application/javascript">
+
+    // путь к бэк-энду
+    const baseURL = '/opac/'
+
+    const orderTable = document.getElementById('order-table')
+    let counter = 1
+
+    function printElem(elem) {
+        const mywindow = window.open()
+
+        mywindow.document.write('<html lang="ru"><head><title>' + document.title + '</title>')
+        mywindow.document.write('</head><body >')
+        mywindow.document.write(document.getElementById(elem).innerHTML)
+        mywindow.document.write('</body></html>')
+
+        mywindow.document.close() // necessary for IE >= 10
+        mywindow.focus() // necessary for IE >= 10
+
+        mywindow.print()
+        mywindow.close()
+
+        return true;
+    }
+
+    function fetchOrders() {
+        orderTable.innerHTML = ''
+        axios.get(baseURL + 'orders')
+            .then (function (response) {
+                const orders = response.data
+                createTable(orders)
+            })
+    }
+
+    function cancelOrder(orderId) {
+        axios.put(baseURL + 'orders/status/' + orderId + '/cancelled')
+            .then (function () {
+                fetchOrders()
+            })
+    }
+
+    function addRow(order) {
+        const row = document.createElement('tr')
+
+        const orderId = order.id
+
+        const idCell = document.createElement('td')
+        idCell.innerText = order.id
+        row.appendChild(idCell)
+
+        const dateCell = document.createElement('td')
+        const orderDate = new Date (Date.parse(order.date))
+        dateCell.innerText = orderDate.toLocaleDateString()
+        row.appendChild(dateCell)
+
+        const ticketCell = document.createElement('td')
+        ticketCell.innerText = order.ticket
+        row.appendChild(ticketCell)
+
+        const descriptionCell = document.createElement('td')
+        descriptionCell.id = 'order' + orderId
+        descriptionCell.innerHTML = order.description
+        row.appendChild(descriptionCell)
+
+        const numberCell = document.createElement('td')
+        numberCell.innerText = order.instance.number
+        row.appendChild(numberCell)
+
+        const statusCell = document.createElement('td')
+        statusCell.innerText = order.status
+        row.appendChild(statusCell)
+
+        const printCell = document.createElement('td')
+        const printButton = document.createElement('button')
+        printButton.classList.add('btn')
+        printButton.classList.add('btn-outline-primary')
+        const printText = document.createElement('i')
+        printText.classList.add('fa-solid')
+        printText.classList.add('fa-print')
+        printButton.appendChild(printText)
+        printButton.addEventListener('click', () => {
+            printElem('order' + orderId)
+        })
+        printCell.appendChild(printButton)
+        row.appendChild(printCell)
+
+        const cancelCell = document.createElement('td')
+        const cancelButton = document.createElement('button')
+        cancelButton.classList.add('btn')
+        cancelButton.classList.add('btn-outline-danger')
+        const cancelText = document.createElement('i')
+        cancelText.classList.add('fa-regular')
+        cancelText.classList.add('fa-circle-xmark')
+        cancelButton.appendChild(cancelText)
+        cancelButton.addEventListener('click', () => {
+            cancelOrder(orderId)
+        })
+        cancelCell.appendChild(cancelButton)
+        row.appendChild(cancelCell)
+
+        return row
+    }
+
+    function createTable(orders) {
+        orderTable.innerHTML = ''
+
+        const table = document.createElement('table')
+        table.classList.add('table')
+        table.classList.add('table-striped')
+
+        const tableHead = document.createElement('thead')
+        const headerRow = document.createElement('tr')
+
+        const idCell = document.createElement('th')
+        idCell.innerText = '#'
+        headerRow.appendChild(idCell)
+
+        const dateCell = document.createElement('th')
+        dateCell.innerText = 'Дата'
+        headerRow.appendChild(dateCell)
+
+        const ticketCell = document.createElement('th')
+        ticketCell.innerText = 'Билет'
+        headerRow.appendChild(ticketCell)
+
+        const descriptionCell = document.createElement('th')
+        descriptionCell.innerHTML = 'Библиографическое описание'
+        headerRow.appendChild(descriptionCell)
+
+        const numberCell = document.createElement('th')
+        numberCell.innerText = 'Экземпляры'
+        headerRow.appendChild(numberCell)
+
+        const statusCell = document.createElement('th')
+        statusCell.innerText = 'Статус'
+        headerRow.appendChild(statusCell)
+
+        const printCell = document.createElement('th')
+        printCell.innerText = ''
+        headerRow.appendChild(printCell)
+
+        const deleteCell = document.createElement('th')
+        deleteCell.innerText = ''
+        headerRow.appendChild(deleteCell)
+
+        tableHead.appendChild(headerRow)
+        table.appendChild(tableHead)
+
+        const tableBody = document.createElement('tbody')
+        for (const order of orders) {
+            const row = addRow(order)
+            tableBody.appendChild(row)
+        }
+
+        table.appendChild(tableBody)
+        orderTable.appendChild(table)
+    }
+
+    setTimeout(function () {
+        fetchOrders()
+    })
+
+</script>
+
+</body>
+</html>

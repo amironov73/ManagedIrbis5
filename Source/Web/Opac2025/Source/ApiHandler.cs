@@ -204,29 +204,29 @@ internal sealed class ApiHandler
     private IResult UpdateOrderStatus
         (
             [SwaggerParameter ("Order identifier")]
-            int orderId,
+            int id,
 
             [SwaggerParameter ("New status value")]
-            string newStatus
+            string status
         )
     {
-        Sure.NonNegative (orderId);
-        Sure.NotNullNorEmpty (newStatus);
+        Sure.NonNegative (id);
+        Sure.NotNullNorEmpty (status);
 
         var existingOrder = _mockup.Orders.SingleOrDefault
             (
-                o => o.Id == orderId
+                o => o.Id == id
             );
         if (existingOrder is null)
         {
             _logger.LogTrace (nameof (UpdateOrderStatus) +
-                              ": {OrderId} not found", orderId);
+                              ": {OrderId} not found", id);
             return Results.NotFound();
         }
 
-        existingOrder.Status = newStatus;
+        existingOrder.Status = status;
         _logger.LogTrace (nameof (UpdateOrderStatus) +
-                          ": {OrderId}, {Status}: OK", newStatus, newStatus);
+                          ": {OrderId}, {Status}: OK", status, status);
 
         return Results.Json (existingOrder);
     }
@@ -238,18 +238,18 @@ internal sealed class ApiHandler
     private IResult DeleteOrder
         (
             [SwaggerParameter ("Identifier of the order to delete")]
-            int orderId
+            int id
         )
     {
-        Sure.NonNegative (orderId);
+        Sure.NonNegative (id);
 
         var existingOrder = _mockup.Orders.SingleOrDefault
             (
-                o => o.Id == orderId
+                o => o.Id == id
             );
         if (existingOrder is null)
         {
-            _logger.LogTrace (nameof (DeleteOrder) + ": {OrderId}: not found", orderId);
+            _logger.LogTrace (nameof (DeleteOrder) + ": {OrderId}: not found", id);
             return Results.NotFound();
         }
 
