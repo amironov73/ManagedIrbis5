@@ -34,13 +34,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "A6001",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ФКХ"
                 },
                 new ()
                 {
                     Number = "A60002",
-                    Status = "6",
+                    Status = "absent",
                     Sigla = "ЧЗ"
                 }
             ]
@@ -55,13 +55,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "A6003",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ФКХ"
                 },
                 new ()
                 {
                     Number = "A60004",
-                    Status = "2",
+                    Status = "waiting",
                     Sigla = "ЧЗ"
                 }
             ]
@@ -76,13 +76,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "A6005",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ЧЗ"
                 },
                 new ()
                 {
                     Number = "A60006",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ФКХ"
                 }
             ]
@@ -97,13 +97,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "A6005",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ЧЗ"
                 },
                 new ()
                 {
                     Number = "A60006",
-                    Status = "1",
+                    Status = "loan",
                     Sigla = "ФКХ"
                 }
             ]
@@ -118,13 +118,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "A6007",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ЧЗ"
                 },
                 new ()
                 {
                     Number = "A60008",
-                    Status = "1",
+                    Status = "loan",
                     Sigla = "ФКХ"
                 }
             ]
@@ -139,13 +139,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "B6102",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ЧЗ"
                 },
                 new ()
                 {
                     Number = "B6103",
-                    Status = "1",
+                    Status = "loan",
                     Sigla = "ФКХ"
                 }
             ]
@@ -160,13 +160,13 @@ internal sealed class Mockup
                 new ()
                 {
                     Number = "M1112",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ФКХ"
                 },
                 new ()
                 {
                     Number = "M1113",
-                    Status = "0",
+                    Status = "ok",
                     Sigla = "ЧЗ"
                 }
             ]

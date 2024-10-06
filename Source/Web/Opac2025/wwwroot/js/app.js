@@ -114,8 +114,8 @@ function handleSuccess(data) {
 
         for (const exemplar of book.exemplars) {
             const area = document.createElement('span')
-            area.classList.add(exemplar.status === '0' ? 'exemplar-good' : 'exemplar-bad')
-            area.innerText = exemplar.number + ' (' + exemplar.status + ')'
+            area.classList.add(exemplar.status === 'ok' ? 'exemplar-ok' : 'exemplar-not-ok')
+            area.innerText = exemplar.number
 
             const sigla = document.createElement('span')
             sigla.classList.add('sigla')
@@ -282,6 +282,9 @@ setTimeout(function () {
         createRow()
         createRow()
         createRow()
+
+        // возможность добавления строк с поисковыми атрибутами
+        document.getElementById('add-row').addEventListener('click', addRow)
 
         mainForm.onsubmit = handleSubmit
     }
