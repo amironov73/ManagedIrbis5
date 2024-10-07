@@ -23,6 +23,7 @@ namespace Opac2025;
 /// Обработчик API-запросов.
 /// </summary>
 internal sealed class ApiHandler
+    : IApiHandler
 {
     #region Construction
 
@@ -45,7 +46,6 @@ internal sealed class ApiHandler
 
     #region Private members
 
-    private readonly Mockup _mockup = new ();
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
     private readonly ILogger _logger;
@@ -64,10 +64,14 @@ internal sealed class ApiHandler
     [SwaggerOperation ("List all orders")]
     private IResult ListOrders()
     {
-        // using var storehouse = GetStorehouse();
-        _logger.LogTrace (nameof (ListOrders) + ": OK");
+         using var storehouse = GetStorehouse();
 
-        return Results.Json (_mockup.Orders);
+
+        // _logger.LogTrace (nameof (ListOrders) + ": OK");
+
+        throw new NotImplementedException();
+
+        // return Results.Json (_mockup.Orders);
     }
 
     /// <summary>
@@ -82,13 +86,11 @@ internal sealed class ApiHandler
     {
         Sure.NotNullNorEmpty (status);
 
-        var orders = _mockup.Orders
-            .Where (o => o.Status == status)
-            .ToArray();
+        throw new NotImplementedException();
 
-        _logger.LogTrace (nameof (ListOrdersWithStatus) + ": {Status}: OK", status);
-
-        return Results.Json (orders);
+        // _logger.LogTrace (nameof (ListOrdersWithStatus) + ": {Status}: OK", status);
+        //
+        // return Results.Json (orders);
     }
 
     /// <summary>
@@ -103,13 +105,11 @@ internal sealed class ApiHandler
     {
         Sure.NotNullNorEmpty (ticket);
 
-        var orders = _mockup.Orders
-            .Where (o => o.Ticket == ticket)
-            .ToArray();
+        throw new NotImplementedException();
 
-        _logger.LogTrace (nameof (ListOrdersOfReader) + ": {Ticket}: OK", ticket);
-
-        return Results.Json (orders);
+        // _logger.LogTrace (nameof (ListOrdersOfReader) + ": {Ticket}: OK", ticket);
+        //
+        // return Results.Json (orders);
     }
 
     /// <summary>
@@ -132,15 +132,11 @@ internal sealed class ApiHandler
         Sure.NotNullNorEmpty (book);
         Sure.NotNullNorEmpty (number);
 
-        var orders = _mockup.Orders
-            .Where (o => o.Instance?.Database == database
-                && o.Instance.Book == book
-                && o.Instance?.Number == number)
-            .ToArray();
+        throw new NotImplementedException();
 
-        _logger.LogTrace (nameof (ListOrdersOfExemplar) + ": {Number}: OK", number);
-
-        return Results.Json (orders);
+        // _logger.LogTrace (nameof (ListOrdersOfExemplar) + ": {Number}: OK", number);
+        //
+        // return Results.Json (orders);
     }
 
     /// <summary>
@@ -155,12 +151,11 @@ internal sealed class ApiHandler
     {
         Sure.NotNull (newOrder);
 
-        newOrder.Id = _mockup.GetNextOrderId();
-        _mockup.Orders.Add (newOrder);
+        throw new NotImplementedException();
 
-        _logger.LogTrace (nameof (CreateOrder) + ": {Order}: OK", newOrder);
-
-        return Results.Ok();
+        // _logger.LogTrace (nameof (CreateOrder) + ": {Order}: OK", newOrder);
+        //
+        // return Results.Ok();
     }
 
     /// <summary>
@@ -175,26 +170,12 @@ internal sealed class ApiHandler
     {
         Sure.NotNull (updatedOrder);
 
-        var existingOrder = _mockup.Orders.SingleOrDefault
-            (
-                o => o.Id == updatedOrder.Id
-            );
-        if (existingOrder is null)
-        {
-            _logger.LogTrace (nameof (UpdateOrder)
-                              + ": {Order}: not found", updatedOrder);
-            return Results.NotFound();
-        }
+        throw new NotImplementedException();
 
-        existingOrder.Status = updatedOrder.Status;
-        existingOrder.Instance = updatedOrder.Instance;
-        existingOrder.Ticket = updatedOrder.Ticket;
-        existingOrder.Date = updatedOrder.Date;
+        // _logger.LogTrace (nameof (UpdateOrder)
+        //                   + ": {Order}: OK", updatedOrder);
 
-        _logger.LogTrace (nameof (UpdateOrder)
-                          + ": {Order}: OK", updatedOrder);
-
-        return Results.Ok();
+        // return Results.Ok();
     }
 
     /// <summary>
@@ -213,22 +194,12 @@ internal sealed class ApiHandler
         Sure.NonNegative (id);
         Sure.NotNullNorEmpty (status);
 
-        var existingOrder = _mockup.Orders.SingleOrDefault
-            (
-                o => o.Id == id
-            );
-        if (existingOrder is null)
-        {
-            _logger.LogTrace (nameof (UpdateOrderStatus) +
-                              ": {OrderId} not found", id);
-            return Results.NotFound();
-        }
+        throw new NotImplementedException();
 
-        existingOrder.Status = status;
-        _logger.LogTrace (nameof (UpdateOrderStatus) +
-                          ": {OrderId}, {Status}: OK", status, status);
-
-        return Results.Json (existingOrder);
+        // _logger.LogTrace (nameof (UpdateOrderStatus) +
+        //                   ": {OrderId}, {Status}: OK", status, status);
+        //
+        // return Results.Json (existingOrder);
     }
 
     /// <summary>
@@ -243,20 +214,11 @@ internal sealed class ApiHandler
     {
         Sure.NonNegative (id);
 
-        var existingOrder = _mockup.Orders.SingleOrDefault
-            (
-                o => o.Id == id
-            );
-        if (existingOrder is null)
-        {
-            _logger.LogTrace (nameof (DeleteOrder) + ": {OrderId}: not found", id);
-            return Results.NotFound();
-        }
+        throw new NotImplementedException();
 
-        _mockup.Orders.Remove (existingOrder);
-        _logger.LogTrace (nameof (DeleteOrder) + ": {Order}: OK", existingOrder);
-
-        return Results.Ok();
+        // _logger.LogTrace (nameof (DeleteOrder) + ": {Order}: OK", existingOrder);
+        //
+        // return Results.Ok();
     }
 
     /// <summary>
@@ -265,10 +227,14 @@ internal sealed class ApiHandler
     [SwaggerOperation ("List all databases")]
     private IResult ListDatabases()
     {
-        // using var storehouse = GetStorehouse();
-        _logger.LogTrace (nameof (ListDatabases) + ": OK");
+        using var storehouse = GetStorehouse();
+        return Results.Json (storehouse.ListDatabases());
 
-        return Results.Json (_mockup.Databases);
+        // _logger.LogTrace (nameof (ListDatabases) + ": OK");
+
+        // throw new NotImplementedException();
+
+        // return Results.Json (_mockup.Databases);
     }
 
     /// <summary>
@@ -283,11 +249,16 @@ internal sealed class ApiHandler
     {
         Sure.NotNullNorEmpty (database);
 
-        // using var storehouse = GetStorehouse();
-        _logger.LogTrace (nameof (ListScenarios) +
-                          ": {Database} : OK", database);
+        using var storehouse = GetStorehouse();
+        return Results.Json (storehouse.ListScenarios (database));
 
-        return Results.Json (_mockup.Scenarios);
+
+        // _logger.LogTrace (nameof (ListScenarios) +
+        //                   ": {Database} : OK", database);
+        //
+        // throw new NotImplementedException();
+
+        // return Results.Json (_mockup.Scenarios);
     }
 
     /// <summary>
@@ -302,20 +273,11 @@ internal sealed class ApiHandler
     {
         Sure.NotNullNorEmpty (ticket);
 
-        var reader = _mockup.Readers.SingleOrDefault
-            (
-                r => r.Ticket == ticket
-            );
-        if (reader is null)
-        {
-            _logger.LogTrace (nameof (GetReader)
-                              + ": {Ticket}: not found", ticket);
-            return Results.NotFound();
-        }
+        throw new NotImplementedException();
 
-        _logger.LogTrace (nameof (GetReader) + ": OK: {Reader}", reader);
-
-        return Results.Json (reader);
+        // _logger.LogTrace (nameof (GetReader) + ": OK: {Reader}", reader);
+        //
+        // return Results.Json (reader);
     }
 
     /// <summary>
@@ -334,24 +296,8 @@ internal sealed class ApiHandler
         Sure.NotNullNorEmpty (database);
         Sure.NotNullNorEmpty (query);
 
-        var books = _mockup.Books;
-        var result = new List<Book>();
-        var random = new Random();
-        var howMany = random.Next (books.Count);
-        var found = new List<int>();
-        for (var i = 0; i < howMany; i++)
-        {
-            while (true)
-            {
-                var candidate = random.Next (books.Count);
-                if (!found.Contains (candidate))
-                {
-                    found.Add (candidate);
-                    result.Add (books[i]);
-                    break;
-                }
-            }
-        }
+        using var storehouse = GetStorehouse();
+        var result = storehouse.SearchBooks (database, query);
 
         return Results.Json (result);
     }

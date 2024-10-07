@@ -132,19 +132,8 @@ internal sealed /* нельзя static */ class Program
         // создаем endpoint'ы
 
         var api = app.MapGroup ("/opac");
-        api.MapGet ("test", HandleTestRequest);
-        // api.MapGet ("state", HandleStateRequest);
-        // api.MapGet ("history", HandleHistoryRequest);
-        // api.MapGet ("stat", HandleStatRequest);
-        // api.MapGet ("stop", HandleStopRequest);
-        // api.MapGet ("ok", HandleOkRequest);
-        // api.MapGet ("version", HandleVersionRequest);
-        // api.MapGet ("staff", HandleStaffRequest);
-        // api.MapGet ("passage", HandlePassageRequest);
-        //
-        // app.MapPost ("/auth", HandleAuthRequest);
-        //
 
+        // var handler = new MockupHandler (Logger);
         var handler = new ApiHandler (app);
         handler.Register (api);
 

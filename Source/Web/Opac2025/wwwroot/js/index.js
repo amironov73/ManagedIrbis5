@@ -75,18 +75,18 @@ function handleSuccess(data) {
         return
     }
 
-    let index = 0
+    // let index = 0
     for (const book of documents) {
         const item = document.createElement('div')
         item.classList.add('found-card')
         item.classList.add('d-flex')
         item.classList.add('flex-row')
 
-        const serial = document.createElement('div')
-        serial.classList.add('serial')
-        serial.style.setProperty('margin-right', '1em')
-        serial.innerText = (++index).toString()
-        item.appendChild(serial)
+        // const serial = document.createElement('div')
+        // serial.classList.add('serial')
+        // serial.style.setProperty('margin-right', '1em')
+        // serial.innerText = (++index).toString()
+        // item.appendChild(serial)
 
         const coverUrl = book.cover
         if (coverUrl) {
@@ -103,28 +103,52 @@ function handleSuccess(data) {
         description.innerHTML = book.description
         item.appendChild(description)
 
-        const exemplarsDiv = document.createElement('div')
-        exemplarsDiv.classList.add('exemplar')
+        if (book.links) {
+            const linksDiv = document.createElement('div')
+            linksDiv.classList.add('links')
 
-        const label = document.createElement('span')
-        label.classList.add('mr-1')
-        label.classList.add('text-primary')
-        label.innerText = 'Экземпляры:'
-        exemplarsDiv.appendChild(label)
+            const label = document.createElement('span')
+            label.classList.add('mr-1')
+            label.classList.add('text-primary')
+            label.innerText = book.links.length === 1 ? 'Ссылка:' : 'Ссылки:'
+            linksDiv.appendChild(label)
 
-        for (const exemplar of book.exemplars) {
-            const area = document.createElement('span')
-            area.classList.add(exemplar.status === 'ok' ? 'exemplar-ok' : 'exemplar-not-ok')
-            area.innerText = exemplar.number
+            for (const link of book.links) {
+                const one = document.createElement('a')
+                one.classList.add('link')
+                one.href = link.url
+                one.target = '_blank'
+                one.innerText = link.description
+                linksDiv.appendChild(one)
+            }
 
-            const sigla = document.createElement('span')
-            sigla.classList.add('sigla')
-            sigla.innerText = exemplar.sigla
-            area.appendChild(sigla)
-
-            exemplarsDiv.appendChild(area)
+            description.appendChild(linksDiv)
         }
-        description.appendChild(exemplarsDiv)
+
+        if (book.exemplars) {
+            const exemplarsDiv = document.createElement('div')
+            exemplarsDiv.classList.add('exemplar')
+
+            const label = document.createElement('span')
+            label.classList.add('mr-1')
+            label.classList.add('text-primary')
+            label.innerText = book.exemplars.length === 1 ? 'Экземпляр:' : 'Экземпляры:'
+            exemplarsDiv.appendChild(label)
+
+            for (const exemplar of book.exemplars) {
+                const area = document.createElement('span')
+                area.classList.add(exemplar.status === 'ok' ? 'exemplar-ok' : 'exemplar-not-ok')
+                area.innerText = exemplar.number
+
+                const sigla = document.createElement('span')
+                sigla.classList.add('sigla')
+                sigla.innerText = exemplar.sigla
+                area.appendChild(sigla)
+
+                exemplarsDiv.appendChild(area)
+            }
+            description.appendChild(exemplarsDiv)
+        }
 
         resultContainer.appendChild(item)
     }

@@ -46,6 +46,11 @@ public sealed class Book
     public string? Cover { get; set; }
 
     /// <summary>
+    /// Ссылки, сопровождающие книгу.
+    /// </summary>
+    [JsonPropertyName ("links")]
+    public Link[]? Links { get; set; }
+    /// <summary>
     /// Массив экземпляров.
     /// </summary>
     [JsonPropertyName ("exemplars")]

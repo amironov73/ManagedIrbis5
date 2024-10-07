@@ -16,6 +16,7 @@
 }
 
 .exemplar {
+    margin: 1em 0 0 0;
     text-align: end;
     font-weight: bold;
     color: white;
@@ -26,6 +27,7 @@
     margin: 0 0.5em;
     padding: 0.3em 0.5em;
     border-radius: 0.5em;
+    white-space: nowrap;
 }
 
 .exemplar-not-ok {
@@ -33,6 +35,20 @@
     margin: 0 0.5em;
     padding: 0.3em 0.5em;
     border-radius: 0.5em;
+    white-space: nowrap;
+}
+
+.links {
+    margin: 1em 0 0 0;
+}
+
+.link {
+    background: cornflowerblue;
+    margin: 0 0.5em;
+    padding: 0.3em 0.5em;
+    border-radius: 0.5em;
+    text-decoration: none;
+    color: white;
 }
 
 .sigla {
