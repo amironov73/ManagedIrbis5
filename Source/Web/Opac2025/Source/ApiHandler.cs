@@ -13,6 +13,8 @@
 
 using AM;
 
+using Microsoft.AspNetCore.Mvc;
+
 using Swashbuckle.AspNetCore.Annotations;
 
 #endregion
@@ -51,12 +53,8 @@ internal sealed class ApiHandler
     private readonly ILogger _logger;
 
 
-    // ReSharper disable UnusedMember.Local
-
     private Storehouse GetStorehouse() =>
         new (_serviceProvider, _configuration);
-
-    // ReSharper restore UnusedMember.Local
 
     /// <summary>
     /// Перечисление всех заказов.
@@ -302,6 +300,34 @@ internal sealed class ApiHandler
         return Results.Json (result);
     }
 
+    private IResult GetCover
+        (
+            [FromQuery] string file
+        )
+    {
+        Sure.NotNullNorEmpty (file);
+
+        var coverPath = _configuration["cover-path"];
+        var fullPath = string.IsNullOrEmpty (coverPath)
+            ? coverPath
+            : Path.Combine (coverPath, file);
+
+        return Results.File (fullPath!);
+    }
+
+    private IResult Complete
+        (
+            [FromQuery] string db,
+            [FromQuery] string prefix,
+            [FromQuery] string text
+        )
+    {
+        Sure.NotNullNorEmpty (db);
+
+        using var storehouse = GetStorehouse();
+        return Results.Json (storehouse.Complete (db, prefix, text));
+    }
+
     #endregion
 
     #region Public methods
@@ -328,6 +354,8 @@ internal sealed class ApiHandler
         api.MapPut ("/orders", UpdateOrder);
         api.MapPut ("/orders/status/{id}/{status}", UpdateOrderStatus);
         api.MapDelete ("/orders/{id}", DeleteOrder);
+        api.MapGet ("/cover", GetCover);
+        api.MapGet ("/complete", Complete);
     }
 
     #endregion

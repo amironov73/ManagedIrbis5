@@ -34,6 +34,12 @@ public sealed class Book
     public string? Id { get; set; }
 
     /// <summary>
+    /// Расстановочный шифр книги (HTML).
+    /// </summary>
+    [JsonPropertyName ("arrangement")]
+    public string? Arrangement { get; set; }
+
+    /// <summary>
     /// Библиографическое описание.
     /// </summary>
     [JsonPropertyName ("description")]
@@ -68,6 +74,20 @@ public sealed class Book
 
     /// <inheritdoc cref="object.ToString"/>
     public override string ToString() => $"{Id}: {Description}";
+
+    #endregion
+
+    #region Comparer
+
+    public class ByDescription : IComparer<Book>
+    {
+        public int Compare (Book? x, Book? y) => string.CompareOrdinal
+            (
+                x?.Description,
+                y?.Description
+            );
+
+    }
 
     #endregion
 }

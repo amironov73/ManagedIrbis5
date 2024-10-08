@@ -16,6 +16,7 @@ using System.Data.Common;
 using System.Globalization;
 
 using AM;
+using AM.Collections;
 
 //using LinqToDB;
 //using LinqToDB.Data;
@@ -243,6 +244,96 @@ internal sealed class Storehouse
         return result.ToArray();
     }
 
+    private static string? GetArrangement
+        (
+            Record record
+        )
+    {
+        var top = record.FM (906) ?? record.FM (675)
+            ?? record.FM (621) ?? record.FM (686);
+        var down = record.FM (908);
+
+        return string.IsNullOrEmpty (top) || string.IsNullOrEmpty (down)
+            ? null
+            : $"{top}<br>{down}";
+    }
+
+    private static string[]? GetCards
+        (
+            Record record
+        )
+    {
+        var result = new List<string>();
+        foreach (var field in record.EnumerateField (2020))
+        {
+            var path = field.GetFirstSubFieldValue ('b');
+            if (!string.IsNullOrEmpty (path))
+            {
+                result.Add (path);
+            }
+        }
+
+        return result.Count == 0 ? null : result.ToArray();
+    }
+
+    private static Link[]? GetLinks
+        (
+            Record record
+        )
+    {
+        var result = new List<Link>();
+        foreach (var field in record.EnumerateField (951))
+        {
+            var kind = field.GetFirstSubFieldValue ('h');
+            if (kind.SameString ("02a") || kind.SameString ("02b"))
+            {
+                continue;
+            }
+
+            var url = field.GetFirstSubFieldValue ('i');
+            if (!string.IsNullOrEmpty (url))
+            {
+                var link = new Link
+                {
+                    Url = url,
+                    Description = field.GetFirstSubFieldValue ('t')
+                };
+                result.Add (link);
+            }
+        }
+
+        return result.Count == 0 ? null : result.ToArray();
+    }
+
+    private string? GetCover
+        (
+            Record record
+        )
+    {
+        foreach (var field in record.EnumerateField (951))
+        {
+            var kind = field.GetFirstSubFieldValue ('h');
+            if (kind.SameString ("02a"))
+            {
+                var result = field.GetFirstSubFieldValue ('a');
+                if (!string.IsNullOrEmpty (result))
+                {
+                    var prefix = _configuration["cover-prefix"];
+
+                    result = prefix + result.Replace ('\\', '/');
+                }
+                else
+                {
+                    result = field.GetFirstSubFieldValue ('i');
+                }
+
+                return result;
+            }
+        }
+
+        return null;
+    }
+
     #endregion
 
     #region IDisposable members
@@ -332,7 +423,7 @@ internal sealed class Storehouse
         {
             Database = database,
             Expression = expression,
-            NumberOfRecords = 100,
+            NumberOfRecords = 200,
             Format = "@brief"
         };
         var found = irbis.Search(parameters);
@@ -359,8 +450,16 @@ internal sealed class Storehouse
 
         for (var i = 0; i < records.Length; i++)
         {
-            result[i].Exemplars = ConvertExemplars (records[i]);
+            var record = records[i];
+            var item = result[i];
+            item.Arrangement = GetArrangement (record);
+            item.Exemplars = ConvertExemplars (record);
+            item.Cards = GetCards (record);
+            item.Links = GetLinks (record);
+            item.Cover = GetCover (record);
         }
+
+        Array.Sort (result, new Book.ByDescription());
 
         return result;
     }
@@ -407,6 +506,48 @@ internal sealed class Storehouse
         Sure.NotNull (order);
 
         // GetKladovka().Update (order);
+    }
+
+    public string[]? Complete
+        (
+            string database,
+            string prefix,
+            string text
+        )
+    {
+        Sure.NotNullNorEmpty (database);
+
+        var irbis = GetIrbis();
+        var parameters = new TermParameters
+        {
+            Database = database,
+            StartTerm = prefix + text,
+            NumberOfTerms = 20
+        };
+
+        var terms = irbis.ReadTerms (parameters);
+        if (terms.IsNullOrEmpty())
+        {
+            return [];
+        }
+
+        var result = new List<string>();
+        var prefixLength = prefix.Length;
+        result.EnsureCapacity (terms.Length);
+        foreach (var term in terms)
+        {
+            var termText = term.Text;
+            if (!string.IsNullOrEmpty (termText) && termText.StartsWith (prefix))
+            {
+                termText = termText.Substring (prefixLength);
+                if (!string.IsNullOrEmpty (termText))
+                {
+                    result.Add (termText);
+                }
+            }
+        }
+
+        return result.ToArray();
     }
 
     #endregion

@@ -82,11 +82,12 @@ function handleSuccess(data) {
         item.classList.add('d-flex')
         item.classList.add('flex-row')
 
-        // const serial = document.createElement('div')
-        // serial.classList.add('serial')
-        // serial.style.setProperty('margin-right', '1em')
-        // serial.innerText = (++index).toString()
-        // item.appendChild(serial)
+        if (book.arrangement) {
+            const arrangement = document.createElement('div')
+            arrangement.classList.add('arrangement')
+            arrangement.innerHTML = book.arrangement
+            item.appendChild(arrangement)
+        }
 
         const coverUrl = book.cover
         if (coverUrl) {
@@ -99,7 +100,6 @@ function handleSuccess(data) {
         const description = document.createElement('div')
         description.style.setProperty('flex-grow', '1')
         description.style.setProperty('margin-left', '1em')
-        // description.style.setProperty('align-self', 'stretch')
         description.innerHTML = book.description
         item.appendChild(description)
 
@@ -108,9 +108,9 @@ function handleSuccess(data) {
             linksDiv.classList.add('links')
 
             const label = document.createElement('span')
-            label.classList.add('mr-1')
+            label.classList.add('links-label')
             label.classList.add('text-primary')
-            label.innerText = book.links.length === 1 ? 'Ссылка:' : 'Ссылки:'
+            label.innerText = 'Ссылки:'
             linksDiv.appendChild(label)
 
             for (const link of book.links) {
@@ -118,7 +118,7 @@ function handleSuccess(data) {
                 one.classList.add('link')
                 one.href = link.url
                 one.target = '_blank'
-                one.innerText = link.description
+                one.innerText = link.description ?? 'Ссылка'
                 linksDiv.appendChild(one)
             }
 
