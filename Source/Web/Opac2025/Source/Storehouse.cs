@@ -11,14 +11,20 @@
 
 #region Using directives
 
+using System.Data;
+using System.Data.Common;
+using System.Globalization;
+
 using AM;
 
-using LinqToDB;
-using LinqToDB.Data;
-using LinqToDB.DataProvider.SqlServer;
+//using LinqToDB;
+//using LinqToDB.Data;
+//using LinqToDB.DataProvider.SqlServer;
 
 using ManagedIrbis;
 using ManagedIrbis.Providers;
+
+using Microsoft.Data.SqlClient;
 
 #endregion
 
@@ -38,8 +44,7 @@ internal sealed class Storehouse
     public Storehouse
         (
             IServiceProvider serviceProvider,
-            IConfiguration configuration,
-            string? connectionString = null
+            IConfiguration configuration
         )
     {
         _serviceProvider = serviceProvider;
@@ -48,7 +53,7 @@ internal sealed class Storehouse
 
         _logger.LogTrace (nameof (Storehouse) + "::Constructor");
 
-        _kladovkaConnectionString = (connectionString ?? _configuration["kladovka"])
+        _kladovkaConnectionString = _configuration["kladovka"]
             .ThrowIfNullOrEmpty();
 
         _irbisConnectionString = _configuration["irbis-connection-string"]
@@ -65,7 +70,7 @@ internal sealed class Storehouse
     private readonly string _kladovkaConnectionString;
     private readonly ILogger _logger;
 
-    private DataConnection? _dataConnection;
+    private DbConnection? _dataConnection;
     private SyncConnection? _irbisConnection;
 
     private SyncConnection GetIrbis() => _irbisConnection
@@ -100,7 +105,7 @@ internal sealed class Storehouse
     /// <summary>
     /// Подключается к MSSQL.
     /// </summary>
-    private static DataConnection GetMsSqlConnection
+    private static DbConnection GetMsSqlConnection
         (
             string connectionString
         )
@@ -109,9 +114,10 @@ internal sealed class Storehouse
 
         try
         {
-            var result = SqlServerTools.CreateDataConnection (connectionString);
+            var connection = new SqlConnection (connectionString);
+            connection.Open();
 
-            return result;
+            return connection;
         }
         catch (Exception exception)
         {
@@ -127,13 +133,37 @@ internal sealed class Storehouse
     /// <summary>
     /// Подключается к базе <c>kladovka</c>.
     /// </summary>
-    private DataConnection GetKladovka() => _dataConnection
+    private DbConnection GetKladovka() => _dataConnection
         ??= GetMsSqlConnection (_kladovkaConnectionString);
 
-    /// <summary>
-    /// Получает таблицу <c>orders</c>.
-    /// </summary>
-    private ITable<Order> GetOrders() => GetKladovka().GetTable<Order>();
+    // /// <summary>
+    // /// Получает таблицу <c>orders</c>.
+    // /// </summary>
+    // private ITable<Order> GetOrders() => GetKladovka().GetTable<Order>();
+
+    private static string ConvertStatus (string? status) => status switch
+    {
+        "0" => "ok",
+        "C" or "U" => "u",
+        _ => "bad"
+    };
+
+    private static string? GetDataString
+        (
+            DbDataReader reader,
+            int count
+        )
+    {
+        for (var i = 0; i < count; i++)
+        {
+            if (!reader.IsDBNull (i))
+            {
+                return reader.GetString (i);
+            }
+        }
+
+        return null;
+    }
 
     private Exemplar ConvertExemplar
         (
@@ -142,10 +172,39 @@ internal sealed class Storehouse
     {
         var result = new Exemplar
         {
+            Status = ConvertStatus (field.GetFirstSubFieldValue ('a')),
             Number = field.GetFirstSubFieldValue ('b'),
-            Status = field.GetFirstSubFieldValue ('a') == "0" ? "ok" : "bad",
             Sigla = field.GetFirstSubFieldValue ('d'),
+            Amount = field.GetFirstSubFieldValue ('1').SafeToInt32()
+
         };
+
+        if (result.Status == "ok"
+            && int.TryParse (result.Number, NumberStyles.Integer,
+                CultureInfo.InvariantCulture, out var number))
+        {
+            var kladovka = GetKladovka();
+            var command = kladovka.CreateCommand();
+            command.CommandText = "select [chb], [onhand] from [podsob] where [invent] = @number";
+            var parameter = command.CreateParameter();
+            parameter.ParameterName = "@number";
+            parameter.DbType = DbType.Int32;
+            parameter.Direction = ParameterDirection.Input;
+            parameter.Value = number;
+            command.Parameters.Add (parameter);
+            using var reader = command.ExecuteReader();
+            if (reader.HasRows)
+            {
+                reader.Read();
+                var onhand = GetDataString (reader, 2);
+                if (!string.IsNullOrEmpty (onhand))
+                {
+                    result.OnHand = onhand;
+                    result.Status = "onhand";
+                }
+            }
+
+        }
 
         return result;
     }
@@ -159,6 +218,26 @@ internal sealed class Storehouse
         foreach (var field in record.EnumerateField (910))
         {
             result.Add (ConvertExemplar (field));
+        }
+
+        if (result.Count (x => x.Amount != 0) > 1)
+        {
+            var siglas = result
+                .Where (x => x.Status == "u")
+                .Select (x => x.Sigla).Distinct().ToArray();
+            foreach (var sigla in siglas)
+            {
+                var one = new Exemplar
+                {
+                    Status = "u",
+                    Sigla = sigla,
+                    Amount = result
+                        .Where (x => x.Status == "u" && x.Sigla == sigla)
+                        .Sum (x => x.Amount)
+                };
+                result.RemoveAll (x => x.Sigla == sigla);
+                result.Add (one);
+            }
         }
 
         return result.ToArray();
@@ -289,7 +368,7 @@ internal sealed class Storehouse
     /// <summary>
     /// Получение списка всех заказов.
     /// </summary>
-    public Order[] ListAllOrders() => GetOrders().ToArray();
+    public Order[] ListAllOrders() => [];
 
     /// <summary>
     /// Создание нового заказа.
@@ -301,7 +380,7 @@ internal sealed class Storehouse
     {
         Sure.NotNull (order);
 
-        GetKladovka().Insert (order);
+        // GetKladovka().Insert (order);
     }
 
     /// <summary>
@@ -314,7 +393,7 @@ internal sealed class Storehouse
     {
         Sure.NonNegative (orderId);
 
-        GetOrders().Delete (order => order.Id == orderId);
+        // GetOrders().Delete (order => order.Id == orderId);
     }
 
     /// <summary>
@@ -327,7 +406,7 @@ internal sealed class Storehouse
     {
         Sure.NotNull (order);
 
-        GetKladovka().Update (order);
+        // GetKladovka().Update (order);
     }
 
     #endregion

@@ -34,6 +34,18 @@ public class Exemplar
     public string? Number { get; set; }
 
     /// <summary>
+    /// Количество экземпляров (для учебного фонда).
+    /// </summary>
+    [JsonPropertyName ("amount")]
+    public int Amount { get; set; }
+
+    /// <summary>
+    /// Книга на руках у читателя: номер билета.
+    /// </summary>
+    [JsonPropertyName ("onhand")]
+    public string? OnHand { get; set; }
+
+    /// <summary>
     /// Статус экземпляра.
     /// </summary>
     [JsonPropertyName ("status")]

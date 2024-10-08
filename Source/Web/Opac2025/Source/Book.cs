@@ -56,6 +56,12 @@ public sealed class Book
     [JsonPropertyName ("exemplars")]
     public Exemplar[]? Exemplars { get; set; }
 
+    /// <summary>
+    /// Карточки.
+    /// </summary>
+    [JsonPropertyName ("cards")]
+    public string[]? Cards { get; set; }
+
     #endregion
 
     #region Object members

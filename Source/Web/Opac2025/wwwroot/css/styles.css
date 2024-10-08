@@ -16,24 +16,39 @@
 }
 
 .exemplar {
+    display: flex;
+    flex-flow: wrap;
+    justify-content: flex-end;
     margin: 1em 0 0 0;
-    text-align: end;
     font-weight: bold;
     color: white;
 }
 
+.exemplar-label {
+    margin: 0.3em;
+    padding: 0.3em;
+}
+
 .exemplar-ok {
     background: green;
-    margin: 0 0.5em;
-    padding: 0.3em 0.5em;
+    margin: 0.3em;
+    padding: 0.3em;
     border-radius: 0.5em;
     white-space: nowrap;
 }
 
-.exemplar-not-ok {
+.exemplar-bad {
     background: indianred;
-    margin: 0 0.5em;
-    padding: 0.3em 0.5em;
+    margin: 0.3em;
+    padding: 0.3em;
+    border-radius: 0.5em;
+    white-space: nowrap;
+}
+
+.exemplar-u {
+    background: cadetblue;
+    margin: 0.3em;
+    padding: 0.3em;
     border-radius: 0.5em;
     white-space: nowrap;
 }

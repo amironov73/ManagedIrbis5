@@ -3,7 +3,7 @@
     <PropertyGroup>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <InvariantGlobalization>true</InvariantGlobalization>
+        <!-- InvariantGlobalization>true</InvariantGlobalization -->
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +17,7 @@
         <PackageReference Include="NLog.Extensions.Logging"/>
         <PackageReference Include="NLog.Web.AspNetCore"/>
 
-        <PackageReference Include="linq2db"/>
+        <!-- PackageReference Include="linq2db"/ -->
         <PackageReference Include="Microsoft.AspNetCore.OpenApi"/>
         <PackageReference Include="Rabota.Data.SqlClient"/>
         <PackageReference Include="Swashbuckle.AspNetCore"/>

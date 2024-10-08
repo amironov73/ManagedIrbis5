@@ -130,15 +130,29 @@ function handleSuccess(data) {
             exemplarsDiv.classList.add('exemplar')
 
             const label = document.createElement('span')
-            label.classList.add('mr-1')
+            label.classList.add('exemplar-label')
             label.classList.add('text-primary')
-            label.innerText = book.exemplars.length === 1 ? 'Экземпляр:' : 'Экземпляры:'
+            label.innerText = 'Экземпляры:'
             exemplarsDiv.appendChild(label)
 
             for (const exemplar of book.exemplars) {
                 const area = document.createElement('span')
-                area.classList.add(exemplar.status === 'ok' ? 'exemplar-ok' : 'exemplar-not-ok')
-                area.innerText = exemplar.number
+                switch (exemplar.status) {
+                    case 'ok':
+                        area.classList.add('exemplar-ok')
+                        area.innerText = exemplar.number
+                        break;
+
+                    case 'u':
+                        area.classList.add('exemplar-u')
+                        area.innerText = exemplar.amount + ' экз.'
+                        break;
+
+                    default:
+                        area.classList.add('exemplar-bad')
+                        area.innerText = exemplar.number + ' (' + exemplar.onhand + ')'
+                        break;
+                }
 
                 const sigla = document.createElement('span')
                 sigla.classList.add('sigla')

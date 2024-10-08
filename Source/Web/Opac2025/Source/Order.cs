@@ -15,7 +15,7 @@ using System.Text.Json.Serialization;
 
 using JetBrains.Annotations;
 
-using LinqToDB.Mapping;
+// using LinqToDB.Mapping;
 
 #endregion
 
@@ -25,7 +25,7 @@ namespace Opac2025;
 /// Информация о заказе.
 /// </summary>
 [PublicAPI]
-[Table ("orders")]
+// [Table ("orders")]
 public sealed class Order
 {
     #region Properties
