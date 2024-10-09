@@ -4,15 +4,13 @@
     max-width: 500px;
 }
 
-.found-card {
-    background-color: aliceblue;
+.book-card {
+    border: gray solid thin;
+    border-radius: 2mm;
+    background: rgb(237, 237, 237) url("../img/paper-brown.jpg");
+    background-size: cover;
     margin: 1em 0;
     padding: 1em;
-    border: none;
-}
-
-.serial {
-    font-weight: bold;
 }
 
 .exemplar {

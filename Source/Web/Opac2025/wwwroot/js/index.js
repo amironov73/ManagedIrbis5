@@ -65,6 +65,14 @@ function buildExpression() {
     return result
 }
 
+function handleImageError() {
+    if (this.src !== 'img/no-cover.jpg') {
+        this.src = 'img/no-cover.jpg'
+        this.width = 100
+        this.height = 100
+    }
+}
+
 function handleSuccess(data) {
     // const documents = data.sort()
     const documents = data
@@ -78,30 +86,36 @@ function handleSuccess(data) {
     // let index = 0
     for (const book of documents) {
         const item = document.createElement('div')
-        item.classList.add('found-card')
+        item.classList.add('book-card')
         item.classList.add('d-flex')
         item.classList.add('flex-row')
-
-        if (book.arrangement) {
-            const arrangement = document.createElement('div')
-            arrangement.classList.add('arrangement')
-            arrangement.innerHTML = book.arrangement
-            item.appendChild(arrangement)
-        }
 
         const coverUrl = book.cover
         if (coverUrl) {
             const cover = document.createElement('img')
+            // cover.classList.add('book-cover')
+            cover.onerror = handleImageError
             cover.src = coverUrl
-            cover.width = 100
+            cover.alt = 'Обложка книги'
+            // cover.width = 100
             item.appendChild(cover)
         }
 
         const description = document.createElement('div')
         description.style.setProperty('flex-grow', '1')
         description.style.setProperty('margin-left', '1em')
-        description.innerHTML = book.description
         item.appendChild(description)
+
+        if (book.arrangement) {
+            const arrangement = document.createElement('div')
+            arrangement.classList.add('arrangement')
+            arrangement.innerHTML = book.arrangement
+            description.appendChild(arrangement)
+        }
+
+        const descriptionItself = document.createElement('div')
+        descriptionItself.innerHTML = book.description
+        description.appendChild(descriptionItself)
 
         if (book.links) {
             const linksDiv = document.createElement('div')

@@ -49,33 +49,35 @@
 <div class="container">
 
     <div class="row">
-        <div class="col-lg-8 offset-lg-2 mt-3">
+        <div class="col-lg-6 offset-lg-3 mt-3 mb-6">
             <h2 class="text-center">Электронный каталог НТБ ИРНИТУ</h2>
         </div>
     </div>
 
-    <div class="input-group">
-        <div class="form-control">
-            <label for="database-selector" class="form-control">База данных: </label>
+    <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
+        <div class="input-group">
+            <div class="form-control">
+                <label for="database-selector" class="form-control">База данных: </label>
+            </div>
+            <select id="database-selector" class="btn btn-outline-primary"
+                    style="text-align: left;">
+            </select>
+            <button id="add-row" class="btn btn-sm btn-outline-secondary"
+                    style="width: 5em;"
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    title="добавление строки"><i class="fas fa-plus"></i></button>
         </div>
-        <select id="database-selector" class="btn btn-outline-primary"
-                style="text-align: left;">
-        </select>
-        <button id="add-row" class="btn btn-sm btn-outline-secondary"
-                style="width: 5em;"
-                data-bs-toggle="tooltip" data-bs-placement="top"
-                title="добавление строки"><i class="fas fa-plus"></i></button>
+
+        <form id="main-form" autocomplete="off">
+            <div id="input-container"></div>
+
+            <div class="input-group mt-3 mb-3">
+                <button type="submit" class="btn btn-primary form-control">Поиск</button>
+                <button type="reset" class="btn btn-outline-primary form-control">Сброс</button>
+            </div>
+
+        </form>
     </div>
-
-    <form id="main-form" autocomplete="off">
-        <div id="input-container"></div>
-
-        <div class="input-group mt-3 mb-3">
-            <button type="submit" class="btn btn-primary form-control">Поиск</button>
-            <button type="reset" class="btn btn-outline-primary form-control">Сброс</button>
-        </div>
-
-    </form>
 
     <div id="busy-indicator" class="text-center mb-5" style="display: none;">
         <h2><img id="arctic-fox" src="img/arctic-fox.gif" alt="полярная лиса"></h2>
@@ -86,7 +88,7 @@
     </div>
 
     <div class="row">
-        <div class="col">
+        <div class="col-lg-6 offset-lg-3 col-md-8 offset-md-2">
             <div id="result-container">
             </div>
         </div>

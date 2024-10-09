@@ -28,6 +28,12 @@ public sealed class Book
     #region Properties
 
     /// <summary>
+    ///
+    /// </summary>
+    [JsonPropertyName ("selected")]
+    public bool Selected { get; set; }
+
+    /// <summary>
     /// Идентификатор (шифр в базе).
     /// </summary>
     [JsonPropertyName ("id")]

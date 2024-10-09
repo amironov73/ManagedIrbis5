@@ -71,18 +71,24 @@ internal sealed class Storehouse
     private readonly string _kladovkaConnectionString;
     private readonly ILogger _logger;
 
+    private bool _skipDbConnection;
     private DbConnection? _dataConnection;
     private SyncConnection? _irbisConnection;
 
     private SyncConnection GetIrbis() => _irbisConnection
         ?? GetIrbisConnection (_irbisConnectionString);
 
-    private static SyncConnection GetIrbisConnection
+    private SyncConnection GetIrbisConnection
         (
             string connectionString
         )
     {
         Sure.NotNullNorEmpty (connectionString);
+
+        if (_skipDbConnection)
+        {
+            throw new DataException();
+        }
 
         try
         {
@@ -94,6 +100,7 @@ internal sealed class Storehouse
         }
         catch (Exception exception)
         {
+            _skipDbConnection = true;
             Magna.Logger.LogError
                 (
                     exception,
@@ -216,29 +223,37 @@ internal sealed class Storehouse
         )
     {
         var result = new List<Exemplar>();
-        foreach (var field in record.EnumerateField (910))
-        {
-            result.Add (ConvertExemplar (field));
-        }
 
-        if (result.Count (x => x.Amount != 0) > 1)
+        try
         {
-            var siglas = result
-                .Where (x => x.Status == "u")
-                .Select (x => x.Sigla).Distinct().ToArray();
-            foreach (var sigla in siglas)
+            foreach (var field in record.EnumerateField (910))
             {
-                var one = new Exemplar
-                {
-                    Status = "u",
-                    Sigla = sigla,
-                    Amount = result
-                        .Where (x => x.Status == "u" && x.Sigla == sigla)
-                        .Sum (x => x.Amount)
-                };
-                result.RemoveAll (x => x.Sigla == sigla);
-                result.Add (one);
+                result.Add (ConvertExemplar (field));
             }
+
+            if (result.Count (x => x.Amount != 0) > 1)
+            {
+                var siglas = result
+                    .Where (x => x.Status == "u")
+                    .Select (x => x.Sigla).Distinct().ToArray();
+                foreach (var sigla in siglas)
+                {
+                    var one = new Exemplar
+                    {
+                        Status = "u",
+                        Sigla = sigla,
+                        Amount = result
+                            .Where (x => x.Status == "u" && x.Sigla == sigla)
+                            .Sum (x => x.Amount)
+                    };
+                    result.RemoveAll (x => x.Sigla == sigla);
+                    result.Add (one);
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError (exception, nameof (ConvertExemplars));
         }
 
         return result.ToArray();
