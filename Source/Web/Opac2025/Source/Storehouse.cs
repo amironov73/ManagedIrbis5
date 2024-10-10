@@ -439,7 +439,7 @@ internal sealed class Storehouse
             Database = database,
             Expression = expression,
             NumberOfRecords = 200,
-            Format = "@brief"
+            Format = "@opac"
         };
         var found = irbis.Search(parameters);
         if (found is null or [])

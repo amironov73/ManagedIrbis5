@@ -7,7 +7,7 @@
 .book-card {
     border: gray solid thin;
     border-radius: 2mm;
-    background: rgb(237, 237, 237) url("../img/paper-brown.jpg");
+    background: url("../img/paper-brown.jpg");
     background-size: cover;
     margin: 1em 0;
     padding: 1em;
@@ -80,4 +80,8 @@
     margin-right: 1em;
     white-space: nowrap;
     word-wrap: break-word;
+}
+
+.mfn {
+    font-size: small;
 }
