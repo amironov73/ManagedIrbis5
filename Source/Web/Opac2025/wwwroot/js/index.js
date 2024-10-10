@@ -232,6 +232,9 @@ function createRow() {
     const input = document.createElement('input')
     input.classList.add('form-control')
     input.type = 'text'
+    $(input).autocomplete({
+        source: handleAutocomplete,
+    })
     inputGroup.appendChild(input)
 
     const div = document.createElement('div')
@@ -291,6 +294,16 @@ function addRow() {
     fillTheRow(inputRows [inputRows.length - 1], 0)
 
     return false
+}
+
+function handleAutocomplete(request, callback) {
+    const db = 'ISTU' // брать из верхнего выпадающего списка
+    const prefix = 'K=' // брать из левого выпадающего списка
+    const text = request.term
+    axios.get(baseURL + 'complete?&db=' + db + '&prefix=' + prefix + '&text=' + text)
+        .then(function (response) {
+            callback(response.data)
+        })
 }
 
 setTimeout(function () {

@@ -6,18 +6,31 @@ ref(l(|I=|v933),
 |. &ndash; |v934,
 |. &ndash; т. |v935,
 |. &ndash; № |v936,
-'.'
-fi
+fi,
+
+/* Автор общей части
+if p(v461^x) then
+  v461^x,
+  '.', '<br>',
+fi,
 
 /* Общая часть
 if p(v461) then
    v461^c, | : |v461^e, | / |v461^f,
+   |. &ndash; |v461^d,
+   | : |v461^g,
+   if p(v461^h) then
+   ', ', v461^h,
+     if p(v461^z) then 
+       if v461^z<>v461^h then '-', v461^z fi,
+     fi,
+   fi,
    '.', '<br>',
 fi,
 
 /* Первый автор
 v700^a, " ("v700^1")", " "v700^d, " ("v700^r")",
-if p(v700^g) then ", "v700^g, else ", "v700^e, fi,
+if p(v700^g) then ", "v700^g, else ", "v700^b, fi,
 " ("v700^f")", " ("v700^p")",
 ".<br>"d700^a,
 
@@ -43,7 +56,7 @@ fi
 
 /* Выходные данные
 if p(v210) then '.' fi,
-" &ndash; "v210^a, " : "v210^c, ", "v210^d,
+" &ndash; "v210^a, " : "v210^c, ", "v210^d, "-"v210^e,
 
 /* Физические характеристики
 (if p(v215) then '.',
@@ -52,6 +65,10 @@ if v215^c*1.1='-'then " : "v215^c*2 else
 " : "v215^c,
 fi,
 fi),
+
+/* Периодичность
+if p(v110^d) then, '. &ndash; Выходит ', &uf('K110d.mnu|',v110^d,"^x"v110^x),
+else ". &ndash; Периодичность: "v110^x, fi,
 
 /* Библиография
 |. &ndash; |v320,
@@ -67,6 +84,21 @@ fi)
   |. &ndash; ISBN |v10^a,
   if p(v10^d) then '. &ndash; ', v10^d, | |v10^c, | руб.|n10^c, fi,
 fi)
+
+/* ISSN
+(if p(v11) then
+  |. &ndash; ISSN |v11^a,
+fi)
+
+/* Язык основного текста
+if p(v101) and v101 <> 'rus' then 
+ '. &ndash; ',
+ if &uf('+N101') = '1' then 'Язык: ' else 'Языки: ' fi,
+ (if p (v101) then,
+ if &uf('+90') <> '1' then ', ' fi,
+ &uf('Q',&uf('Kjz.mnu\',v101)),
+ fi,)
+fi,
 
 /* Вид и тип
 (if p(v203) then
@@ -86,33 +118,35 @@ fi,
 
 /* Рубрики
 if s(v331,v600,v601,v606^a,v607^a,v610) <> '' then '<br>' fi,
-if s(v606^a,v607^a) <> '' then '<br>Рубрики: ' fi,
+if s(v606^a,v607^a) <> '' then '<br><strong>Рубрики</strong>: ' fi,
 (if p(v606^a) then
- '<br>', v606^a, | &ndash; |v606^b, | &ndash; |v606^c, | &ndash; |v606^d,
+ '<br>', &uf('+90'), '. ',
+ v606^a, | &ndash; |v606^b, | &ndash; |v606^c, | &ndash; |v606^d,
  '.'
 fi),
 (if p(v607^a) then
-'<br>', v607^a, | &ndash; |v607^b, | &ndash; |v607^c, | &ndash; |v607^d,
-'.',
+ '<br>', &uf('+90'), '. ',
+ v607^a, | &ndash; |v607^b, | &ndash; |v607^c, | &ndash; |v607^d,
+ '.',
 fi)
 
 /* Ключевые слова
 if s(v606^a,v607^a) <> '' then '<br>' fi,
-if p(v610) then '<br>Ключевые слова: ' fi,
+if p(v610) then '<br><strong>Ключевые слова</strong>: ' fi,
 | &ndash; |+v610^*,
 
 /* Классификационные индексы
-if s(v621, v675, v686, v964) <> '' then '<br>' fi,
-"<br>УДК: "v675^*+| + |"."
-"<br>ББК: "v621^*+| + |"."
-"<br>ГРНТИ: "v964^*+| + |"."
-"<br>Индекс: "v686^*+| + |"."
+if (s(v606^a,v607^a) = '' or v610 <> '') 
+  and s(v621, v675, v686, v964) <> '' then '<br>' fi,
+"<br><strong>УДК</strong>: "v675^*+| + |"."
+"<br><strong>ББК</strong>: "v621^*+| + |"."
+"<br><strong>ГРНТИ</strong>: "v964^*+| + |"."
+"<br><strong>Индекс</strong>: "v686^*+| + |"."
 
 /* Аннотация
-(if p(v331) then '<br>', v331, fi,)
+if p(v331) then '<br><br><strong>Аннотация:</strong>' fi, 
+(if p(v331) then '<br>', v331, '.' fi,)
 
-'.',
-
-'<br><br>MFN: ', f(mfn,0,0),
+'<br><br><span class="mfn">MFN: ', f(mfn,0,0),'</span>'
 
 &uf('!')

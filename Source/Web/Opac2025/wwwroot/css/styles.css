@@ -6,7 +6,7 @@
 
 .book-card {
     border: gray solid thin;
-    border-radius: 2mm;
+    border-radius: 1mm;
     background: url("../img/paper-brown.jpg");
     background-size: cover;
     margin: 1em 0;
@@ -83,5 +83,6 @@
 }
 
 .mfn {
+    color: green;
     font-size: small;
 }
